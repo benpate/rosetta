@@ -6,7 +6,7 @@ require (
 	github.com/benpate/derp v0.22.2
 	github.com/benpate/exp v0.1.4
 	github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.3
 )
 
 require (
