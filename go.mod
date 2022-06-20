@@ -6,7 +6,7 @@ require (
 	github.com/benpate/derp v0.22.2
 	github.com/benpate/exp v0.1.4
 	github.com/microcosm-cc/bluemonday v1.0.18
-	github.com/stretchr/testify v1.7.3
+	github.com/stretchr/testify v1.7.4
 )
 
 require (
@@ -14,6 +14,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/net v0.0.0-20220617184016-355a448f1bc9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
