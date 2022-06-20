@@ -1,10 +1,10 @@
 # path 🏞
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/path)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/path/Go/main)](https://github.com/benpate/rosetta/path/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/path.svg?style=flat-square)](https://codecov.io/gh/benpate/path)
+[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/path/Go/main)](https://github.com/benpate/rosetta/path/actions/workflows/go.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/path.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/path)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/path?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/path)
-[![Version](https://img.shields.io/github/v/release/benpate/path?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/path/releases)
+[![Version](https://img.shields.io/github/v/release/benpate/rosetta/path?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/path/releases)
 
 ## Resolve data from arbitrary structures
 

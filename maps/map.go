@@ -7,17 +7,17 @@ import (
 	"github.com/benpate/rosetta/path"
 )
 
-// Map implements some quality of life extensions to a standard map[string]interface{}
-type Map map[string]interface{}
+// Map implements some quality of life extensions to a standard map[string]any
+type Map map[string]any
 
-// NewMap returns a fully initialized Map object.
-func NewMap() Map {
-	return Map(map[string]interface{}{})
+// New returns a fully initialized Map object.
+func New() Map {
+	return Map(map[string]any{})
 }
 
 // AsMapOfInterface returns the underlying map datastructure
-func (m Map) AsMapOfInterface() map[string]interface{} {
-	return map[string]interface{}(m)
+func (m Map) AsMapOfInterface() map[string]any {
+	return map[string]any(m)
 }
 
 // GetKeys returns all keys of the underlying map
@@ -34,7 +34,7 @@ func (m Map) GetKeys() []string {
 }
 
 // GetInterface returns a named option without any conversion.  You get what you get.
-func (m Map) GetInterface(name string) interface{} {
+func (m Map) GetInterface(name string) any {
 	return m[name]
 }
 
@@ -78,7 +78,7 @@ func (m Map) GetSliceOfFloat(name string) []float64 {
 	return convert.SliceOfFloat(m[name])
 }
 
-// GetSliceOfMap returns a named option as a slice of map.Map objects.
+// GetSliceOfMap returns a named option as a slice of maps.Map objects.
 func (m Map) GetSliceOfMap(name string) []Map {
 	value := convert.SliceOfMap(m[name])
 	result := make([]Map, len(value))
@@ -90,14 +90,14 @@ func (m Map) GetSliceOfMap(name string) []Map {
 	return result
 }
 
-// GetMap returns a named option as a map.Map
+// GetMap returns a named option as a maps.Map
 func (m Map) GetMap(name string) Map {
 
 	if value, ok := m[name].(Map); ok {
 		return value
 	}
 
-	if value, ok := m[name].(map[string]interface{}); ok {
+	if value, ok := m[name].(map[string]any); ok {
 		return Map(value)
 	}
 
@@ -138,7 +138,7 @@ func (m Map) SetString(name string, value string) {
  ****************************/
 
 // GetPath implements the path.Getter interface
-func (m Map) GetPath(name string) (interface{}, bool) {
+func (m Map) GetPath(name string) (any, bool) {
 
 	head, tail := list.Split(name, ".")
 
@@ -151,7 +151,7 @@ func (m Map) GetPath(name string) (interface{}, bool) {
 }
 
 // SetPath implements the path.Setter interface
-func (m Map) SetPath(name string, value interface{}) error {
+func (m Map) SetPath(name string, value any) error {
 
 	head, tail := list.Split(name, ".")
 
@@ -176,7 +176,7 @@ func (m Map) DeletePath(name string) error {
 	temp := m[head]
 
 	if err := path.Delete(temp, tail); err != nil {
-		return derp.Wrap(err, "map.Map.DeletePath", "Error deleting from child element")
+		return derp.Wrap(err, "maps.Map.DeletePath", "Error deleting from child element")
 	}
 
 	m[head] = temp

@@ -7,6 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNew(t *testing.T) {
+
+	m := New()
+	require.Equal(t, map[string]any{}, m.AsMapOfInterface())
+}
+
 func TestMapGet(t *testing.T) {
 
 	m := Map{"hello": "there", "general": "kenobi", "intValue": 69, "boolValue": true, "floatValue": 42.1}

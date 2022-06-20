@@ -1,10 +1,10 @@
 # Compare
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/compare)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/compare/Go/main)](https://github.com/benpate/rosetta/compare/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/compare.svg?style=flat-square)](https://codecov.io/gh/benpate/compare)
+[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/compare/Go/main)](https://github.com/benpate/rosetta/compare/actions/workflows/go.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/compare.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/compare)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/compare?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/compare)
-[![Version](https://img.shields.io/github/v/release/benpate/compare?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/compare/releases)
+[![Version](https://img.shields.io/github/v/release/benpate/rosetta/compare?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/compare/releases)
 
 ## Easy Comparisions in Go
 

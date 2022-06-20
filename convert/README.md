@@ -1,10 +1,10 @@
 # convert 🚀
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/convert)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/convert/Go/main)](https://github.com/benpate/rosetta/convert/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/convert.svg?style=flat-square)](https://codecov.io/gh/benpate/convert)
+[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/convert/Go/main)](https://github.com/benpate/rosetta/convert/actions/workflows/go.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/convert.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/convert)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/convert?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/convert)
-[![Version](https://img.shields.io/github/v/release/benpate/convert?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/convert/releases)
+[![Version](https://img.shields.io/github/v/release/benpate/rosetta/convert?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/convert/releases)
 
 ## Type Conversion Sugar
 

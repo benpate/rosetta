@@ -1,10 +1,10 @@
-# HTMLConv 🤓
+# HTML 🤓
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/html)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/html/Go/main)](https://github.com/benpate/rosetta/html/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/html.svg?style=flat-square)](https://codecov.io/gh/benpate/html)
+[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/html/Go/main)](https://github.com/benpate/rosetta/html/actions/workflows/go.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/html.svg?style=flat-square)](https://codecov.io/gh/benpate/html)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/html?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/html)
-[![Version](https://img.shields.io/github/v/release/benpate/html?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/html/releases)
+[![Version](https://img.shields.io/github/v/release/benpate/rosetta/html?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/html/releases)
 
 ## Simple Go (golang) library for manipulating HTML content
 
