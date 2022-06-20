@@ -3,15 +3,8 @@ module github.com/benpate/rosetta
 go 1.18
 
 require (
-	github.com/benpate/rosetta/compare v0.1.3
-	github.com/benpate/rosetta/convert v0.13.5
 	github.com/benpate/derp v0.22.2
 	github.com/benpate/exp v0.1.4
-	github.com/benpate/htmlconv v0.3.3
-	github.com/benpate/rosetta/list v0.4.2
-	github.com/benpate/rosetta/null v0.6.4
-	github.com/benpate/rosetta/path v0.8.4
-	github.com/benpate/rosetta/schema v0.15.1
 	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/stretchr/testify v1.7.2
 )

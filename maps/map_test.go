@@ -1,4 +1,4 @@
-package datatype
+package maps
 
 import (
 	"testing"

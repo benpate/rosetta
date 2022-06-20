@@ -16,12 +16,13 @@ All of these packages pre-date Go generics, and many are being refactored to tak
 
 * [Convert](convert) between arbitrary data types with sensible, configurable defaults.
 * [Compare](compare) values of unknown data types.
-* [Nullable](null) values with strong type protections.
+* [HTML](html) conversion tools
+* [Nullable](null) values with strong type
 * [Path getter/setter](path) for generic, complex data structures
 * [Schema](schema) validation based on JSON Schema
 ### Enhanced Data Types
 * [List](list) parsing library
-* [Map](map) data type with type safe getters/setters
+* [Map](maps) data type with type safe getters/setters
 * [Null](null)-able data types
 * [Slice](slice) manipulation library
 ## Pull Requests Welcome
