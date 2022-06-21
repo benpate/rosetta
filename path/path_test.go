@@ -3,142 +3,18 @@ package path
 import (
 	"testing"
 
-	"github.com/benpate/rosetta/list"
 	"github.com/stretchr/testify/require"
 )
 
-func TestProperties(t *testing.T) {
+func TestSplit(t *testing.T) {
 
-	d := getTestData()
+	head, tail := Split("head.tail.tail.tail")
 
-	{
-		value := Get(d, "name")
-		require.Equal(t, "John Connor", value)
-	}
-
-	{
-		value := Get(d, "email")
-		require.Equal(t, "john@connor.mil", value)
-	}
-
-	{
-		value := Get(d, "missing property")
-		require.Nil(t, value)
-	}
+	require.Equal(t, "head", head)
+	require.Equal(t, "tail.tail.tail", tail)
 }
 
-func TestSubProperties(t *testing.T) {
-
-	d := getTestData()
-
-	{
-		value := Get(d, "relatives.mom")
-		require.Equal(t, "Sarah Connor", value)
-	}
-
-	{
-		value := Get(d, "relatives.dad")
-		require.Equal(t, "Kyle Reese", value)
-	}
-
-	{
-		value := Get(d, "relatives.sister")
-		require.Nil(t, value)
-	}
-}
-
-func TestArrays(t *testing.T) {
-
-	d := getTestData()
-
-	{
-		value := Get(d, "enemies.0")
-		require.Equal(t, "T-1000", value)
-	}
-
-	{
-		value := Get(d, "enemies.1")
-		require.Equal(t, "T-3000", value)
-	}
-
-	{
-		value := Get(d, "enemies.2")
-		require.Equal(t, "T-5000", value)
-	}
-
-	{
-		value := Get(d, "enemies.-1")
-		require.Nil(t, value)
-	}
-
-	{
-		value := Get(d, "enemies.3")
-		require.Nil(t, value)
-	}
-
-	{
-		value := Get(d, "enemies.100000")
-		require.Nil(t, value)
-	}
-
-	{
-		value := Get(d, "enemies.fred")
-		require.Nil(t, value)
-	}
-}
-
-func TestError(t *testing.T) {
-
-	{
-		value := Get("unsupported data", "property")
-		require.Nil(t, value)
-	}
-
-	{
-		value := Get("string at the end of a path", "")
-		require.Equal(t, "string at the end of a path", value)
-	}
-}
-
-func TestGetter(t *testing.T) {
-
-	d := getTestStruct()
-
-	{
-		value := Get(d, "name")
-		require.Equal(t, "John Connor", value)
-	}
-
-	{
-		value := Get(d, "email")
-		require.Equal(t, "john@connor.mil", value)
-	}
-
-	{
-		value := Get(d, "relatives.0.name")
-		require.Equal(t, "Sarah Connor", value)
-	}
-
-	{
-		value := Get(d, "relatives.1.relatives.1.name")
-		require.Equal(t, "Sarah Connor", value)
-	}
-
-	{
-		value := Get(d, "missing-property")
-		require.Nil(t, value)
-	}
-}
-
-func TestSet(t *testing.T) {
-
-	d := getTestData()
-
-	// Not implemented yet, so this should just error
-	require.NotNil(t, Set(d, "anywhere.doesnt.matter", "1"))
-}
-
-func TestParseIntInRange(t *testing.T) {
+func TestIndex(t *testing.T) {
 
 	// Test valid index value
 	{
@@ -198,7 +74,7 @@ func (d testStruct) GetPath(path string) (interface{}, bool) {
 		return d, true
 	}
 
-	head, tail := list.Split(path, ".")
+	head, tail := Split(path)
 
 	switch head {
 
@@ -223,7 +99,7 @@ func (d testStructArray) GetPath(path string) (interface{}, bool) {
 		return d, true
 	}
 
-	head, tail := list.Split(path, ".")
+	head, tail := Split(path)
 	index, err := Index(head, len(d))
 
 	if err != nil {

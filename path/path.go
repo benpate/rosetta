@@ -51,22 +51,40 @@ func GetOK(object interface{}, path string) (interface{}, bool) {
 		return obj.GetPath(path)
 
 	case []Getter:
-		return getSliceOfGetter(obj, path)
+		return getFromSliceGeneric(obj, path)
 
 	case []string:
-		return getFromSliceOfString(obj, path)
+		return getFromSliceGeneric(obj, path)
 
 	case []int:
-		return getSliceOfInt(obj, path)
+		return getFromSliceGeneric(obj, path)
 
-	case []interface{}:
-		return getSliceOfInterface(obj, path)
+	case []int64:
+		return getFromSliceGeneric(obj, path)
+
+	case []float64:
+		return getFromSliceGeneric(obj, path)
+
+	case []any:
+		return getFromSliceGeneric(obj, path)
+
+	case map[string]Getter:
+		return getFromMapOfGeneric(obj, path)
 
 	case map[string]string:
-		return getMapOfString(obj, path)
+		return getFromMapOfGeneric(obj, path)
 
-	case map[string]interface{}:
-		return getMapOfInterface(obj, path)
+	case map[string]int:
+		return getFromMapOfGeneric(obj, path)
+
+	case map[string]int64:
+		return getFromMapOfGeneric(obj, path)
+
+	case map[string]float64:
+		return getFromMapOfGeneric(obj, path)
+
+	case map[string]any:
+		return getFromMapOfGeneric(obj, path)
 
 	default:
 		return GetWithReflection(reflect.ValueOf(obj), path)
@@ -161,5 +179,6 @@ func Index(value string, maximum int) (int, error) {
 
 // Split splits the path into head and tail strings (separated by ".")
 func Split(path string) (string, string) {
-	return list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
+	return head, tail.String()
 }

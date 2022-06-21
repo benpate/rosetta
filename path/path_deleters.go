@@ -2,7 +2,6 @@ package path
 
 import (
 	"github.com/benpate/derp"
-	"github.com/benpate/rosetta/list"
 )
 
 func deleteSliceOfString(path string, object []string) error {
@@ -23,7 +22,7 @@ func deleteSliceOfInterface(path string, object []interface{}) error {
 
 func deleteMapOfString(path string, object map[string]string) error {
 
-	head, tail := list.Split(path, ".")
+	head, tail := Split(path)
 
 	if tail != "" {
 		return derp.NewInternalError("path.deleteMapOfString", "Cannot delete sub-elements of string", path)
@@ -35,7 +34,7 @@ func deleteMapOfString(path string, object map[string]string) error {
 
 func deleteMapOfInterface(name string, object map[string]interface{}) error {
 
-	head, tail := list.Split(name, ".")
+	head, tail := Split(name)
 
 	if tail != "" {
 		return Delete(object[head], tail)
