@@ -140,42 +140,42 @@ func (m Map) SetString(name string, value string) {
 // GetPath implements the path.Getter interface
 func (m Map) GetPath(name string) (any, bool) {
 
-	head, tail := list.Split(name, ".")
+	head, tail := list.Dot(name).Split()
 
-	if tail == "" {
+	if tail.IsEmpty() {
 		result, ok := m[head]
 		return result, ok
 	}
 
-	return path.GetOK(m[head], tail)
+	return path.GetOK(m[head], tail.String())
 }
 
 // SetPath implements the path.Setter interface
 func (m Map) SetPath(name string, value any) error {
 
-	head, tail := list.Split(name, ".")
+	head, tail := list.Dot(name).Split()
 
-	if tail == "" {
+	if tail.IsEmpty() {
 		m[head] = value
 		return nil
 	}
 
-	return path.Set(m[head], tail, value)
+	return path.Set(m[head], tail.String(), value)
 }
 
 // DeletePath implements the path.Deleter interface
 func (m Map) DeletePath(name string) error {
 
-	head, tail := list.Split(name, ".")
+	head, tail := list.Dot(name).Split()
 
-	if tail == "" {
+	if tail.IsEmpty() {
 		delete(m, head)
 		return nil
 	}
 
 	temp := m[head]
 
-	if err := path.Delete(temp, tail); err != nil {
+	if err := path.Delete(temp, tail.String()); err != nil {
 		return derp.Wrap(err, "maps.Map.DeletePath", "Error deleting from child element")
 	}
 

@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 	require.Equal(t, map[string]any{}, m.AsMapOfInterface())
 }
 
-func TestMapGet(t *testing.T) {
+func TestMap_Get(t *testing.T) {
 
 	m := Map{"hello": "there", "general": "kenobi", "intValue": 69, "boolValue": true, "floatValue": 42.1}
 
@@ -54,7 +54,20 @@ func TestMapGet(t *testing.T) {
 	require.Nil(t, m.GetInterface("mising"))
 }
 
-func TestMapSet(t *testing.T) {
+func TestMap_GetPath(t *testing.T) {
+
+	m := Map{
+		"slice": []string{"zero", "one", "two", "three"},
+	}
+
+	// require.Equal(t, []string{"zero", "one", "two", "three"}, path.Get(m, "slice"))
+	require.Equal(t, "zero", path.Get(m, "slice.0"))
+	require.Equal(t, "one", path.Get(m, "slice.1"))
+	require.Equal(t, "two", path.Get(m, "slice.2"))
+	require.Equal(t, "three", path.Get(m, "slice.3"))
+}
+
+func TestMap_Set(t *testing.T) {
 
 	m := Map{}
 
@@ -72,7 +85,7 @@ func TestMapSet(t *testing.T) {
 	require.Equal(t, "John Doe", m.GetString("string"))
 }
 
-func TestMapSetPath(t *testing.T) {
+func TestMap_SetPath(t *testing.T) {
 
 	m := Map{"stringValue": "kenobi", "intValue": 69, "boolValue": true}
 
@@ -87,10 +100,14 @@ func TestMapSetPath(t *testing.T) {
 	// Add a slice of strings to the map
 	path.Set(m, "slice", []string{"hello", "there", "general", "kenobi"})
 
+	x, ok := m.GetPath("slice")
+	require.True(t, ok)
+	require.Equal(t, []string{"hello", "there", "general", "kenobi"}, x)
+
 	{
 		value, ok := path.GetOK(m, "slice.0")
-		require.True(t, ok)
 		require.Equal(t, "hello", value)
+		require.True(t, ok)
 	}
 
 	{
