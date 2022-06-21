@@ -35,7 +35,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 		object.Set(reflect.MakeMap(mapType))
 	}
 
-	head, tail := list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
 
 	// Try to find the matching property in this schema
 	property, ok := element.Properties[head]
@@ -50,7 +50,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 
 	// If the value already exists, then try to update it
 	if subValue.CanSet() {
-		if err = property.Set(subValue, tail, value); err != nil {
+		if err = property.Set(subValue, tail.String(), value); err != nil {
 			return derp.Wrap(err, location, "Error setting sub-element", path, value)
 		}
 	}
@@ -58,7 +58,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 	// Fall through means we're adding a new value ot the map
 	newValue := reflect.New(property.Type()).Elem()
 
-	if err := property.Set(newValue, tail, value); err != nil {
+	if err := property.Set(newValue, tail.String(), value); err != nil {
 		return derp.Wrap(err, location, "Error setting sub-element", path, value)
 	}
 

@@ -46,7 +46,7 @@ func addPath(path string, err error) error {
 
 	switch e := err.(type) {
 	case ValidationError:
-		e.Path = list.PushHead(e.Path, path, ".")
+		e.Path = list.Dot(e.Path).PushHead(path).String()
 		return e
 
 	case derp.MultiError:

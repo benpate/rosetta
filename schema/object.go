@@ -33,7 +33,7 @@ func (element Object) Get(object reflect.Value, path string) (any, Element, erro
 	}
 
 	// Find the property in the schema
-	head, tail := list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
 	property, ok := element.Properties[head]
 
 	if !ok {
@@ -46,7 +46,7 @@ func (element Object) Get(object reflect.Value, path string) (any, Element, erro
 
 	case reflect.Map:
 		valueOf := object.MapIndex(reflect.ValueOf(head))
-		return property.Get(valueOf, tail)
+		return property.Get(valueOf, tail.String())
 
 	case reflect.Struct:
 		valueOf, err := findFieldByTag(object, head)
@@ -55,10 +55,10 @@ func (element Object) Get(object reflect.Value, path string) (any, Element, erro
 			return nil, property, derp.NewInternalError("schema.Object.Get", "Property does not exist in object", object, path)
 		}
 
-		return property.Get(valueOf, tail)
+		return property.Get(valueOf, tail.String())
 	}
 
-	return property.Get(reflect.ValueOf(nil), tail)
+	return property.Get(reflect.ValueOf(nil), tail.String())
 }
 
 // Set validates/formats a value using this schema

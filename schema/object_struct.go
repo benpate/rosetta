@@ -23,7 +23,7 @@ func (element Object) setStruct(object reflect.Value, path string, value any) er
 		return derp.NewInternalError(location, "Cannot set struct value directly.  Set sub-items instead.", value)
 	}
 
-	head, tail := list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
 
 	// Try to find the matching property in this schema
 	property, ok := element.Properties[head]
@@ -40,7 +40,7 @@ func (element Object) setStruct(object reflect.Value, path string, value any) er
 	}
 
 	// Try to put the value into the object
-	if err := property.Set(field, tail, value); err != nil {
+	if err := property.Set(field, tail.String(), value); err != nil {
 		return derp.Wrap(err, location, "Error creating value of sub-element", path, value)
 	}
 

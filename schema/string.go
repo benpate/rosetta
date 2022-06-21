@@ -169,10 +169,10 @@ func (element String) formatFunctions() []format.StringFormat {
 
 	for _, arg := range params {
 
-		name, arg := list.Split(arg, "=")
+		name, value := list.Equal(arg).Split()
 
 		if formatFunction, ok := formats[name]; ok {
-			result = append(result, formatFunction(arg))
+			result = append(result, formatFunction(value.String()))
 		}
 	}
 

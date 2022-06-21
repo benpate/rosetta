@@ -35,7 +35,7 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 		return convert.Interface(object), element, nil
 	}
 
-	head, tail := list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 		}
 
 		result := object.Index(index)
-		return element.Items.Get(result, tail)
+		return element.Items.Get(result, string(tail))
 
 	}
 
@@ -82,7 +82,7 @@ func (element Array) Set(object reflect.Value, path string, value any) error {
 	}
 
 	// Try to calculate the array index
-	head, tail := list.Split(path, ".")
+	head, tail := list.Dot(path).Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
@@ -125,7 +125,7 @@ func (element Array) Set(object reflect.Value, path string, value any) error {
 	// Try to set the result into this object
 	subObject := object.Index(index)
 
-	if err := element.Items.Set(subObject, tail, value); err != nil {
+	if err := element.Items.Set(subObject, string(tail), value); err != nil {
 		return derp.Wrap(err, location, "Error setting array index")
 	}
 
