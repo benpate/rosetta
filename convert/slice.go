@@ -2,6 +2,7 @@ package convert
 
 import (
 	"reflect"
+	"strings"
 )
 
 // SliceOfString converts the value into a slice of strings.
@@ -67,6 +68,26 @@ func SliceOfString(value interface{}) []string {
 
 	// Fall through is failure.  This is a nothing
 	return make([]string, 0)
+}
+
+// SplitSliceOfString splits is a special case of SliceOfString.  If it receives a string, Stringer, or reflect.String,
+// it will make a slice of strings by splitting the value into a slice.  All other values are passed to SliceOfString
+// to be processed normally.
+func SplitSliceOfString(value any, sep string) []string {
+
+	if sep != "" {
+
+		switch value := value.(type) {
+		case string:
+			return strings.Split(value, sep)
+		case reflect.Value:
+			return SplitSliceOfString(value.Interface(), sep)
+		case Stringer:
+			return strings.Split(value.String(), sep)
+		}
+	}
+
+	return SliceOfString(value)
 }
 
 // SliceOfInt converts the value into a slice of ints.

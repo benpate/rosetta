@@ -16,6 +16,7 @@ type Array struct {
 	MinLength null.Int
 	MaxLength null.Int
 	Required  bool
+	Delimiter string
 }
 
 // Type returns the reflection type of this Element
@@ -31,10 +32,26 @@ func (element Array) IsRequired() bool {
 // Find locates a child of this element
 func (element Array) Get(object reflect.Value, path string) (any, Element, error) {
 
+	// Validate that we have the right type of object
+	switch object.Kind() {
+	case reflect.Array, reflect.Slice:
+		// Move along, these types are good.
+
+	case reflect.String:
+		// Strings can be split into arrays
+		object = reflect.ValueOf(convert.SplitSliceOfString(object, element.Delimiter))
+
+	default:
+		// All other types are invalid.
+		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Value must be an array, slice, or a string that can be split into an array.", object, path)
+	}
+
+	// If the request is for this object, then convert it from
 	if path == "" {
 		return convert.Interface(object), element, nil
 	}
 
+	// Finf (and validate) the requested array index
 	head, tail := list.Dot(path).Split()
 	index, err := strconv.Atoi(head)
 
@@ -46,19 +63,12 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (less than zero)", path)
 	}
 
-	switch object.Kind() {
-	case reflect.Array, reflect.Slice:
-
-		if index >= object.Len() {
-			return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
-		}
-
-		result := object.Index(index)
-		return element.Items.Get(result, string(tail))
-
+	if index >= object.Len() {
+		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
 	}
 
-	return nil, element, derp.NewBadRequestError("schema.Array.Find", "Value is not an array", object, path)
+	result := object.Index(index)
+	return element.Items.Get(result, string(tail))
 }
 
 // Set formats/validates a generic value using this schema

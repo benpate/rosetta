@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/benpate/rosetta/null"
@@ -42,4 +43,40 @@ func TestArrayValidation(t *testing.T) {
 		err := s.Validate(17)
 		require.NotNil(t, err)
 	}
+}
+
+func TestArrayGet(t *testing.T) {
+	s := &Array{Items: &String{}}
+
+	v := []string{"zero", "one", "two", "three"}
+
+	{
+		result, _, err := s.Get(reflect.ValueOf(v), "0")
+		require.Nil(t, err)
+		require.Equal(t, "zero", result)
+	}
+
+	{
+		// Test that negaitve indexes are handled correctly
+		result, _, err := s.Get(reflect.ValueOf(v), "-1")
+		require.NotNil(t, err)
+		require.Nil(t, result)
+	}
+
+	{
+		// Test that negaitve indexes are handled correctly
+		result, _, err := s.Get(reflect.ValueOf(v), "notanumber")
+		require.NotNil(t, err)
+		require.Nil(t, result)
+	}
+}
+
+func TestArraySplit(t *testing.T) {
+	s := &Array{Items: &String{}}
+
+	v := "zero,one,two,three"
+
+	result, _, err := s.Get(reflect.ValueOf(v), "0")
+	require.Nil(t, err)
+	require.Equal(t, "zero", result)
 }
