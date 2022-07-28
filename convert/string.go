@@ -5,12 +5,12 @@ import (
 	"io"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 // String forces a conversion from an arbitrary value into an string.
 // If the value cannot be converted, then the default value for the type is used.
 func String(value interface{}) string {
-
 	result, _ := StringOk(value, "")
 	return result
 }
@@ -18,7 +18,6 @@ func String(value interface{}) string {
 // StringDefault forces a conversion from an arbitrary value into a string.
 // if the value cannot be converted, then the default value is used.
 func StringDefault(value interface{}, defaultValue string) string {
-
 	result, _ := StringOk(value, defaultValue)
 	return result
 }
@@ -113,4 +112,28 @@ func StringOk(value interface{}, defaultValue string) (string, bool) {
 	}
 
 	return defaultValue, false
+}
+
+func JoinString(value any, delimiter string) string {
+
+	if delimiter != "" {
+
+		switch value := value.(type) {
+
+		case []string:
+			return strings.Join(value, delimiter)
+
+		case []any:
+			result := make([]string, len(value))
+			for index, v := range value {
+				result[index] = String(v)
+			}
+			return strings.Join(result, delimiter)
+
+		case reflect.Value:
+			return JoinString(Interface(value), delimiter)
+		}
+	}
+
+	return String(value)
 }

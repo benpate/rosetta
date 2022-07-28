@@ -80,6 +80,7 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	// Set each value in the schema
 	for path, value := range values {
+
 		// Errors are intentionally ignored here.
 		// Unallowed data does not make it through the schema filter
 		schema.Set(object, path, value)
@@ -113,7 +114,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	// Guarantee that we've been passed a pointer
 	if valueOf.Kind() != reflect.Pointer {
-		return derp.NewInternalError(location, "Must pass a pointer (not a value) to this function.")
+		return derp.NewInternalError(location, "Must pass a pointer (not a value) to this function.", object, path, value)
 	}
 
 	// Now that we KNOW it's a pointer, dereference
