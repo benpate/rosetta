@@ -3,6 +3,8 @@ package schema
 import (
 	"testing"
 
+	"github.com/benpate/rosetta/maps"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -81,5 +83,42 @@ func TestValidateComplexObject(t *testing.T) {
 		require.Equal(t, "123-456-7890", innerMap["phone"])
 		require.Equal(t, "connor.com", innerMap["domain"])
 		// require.Nil(t, innerMap["badValue"])
+	}
+}
+
+func TestGroupID(t *testing.T) {
+
+	spew.Config.DisableMethods = true
+
+	value := maps.Map{
+		"rule": "private",
+		"groupIds": []string{
+			"5fafafafafafafafafafaf",
+			"5fbfbfbfbfbfbfbfbfbfbf",
+			"5fcfcfcfcfcfcfcfcfcfcf",
+		},
+	}
+
+	s := Schema{
+		Element: Object{
+			Properties: map[string]Element{
+				"rule":     String{Default: "anonymous"},
+				"groupIds": Array{Items: String{Format: "objectId"}},
+			},
+		},
+	}
+
+	{
+		result, element, err := s.Get(value, "rule")
+		require.Nil(t, err)
+		require.NotNil(t, element)
+		require.Equal(t, "private", result)
+	}
+
+	{
+		result, element, err := s.Get(value, "groupIds")
+		require.Nil(t, err)
+		require.NotNil(t, element)
+		require.Equal(t, []string{"5fafafafafafafafafafaf", "5fbfbfbfbfbfbfbfbfbfbf", "5fcfcfcfcfcfcfcfcfcfcf"}, result)
 	}
 }

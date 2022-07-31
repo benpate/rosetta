@@ -72,7 +72,7 @@ func TestArrayGet(t *testing.T) {
 }
 
 func TestArraySplit(t *testing.T) {
-	s := &Array{Items: &String{}}
+	s := &Array{Items: &String{}, Delimiter: ","}
 
 	v := "zero,one,two,three"
 

@@ -37,13 +37,17 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 	case reflect.Array, reflect.Slice:
 		// Move along, these types are good.
 
+	case reflect.Interface, reflect.Pointer:
+		// Dereferenced pointers
+		return element.Get(object.Elem(), path)
+
 	case reflect.String:
 		// Strings can be split into arrays
 		object = reflect.ValueOf(convert.SplitSliceOfString(object, element.Delimiter))
 
 	default:
 		// All other types are invalid.
-		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Value must be an array, slice, or a string that can be split into an array.", object, path)
+		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Value must be an array, slice, or a string that can be split into an array.", object.Kind(), path, object.Interface())
 	}
 
 	// If the request is for this object, then convert it from
@@ -56,11 +60,11 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
-		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (not an integer)", path)
+		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (not an integer)", path)
 	}
 
 	if index < 0 {
-		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (less than zero)", path)
+		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (less than zero)", path)
 	}
 
 	if index >= object.Len() {
