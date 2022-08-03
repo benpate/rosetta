@@ -43,6 +43,11 @@ func (m Map) GetString(name string) string {
 	return convert.String(m[name])
 }
 
+// GetBytes returns a named option as a slice of bytes.
+func (m Map) GetBytes(name string) []byte {
+	return convert.Bytes(m[name])
+}
+
 // GetBool returns a named option as a bool type.
 func (m Map) GetBool(name string) bool {
 	return convert.Bool(m[name])
