@@ -1,4 +1,4 @@
-# Rosetta 💐
+# Rosetta 🌹
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta)
 [![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/Go/main)](https://github.com/benpate/rosetta/actions/workflows/go.yml)
