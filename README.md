@@ -14,17 +14,20 @@ All of these packages pre-date Go generics, and many are being refactored to tak
 
 ### What's Included
 
-* [Convert](convert) between arbitrary data types with sensible, configurable defaults.
 * [Compare](compare) values of unknown data types.
+* [Convert](convert) between arbitrary data types with sensible, configurable defaults.
 * [HTML](html) conversion tools
 * [Nullable](null) values with strong type
 * [Path getter/setter](path) for generic, complex data structures
 * [Schema](schema) validation based on JSON Schema
+
 ### Enhanced Data Types
+
 * [List](list) parsing library
 * [Map](maps) data type with type safe getters/setters
 * [Null](null)-able data types
 * [Slice](slice) manipulation library
+
 ## Pull Requests Welcome
 
 While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making Rosetta better, send in a pull request.  We're all in this together! 👍
