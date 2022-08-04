@@ -34,6 +34,11 @@ func (element Array) Get(object reflect.Value, path string) (any, Element, error
 
 	// Validate that we have the right type of object
 	switch object.Kind() {
+
+	case reflect.Invalid:
+		// If the value is invalid (nil) then return nil
+		return nil, element, nil
+
 	case reflect.Array, reflect.Slice:
 		// Move along, these types are good.
 
