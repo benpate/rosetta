@@ -25,8 +25,12 @@ func (element Boolean) IsRequired() bool {
 	return element.Required
 }
 
+func (element Boolean) Get(object any, path string) (any, Element, error) {
+	return element.GetReflect(convert.ReflectValue(object), path)
+}
+
 // Find locates a child of this element
-func (element Boolean) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Boolean) GetReflect(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
@@ -36,7 +40,18 @@ func (element Boolean) Get(object reflect.Value, path string) (any, Element, err
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Boolean) Set(object reflect.Value, path string, value any) error {
+func (element Boolean) Set(object any, path string, value any) error {
+
+	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
+	if setter, ok := object.(PathSetter); ok {
+		return setter.SetPath(path, value)
+	}
+
+	return element.SetReflect(convert.ReflectValue(object), path, value)
+}
+
+// Set formats a value and applies it to the provided object/path
+func (element Boolean) SetReflect(object reflect.Value, path string, value any) error {
 
 	// Cannot set sub-properties of a boolean
 	if path != "" {
@@ -57,6 +72,11 @@ func (element Boolean) Validate(object any) error {
 	}
 
 	return nil
+}
+
+// DefaultValue returns the default value for this element type
+func (element Boolean) DefaultValue() any {
+	return element.Required
 }
 
 // MarshalJSON implements the json.Marshaler interface

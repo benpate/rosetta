@@ -38,8 +38,11 @@ func (element String) IsRequired() bool {
 	return element.Required
 }
 
-// Find locates a child of this element
-func (element String) Get(object reflect.Value, path string) (any, Element, error) {
+func (element String) Get(object any, path string) (any, Element, error) {
+	return element.GetReflect(convert.ReflectValue(object), path)
+}
+
+func (element String) GetReflect(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
@@ -49,7 +52,18 @@ func (element String) Get(object reflect.Value, path string) (any, Element, erro
 }
 
 // Set validates/formats a generic value using this schema
-func (element String) Set(object reflect.Value, path string, value any) error {
+func (element String) Set(object any, path string, value any) error {
+
+	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
+	if setter, ok := object.(PathSetter); ok {
+		return setter.SetPath(path, value)
+	}
+
+	return element.SetReflect(convert.ReflectValue(object), path, value)
+}
+
+// Set validates/formats a generic value using this schema
+func (element String) SetReflect(object reflect.Value, path string, value any) error {
 
 	if path != "" {
 		return derp.NewInternalError("schema.String.Set", "Can't set sub-properties on a string", path, value)
@@ -101,6 +115,11 @@ func (element String) Validate(value any) error {
 	}
 
 	return errorReport
+}
+
+// DefaultValue returns the default value for this element type
+func (element String) DefaultValue() any {
+	return element.Default
 }
 
 // MarshalMap populates object data into a map[string]any

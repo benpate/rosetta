@@ -78,10 +78,12 @@ func getTestSchema() Schema {
 		"type": "object",
 		"properties": {
 			"title": {
-				"type": "string"
+				"type": "string",
+				"required": true
 			},
 			"content": {
-				"type": "string"
+				"type": "string",
+				"required": true
 			},
 			"age": {
 				"description": "Age in years",

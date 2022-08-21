@@ -35,8 +35,11 @@ func (element Number) IsRequired() bool {
 	return element.Required
 }
 
-// Find locates a child of this element
-func (element Number) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Number) Get(object any, path string) (any, Element, error) {
+	return element.GetReflect(convert.ReflectValue(object), path)
+}
+
+func (element Number) GetReflect(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
@@ -54,7 +57,18 @@ func (element Number) Get(object reflect.Value, path string) (any, Element, erro
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Number) Set(object reflect.Value, path string, value any) error {
+func (element Number) Set(object any, path string, value any) error {
+
+	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
+	if setter, ok := object.(PathSetter); ok {
+		return setter.SetPath(path, value)
+	}
+
+	return element.SetReflect(convert.ReflectValue(object), path, value)
+}
+
+// Set formats a value and applies it to the provided object/path
+func (element Number) SetReflect(object reflect.Value, path string, value any) error {
 
 	if path != "" {
 		return derp.NewInternalError("schema.Number.Set", "Can't set sub-properties on a number", path, value)
@@ -113,6 +127,11 @@ func (element Number) Validate(value any) error {
 	}
 
 	return err
+}
+
+// DefaultValue returns the default value for this element type
+func (element Number) DefaultValue() any {
+	return element.Default.Float()
 }
 
 // MarshalMap populates object data into a map[string]any

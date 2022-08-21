@@ -55,7 +55,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 		}
 	}
 
-	// Fall through means we're adding a new value ot the map
+	// Fall through means we're adding a new value to the map
 	newValue := reflect.New(property.Type()).Elem()
 
 	if err := property.Set(newValue, tail.String(), value); err != nil {

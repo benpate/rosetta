@@ -34,8 +34,11 @@ func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-// Find locates a child of this element
-func (element Integer) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Integer) Get(object any, path string) (any, Element, error) {
+	return element.GetReflect(convert.ReflectValue(object), path)
+}
+
+func (element Integer) GetReflect(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
@@ -53,7 +56,18 @@ func (element Integer) Get(object reflect.Value, path string) (any, Element, err
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Integer) Set(object reflect.Value, path string, value any) error {
+func (element Integer) Set(object any, path string, value any) error {
+
+	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
+	if setter, ok := object.(PathSetter); ok {
+		return setter.SetPath(path, value)
+	}
+
+	return element.SetReflect(convert.ReflectValue(object), path, value)
+}
+
+// Set formats a value and applies it to the provided object/path
+func (element Integer) SetReflect(object reflect.Value, path string, value any) error {
 
 	// Cannot set sub-properties of an Integer
 	if path != "" {
@@ -111,6 +125,11 @@ func (element Integer) Validate(value any) error {
 	}
 
 	return err
+}
+
+// DefaultValue returns the default value for this element type
+func (element Integer) DefaultValue() any {
+	return element.Default.Int64()
 }
 
 // MarshalMap populates object data into a map[string]any

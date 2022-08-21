@@ -126,7 +126,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// Try to set the value in the variable
-	if err := schema.Element.Set(addressable, path, value); err != nil {
+	if err := schema.Element.SetReflect(addressable, path, value); err != nil {
 		return derp.Wrap(err, location, "Error setting value")
 	}
 
