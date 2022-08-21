@@ -216,6 +216,10 @@ func SliceOfBool(value interface{}) []bool {
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfInterface(value interface{}) []interface{} {
 
+	if value == nil {
+		return make([]interface{}, 0)
+	}
+
 	switch value := value.(type) {
 
 	case []interface{}:
@@ -264,4 +268,22 @@ func SliceOfInterface(value interface{}) []interface{} {
 
 	// Fall through means this isn't even an array/slice.  Admit defeat and go home.
 	return make([]interface{}, 0)
+}
+
+func SliceLength(value interface{}) int {
+
+	if value == nil {
+		return 0
+	}
+
+	valueOf := reflect.ValueOf(value)
+
+	switch valueOf.Kind() {
+	case reflect.Pointer:
+		return SliceLength(valueOf.Elem().Interface())
+	case reflect.Array, reflect.Slice:
+		return valueOf.Len()
+	}
+
+	return 0
 }
