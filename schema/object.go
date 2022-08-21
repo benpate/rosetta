@@ -95,22 +95,28 @@ func (element Object) SetReflect(object reflect.Value, path string, value any) e
 	// Otherwise, use reflection to push the value into the object
 	switch object.Kind() {
 	case reflect.Pointer:
+		spew.Dump("DEREFERENCE POINTER")
 		return element.SetReflect(object.Elem(), path, value)
 
 	case reflect.Interface:
+		spew.Dump("DEREFERENCE INTERFACE")
 		return element.SetReflect(object.Elem(), path, value)
 
 	case reflect.Map:
 		result := element.setMap(object, path, value)
-		spew.Dump("result...", object.Interface())
+		spew.Dump("MAP result...", object.Interface())
 		return result
 
 	case reflect.Struct:
-		return element.setStruct(object, path, value)
+		result := element.setStruct(object, path, value)
+		spew.Dump("STRUCT result...", object.Interface())
+		return result
 
 	case reflect.Invalid:
 		newMap := make(maps.Map)
-		return element.setMap(reflect.ValueOf(newMap), path, value)
+		result := element.setMap(reflect.ValueOf(newMap), path, value)
+		spew.Dump("INVALID result...", object.Interface())
+		return result
 	}
 
 	return derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path, value)

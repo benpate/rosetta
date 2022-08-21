@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/list"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func (element Object) setMap(object reflect.Value, path string, value any) error {
@@ -23,7 +24,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 		return derp.NewInternalError(location, "Cannot set map value directly.  Set sub-items instead.", value)
 	}
 
-	// If the map is nil then initialize it as a new map[string]interface{}
+	// If the map is nil then initialize it as a new map
 	if object.IsNil() {
 		var key string
 		var value interface{}
@@ -31,7 +32,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 		keyType := reflect.TypeOf(key)
 		valueType := reflect.TypeOf(&value).Elem()
 
-		mapType := reflect.MapOf(keyType, valueType) // TODO: can we be more specific than map[string]interface{}?
+		mapType := reflect.MapOf(keyType, valueType) // TODO: can we be more specific than an empty map?
 		object.Set(reflect.MakeMap(mapType))
 	}
 
@@ -50,19 +51,22 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 
 	// If the value already exists, then try to update it
 	if subValue.CanSet() {
-		if err = property.Set(subValue, tail.String(), value); err != nil {
+		if err = property.SetReflect(subValue, tail.String(), value); err != nil {
 			return derp.Wrap(err, location, "Error setting sub-element", path, value)
 		}
 	}
 
 	// Fall through means we're adding a new value to the map
+	spew.Dump(".. add new key", head, value)
 	newValue := reflect.New(property.Type()).Elem()
 
-	if err := property.Set(newValue, tail.String(), value); err != nil {
+	if err := property.SetReflect(newValue, tail.String(), value); err != nil {
 		return derp.Wrap(err, location, "Error setting sub-element", path, value)
 	}
 
 	object.SetMapIndex(keyValue, newValue)
+
+	spew.Dump(".. object", object.Interface())
 
 	// Done
 	return err

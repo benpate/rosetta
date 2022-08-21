@@ -4,7 +4,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/benpate/rosetta/maps"
 	"github.com/benpate/rosetta/null"
+	"github.com/benpate/rosetta/slice"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -79,4 +82,44 @@ func TestArraySplit(t *testing.T) {
 	result, _, err := s.Get(reflect.ValueOf(v), "0")
 	require.Nil(t, err)
 	require.Equal(t, "zero", result)
+}
+
+func TestComplexArrayOperations(t *testing.T) {
+
+	schema := Schema{
+		Element: Object{
+			Properties: ElementMap{
+				"name":  String{},
+				"age":   Number{},
+				"email": String{},
+				"friends": Array{
+					Items: Object{
+						Properties: ElementMap{
+							"name":  String{},
+							"age":   Number{},
+							"email": String{},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	data := make(maps.Map)
+
+	schema.Set(&data, "name", "John Connor")
+	schema.Set(&data, "age", 30)
+	schema.Set(&data, "email", "john@connor.mil")
+
+	friend := maps.Map{
+		"name":  "Sarah Connor",
+		"age":   30,
+		"email": "sarah@sky.net",
+	}
+
+	friends, _, _ := slice.AnyAppend(data["friends"], friend)
+
+	schema.Set(&data, "friends", friends)
+
+	spew.Dump(data)
 }
