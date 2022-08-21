@@ -82,6 +82,12 @@ func TestStringToInt(t *testing.T) {
 	}
 
 	{
+		result, ok := IntOk("1", -1)
+		require.True(t, ok)
+		require.Equal(t, 1, result)
+	}
+
+	{
 		result, natural := IntOk("10", -1)
 		require.True(t, natural)
 		require.Equal(t, result, int(10))
