@@ -13,7 +13,7 @@ func TestObject(t *testing.T) {
 
 	schema := getTestSchema()
 
-	object := schema.Element.(*Object)
+	object := schema.Element.(Object)
 
 	assert.NotNil(t, object)
 }

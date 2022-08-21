@@ -164,7 +164,7 @@ func TestBool_Unmarshal(t *testing.T) {
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(*Boolean).Required)
+	require.True(t, s.Element.(Boolean).Required)
 
 	require.Nil(t, s.Validate(true))
 	require.NotNil(t, s.Validate(false))

@@ -14,7 +14,7 @@ func TestUnmarshal_Success(t *testing.T) {
 	require.Equal(t, "TEST-SCHEMA", s.ID)
 	require.Equal(t, "Test Unmarshal", s.Comment)
 
-	element := s.Element.(*String)
+	element := s.Element.(String)
 	require.True(t, element.MaxLength.IsPresent())
 	require.Equal(t, element.MaxLength.Int(), 10)
 

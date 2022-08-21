@@ -15,7 +15,7 @@ func TestStringUnmarshalSimple1(t *testing.T) {
 	st, err := UnmarshalJSON(value)
 	assert.Nil(t, err)
 
-	str := st.(*String)
+	str := st.(String)
 	assert.Equal(t, str.MinLength, null.NewInt(10))
 	assert.Equal(t, str.MaxLength, null.NewInt(100))
 }
@@ -28,7 +28,7 @@ func TestStringUnmarshalComplete1(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	str := st.(*String)
+	str := st.(String)
 	assert.Equal(t, str.MinLength, null.NewInt(10))
 	assert.Equal(t, str.MaxLength, null.NewInt(100))
 	assert.Equal(t, str.Required, true)

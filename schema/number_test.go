@@ -44,7 +44,7 @@ func TestNumberRequired(t *testing.T) {
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(*Number).Required)
+	require.True(t, s.Element.(Number).Required)
 
 	require.Nil(t, s.Validate(10.1))
 	require.Nil(t, s.Validate(20.0))

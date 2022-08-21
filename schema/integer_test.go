@@ -41,7 +41,7 @@ func TestIntegerRequired(t *testing.T) {
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(*Integer).Required)
+	require.True(t, s.Element.(Integer).Required)
 
 	require.Nil(t, s.Validate(10))
 	require.Nil(t, s.Validate(20))

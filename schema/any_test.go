@@ -36,7 +36,7 @@ func TestAnyRequired(t *testing.T) {
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(*Any).Required)
+	require.True(t, s.Element.(Any).Required)
 
 	require.Nil(t, s.Validate("any string"))
 	require.Nil(t, s.Validate(10))

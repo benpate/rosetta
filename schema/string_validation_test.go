@@ -27,7 +27,7 @@ func TestStringUnmarshal(t *testing.T) {
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(*String).Required)
+	require.True(t, s.Element.(String).Required)
 
 	require.Nil(t, s.Validate("this should work"))
 	require.NotNil(t, s.Validate(""))
