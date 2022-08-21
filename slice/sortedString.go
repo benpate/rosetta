@@ -79,7 +79,7 @@ func Contains(s []string, value string) bool {
 func ContainsAll(s1 []string, s2 []string) bool {
 
 	for _, v := range s2 {
-		if Contains(s1, v) == false {
+		if !Contains(s1, v) {
 			return false
 		}
 	}
