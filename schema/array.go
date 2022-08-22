@@ -16,7 +16,7 @@ type Array struct {
 	MinLength null.Int
 	MaxLength null.Int
 	Required  bool
-	Delimiter string
+	Delimiter string // DEPRECATED
 }
 
 // Type returns the reflection type of this Element
@@ -29,11 +29,20 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-func (element Array) Get(object any, path string) (any, Element, error) {
-	return element.GetReflect(convert.ReflectValue(object), path)
-}
+func (element Array) Get(object reflect.Value, path string) (any, Element, error) {
 
-func (element Array) GetReflect(object reflect.Value, path string) (any, Element, error) {
+	const location = "schema.Array.Get"
+
+	var subResult any
+	var subElement Element
+	var err error
+
+	// Catch any reflection panics
+	defer func() {
+		if r := recover(); r != nil {
+			err = derp.NewInternalError(location, "Panic while trying to get array element", path, r)
+		}
+	}()
 
 	// Validate that we have the right type of object
 	switch object.Kind() {
@@ -47,15 +56,11 @@ func (element Array) GetReflect(object reflect.Value, path string) (any, Element
 
 	case reflect.Interface, reflect.Pointer:
 		// Dereferenced pointers
-		return element.GetReflect(object.Elem(), path)
-
-	case reflect.String:
-		// Strings can be split into arrays
-		object = reflect.ValueOf(convert.SplitSliceOfString(object, element.Delimiter))
+		return element.Get(object.Elem(), path)
 
 	default:
 		// All other types are invalid.
-		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Value must be an array, slice, or a string that can be split into an array.", object.Kind(), path, object.Interface())
+		return nil, element, derp.NewBadRequestError(location, "Value must be an array, slice.", object.Kind(), path, object.Interface())
 	}
 
 	// If the request is for this object, then convert it from
@@ -80,22 +85,13 @@ func (element Array) GetReflect(object reflect.Value, path string) (any, Element
 	}
 
 	result := object.Index(index)
-	return element.Items.GetReflect(result, string(tail))
+	subResult, subElement, err = element.Items.Get(result, string(tail))
+
+	return subResult, subElement, err
 }
 
 // Set formats/validates a generic value using this schema
-func (element Array) Set(object any, path string, value any) error {
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	return element.SetReflect(convert.ReflectValue(object), path, value)
-}
-
-// Set formats/validates a generic value using this schema
-func (element Array) SetReflect(object reflect.Value, path string, value any) error {
+func (element Array) Set(object reflect.Value, path string, value any) error {
 
 	const location = "schema.Array.Set"
 	var err error
@@ -205,6 +201,18 @@ func (element Array) Validate(value any) error {
 	return errorReport
 }
 
+// DefaultType returns the default type for this element
+func (element Array) DefaultType() reflect.Type {
+	return reflect.SliceOf(element.Items.DefaultType())
+}
+
+// DefaultValue returns the default value for this element type
+func (element Array) DefaultValue() any {
+	items := element.Items.DefaultValue()
+	sliceType := reflect.SliceOf(reflect.TypeOf(items))
+	return reflect.MakeSlice(sliceType, 0, 0).Interface()
+}
+
 // MarshalMap populates object data into a map[string]any
 func (element Array) MarshalMap() map[string]any {
 
@@ -214,13 +222,6 @@ func (element Array) MarshalMap() map[string]any {
 		"minLength": element.MinLength,
 		"maxLength": element.MaxLength,
 	}
-}
-
-// DefaultValue returns the default value for this element type
-func (element Array) DefaultValue() any {
-	items := element.Items.DefaultValue()
-	sliceType := reflect.SliceOf(reflect.TypeOf(items))
-	return reflect.MakeSlice(sliceType, 0, 0).Interface()
 }
 
 // UnmarshalMap tries to populate this object using data from a map[string]any

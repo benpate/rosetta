@@ -8,7 +8,7 @@ import (
 )
 
 // setWithReflection applies apply a value to a generic variable.
-func setWithReflection(object reflect.Value, value interface{}) error {
+func setWithReflection(object reflect.Value, value any) error {
 
 	var err error
 

@@ -26,8 +26,8 @@ func TestArrayCreate(t *testing.T) {
 
 func TestArrayValidation(t *testing.T) {
 
-	s := &Array{
-		Items: &String{MaxLength: null.NewInt(10)},
+	s := Array{
+		Items: String{MaxLength: null.NewInt(10)},
 	}
 
 	{
@@ -49,7 +49,7 @@ func TestArrayValidation(t *testing.T) {
 }
 
 func TestArrayGet(t *testing.T) {
-	s := &Array{Items: &String{}}
+	s := &Array{Items: String{}}
 
 	v := []string{"zero", "one", "two", "three"}
 
@@ -72,16 +72,6 @@ func TestArrayGet(t *testing.T) {
 		require.NotNil(t, err)
 		require.Nil(t, result)
 	}
-}
-
-func TestArraySplit(t *testing.T) {
-	s := &Array{Items: &String{}, Delimiter: ","}
-
-	v := "zero,one,two,three"
-
-	result, _, err := s.Get(reflect.ValueOf(v), "0")
-	require.Nil(t, err)
-	require.Equal(t, "zero", result)
 }
 
 func TestComplexArrayOperations(t *testing.T) {

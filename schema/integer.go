@@ -34,11 +34,7 @@ func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-func (element Integer) Get(object any, path string) (any, Element, error) {
-	return element.GetReflect(convert.ReflectValue(object), path)
-}
-
-func (element Integer) GetReflect(object reflect.Value, path string) (any, Element, error) {
+func (element Integer) Get(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
@@ -56,18 +52,7 @@ func (element Integer) GetReflect(object reflect.Value, path string) (any, Eleme
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Integer) Set(object any, path string, value any) error {
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	return element.SetReflect(convert.ReflectValue(object), path, value)
-}
-
-// Set formats a value and applies it to the provided object/path
-func (element Integer) SetReflect(object reflect.Value, path string, value any) error {
+func (element Integer) Set(object reflect.Value, path string, value any) error {
 
 	// Cannot set sub-properties of an Integer
 	if path != "" {
@@ -78,8 +63,9 @@ func (element Integer) SetReflect(object reflect.Value, path string, value any) 
 	intValue, ok := convert.Int64Ok(value, element.Default.Int64())
 
 	if !ok {
-		return derp.NewBadRequestError("schema.Integer.Set", "Error setting value to integer field", value)
+		return derp.NewBadRequestError("schema.Integer.Set", "Value must be convertable to an integer", value)
 	}
+
 	return setWithReflection(object, intValue)
 }
 
@@ -125,6 +111,11 @@ func (element Integer) Validate(value any) error {
 	}
 
 	return err
+}
+
+// DefaultType returns the default type for this element
+func (element Integer) DefaultType() reflect.Type {
+	return reflect.TypeOf(int64(0))
 }
 
 // DefaultValue returns the default value for this element type

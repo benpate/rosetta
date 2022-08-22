@@ -15,19 +15,16 @@ type Element interface {
 	Type() reflect.Type
 
 	// Get uses the path to locate a value in an object along with the schema that defines it.
-	Get(object any, path string) (any, Element, error)
-
-	// GetReflect uses the path to locate a value in an reflection object along with the schema that defines it.
-	GetReflect(object reflect.Value, path string) (any, Element, error)
+	Get(object reflect.Value, path string) (any, Element, error)
 
 	// Set formats a value and applies it to the provided object/path
-	Set(object any, path string, value any) error
-
-	// SetReflect formats a value and applies it to the provided reflection object/path
-	SetReflect(object reflect.Value, path string, value any) error
+	Set(object reflect.Value, path string, value any) error
 
 	// Validate validates the provided value
 	Validate(value any) error
+
+	// DefaultType returns the default type for this element
+	DefaultType() reflect.Type
 
 	// Default returns the default value for this element
 	DefaultValue() any
@@ -35,6 +32,7 @@ type Element interface {
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
 
+	// IsRequired returns true if this a value is required for this element
 	IsRequired() bool
 }
 

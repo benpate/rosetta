@@ -35,11 +35,7 @@ func (element Number) IsRequired() bool {
 	return element.Required
 }
 
-func (element Number) Get(object any, path string) (any, Element, error) {
-	return element.GetReflect(convert.ReflectValue(object), path)
-}
-
-func (element Number) GetReflect(object reflect.Value, path string) (any, Element, error) {
+func (element Number) Get(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
@@ -57,18 +53,7 @@ func (element Number) GetReflect(object reflect.Value, path string) (any, Elemen
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Number) Set(object any, path string, value any) error {
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	return element.SetReflect(convert.ReflectValue(object), path, value)
-}
-
-// Set formats a value and applies it to the provided object/path
-func (element Number) SetReflect(object reflect.Value, path string, value any) error {
+func (element Number) Set(object reflect.Value, path string, value any) error {
 
 	if path != "" {
 		return derp.NewInternalError("schema.Number.Set", "Can't set sub-properties on a number", path, value)
@@ -77,7 +62,7 @@ func (element Number) SetReflect(object reflect.Value, path string, value any) e
 	floatValue, ok := convert.FloatOk(value, element.Default.Float())
 
 	if !ok {
-		return derp.NewBadRequestError("schema.Number.Set", "Error setting value to number field", value)
+		return derp.NewBadRequestError("schema.Number.Set", "Value must be convertable to a number", value)
 	}
 
 	// Convert value and save
@@ -127,6 +112,11 @@ func (element Number) Validate(value any) error {
 	}
 
 	return err
+}
+
+// DefaultType returns the default type for this element
+func (element Number) DefaultType() reflect.Type {
+	return reflect.TypeOf(float64(0))
 }
 
 // DefaultValue returns the default value for this element type

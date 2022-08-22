@@ -51,7 +51,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 
 	// If the value already exists, then try to update it
 	if subValue.CanSet() {
-		if err = property.SetReflect(subValue, tail.String(), value); err != nil {
+		if err = property.Set(subValue, tail.String(), value); err != nil {
 			return derp.Wrap(err, location, "Error setting sub-element", path, value)
 		}
 	}
@@ -60,7 +60,7 @@ func (element Object) setMap(object reflect.Value, path string, value any) error
 	spew.Dump(".. add new key", head, value)
 	newValue := reflect.New(property.Type()).Elem()
 
-	if err := property.SetReflect(newValue, tail.String(), value); err != nil {
+	if err := property.Set(newValue, tail.String(), value); err != nil {
 		return derp.Wrap(err, location, "Error setting sub-element", path, value)
 	}
 

@@ -24,16 +24,17 @@ func New(properties ElementMap) Schema {
 	}
 }
 
-// Get retrieves a generic value from the object, along with
-// the schema element that defines it.  If the object is nil, Get still
-// tries to return a default value if provided by the schema
+// Get retrieves a generic value from the object.  If the object is nil,
+// Get still tries to return a default value if provided by the schema
 func (schema Schema) Get(object any, path string) (any, Element, error) {
 
+	const location = "schema.Schema.Get"
+
 	if schema.Element == nil {
-		return nil, nil, derp.NewInternalError("schema.Schema.Get", "Invalid schema.  Element is nil")
+		return nil, nil, derp.NewInternalError(location, "Invalid schema.  Element is nil")
 	}
 
-	return schema.Element.Get(reflect.ValueOf(object), path)
+	return schema.Element.Get(convert.ReflectValue(object), path)
 }
 
 // GetBool retrieves a bool value from this object.  If the value
@@ -71,6 +72,48 @@ func (schema Schema) GetString(object any, path string) string {
 	return convert.String(result)
 }
 
+// Schema applies a value to the object at the given path.  If the path is invalid
+// then it returns an error
+func (schema Schema) Set(object any, path string, value any) error {
+
+	const location = "schema.Schema.Set"
+
+	var err error
+
+	// Catch any reflection panics
+	defer func() {
+		if r := recover(); r != nil {
+			err = derp.NewInternalError(location, "Error in reflection", r)
+		}
+	}()
+
+	if schema.Element == nil {
+		return derp.NewInternalError("schema.Schema.Set", "Invalid schema.  Element is nil.")
+	}
+
+	valueOf := convert.ReflectValue(object)
+
+	// Guarantee that we've been passed a pointer
+	if valueOf.Kind() != reflect.Pointer {
+		return derp.NewInternalError(location, "Must pass a pointer (not a value) to this function.", object, path, value)
+	}
+
+	// Now that we KNOW it's a pointer, dereference it.  This value should ALWAYS be addressable.
+	addressable := valueOf.Elem()
+
+	// Verify that it's still addressable (this should never fail)
+	if !addressable.CanSet() {
+		return derp.NewInternalError(location, "Cannot set value")
+	}
+
+	// Try to set the value in the variable
+	if err := schema.Element.Set(addressable, path, value); err != nil {
+		return derp.Wrap(err, location, "Error setting value")
+	}
+
+	return err
+}
+
 // SetAll iterates over Set to apply all of the values to the object one at a time, stopping
 // at the first error it encounters.  If all values are addedd successfully, then SetAll
 // also uses Validate() to confirm that the object is still correct.
@@ -93,45 +136,6 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	// Success!!
 	return nil
-}
-
-// Schema applies a value to the object at the given path.  If the path is invalid
-// then it returns an error
-func (schema Schema) Set(object any, path string, value any) error {
-
-	const location = "schema.Schema.Set"
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	if schema.Element == nil {
-		return derp.NewInternalError("schema.Schema.Set", "Invalid schema.  Element is nil.")
-	}
-
-	valueOf := reflect.ValueOf(object)
-
-	// Guarantee that we've been passed a pointer
-	if valueOf.Kind() != reflect.Pointer {
-		return derp.NewInternalError(location, "Must pass a pointer (not a value) to this function.", object, path, value)
-	}
-
-	// Now that we KNOW it's a pointer, dereference
-	addressable := valueOf.Elem()
-
-	// Verify that it's still addressable (this should never fail)
-	if !addressable.CanSet() {
-		return derp.NewInternalError(location, "Cannot set value")
-	}
-
-	// Try to set the value in the variable
-	if err := schema.Element.SetReflect(addressable, path, value); err != nil {
-		return derp.Wrap(err, location, "Error setting value")
-	}
-
-	return nil
-
 }
 
 // Validate checks a particular value against this schema.  If the

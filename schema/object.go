@@ -28,12 +28,7 @@ func (element Object) IsRequired() bool {
 }
 
 // Find locates a child of this element
-func (element Object) Get(object any, path string) (any, Element, error) {
-	return element.GetReflect(convert.ReflectValue(object), path)
-}
-
-// Find locates a child of this element
-func (element Object) GetReflect(object reflect.Value, path string) (any, Element, error) {
+func (element Object) Get(object reflect.Value, path string) (any, Element, error) {
 
 	if path == "" {
 		return convert.Interface(object), element, nil
@@ -49,14 +44,14 @@ func (element Object) GetReflect(object reflect.Value, path string) (any, Elemen
 
 	switch object.Kind() {
 	case reflect.Pointer:
-		return element.GetReflect(object.Elem(), path)
+		return element.Get(object.Elem(), path)
 
 	case reflect.Interface:
-		return element.GetReflect(object.Elem(), path)
+		return element.Get(object.Elem(), path)
 
 	case reflect.Map:
 		valueOf := object.MapIndex(reflect.ValueOf(head))
-		return property.GetReflect(valueOf, tail.String())
+		return property.Get(valueOf, tail.String())
 
 	case reflect.Struct:
 		valueOf, err := findFieldByTag(object, head)
@@ -65,30 +60,14 @@ func (element Object) GetReflect(object reflect.Value, path string) (any, Elemen
 			return nil, property, derp.NewInternalError("schema.Object.Get", "Property does not exist in object", object, path)
 		}
 
-		return property.GetReflect(valueOf, tail.String())
+		return property.Get(valueOf, tail.String())
 	}
 
-	return property.GetReflect(reflect.ValueOf(nil), tail.String())
+	return property.Get(reflect.ValueOf(nil), tail.String())
 }
 
 // Set validates/formats a value using this schema
-func (element Object) Set(object any, path string, value any) error {
-
-	// If we've been passed a NIL, then cast it as a map[string]any
-	if object == nil {
-		object = make(maps.Map)
-	}
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	return element.SetReflect(convert.ReflectValue(object), path, value)
-}
-
-// Set validates/formats a value using this schema
-func (element Object) SetReflect(object reflect.Value, path string, value any) error {
+func (element Object) Set(object reflect.Value, path string, value any) error {
 
 	spew.Dump("<<<<<<<<<<<<<< object.SetReflect >>>>>>>>>>>", path, object.Interface(), value)
 
@@ -96,11 +75,11 @@ func (element Object) SetReflect(object reflect.Value, path string, value any) e
 	switch object.Kind() {
 	case reflect.Pointer:
 		spew.Dump("DEREFERENCE POINTER")
-		return element.SetReflect(object.Elem(), path, value)
+		return element.Set(object.Elem(), path, value)
 
 	case reflect.Interface:
 		spew.Dump("DEREFERENCE INTERFACE")
-		return element.SetReflect(object.Elem(), path, value)
+		return element.Set(object.Elem(), path, value)
 
 	case reflect.Map:
 		result := element.setMap(object, path, value)
@@ -159,6 +138,11 @@ func (element Object) Validate(value any) error {
 	}
 
 	return errorReport
+}
+
+// DefaultType returns the default type for this element
+func (element Object) DefaultType() reflect.Type {
+	return reflect.TypeOf(maps.Map{})
 }
 
 // DefaultValue returns the default value for this element type.  In a special case for objects,

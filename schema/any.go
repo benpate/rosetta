@@ -22,12 +22,8 @@ func (element Any) IsRequired() bool {
 	return element.Required
 }
 
-// Find locates a child of this element
-func (element Any) Get(object any, path string) (any, Element, error) {
-	return element.GetReflect(convert.ReflectValue(object), path)
-}
-
-func (element Any) GetReflect(object reflect.Value, path string) (any, Element, error) {
+// Get returns the value of this element or its children
+func (element Any) Get(object reflect.Value, path string) (any, Element, error) {
 
 	if path != "" {
 		return nil, element, derp.NewInternalError("schema.Any.Find", "Can't find sub-properties on an 'any' type", path)
@@ -37,18 +33,7 @@ func (element Any) GetReflect(object reflect.Value, path string) (any, Element, 
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Any) Set(object any, path string, value any) error {
-
-	// Shortcut if the object is a PathSetter.  Just call the SetPath function and we're good.
-	if setter, ok := object.(PathSetter); ok {
-		return setter.SetPath(path, value)
-	}
-
-	return element.SetReflect(convert.ReflectValue(object), path, value)
-}
-
-// Set formats a value and applies it to the provided object/path
-func (element Any) SetReflect(object reflect.Value, path string, value any) error {
+func (element Any) Set(object reflect.Value, path string, value any) error {
 
 	if path != "" {
 		return derp.NewInternalError("schema.Any.Set", "Can't set sub-properties on an 'any' type", path, value)
@@ -67,6 +52,11 @@ func (element Any) Validate(value any) error {
 	}
 
 	return nil
+}
+
+// DefaultType returns the default type for this element
+func (element Any) DefaultType() reflect.Type {
+	return reflect.TypeOf(interface{}(nil))
 }
 
 // DefaultValue returns the default value for this element type
