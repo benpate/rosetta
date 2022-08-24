@@ -29,137 +29,137 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-func (element Array) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Array) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
 	const location = "schema.Array.Get"
-
-	var subResult any
-	var subElement Element
-	var err error
-
-	// Catch any reflection panics
-	defer func() {
-		if r := recover(); r != nil {
-			err = derp.NewInternalError(location, "Panic while trying to get array element", path, r)
-		}
-	}()
 
 	// Validate that we have the right type of object
 	switch object.Kind() {
 
+	// If the value is invalid (nil) then return nil
 	case reflect.Invalid:
-		// If the value is invalid (nil) then return nil
-		return nil, element, nil
+		return reflect.ValueOf(element.DefaultValue()), element, nil
 
-	case reflect.Array, reflect.Slice:
-		// Move along, these types are good.
-
-	case reflect.Interface, reflect.Pointer:
-		// Dereferenced pointers
+	// Dereference interfaces
+	case reflect.Interface:
 		return element.Get(object.Elem(), path)
 
+	// Dereference pointers
+	case reflect.Pointer:
+		return element.Get(object.Elem(), path)
+
+	// Move along, these types are good.
+	case reflect.Array, reflect.Slice:
+
+	// All other types are invalid.
 	default:
-		// All other types are invalid.
-		return nil, element, derp.NewBadRequestError(location, "Value must be an array, slice.", object.Kind(), path, object.Interface())
+		return reflect.ValueOf(nil), element, derp.NewBadRequestError(location, "Value must be an array, slice.", object.Kind(), path, object.Interface())
 	}
 
 	// If the request is for this object, then convert it from
 	if path == "" {
-		return convert.Interface(object), element, nil
+		return object, element, nil
 	}
 
-	// Finf (and validate) the requested array index
+	// Get (and bounds-check) the array index
 	head, tail := list.Dot(path).Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
-		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (not an integer)", path)
+		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (not an integer)", path)
 	}
 
 	if index < 0 {
-		return nil, element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (less than zero)", path)
+		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (less than zero)", path)
 	}
 
 	if index >= object.Len() {
-		return nil, element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
+		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
 	}
 
-	result := object.Index(index)
-	subResult, subElement, err = element.Items.Get(result, string(tail))
-
-	return subResult, subElement, err
+	//
+	subValue := object.Index(index)
+	return element.Items.Get(subValue, string(tail))
 }
 
 // Set formats/validates a generic value using this schema
-func (element Array) Set(object reflect.Value, path string, value any) error {
+func (element Array) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
 	const location = "schema.Array.Set"
-	var err error
 
-	// Catch any reflection panics
-	defer func() {
-		if r := recover(); r != nil {
-			err = derp.NewInternalError(location, "Error in reflection", r)
-		}
-	}()
+	// Validate that we have the right type of object
+	switch object.Kind() {
+
+	// If the value is invalid (nil) then return nil
+	case reflect.Invalid:
+		return element.Set(reflect.ValueOf(element.DefaultValue()), path, value)
+
+	// Dereference interfaces
+	case reflect.Interface:
+		return element.Set(object.Elem(), path, value)
+
+	// Dereference pointers
+	case reflect.Pointer:
+		return element.Set(object.Elem(), path, value)
+	}
 
 	// Try to set the value directly.  This will barf if the types don't match
 	// but it's better to try and fail, than to not try at all.
 	if path == "" {
-		object.Set(reflect.ValueOf(value))
-		return err
+		return object, nil
 	}
 
-	// Try to calculate the array index
+	// Get (and bounds-check) the array index
 	head, tail := list.Dot(path).Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
-		return derp.NewBadRequestError(location, "Invalid array index", head)
+		return reflect.ValueOf(nil), derp.NewBadRequestError(location, "Invalid array index", head)
 	}
 
 	if index < 0 {
-		return derp.NewBadRequestError(location, "Index out of bounds (negative index)", index)
+		return reflect.ValueOf(nil), derp.NewBadRequestError(location, "Index out of bounds (negative index)", index)
 	}
 
-	// Verify that the index has not overflowed the slice/array bounds
+	// Bounds check index overflow...
 	switch object.Kind() {
 
+	// Bounds check for Arrays: return an error if the index is too big.
 	case reflect.Array:
 
 		// If the index is too large, then error because we cannot increase the size of the array
 		if index >= object.Len() {
-			return derp.NewInternalError(location, "Index out of bounds (array overflow)", index)
+			return reflect.ValueOf(nil), derp.NewInternalError(location, "Index out of bounds (array overflow)", index)
 		}
 
+	// Bounds check for slices: grow the slice if the index is too big.
 	case reflect.Slice:
 
-		// If the index is too large, then increase the size of the slice
 		minLength := index + 1
 		if needed := minLength - object.Len(); needed > 0 {
 			emptySlice := reflect.MakeSlice(element.Type(), needed, needed)
-			newSlice := reflect.AppendSlice(object, emptySlice)
-			object.Set(newSlice)
+			object = reflect.AppendSlice(object, emptySlice)
 		}
 
-	// If we have a "nil" object, then make a new slice of the required size
-	case reflect.Invalid:
-		minLength := index + 1
-		object.Set(reflect.MakeSlice(element.Type(), minLength, minLength))
-
 	default:
-		return derp.NewInternalError(location, "Value must be an array")
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Value must be an array")
 	}
 
-	// Try to set the result into this object
+	// Get the value in the array (should be addressable)
 	subObject := object.Index(index)
 
-	if err := element.Items.Set(subObject, string(tail), value); err != nil {
-		return derp.Wrap(err, location, "Error setting array index")
+	// Try to set the value of the indexed sub-object
+	subResult, err := element.Items.Set(subObject, string(tail), value)
+
+	if err != nil {
+		return reflect.ValueOf(nil), derp.Wrap(err, location, "Error setting array index")
 	}
 
-	// Should be nil (unless reflection panic)
-	return err
+	// Put the value back into the array/slice
+	subObject.Set(subResult)
+
+	// Done
+	return object, nil
 }
 
 // Validate validates a value against this schema
@@ -201,15 +201,9 @@ func (element Array) Validate(value any) error {
 	return errorReport
 }
 
-// DefaultType returns the default type for this element
-func (element Array) DefaultType() reflect.Type {
-	return reflect.SliceOf(element.Items.DefaultType())
-}
-
 // DefaultValue returns the default value for this element type
 func (element Array) DefaultValue() any {
-	items := element.Items.DefaultValue()
-	sliceType := reflect.SliceOf(reflect.TypeOf(items))
+	sliceType := reflect.SliceOf(element.Items.Type())
 	return reflect.MakeSlice(sliceType, 0, 0).Interface()
 }
 

@@ -5,9 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // Object represents an object data type within a JSON-Schema.
@@ -19,7 +17,7 @@ type Object struct {
 
 // Type returns the data type of this Element
 func (element Object) Type() reflect.Type {
-	return reflect.TypeOf(map[string]any{})
+	return reflect.TypeOf(maps.Map{})
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -28,77 +26,62 @@ func (element Object) IsRequired() bool {
 }
 
 // Find locates a child of this element
-func (element Object) Get(object reflect.Value, path string) (any, Element, error) {
-
-	if path == "" {
-		return convert.Interface(object), element, nil
-	}
-
-	// Find the property in the schema
-	head, tail := list.Dot(path).Split()
-	property, ok := element.Properties[head]
-
-	if !ok {
-		return nil, element, derp.NewInternalError("schema.Object.Get", "Property does not exist in schema", path)
-	}
+func (element Object) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
 	switch object.Kind() {
+
+	// If value is nil, then substitute the default value
+	case reflect.Invalid:
+		return element.Get(reflect.ValueOf(element.DefaultValue()), path)
+
+	// Dereference pointers
 	case reflect.Pointer:
 		return element.Get(object.Elem(), path)
 
+	// Dereference interfaces
 	case reflect.Interface:
 		return element.Get(object.Elem(), path)
 
+	// look up values in Maps
 	case reflect.Map:
-		valueOf := object.MapIndex(reflect.ValueOf(head))
-		return property.Get(valueOf, tail.String())
+		return element.getFromMap(object, path)
 
+	// look up values in Structs
 	case reflect.Struct:
-		valueOf, err := findFieldByTag(object, head)
-
-		if err != nil {
-			return nil, property, derp.NewInternalError("schema.Object.Get", "Property does not exist in object", object, path)
-		}
-
-		return property.Get(valueOf, tail.String())
+		return element.getFromStruct(object, path)
 	}
 
-	return property.Get(reflect.ValueOf(nil), tail.String())
+	return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Object.Get", "object must be a struct or a map", object.Kind().String(), object.Interface(), path)
 }
 
 // Set validates/formats a value using this schema
-func (element Object) Set(object reflect.Value, path string, value any) error {
+func (element Object) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
-	spew.Dump("<<<<<<<<<<<<<< object.SetReflect >>>>>>>>>>>", path, object.Interface(), value)
-
-	// Otherwise, use reflection to push the value into the object
 	switch object.Kind() {
+
+	// Dereference pointers
 	case reflect.Pointer:
-		spew.Dump("DEREFERENCE POINTER")
 		return element.Set(object.Elem(), path, value)
 
+	// Dereference interfaces
 	case reflect.Interface:
-		spew.Dump("DEREFERENCE INTERFACE")
 		return element.Set(object.Elem(), path, value)
 
+	// Set Maps
 	case reflect.Map:
-		result := element.setMap(object, path, value)
-		spew.Dump("MAP result...", object.Interface())
-		return result
+		return element.setToMap(object, path, value)
 
+	// Set Structs
 	case reflect.Struct:
-		result := element.setStruct(object, path, value)
-		spew.Dump("STRUCT result...", object.Interface())
-		return result
+		return element.setToStruct(object, path, value)
 
+	// If the value is nil, then create a default value and set the new property in it.
 	case reflect.Invalid:
-		newMap := make(maps.Map)
-		result := element.setMap(reflect.ValueOf(newMap), path, value)
-		spew.Dump("INVALID result...", object.Interface())
-		return result
+		return element.Set(reflect.ValueOf(element.DefaultValue()), path, value)
+
 	}
 
-	return derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path, value)
+	return reflect.ValueOf(nil), derp.Report(derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path, value))
 }
 
 // Validate validates a value against this schema
@@ -112,6 +95,9 @@ func (element Object) Validate(value any) error {
 	switch valueOf.Kind() {
 
 	case reflect.Pointer:
+		return element.Validate(convert.Interface(valueOf.Elem()))
+
+	case reflect.Interface:
 		return element.Validate(convert.Interface(valueOf.Elem()))
 
 	case reflect.Map:
@@ -138,11 +124,6 @@ func (element Object) Validate(value any) error {
 	}
 
 	return errorReport
-}
-
-// DefaultType returns the default type for this element
-func (element Object) DefaultType() reflect.Type {
-	return reflect.TypeOf(maps.Map{})
 }
 
 // DefaultValue returns the default value for this element type.  In a special case for objects,
@@ -218,19 +199,17 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 			if property, ok := element.Properties[name]; ok {
 
 				switch p := property.(type) {
-				case *Any:
+				case Array:
 					p.Required = true
-				case *Array:
+				case Boolean:
 					p.Required = true
-				case *Boolean:
+				case Integer:
 					p.Required = true
-				case *Integer:
+				case Number:
 					p.Required = true
-				case *Number:
+				case Object:
 					p.Required = true
-				case *Object:
-					p.Required = true
-				case *String:
+				case String:
 					p.Required = true
 				}
 			}

@@ -26,7 +26,7 @@ func (element Integer) Enumerate() []string {
 
 // Type returns the data type of this Schema
 func (element Integer) Type() reflect.Type {
-	return reflect.TypeOf(0)
+	return reflect.TypeOf(int64(0))
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -34,39 +34,40 @@ func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-func (element Integer) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Integer) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
 	if path != "" {
-		return nil, element, derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
+		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
+	}
+
+	if intValue, ok := convert.Int64Ok(object, 0); ok {
+		return reflect.ValueOf(intValue), element, nil
 	}
 
 	if element.Default.IsPresent() {
-		return convert.Int64Default(object, element.Default.Int64()), element, nil
+		defaultValue := convert.Int64Default(object, element.Default.Int64())
+		return reflect.ValueOf(defaultValue), element, nil
 	}
 
-	if intValue, ok := convert.Int64Ok(object, element.Default.Int64()); ok {
-		return intValue, element, nil
-	}
-
-	return nil, element, nil
+	return reflect.ValueOf(nil), element, nil
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Integer) Set(object reflect.Value, path string, value any) error {
+func (element Integer) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
-	// Cannot set sub-properties of an Integer
+	// RULE: Cannot set sub-properties of an Integer
 	if path != "" {
-		return derp.NewInternalError("schema.Integer.Set", "Can't set sub-properties on an integer", path, value)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Integer.Set", "Can't set sub-properties on an integer", path, value)
 	}
 
-	// Convert and set value
+	// Convert and return the new value
 	intValue, ok := convert.Int64Ok(value, element.Default.Int64())
 
 	if !ok {
-		return derp.NewBadRequestError("schema.Integer.Set", "Value must be convertable to an integer", value)
+		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Integer.Set", "Value must be convertable to an integer", value)
 	}
 
-	return setWithReflection(object, intValue)
+	return reflect.ValueOf(intValue), nil
 }
 
 // Validate validates a value using this schema
@@ -111,11 +112,6 @@ func (element Integer) Validate(value any) error {
 	}
 
 	return err
-}
-
-// DefaultType returns the default type for this element
-func (element Integer) DefaultType() reflect.Type {
-	return reflect.TypeOf(int64(0))
 }
 
 // DefaultValue returns the default value for this element type

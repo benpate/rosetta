@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/benpate/rosetta/maps"
 	"github.com/stretchr/testify/require"
 )
 
@@ -36,12 +37,10 @@ func TestSet(t *testing.T) {
 
 	s := getTestSchema()
 
-	object := map[string]interface{}{}
-
-	var err error
+	object := maps.Map{}
 
 	// Test setting values using the schema
-	err = s.Set(&object, "title", "This is the title")
+	err := s.Set(&object, "title", "This is the title")
 	require.Nil(t, err)
 	require.Equal(t, "This is the title", object["title"])
 
@@ -51,7 +50,7 @@ func TestSet(t *testing.T) {
 
 	err = s.Set(&object, "age", 21)
 	require.Nil(t, err)
-	require.Equal(t, 21, object["age"])
+	require.Equal(t, int64(21), object["age"])
 
 	// Test values that will not get set (and should return an error)
 	err = s.Set(&object, "this-path-doesn't-exist", "so it won't get set")
@@ -64,7 +63,7 @@ func TestSet(t *testing.T) {
 	// require.Equal(t, 3, len(object))
 	require.Equal(t, "This is the title", object["title"])
 	require.Equal(t, "This is the content", object["content"])
-	require.Equal(t, 21, object["age"])
+	require.Equal(t, int64(21), object["age"])
 }
 
 func getTestSchema() Schema {

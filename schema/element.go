@@ -15,16 +15,13 @@ type Element interface {
 	Type() reflect.Type
 
 	// Get uses the path to locate a value in an object along with the schema that defines it.
-	Get(object reflect.Value, path string) (any, Element, error)
+	Get(object reflect.Value, path string) (reflect.Value, Element, error)
 
 	// Set formats a value and applies it to the provided object/path
-	Set(object reflect.Value, path string, value any) error
+	Set(object reflect.Value, path string, value any) (reflect.Value, error)
 
 	// Validate validates the provided value
 	Validate(value any) error
-
-	// DefaultType returns the default type for this element
-	DefaultType() reflect.Type
 
 	// Default returns the default value for this element
 	DefaultValue() any
@@ -78,11 +75,6 @@ func UnmarshalMap(data any) (Element, error) {
 	}
 
 	switch Type(convert.String(dataMap["type"])) {
-
-	case TypeAny:
-		result := Any{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
 
 	case TypeArray:
 		result := Array{}

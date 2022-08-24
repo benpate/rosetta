@@ -6,8 +6,6 @@ import (
 
 	"github.com/benpate/rosetta/maps"
 	"github.com/benpate/rosetta/null"
-	"github.com/benpate/rosetta/slice"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,9 +24,9 @@ func TestArrayCreate(t *testing.T) {
 
 func TestArrayValidation(t *testing.T) {
 
-	s := Array{
+	s := New(Array{
 		Items: String{MaxLength: null.NewInt(10)},
-	}
+	})
 
 	{
 		v := []string{"one", "two", "three", "valid"}
@@ -49,7 +47,7 @@ func TestArrayValidation(t *testing.T) {
 }
 
 func TestArrayGet(t *testing.T) {
-	s := &Array{Items: String{}}
+	s := New(Array{Items: String{}})
 
 	v := []string{"zero", "one", "two", "three"}
 
@@ -80,13 +78,14 @@ func TestComplexArrayOperations(t *testing.T) {
 		Element: Object{
 			Properties: ElementMap{
 				"name":  String{},
-				"age":   Number{},
+				"age":   Integer{},
 				"email": String{},
+				"notes": String{},
 				"friends": Array{
 					Items: Object{
 						Properties: ElementMap{
 							"name":  String{},
-							"age":   Number{},
+							"age":   Integer{},
 							"email": String{},
 						},
 					},
@@ -98,18 +97,25 @@ func TestComplexArrayOperations(t *testing.T) {
 	data := make(maps.Map)
 
 	schema.Set(&data, "name", "John Connor")
-	schema.Set(&data, "age", 30)
 	schema.Set(&data, "email", "john@connor.mil")
+	schema.Set(&data, "age", 30)
 
-	friend := maps.Map{
+	schema.Set(&data, "friends.0", maps.Map{
 		"name":  "Sarah Connor",
 		"age":   30,
 		"email": "sarah@sky.net",
-	}
+	})
 
-	friends, _, _ := slice.AnyAppend(data["friends"], friend)
+	require.Equal(t, "John Connor", data["name"])
+	require.Equal(t, "john@connor.mil", data["email"])
+	require.Equal(t, int64(30), data["age"])
+	require.Equal(t, 1, len(data["friends"].([]maps.Map)))
+	require.Equal(t, "Sarah Connor", data["friends"].([]maps.Map)[0]["name"])
+	require.Equal(t, "sarah@sky.net", data["friends"].([]maps.Map)[0]["email"])
+	require.Equal(t, 30, data["friends"].([]maps.Map)[0]["age"])
 
-	schema.Set(&data, "friends", friends)
-
-	spew.Dump(data)
+	notes, _, err := schema.Get(data, "notes")
+	require.Equal(t, nil, data["notes"])
+	require.Equal(t, "", notes)
+	require.Nil(t, err)
 }

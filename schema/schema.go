@@ -6,6 +6,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/davecgh/go-spew/spew"
 )
 
 // Schema defines a (simplified) JSON-Schema object, that can be Marshalled/Unmarshalled to JSON.
@@ -16,11 +17,9 @@ type Schema struct {
 }
 
 // New generates a fully initialized Schema object using the provided properties
-func New(properties ElementMap) Schema {
+func New(element Element) Schema {
 	return Schema{
-		Element: Object{
-			Properties: properties,
-		},
+		Element: element,
 	}
 }
 
@@ -30,11 +29,39 @@ func (schema Schema) Get(object any, path string) (any, Element, error) {
 
 	const location = "schema.Schema.Get"
 
+	var resultValue reflect.Value
+	var result any
+	var element Element
+	var err error
+
+	// Catch reflection panics
+	defer func() {
+		if r := recover(); r != nil {
+			err = derp.NewInternalError(location, "Error in reflection", r)
+			derp.Report(err)
+		}
+	}()
+
 	if schema.Element == nil {
 		return nil, nil, derp.NewInternalError(location, "Invalid schema.  Element is nil")
 	}
 
-	return schema.Element.Get(convert.ReflectValue(object), path)
+	// Get the value from the schema element
+	resultValue, element, err = schema.Element.Get(convert.ReflectValue(object), path)
+
+	if err != nil {
+		return nil, nil, derp.Wrap(err, location, "Invalid Get", object, path)
+	}
+
+	if resultValue.Kind() == 0 {
+		spew.Dump(element)
+		spew.Dump(err)
+	}
+
+	result = resultValue.Interface()
+
+	// Return to caller
+	return result, element, err
 }
 
 // GetBool retrieves a bool value from this object.  If the value
@@ -80,15 +107,16 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	var err error
 
-	// Catch any reflection panics
+	// Catch reflection panics
 	defer func() {
 		if r := recover(); r != nil {
 			err = derp.NewInternalError(location, "Error in reflection", r)
+			derp.Report(err)
 		}
 	}()
 
 	if schema.Element == nil {
-		return derp.NewInternalError("schema.Schema.Set", "Invalid schema.  Element is nil.")
+		return derp.NewInternalError(location, "Invalid schema.  Element is nil.")
 	}
 
 	valueOf := convert.ReflectValue(object)
@@ -107,9 +135,13 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// Try to set the value in the variable
-	if err := schema.Element.Set(addressable, path, value); err != nil {
+	result, err := schema.Element.Set(addressable, path, value)
+
+	if err != nil {
 		return derp.Wrap(err, location, "Error setting value")
 	}
+
+	addressable.Set(result)
 
 	return err
 }

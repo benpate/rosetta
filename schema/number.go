@@ -27,7 +27,7 @@ func (element Number) Enumerate() []string {
 
 // Type returns the data type of this Element
 func (element Number) Type() reflect.Type {
-	return reflect.TypeOf(0.1)
+	return reflect.TypeOf(float64(0))
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -35,38 +35,44 @@ func (element Number) IsRequired() bool {
 	return element.Required
 }
 
-func (element Number) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Number) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
+	// RULE: Cannot get sub-properties on a number
 	if path != "" {
-		return nil, element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
+		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
 	}
 
+	// Try to convert and return the value
+	if intValue, ok := convert.FloatOk(object, 0); ok {
+		return reflect.ValueOf(intValue), element, nil
+	}
+
+	// Try to use the default value
 	if element.Default.IsPresent() {
-		return convert.FloatDefault(object, element.Default.Float()), element, nil
+		defaultValue := convert.FloatDefault(object, element.Default.Float())
+		return reflect.ValueOf(defaultValue), element, nil
 	}
 
-	if intValue, ok := convert.FloatOk(object, element.Default.Float()); ok {
-		return intValue, element, nil
-	}
-
-	return nil, element, nil
+	// Return nil if no value is present
+	return reflect.ValueOf(nil), element, nil
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Number) Set(object reflect.Value, path string, value any) error {
+func (element Number) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
+	// RULE: Cannot set sub-properties on a number
 	if path != "" {
-		return derp.NewInternalError("schema.Number.Set", "Can't set sub-properties on a number", path, value)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Number.Set", "Can't set sub-properties on a number", path, value)
 	}
 
+	// Convert and return the new value
 	floatValue, ok := convert.FloatOk(value, element.Default.Float())
 
 	if !ok {
-		return derp.NewBadRequestError("schema.Number.Set", "Value must be convertable to a number", value)
+		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Number.Set", "Value must be convertable to a number", value)
 	}
 
-	// Convert value and save
-	return setWithReflection(object, floatValue)
+	return reflect.ValueOf(floatValue), nil
 }
 
 // Validate validates a value against this schema
@@ -112,11 +118,6 @@ func (element Number) Validate(value any) error {
 	}
 
 	return err
-}
-
-// DefaultType returns the default type for this element
-func (element Number) DefaultType() reflect.Type {
-	return reflect.TypeOf(float64(0))
 }
 
 // DefaultValue returns the default value for this element type

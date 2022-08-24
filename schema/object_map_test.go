@@ -33,8 +33,143 @@ func TestSetComplexObject(t *testing.T) {
 	{
 		err := schema.Set(&data, "address.address1", "1600 Pennsylvania Avenue")
 		require.Nil(t, err)
-		require.Equal(t, "1600 Pennsylvania Avenue", data["address"].(map[string]any)["address1"])
+		require.Equal(t, "1600 Pennsylvania Avenue", data["address"].(maps.Map)["address1"])
 	}
+}
+
+func TestComplexObjectSet(t *testing.T) {
+
+	var err error
+
+	schema := Schema{
+		Element: Object{
+			Properties: map[string]Element{
+				"name": String{},
+				"age":  Integer{},
+				"contact": Object{
+					Properties: map[string]Element{
+						"email":  String{},
+						"phone":  String{},
+						"domain": String{},
+					},
+				},
+				"friends": Array{Items: Object{
+					Properties: map[string]Element{
+						"name": String{},
+						"age":  Integer{},
+						"friends": Array{Items: Object{
+							Properties: map[string]Element{
+								"name": String{},
+								"age":  Integer{},
+							},
+						}},
+					},
+				}},
+			},
+		},
+	}
+
+	var data interface{}
+
+	err = schema.Set(&data, "contact.email", "john@doemain.com")
+	require.Nil(t, err)
+
+	require.Equal(t, maps.Map{
+		"name": "",
+		"age":  int64(0),
+		"contact": maps.Map{
+			"domain": "",
+			"email":  "john@doemain.com",
+			"phone":  "",
+		},
+		"friends": []maps.Map{},
+	}, data)
+}
+
+func TestComplexObjectSet2(t *testing.T) {
+
+	var err error
+
+	schema := Schema{
+		Element: Object{
+			Properties: map[string]Element{
+				"name": String{},
+				"age":  Integer{},
+				"contact": Object{
+					Properties: map[string]Element{
+						"email":  String{},
+						"phone":  String{},
+						"domain": String{},
+					},
+				},
+				"friends": Array{Items: Object{
+					Properties: map[string]Element{
+						"name": String{},
+						"age":  Integer{},
+						"friends": Array{Items: Object{
+							Properties: map[string]Element{
+								"name": String{},
+								"age":  Integer{},
+							},
+						}},
+					},
+				}},
+			},
+		},
+	}
+
+	data := maps.Map{
+		"contact": maps.Map{
+			"domain": "doemain.com",
+		},
+	}
+
+	err = schema.Set(&data, "name", "John Doe")
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "age", 42)
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "contact.email", "john@doe.com")
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "contact.phone", "123-456-7890")
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "contact.domain", "doe.com")
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "friends.2.friends.2.name", "John Doe")
+	require.Nil(t, err)
+
+	err = schema.Set(&data, "contact.badValue", "We don't talk about bruno.")
+	require.NotNil(t, err)
+
+	require.Equal(t, maps.Map{
+		"name": "John Doe",
+		"age":  int64(42),
+		"contact": maps.Map{
+			"email":  "john@doe.com",
+			"phone":  "123-456-7890",
+			"domain": "doe.com",
+		},
+		"friends": []maps.Map{
+			nil,
+			nil,
+			{
+				"name": "",
+				"age":  int64(0),
+				"friends": []maps.Map{
+					nil,
+					nil,
+					{
+						"name": "John Doe",
+						"age":  int64(0),
+					},
+				},
+			},
+		},
+	}, data)
 }
 
 func TestValidateComplexObject(t *testing.T) {

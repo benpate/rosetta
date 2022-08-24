@@ -17,7 +17,7 @@ type Boolean struct {
 
 // Type returns the data type of this Element
 func (element Boolean) Type() reflect.Type {
-	return reflect.TypeOf(true)
+	return reflect.TypeOf(bool(true))
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -26,25 +26,27 @@ func (element Boolean) IsRequired() bool {
 }
 
 // Find locates a child of this element
-func (element Boolean) Get(object reflect.Value, path string) (any, Element, error) {
+func (element Boolean) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
+	// RULE: Cannot get sub-properties of a boolean
 	if path != "" {
-		return nil, element, derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
+		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
 	}
 
-	return convert.BoolDefault(object, element.Default.Bool()), element, nil
+	// Try to convert and return the new value
+	return reflect.ValueOf(convert.BoolDefault(object, element.Default.Bool())), element, nil
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Boolean) Set(object reflect.Value, path string, value any) error {
+func (element Boolean) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
-	// Cannot set sub-properties of a boolean
+	// RULE: Cannot set sub-properties of a boolean
 	if path != "" {
-		return derp.NewInternalError("schema.Boolean.Set", "Can't set sub-properties on a boolean", path, value)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Boolean.Set", "Can't set sub-properties on a boolean", path, value)
 	}
 
-	// Convert and set the value
-	return setWithReflection(object, convert.BoolDefault(value, element.Default.Bool()))
+	// Convert and return the value
+	return reflect.ValueOf(convert.BoolDefault(value, element.Default.Bool())), nil
 }
 
 // Validate validates a generic value using this schema
@@ -57,11 +59,6 @@ func (element Boolean) Validate(object any) error {
 	}
 
 	return nil
-}
-
-// DefaultType returns the default type for this element
-func (element Boolean) DefaultType() reflect.Type {
-	return reflect.TypeOf(bool(true))
 }
 
 // DefaultValue returns the default value for this element type

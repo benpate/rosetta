@@ -30,7 +30,7 @@ func (element String) Enumerate() []string {
 
 // Type returns the data type of this Element
 func (element String) Type() reflect.Type {
-	return reflect.TypeOf("")
+	return reflect.TypeOf(string(""))
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -38,23 +38,33 @@ func (element String) IsRequired() bool {
 	return element.Required
 }
 
-func (element String) Get(object reflect.Value, path string) (any, Element, error) {
+func (element String) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
 
+	// RULE: Cannot get sub-properties on a string
 	if path != "" {
-		return nil, element, derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
+		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
 	}
 
-	return convert.StringDefault(object, element.Default), element, nil
+	// Try to convert and return the value
+	if stringValue, ok := convert.StringOk(object, ""); ok {
+		return reflect.ValueOf(stringValue), element, nil
+	}
+
+	// Return the default value
+	return reflect.ValueOf(element.Default), element, nil
 }
 
 // Set validates/formats a generic value using this schema
-func (element String) Set(object reflect.Value, path string, value any) error {
+func (element String) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
 
+	// RULE: Cannot set sub-properties on a string
 	if path != "" {
-		return derp.NewInternalError("schema.String.Set", "Can't set sub-properties on a string", path, value)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Set", "Can't set sub-properties on a string", path, value)
 	}
 
-	return setWithReflection(object, convert.StringDefault(value, element.Default))
+	// Convert and return the new value
+	stringValue := convert.StringDefault(value, element.Default)
+	return reflect.ValueOf(stringValue), nil
 }
 
 // Validate compares a generic data value using this Schema
@@ -100,11 +110,6 @@ func (element String) Validate(value any) error {
 	}
 
 	return errorReport
-}
-
-// DefaultType returns the default type for this element
-func (element String) DefaultType() reflect.Type {
-	return reflect.TypeOf(string(""))
 }
 
 // DefaultValue returns the default value for this element type

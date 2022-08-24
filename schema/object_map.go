@@ -5,69 +5,70 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/list"
-	"github.com/davecgh/go-spew/spew"
 )
 
-func (element Object) setMap(object reflect.Value, path string, value any) error {
+func (element Object) getFromMap(object reflect.Value, path string) (reflect.Value, Element, error) {
 
-	const location = "schema.Object.setMap"
+	const location = "schema.Object.getFromMap"
 
-	var err error
-
-	defer func() {
-		if r := recover(); r != nil {
-			err = derp.NewInternalError(location, "Panic in reflection", r)
-		}
-	}()
-
+	// RULE: if the path is empty, then return the entire map
 	if path == "" {
-		return derp.NewInternalError(location, "Cannot set map value directly.  Set sub-items instead.", value)
+		return object, element, nil
 	}
 
-	// If the map is nil then initialize it as a new map
-	if object.IsNil() {
-		var key string
-		var value interface{}
-
-		keyType := reflect.TypeOf(key)
-		valueType := reflect.TypeOf(&value).Elem()
-
-		mapType := reflect.MapOf(keyType, valueType) // TODO: can we be more specific than an empty map?
-		object.Set(reflect.MakeMap(mapType))
-	}
-
+	// Split the path into head and tail
 	head, tail := list.Dot(path).Split()
 
 	// Try to find the matching property in this schema
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return derp.NewInternalError(location, "Sub-element does not exist for this path", path, value)
+		return reflect.ValueOf(nil), element, derp.NewInternalError(location, "Sub-element does not exist for this path", path)
 	}
 
-	// Try to index the map
-	keyValue := reflect.ValueOf(head)
-	subValue := object.MapIndex(keyValue)
+	// Retrieve and return the existing value from the map
+	mapKey := reflect.ValueOf(head)
+	return property.Get(object.MapIndex(mapKey), tail.String())
+}
 
-	// If the value already exists, then try to update it
-	if subValue.CanSet() {
-		if err = property.Set(subValue, tail.String(), value); err != nil {
-			return derp.Wrap(err, location, "Error setting sub-element", path, value)
-		}
+func (element Object) setToMap(object reflect.Value, path string, value any) (reflect.Value, error) {
+
+	const location = "schema.Object.setMap"
+
+	// RULE: if the path is empty, then set and return the entire map
+	if path == "" {
+		object.Set(reflect.ValueOf(value))
+		return object, nil
 	}
 
-	// Fall through means we're adding a new value to the map
-	spew.Dump(".. add new key", head, value)
-	newValue := reflect.New(property.Type()).Elem()
-
-	if err := property.Set(newValue, tail.String(), value); err != nil {
-		return derp.Wrap(err, location, "Error setting sub-element", path, value)
+	// If the map is nil then initialize it as a new default value
+	if object.IsNil() {
+		object.Set(reflect.ValueOf(element.DefaultValue()))
 	}
 
-	object.SetMapIndex(keyValue, newValue)
+	head, tail := list.Dot(path).Split()
 
-	spew.Dump(".. object", object.Interface())
+	// Try to find the matching property in this schema
+	subElement, ok := element.Properties[head]
+
+	if !ok {
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path, value)
+	}
+
+	// Retrieve the existing value from the map
+	mapKey := reflect.ValueOf(head)     // map key
+	mapValue := object.MapIndex(mapKey) // existing map value
+
+	// Try to use the next schema subElement to get the correct, new value for the map
+	mapValue, err := subElement.Set(mapValue, tail.String(), value)
+
+	if err != nil {
+		return reflect.ValueOf(nil), derp.Wrap(err, location, "Failed to set value", path, value)
+	}
+
+	// Apply the new value back into the map.
+	object.SetMapIndex(mapKey, mapValue)
 
 	// Done
-	return err
+	return object, nil
 }

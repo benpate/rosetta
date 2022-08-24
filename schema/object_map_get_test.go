@@ -14,12 +14,14 @@ func TestGetMap(t *testing.T) {
 		"three": []string{"a", "b", "c"},
 	}
 
-	s := New(ElementMap{
-		"one":   Integer{},
-		"two":   String{},
-		"three": Array{Items: String{}},
-		"four":  Any{},
-	})
+	s := New(Object{
+		Properties: ElementMap{
+			"one":   Integer{},
+			"two":   String{},
+			"three": Array{Items: String{}},
+			"four":  String{},
+		}},
+	)
 
 	{
 		one, _, err := s.Get(value, "one")
@@ -42,7 +44,7 @@ func TestGetMap(t *testing.T) {
 	{
 		four, _, err := s.Get(value, "four")
 		require.Nil(t, err)
-		require.Equal(t, nil, four)
+		require.Equal(t, "", four)
 	}
 
 	{
