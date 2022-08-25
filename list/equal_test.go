@@ -59,7 +59,7 @@ func TestEqual_At(t *testing.T) {
 
 func TestEqual_Push(t *testing.T) {
 
-	list := Equal("")
+	list := ByEqual("")
 	list = list.PushHead("")
 	require.Equal(t, Equal(""), list)
 

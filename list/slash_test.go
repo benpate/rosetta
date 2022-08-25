@@ -59,7 +59,7 @@ func TestSlash_At(t *testing.T) {
 
 func TestSlash_Push(t *testing.T) {
 
-	list := Slash("")
+	list := BySlash("")
 	list = list.PushHead("")
 	require.Equal(t, Slash(""), list)
 

@@ -59,7 +59,7 @@ func TestDot_At(t *testing.T) {
 
 func TestDot_Push(t *testing.T) {
 
-	list := Dot("")
+	list := List(Dot(""))
 	list = list.PushHead("")
 	require.Equal(t, Dot(""), list)
 

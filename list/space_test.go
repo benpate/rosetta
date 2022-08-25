@@ -59,7 +59,7 @@ func TestSpace_At(t *testing.T) {
 
 func TestSpace_Push(t *testing.T) {
 
-	list := Space("")
+	list := BySpace("")
 	list = list.PushHead("")
 	require.Equal(t, Space(""), list)
 
