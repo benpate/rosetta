@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
 )
 
@@ -15,9 +16,26 @@ type Object struct {
 	Required      bool
 }
 
+/***********************************
+ * ELEMENT META-DATA
+ ***********************************/
+
 // Type returns the data type of this Element
 func (element Object) Type() reflect.Type {
 	return reflect.TypeOf(maps.Map{})
+}
+
+// DefaultValue returns the default value for this element type.  In a special case for objects,
+// which can be represented as both Go structs and maps, this returns a map[string]any that has been
+// populated with any known default keys.
+func (element Object) DefaultValue() any {
+	result := maps.Map{}
+
+	for key, element := range element.Properties {
+		result[key] = element.DefaultValue()
+	}
+
+	return result
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -25,8 +43,12 @@ func (element Object) IsRequired() bool {
 	return element.Required
 }
 
+/***********************************
+ * PRIMARY INTERFACE METHODS
+ ***********************************/
+
 // Find locates a child of this element
-func (element Object) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
+func (element Object) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
 
 	switch object.Kind() {
 
@@ -55,7 +77,7 @@ func (element Object) Get(object reflect.Value, path string) (reflect.Value, Ele
 }
 
 // Set validates/formats a value using this schema
-func (element Object) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element Object) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
 	switch object.Kind() {
 
@@ -79,9 +101,41 @@ func (element Object) Set(object reflect.Value, path string, value any) (reflect
 	case reflect.Invalid:
 		return element.Set(reflect.ValueOf(element.DefaultValue()), path, value)
 
+	default:
+		return reflect.ValueOf(nil), derp.Report(derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path, value))
 	}
 
-	return reflect.ValueOf(nil), derp.Report(derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path, value))
+}
+
+// Remove removes a child of the target object.  In the case of Maps, the map key is removed.
+// In the case of Structs, the field is set to its default value.
+func (element Object) Remove(object reflect.Value, path list.List) (reflect.Value, error) {
+
+	switch object.Kind() {
+
+	// If the value is nil, then create a default value and set the new property in it.
+	case reflect.Invalid:
+		return element.Remove(reflect.ValueOf(element.DefaultValue()), path)
+
+	// Dereference pointers
+	case reflect.Pointer:
+		return element.Remove(object.Elem(), path)
+
+	// Dereference interfaces
+	case reflect.Interface:
+		return element.Remove(object.Elem(), path)
+
+	// Set Maps
+	case reflect.Map:
+		return element.removeFromMap(object, path)
+
+	// Set Structs
+	case reflect.Struct:
+		return element.removeFromStruct(object, path)
+
+	default:
+		return reflect.ValueOf(nil), derp.Report(derp.NewInternalError("schema.Object.Set", "object must be a struct or a map", object.Kind().String(), object.Interface(), path))
+	}
 }
 
 // Validate validates a value against this schema
@@ -126,18 +180,9 @@ func (element Object) Validate(value any) error {
 	return errorReport
 }
 
-// DefaultValue returns the default value for this element type.  In a special case for objects,
-// which can be represented as both Go structs and maps, this returns a map[string]any that has been
-// populated with any known default keys.
-func (element Object) DefaultValue() any {
-	result := maps.Map{}
-
-	for key, element := range element.Properties {
-		result[key] = element.DefaultValue()
-	}
-
-	return result
-}
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
 
 // MarshalMap populates object data into a map[string]any
 func (element Object) MarshalMap() map[string]any {

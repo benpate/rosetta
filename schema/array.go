@@ -19,9 +19,19 @@ type Array struct {
 	Delimiter string // DEPRECATED
 }
 
+/***********************************
+ * ELEMENT META-DATA
+ ***********************************/
+
 // Type returns the reflection type of this Element
 func (element Array) Type() reflect.Type {
 	return reflect.SliceOf(element.Items.Type())
+}
+
+// DefaultValue returns the default value for this element type
+func (element Array) DefaultValue() any {
+	sliceType := reflect.SliceOf(element.Items.Type())
+	return reflect.MakeSlice(sliceType, 0, 0).Interface()
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -29,7 +39,11 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-func (element Array) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
+/***********************************
+ * PRIMARY INTERFACE METHODS
+ ***********************************/
+
+func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
 
 	const location = "schema.Array.Get"
 
@@ -57,12 +71,12 @@ func (element Array) Get(object reflect.Value, path string) (reflect.Value, Elem
 	}
 
 	// If the request is for this object, then convert it from
-	if path == "" {
+	if path.IsEmpty() {
 		return object, element, nil
 	}
 
 	// Get (and bounds-check) the array index
-	head, tail := list.Dot(path).Split()
+	head, tail := path.Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
@@ -79,11 +93,11 @@ func (element Array) Get(object reflect.Value, path string) (reflect.Value, Elem
 
 	//
 	subValue := object.Index(index)
-	return element.Items.Get(subValue, string(tail))
+	return element.Items.Get(subValue, tail)
 }
 
 // Set formats/validates a generic value using this schema
-func (element Array) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element Array) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
 	const location = "schema.Array.Set"
 
@@ -105,12 +119,12 @@ func (element Array) Set(object reflect.Value, path string, value any) (reflect.
 
 	// Try to set the value directly.  This will barf if the types don't match
 	// but it's better to try and fail, than to not try at all.
-	if path == "" {
+	if path.IsEmpty() {
 		return object, nil
 	}
 
 	// Get (and bounds-check) the array index
-	head, tail := list.Dot(path).Split()
+	head, tail := path.Split()
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
@@ -137,7 +151,9 @@ func (element Array) Set(object reflect.Value, path string, value any) (reflect.
 
 		minLength := index + 1
 		if needed := minLength - object.Len(); needed > 0 {
-			emptySlice := reflect.MakeSlice(element.Type(), needed, needed)
+			elementType := object.Type().Elem()
+			sliceType := reflect.SliceOf(elementType)
+			emptySlice := reflect.MakeSlice(sliceType, needed, needed)
 			object = reflect.AppendSlice(object, emptySlice)
 		}
 
@@ -149,7 +165,7 @@ func (element Array) Set(object reflect.Value, path string, value any) (reflect.
 	subObject := object.Index(index)
 
 	// Try to set the value of the indexed sub-object
-	subResult, err := element.Items.Set(subObject, string(tail), value)
+	subResult, err := element.Items.Set(subObject, tail, value)
 
 	if err != nil {
 		return reflect.ValueOf(nil), derp.Wrap(err, location, "Error setting array index")
@@ -160,6 +176,105 @@ func (element Array) Set(object reflect.Value, path string, value any) (reflect.
 
 	// Done
 	return object, nil
+}
+
+func (element Array) Remove(object reflect.Value, path list.List) (reflect.Value, error) {
+
+	const location = "schema.Array.Remove"
+
+	// Validate that we have the right type of object
+	switch object.Kind() {
+
+	// If the value is invalid (nil) then use the default value
+	case reflect.Invalid:
+		return element.Remove(reflect.ValueOf(element.DefaultValue()), path)
+
+	// Dereference interfaces
+	case reflect.Interface:
+		return element.Remove(object.Elem(), path)
+
+	// Dereference pointers
+	case reflect.Pointer:
+		return element.Remove(object.Elem(), path)
+
+	// Allow processing of arrays and slices to continue
+	case reflect.Array, reflect.Slice:
+
+	// All other types are an error.
+	default:
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Cannot remove from this type", object.Kind().String(), object.Interface(), path)
+	}
+
+	// Cannot remove arrays directly.  This should never happen
+	// because this operation SHOULD HAVE been handled by the upstream element.
+	if path.IsEmpty() {
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Cannot remove array directly.  This should never happen")
+	}
+
+	// Get (and bounds-check) the array index
+	head, tail := path.Split()
+	index, err := strconv.Atoi(head)
+
+	if err != nil {
+		return reflect.ValueOf(nil), derp.NewBadRequestError(location, "Invalid array index", head)
+	}
+
+	if index < 0 {
+		return reflect.ValueOf(nil), derp.NewBadRequestError(location, "Index out of bounds (negative index)", index)
+	}
+
+	length := object.Len()
+	if index > length {
+		return object, nil
+	}
+
+	// If we're removing a sub-value, then pass this call to the sub-element.
+	if !tail.IsEmpty() {
+		subValue := object.Index(index)
+		subResult, err := element.Items.Remove(subValue, tail)
+
+		if err != nil {
+			return reflect.ValueOf(nil), derp.Wrap(err, location, "Error removing elements in array index", index)
+		}
+
+		subValue.Set(subResult)
+		return object, nil
+	}
+
+	// Otherwise, we're removing a whole element in this array
+
+	// Create a new value (array or slice) that is one item shorter
+	var result reflect.Value
+	elementType := object.Type().Elem()
+
+	switch object.Kind() {
+
+	case reflect.Array:
+		resultType := reflect.ArrayOf(length-1, elementType)
+		result = reflect.Zero(resultType)
+
+	case reflect.Slice:
+		resultType := reflect.SliceOf(elementType)
+		result = reflect.MakeSlice(resultType, length-1, length-1)
+
+	default:
+		return reflect.ValueOf(nil), derp.NewInternalError("slice.RemoveFromInterface", "Value must be an array or slice", object.Kind().String(), object.Interface())
+	}
+
+	// Copy items from the old value into the new value, skipping the item at the specified index
+	newIndex := 0
+	for oldIndex := 0; oldIndex < length; oldIndex++ {
+
+		if oldIndex == index {
+			continue
+		}
+
+		result.Index(newIndex).Set(object.Index(oldIndex))
+		newIndex += 1
+	}
+
+	// Success!!
+	return result, nil
 }
 
 // Validate validates a value against this schema
@@ -201,11 +316,9 @@ func (element Array) Validate(value any) error {
 	return errorReport
 }
 
-// DefaultValue returns the default value for this element type
-func (element Array) DefaultValue() any {
-	sliceType := reflect.SliceOf(element.Items.Type())
-	return reflect.MakeSlice(sliceType, 0, 0).Interface()
-}
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
 
 // MarshalMap populates object data into a map[string]any
 func (element Array) MarshalMap() map[string]any {

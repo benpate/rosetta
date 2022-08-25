@@ -7,6 +7,7 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
 )
 
@@ -20,14 +21,18 @@ type Number struct {
 	Required   bool
 }
 
-// Enumerate implements the "Enumerator" interface
-func (element Number) Enumerate() []string {
-	return convert.SliceOfString(element.Enum)
-}
+/***********************************
+ * ELEMENT META-DATA
+ ***********************************/
 
 // Type returns the data type of this Element
 func (element Number) Type() reflect.Type {
 	return reflect.TypeOf(float64(0))
+}
+
+// DefaultValue returns the default value for this element type
+func (element Number) DefaultValue() any {
+	return element.Default.Float()
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -35,10 +40,14 @@ func (element Number) IsRequired() bool {
 	return element.Required
 }
 
-func (element Number) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
+/***********************************
+ * PRIMARY INTERFACE METHODS
+ ***********************************/
+
+func (element Number) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
 
 	// RULE: Cannot get sub-properties on a number
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
 	}
 
@@ -58,10 +67,10 @@ func (element Number) Get(object reflect.Value, path string) (reflect.Value, Ele
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Number) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element Number) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
 	// RULE: Cannot set sub-properties on a number
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), derp.NewInternalError("schema.Number.Set", "Can't set sub-properties on a number", path, value)
 	}
 
@@ -73,6 +82,11 @@ func (element Number) Set(object reflect.Value, path string, value any) (reflect
 	}
 
 	return reflect.ValueOf(floatValue), nil
+}
+
+// Remove removes a value from the provided object/path.  In the case of numbers, this is a no-op.
+func (element Number) Remove(_ reflect.Value, _ list.List) (reflect.Value, error) {
+	return reflect.ValueOf(nil), derp.NewInternalError("schema.Number.Remove", "Can't remove properties from a number.  This should never happen.")
 }
 
 // Validate validates a value against this schema
@@ -120,10 +134,18 @@ func (element Number) Validate(value any) error {
 	return err
 }
 
-// DefaultValue returns the default value for this element type
-func (element Number) DefaultValue() any {
-	return element.Default.Float()
+/***********************************
+ * ENUMERATOR INTERFACE
+ ***********************************/
+
+// Enumerate implements the "Enumerator" interface
+func (element Number) Enumerate() []string {
+	return convert.SliceOfString(element.Enum)
 }
+
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
 
 // MarshalMap populates object data into a map[string]any
 func (element Number) MarshalMap() map[string]any {

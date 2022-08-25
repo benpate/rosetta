@@ -6,6 +6,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
 )
 
@@ -15,9 +16,18 @@ type Boolean struct {
 	Required bool
 }
 
+/***********************************
+ * ELEMENT META-DATA
+ ***********************************/
+
 // Type returns the data type of this Element
 func (element Boolean) Type() reflect.Type {
 	return reflect.TypeOf(bool(true))
+}
+
+// DefaultValue returns the default value for this element type
+func (element Boolean) DefaultValue() any {
+	return element.Required
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -25,11 +35,15 @@ func (element Boolean) IsRequired() bool {
 	return element.Required
 }
 
+/***********************************
+ * PRIMARY INTERFACE METHODS
+ ***********************************/
+
 // Find locates a child of this element
-func (element Boolean) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
+func (element Boolean) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
 
 	// RULE: Cannot get sub-properties of a boolean
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
 	}
 
@@ -38,15 +52,20 @@ func (element Boolean) Get(object reflect.Value, path string) (reflect.Value, El
 }
 
 // Set formats a value and applies it to the provided object/path
-func (element Boolean) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element Boolean) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
 	// RULE: Cannot set sub-properties of a boolean
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), derp.NewInternalError("schema.Boolean.Set", "Can't set sub-properties on a boolean", path, value)
 	}
 
 	// Convert and return the value
 	return reflect.ValueOf(convert.BoolDefault(value, element.Default.Bool())), nil
+}
+
+// Remove removes a value from the provided object/path.  In the case of booleans, this is a no-op.
+func (element Boolean) Remove(_ reflect.Value, _ list.List) (reflect.Value, error) {
+	return reflect.ValueOf(nil), derp.NewInternalError("schema.Boolean.Remove", "Can't remove properties from a boolean.  This should never happen.")
 }
 
 // Validate validates a generic value using this schema
@@ -61,10 +80,9 @@ func (element Boolean) Validate(object any) error {
 	return nil
 }
 
-// DefaultValue returns the default value for this element type
-func (element Boolean) DefaultValue() any {
-	return element.Required
-}
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
 
 // MarshalJSON implements the json.Marshaler interface
 func (element Boolean) MarshalJSON() ([]byte, error) {

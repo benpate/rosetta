@@ -6,6 +6,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 )
 
 // Element interface wraps all of the methods required for schema elements.
@@ -14,23 +15,26 @@ type Element interface {
 	// Type returns the Type of this particular schema element
 	Type() reflect.Type
 
+	// Default returns the default value for this element
+	DefaultValue() any
+
+	// IsRequired returns true if this a value is required for this element
+	IsRequired() bool
+
 	// Get uses the path to locate a value in an object along with the schema that defines it.
-	Get(object reflect.Value, path string) (reflect.Value, Element, error)
+	Get(object reflect.Value, path list.List) (reflect.Value, Element, error)
 
 	// Set formats a value and applies it to the provided object/path
-	Set(object reflect.Value, path string, value any) (reflect.Value, error)
+	Set(object reflect.Value, path list.List, value any) (reflect.Value, error)
+
+	// Remove removes the value from the object at the designated path
+	Remove(object reflect.Value, path list.List) (reflect.Value, error)
 
 	// Validate validates the provided value
 	Validate(value any) error
 
-	// Default returns the default value for this element
-	DefaultValue() any
-
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
-
-	// IsRequired returns true if this a value is required for this element
-	IsRequired() bool
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.

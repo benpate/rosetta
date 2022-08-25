@@ -23,14 +23,18 @@ type String struct {
 	Required  bool
 }
 
-// Enumerate implements the "Enumerator" interface
-func (element String) Enumerate() []string {
-	return element.Enum
-}
+/***********************************
+ * ELEMENT META-DATA
+ ***********************************/
 
 // Type returns the data type of this Element
 func (element String) Type() reflect.Type {
 	return reflect.TypeOf(string(""))
+}
+
+// DefaultValue returns the default value for this element type
+func (element String) DefaultValue() any {
+	return element.Default
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -38,10 +42,14 @@ func (element String) IsRequired() bool {
 	return element.Required
 }
 
-func (element String) Get(object reflect.Value, path string) (reflect.Value, Element, error) {
+/***********************************
+ * PRIMARY INTERFACE METHODS
+ ***********************************/
+
+func (element String) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
 
 	// RULE: Cannot get sub-properties on a string
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
 	}
 
@@ -55,16 +63,21 @@ func (element String) Get(object reflect.Value, path string) (reflect.Value, Ele
 }
 
 // Set validates/formats a generic value using this schema
-func (element String) Set(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element String) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
 	// RULE: Cannot set sub-properties on a string
-	if path != "" {
+	if !path.IsEmpty() {
 		return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Set", "Can't set sub-properties on a string", path, value)
 	}
 
 	// Convert and return the new value
 	stringValue := convert.StringDefault(value, element.Default)
 	return reflect.ValueOf(stringValue), nil
+}
+
+// Remove removes a value from the provided object/path.  In the case of strings, this is a no-op.
+func (element String) Remove(_ reflect.Value, _ list.List) (reflect.Value, error) {
+	return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Remove", "Can't remove properties from a string.  This should never happen.")
 }
 
 // Validate compares a generic data value using this Schema
@@ -112,10 +125,18 @@ func (element String) Validate(value any) error {
 	return errorReport
 }
 
-// DefaultValue returns the default value for this element type
-func (element String) DefaultValue() any {
-	return element.Default
+/***********************************
+ * ENUMERATOR INTERFACE
+ ***********************************/
+
+// Enumerate implements the "Enumerator" interface
+func (element String) Enumerate() []string {
+	return element.Enum
 }
+
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
 
 // MarshalMap populates object data into a map[string]any
 func (element String) MarshalMap() map[string]any {
@@ -171,6 +192,10 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 
 	return err
 }
+
+/***********************************
+ * HELPER METHODS
+ ***********************************/
 
 // formatFunctions parses all of the formatting functions
 // used by this string value.

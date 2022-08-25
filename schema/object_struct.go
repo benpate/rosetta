@@ -7,21 +7,23 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
-func (element Object) getFromStruct(object reflect.Value, path string) (reflect.Value, Element, error) {
+func (element Object) getFromStruct(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+
+	const location = "schema.Object.getFromStruct"
 
 	// RULE: if the path is empty, then return the entire struct
-	if path == "" {
+	if path.IsEmpty() {
 		return object, element, nil
 	}
 
 	// Split the path into head and tail
-	head, tail := list.Dot(path).Split()
+	head, tail := path.Split()
 
 	// Try to find the matching property in this schema
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Object.getFromStruct", "Sub-element does not exist for this path", path, object)
+		return reflect.ValueOf(nil), element, derp.NewInternalError(location, "Sub-element does not exist for this path", path, object)
 	}
 
 	// Retrieve and return the existing value from the struct
@@ -31,22 +33,21 @@ func (element Object) getFromStruct(object reflect.Value, path string) (reflect.
 		return reflect.ValueOf(nil), element, err
 	}
 
-	return property.Get(field, tail.String())
+	return property.Get(field, tail)
 }
 
-func (element Object) setToStruct(object reflect.Value, path string, value any) (reflect.Value, error) {
+func (element Object) setToStruct(object reflect.Value, path list.List, value any) (reflect.Value, error) {
 
-	const location = "schema.Object.setStruct"
+	const location = "schema.Object.setToStruct"
 
-	var err error
-
-	if path == "" {
-		return reflect.ValueOf(nil), derp.NewInternalError(location, "Cannot set struct value directly.  Set sub-items instead.", value)
+	// Allow direct setting of struct values.
+	// TODO: This should probably be validated against the schema.
+	if path.IsEmpty() {
+		return object, nil
 	}
 
-	head, tail := list.Dot(path).Split()
-
 	// Try to find the matching property in this schema
+	head, tail := path.Split()
 	property, ok := element.Properties[head]
 
 	if !ok {
@@ -57,11 +58,11 @@ func (element Object) setToStruct(object reflect.Value, path string, value any) 
 	field, err := findFieldByTag(object, head)
 
 	if err != nil {
-		return reflect.ValueOf(nil), derp.NewInternalError(location, "Invalid struct tag", path)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Cannot find struct field with this path", path)
 	}
 
 	// Try to put the value into the object
-	result, err := property.Set(field, tail.String(), value)
+	result, err := property.Set(field, tail, value)
 
 	if err != nil {
 		return reflect.ValueOf(nil), derp.Wrap(err, location, "Error creating value of sub-element", path, value)
@@ -70,7 +71,41 @@ func (element Object) setToStruct(object reflect.Value, path string, value any) 
 	field.Set(result)
 
 	// Done
-	return object, err
+	return object, nil
+}
+
+func (element Object) removeFromStruct(object reflect.Value, path list.List) (reflect.Value, error) {
+
+	const location = "schema.Object.removeFromStruct"
+
+	// Try to find the matching property in this schema
+	head, tail := path.Split()
+	property, ok := element.Properties[head]
+
+	if !ok {
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", element, path)
+	}
+
+	// Try to find the field in this struct
+	field, err := findFieldByTag(object, head)
+
+	if err != nil {
+		return reflect.ValueOf(nil), derp.Wrap(err, location, "Cannot find struct field with this path", path)
+	}
+
+	// If we're removing a sub-value, then pass this call to the sub-element.
+	if !tail.IsEmpty() {
+		subResult, err := property.Remove(field, tail)
+		if err != nil {
+			return reflect.ValueOf(nil), derp.Wrap(err, location, "Error removing sub-element", path, object.Interface())
+		}
+		field.Set(subResult)
+		return object, nil
+	}
+
+	// Otherwise, set the whole property to the default value
+	field.Set(reflect.ValueOf(property.DefaultValue()))
+	return object, nil
 }
 
 // findFieldByTag returns the field whose "path" tag matches the provided value.
@@ -91,5 +126,5 @@ func findFieldByTag(value reflect.Value, tag string) (reflect.Value, error) {
 		}
 	}
 
-	return reflect.Value{}, derp.NewInternalError(location, "Tag does not exist", tag)
+	return reflect.Value{}, derp.NewInternalError(location, "Tag does not exist", tag, value.Interface())
 }

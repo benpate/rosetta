@@ -6,6 +6,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -47,7 +48,7 @@ func (schema Schema) Get(object any, path string) (any, Element, error) {
 	}
 
 	// Get the value from the schema element
-	resultValue, element, err = schema.Element.Get(convert.ReflectValue(object), path)
+	resultValue, element, err = schema.Element.Get(convert.ReflectValue(object), list.ByDot(path))
 
 	if err != nil {
 		return nil, nil, derp.Wrap(err, location, "Invalid Get", object, path)
@@ -107,13 +108,15 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	var err error
 
-	// Catch reflection panics
-	defer func() {
-		if r := recover(); r != nil {
-			err = derp.NewInternalError(location, "Error in reflection", r)
-			derp.Report(err)
-		}
-	}()
+	/*
+		// Catch reflection panics
+		defer func() {
+			if r := recover(); r != nil {
+				err = derp.NewInternalError(location, "Error in reflection", r)
+				derp.Report(err)
+			}
+		}()
+	*/
 
 	if schema.Element == nil {
 		return derp.NewInternalError(location, "Invalid schema.  Element is nil.")
@@ -135,7 +138,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// Try to set the value in the variable
-	result, err := schema.Element.Set(addressable, path, value)
+	result, err := schema.Element.Set(addressable, list.ByDot(path), value)
 
 	if err != nil {
 		return derp.Wrap(err, location, "Error setting value")
@@ -168,6 +171,51 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	// Success!!
 	return nil
+}
+
+func (schema Schema) Remove(object any, path string) error {
+
+	const location = "schema.Schema.Remove"
+
+	var err error
+
+	// Catch reflection panics
+	defer func() {
+		if r := recover(); r != nil {
+			err = derp.NewInternalError(location, "Error in reflection", r)
+			derp.Report(err)
+		}
+	}()
+
+	if schema.Element == nil {
+		return derp.NewInternalError(location, "Invalid schema.  Element is nil.")
+	}
+
+	valueOf := convert.ReflectValue(object)
+
+	// Guarantee that we've been passed a pointer
+	if valueOf.Kind() != reflect.Pointer {
+		return derp.NewInternalError(location, "Must pass a pointer (not a value) to this function.", object, path)
+	}
+
+	// Now that we KNOW it's a pointer, dereference it.  This value should ALWAYS be addressable.
+	addressable := valueOf.Elem()
+
+	// Verify that it's still addressable (this should never fail)
+	if !addressable.CanSet() {
+		return derp.NewInternalError(location, "Cannot set value")
+	}
+
+	// Try to set the value in the variable
+	result, err := schema.Element.Remove(addressable, list.ByDot(path))
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error setting value")
+	}
+
+	addressable.Set(result)
+
+	return err
 }
 
 // Validate checks a particular value against this schema.  If the

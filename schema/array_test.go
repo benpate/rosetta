@@ -119,3 +119,126 @@ func TestComplexArrayOperations(t *testing.T) {
 	require.Equal(t, "", notes)
 	require.Nil(t, err)
 }
+
+func TestArrayRemoveSimple(t *testing.T) {
+	s := New(Array{Items: String{}})
+
+	// Remove first item
+	{
+		v := []string{"zero", "one", "two", "three"}
+
+		err := s.Remove(&v, "0")
+		require.Nil(t, err)
+		require.Equal(t, 3, len(v))
+		require.Equal(t, []string{"one", "two", "three"}, v)
+	}
+
+	// Remove last item
+	{
+		v := []string{"zero", "one", "two", "three"}
+
+		err := s.Remove(&v, "3")
+		require.Nil(t, err)
+		require.Equal(t, 3, len(v))
+		require.Equal(t, []string{"zero", "one", "two"}, v)
+	}
+
+	// Remove middle item
+	{
+		v := []string{"zero", "one", "two", "three"}
+
+		err := s.Remove(&v, "1")
+		require.Nil(t, err)
+		require.Equal(t, 3, len(v))
+		require.Equal(t, []string{"zero", "two", "three"}, v)
+	}
+}
+
+func TestArrayRemoveComplex(t *testing.T) {
+
+	type testPerson struct {
+		Name     string       `path:"name"`
+		Email    string       `path:"email"`
+		Children []testPerson `path:"children"`
+	}
+
+	data := []testPerson{}
+
+	schema := New(Array{Items: Object{Properties: ElementMap{
+		"name":  String{},
+		"email": String{},
+		"children": Array{Items: Object{Properties: ElementMap{
+			"name":  String{},
+			"email": String{},
+		}}},
+	}}})
+
+	// Alfred
+	require.Nil(t, schema.Set(&data, "0.name", "Alfred"))
+	require.Nil(t, schema.Set(&data, "0.email", "aelfred@wessex.gov"))
+
+	// Aethelflad
+	require.Nil(t, schema.Set(&data, "0.children.0.name", "Aethelflad"))
+	require.Nil(t, schema.Set(&data, "0.children.0.email", "aethelflad@mercia.gov"))
+
+	// Edward
+	require.Nil(t, schema.Set(&data, "0.children.1.name", "Edward"))
+	require.Nil(t, schema.Set(&data, "0.children.1.email", "slick-eddie@wessex.gov"))
+
+	// Aelfgiffu
+	require.Nil(t, schema.Set(&data, "1.name", "Aelfgiffu"))
+	require.Nil(t, schema.Set(&data, "1.email", "aelfgiffu@wessex.gov"))
+
+	// Verify inserts
+	require.Equal(t, []testPerson{{
+		Name:  "Alfred",
+		Email: "aelfred@wessex.gov",
+		Children: []testPerson{
+			{
+				Name:  "Aethelflad",
+				Email: "aethelflad@mercia.gov",
+			},
+			{
+				Name:  "Edward",
+				Email: "slick-eddie@wessex.gov",
+			},
+		}},
+		{
+			Name:  "Aelfgiffu",
+			Email: "aelfgiffu@wessex.gov",
+		},
+	}, data)
+
+	require.Nil(t, schema.Remove(&data, "0.children.0"))
+
+	// Verify deletes
+	require.Equal(t, []testPerson{{
+		Name:  "Alfred",
+		Email: "aelfred@wessex.gov",
+		Children: []testPerson{
+			{
+				Name:  "Edward",
+				Email: "slick-eddie@wessex.gov",
+			},
+		}},
+		{
+			Name:  "Aelfgiffu",
+			Email: "aelfgiffu@wessex.gov",
+		},
+	}, data)
+
+	require.Nil(t, schema.Remove(&data, "0.children.0"))
+
+	// Verify deletes
+	require.Equal(t, []testPerson{
+		{
+			Name:     "Alfred",
+			Email:    "aelfred@wessex.gov",
+			Children: []testPerson{},
+		},
+		{
+			Name:  "Aelfgiffu",
+			Email: "aelfgiffu@wessex.gov",
+		},
+	}, data)
+}

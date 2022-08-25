@@ -172,6 +172,85 @@ func TestComplexObjectSet2(t *testing.T) {
 	}, data)
 }
 
+func TestObjectRemove(t *testing.T) {
+
+	schema := Schema{
+		Element: Object{
+			Properties: map[string]Element{
+				"name": String{},
+				"age":  Integer{},
+				"contact": Object{
+					Properties: map[string]Element{
+						"email":  String{},
+						"phone":  String{},
+						"domain": String{},
+					},
+				},
+			},
+		},
+	}
+
+	data := maps.Map{
+		"name": "John Doe",
+		"age":  42,
+		"contact": map[string]any{
+			"email": "john@doe.com",
+		},
+	}
+
+	// Remove non-existing property
+	err := schema.Remove(&data, "contact.bad-property")
+	require.NotNil(t, err)
+	require.Equal(t, maps.Map{
+		"name": "John Doe",
+		"age":  42,
+		"contact": map[string]any{
+			"email": "john@doe.com",
+		},
+	}, data)
+
+	// Remove non-existing key
+	err = schema.Remove(&data, "contact.phone")
+	require.Nil(t, err)
+	require.Equal(t, maps.Map{
+		"name": "John Doe",
+		"age":  42,
+		"contact": map[string]any{
+			"email": "john@doe.com",
+		},
+	}, data)
+
+	// Remove nested key
+	err = schema.Remove(&data, "contact.email")
+	require.Nil(t, err)
+	require.Equal(t, maps.Map{
+		"name":    "John Doe",
+		"age":     42,
+		"contact": map[string]any{},
+	}, data)
+
+	// Remove top-level key
+	err = schema.Remove(&data, "contact")
+	require.Nil(t, err)
+	require.Equal(t, maps.Map{
+		"name": "John Doe",
+		"age":  42,
+	}, data)
+
+	// Remove top-level key
+	err = schema.Remove(&data, "age")
+	require.Nil(t, err)
+	require.Equal(t, maps.Map{
+		"name": "John Doe",
+	}, data)
+
+	// Remove top-level key
+	err = schema.Remove(&data, "name")
+	require.Nil(t, err)
+	require.Equal(t, maps.Map{}, data)
+
+}
+
 func TestValidateComplexObject(t *testing.T) {
 
 	schema := Schema{
