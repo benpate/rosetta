@@ -7,7 +7,6 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // Schema defines a (simplified) JSON-Schema object, that can be Marshalled/Unmarshalled to JSON.
@@ -22,6 +21,16 @@ func New(element Element) Schema {
 	return Schema{
 		Element: element,
 	}
+}
+
+// DefaultValue returns a value that matches the defaults for this schema.
+func (schema Schema) DefaultValue() any {
+
+	if schema.Element == nil {
+		return nil
+	}
+
+	return schema.Element.DefaultValue()
 }
 
 // Get retrieves a generic value from the object.  If the object is nil,
@@ -52,11 +61,6 @@ func (schema Schema) Get(object any, path string) (any, Element, error) {
 
 	if err != nil {
 		return nil, nil, derp.Wrap(err, location, "Invalid Get", object, path)
-	}
-
-	if resultValue.Kind() == 0 {
-		spew.Dump(element)
-		spew.Dump(err)
 	}
 
 	result = resultValue.Interface()
