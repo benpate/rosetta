@@ -31,7 +31,7 @@ func (element Integer) Type() reflect.Type {
 
 // DefaultValue returns the default value for this element type
 func (element Integer) DefaultValue() any {
-	return element.Default.Int64()
+	return element.Default.Interface()
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -43,22 +43,32 @@ func (element Integer) IsRequired() bool {
  * PRIMARY INTERFACE METHODS
  ***********************************/
 
-func (element Integer) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Integer) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
 	}
 
 	if intValue, ok := convert.Int64Ok(object, 0); ok {
-		return reflect.ValueOf(intValue), element, nil
+		return reflect.ValueOf(intValue), nil
 	}
 
 	if element.Default.IsPresent() {
 		defaultValue := convert.Int64Default(object, element.Default.Int64())
-		return reflect.ValueOf(defaultValue), element, nil
+		return reflect.ValueOf(defaultValue), nil
 	}
 
-	return reflect.ValueOf(nil), element, nil
+	return reflect.ValueOf(nil), nil
+}
+
+// GetElement returns a sub-element of this schema
+func (element Integer) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	return nil, derp.NewInternalError("schema.Integer.GetElement", "Can't find sub-properties on an 'integer' type", path)
 }
 
 // Set formats a value and applies it to the provided object/path

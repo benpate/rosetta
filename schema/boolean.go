@@ -40,15 +40,25 @@ func (element Boolean) IsRequired() bool {
  ***********************************/
 
 // Find locates a child of this element
-func (element Boolean) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Boolean) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	// RULE: Cannot get sub-properties of a boolean
 	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Boolean.Find", "Can't find sub-properties on a 'boolean' type", path)
 	}
 
 	// Try to convert and return the new value
-	return reflect.ValueOf(convert.BoolDefault(object, element.Default.Bool())), element, nil
+	return reflect.ValueOf(convert.BoolDefault(object, element.Default.Bool())), nil
+}
+
+// GetElement returns the element definition for a given path
+func (element Boolean) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	return nil, derp.NewInternalError("schema.Boolean.GetElement", "Can't find sub-properties on a boolean", path)
 }
 
 // Set formats a value and applies it to the provided object/path
@@ -111,7 +121,7 @@ func (element Boolean) MarshalMap() map[string]any {
 func (element *Boolean) UnmarshalMap(data map[string]any) error {
 
 	if convert.String(data["type"]) != "boolean" {
-		return derp.New(500, "schema.Boolean.UnmarshalMap", "Data is not type 'boolean'", data)
+		return derp.NewInternalError("schema.Boolean.UnmarshalMap", "Data is not type 'boolean'", data)
 	}
 
 	element.Default = convert.NullBool(data["default"])

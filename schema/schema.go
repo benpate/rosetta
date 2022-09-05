@@ -23,6 +23,11 @@ func New(element Element) Schema {
 	}
 }
 
+// ElementType returns the reflection type of this schema's top-level element
+func (schema *Schema) ElementType() reflect.Type {
+	return schema.Element.Type()
+}
+
 // DefaultValue returns a value that matches the defaults for this schema.
 func (schema Schema) DefaultValue() any {
 
@@ -35,72 +40,81 @@ func (schema Schema) DefaultValue() any {
 
 // Get retrieves a generic value from the object.  If the object is nil,
 // Get still tries to return a default value if provided by the schema
-func (schema Schema) Get(object any, path string) (any, Element, error) {
+func (schema Schema) Get(object any, path string) (any, error) {
 
 	const location = "schema.Schema.Get"
 
 	var resultValue reflect.Value
 	var result any
-	var element Element
 	var err error
 
-	// Catch reflection panics
+	/*/ Catch reflection panics
 	defer func() {
 		if r := recover(); r != nil {
 			err = derp.NewInternalError(location, "Error in reflection", r)
 			derp.Report(err)
 		}
-	}()
+	}()*/
 
 	if schema.Element == nil {
-		return nil, nil, derp.NewInternalError(location, "Invalid schema.  Element is nil")
+		return nil, derp.NewInternalError(location, "Invalid schema.  Element is nil")
 	}
 
 	// Get the value from the schema element
-	resultValue, element, err = schema.Element.Get(convert.ReflectValue(object), list.ByDot(path))
+	resultValue, err = schema.Element.Get(convert.ReflectValue(object), list.ByDot(path))
 
 	if err != nil {
-		return nil, nil, derp.Wrap(err, location, "Invalid Get", object, path)
+		return nil, derp.Wrap(err, location, "Invalid Get", object, path)
 	}
 
+	// Catch empty values
+	if resultValue.Kind() == reflect.Invalid {
+		return nil, nil
+	}
+
+	// If not nil, get the actual value
 	result = resultValue.Interface()
 
 	// Return to caller
-	return result, element, err
+	return result, err
+}
+
+func (schema Schema) GetElement(path string) (Element, error) {
+	return schema.Element.GetElement(list.ByDot(path))
 }
 
 // GetBool retrieves a bool value from this object.  If the value
 // is not defined in the object/schema, then the zero value (false) is returned
 func (schema Schema) GetBool(object any, path string) bool {
-	result, _, _ := schema.Get(object, path)
+	result, _ := schema.Get(object, path)
 	return convert.Bool(result)
 }
 
 // GetFloat retrieves a float64 value from this object.  If the value
 // is not defined in the object/schema, then the zero value (0.0) is returned
 func (schema Schema) GetFloat(object any, path string) float64 {
-	result, _, _ := schema.Get(object, path)
+	result, _ := schema.Get(object, path)
 	return convert.Float(result)
 }
 
 // GetInt retrieves a int value from this object.  If the value
 // is not defined in the object/schema, then the zero value (0) is returned
 func (schema Schema) GetInt(object any, path string) int {
-	result, _, _ := schema.Get(object, path)
+	result, _ := schema.Get(object, path)
 	return convert.Int(result)
 }
 
 // GetInt64 retrieves an int64 value from this object.  If the value
 // is not defined in the object/schema, then the zero value (0) is returned
 func (schema Schema) GetInt64(object any, path string) int64 {
-	result, _, _ := schema.Get(object, path)
+	result, _ := schema.Get(object, path)
 	return convert.Int64(result)
 }
 
 // GetString retrieves a string value from this object.  If the value
 // is not defined in the object/schema, then the zero value ("") is returned
 func (schema Schema) GetString(object any, path string) string {
-	result, _, _ := schema.Get(object, path)
+	result, _ := schema.Get(object, path)
 	return convert.String(result)
 }
 

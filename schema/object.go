@@ -48,7 +48,7 @@ func (element Object) IsRequired() bool {
  ***********************************/
 
 // Find locates a child of this element
-func (element Object) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Object) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	switch object.Kind() {
 
@@ -73,7 +73,21 @@ func (element Object) Get(object reflect.Value, path list.List) (reflect.Value, 
 		return element.getFromStruct(object, path)
 	}
 
-	return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Object.Get", "object must be a struct or a map", object.Kind().String(), object.Interface(), path)
+	return reflect.ValueOf(nil), derp.NewInternalError("schema.Object.Get", "object must be a struct or a map", object.Kind().String(), object.Interface(), path)
+}
+
+// GetElement returns a sub-element of this schema
+func (element Object) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	if property, ok := element.Properties[path.Head()]; ok {
+		return property.GetElement(path.Tail())
+	}
+
+	return nil, derp.NewInternalError("schema.Integer.GetElement", "Property does not exist in this object", path)
 }
 
 // Set validates/formats a value using this schema

@@ -22,6 +22,23 @@ func TestArrayCreate(t *testing.T) {
 	require.Equal(t, "Sarah Connor", value["friends"].([]string)[1])
 }
 
+func TestArrayGetElement(t *testing.T) {
+
+	{
+		s := New(Array{Items: String{}})
+		element, err := s.GetElement("")
+		require.Nil(t, err)
+		require.Equal(t, s.Element, element)
+	}
+
+	{
+		s := New(Array{Items: String{}})
+		element, err := s.GetElement("0")
+		require.Nil(t, err)
+		require.Equal(t, s.Element.(Array).Items, element)
+	}
+}
+
 func TestArrayValidation(t *testing.T) {
 
 	s := New(Array{
@@ -52,24 +69,68 @@ func TestArrayGet(t *testing.T) {
 	v := []string{"zero", "one", "two", "three"}
 
 	{
-		result, _, err := s.Get(reflect.ValueOf(v), "0")
+		result, err := s.Get(reflect.ValueOf(v), "0")
 		require.Nil(t, err)
 		require.Equal(t, "zero", result)
 	}
 
 	{
 		// Test that negaitve indexes are handled correctly
-		result, _, err := s.Get(reflect.ValueOf(v), "-1")
+		result, err := s.Get(reflect.ValueOf(v), "-1")
 		require.NotNil(t, err)
-		require.Nil(t, result)
+		require.Equal(t, nil, result)
 	}
 
 	{
 		// Test that negaitve indexes are handled correctly
-		result, _, err := s.Get(reflect.ValueOf(v), "notanumber")
+		result, err := s.Get(reflect.ValueOf(v), "notanumber")
 		require.NotNil(t, err)
-		require.Nil(t, result)
+		require.Equal(t, nil, result)
 	}
+}
+
+func TestArrayNil1(t *testing.T) {
+
+	s := Schema{
+		Element: Array{
+			Items: Integer{Minimum: null.NewInt64(0), Maximum: null.NewInt64(10)},
+		},
+	}
+
+	value := make([]int, 0)
+
+	element, err := s.GetElement("0")
+	require.Equal(t, element, s.Element.(Array).Items)
+	require.Nil(t, err)
+
+	result, err := s.Get(value, "0")
+
+	require.Equal(t, nil, result)
+	require.NotNil(t, err)
+}
+
+func TestArrayNil2(t *testing.T) {
+
+	s := Schema{
+		Element: Array{
+			Items: Object{
+				Properties: ElementMap{
+					"firstName": String{Default: "John"},
+					"lastName":  String{Default: "Connor", Enum: []string{"Connor", "Jackson", "Jones", "Smith"}},
+				},
+			},
+		},
+	}
+
+	value := make([]maps.Map, 0)
+
+	element, err := s.GetElement("0.firstName")
+	require.Equal(t, element, s.Element.(Array).Items.(Object).Properties["firstName"])
+	require.Nil(t, err)
+
+	result, err := s.Get(value, "0.firstName")
+	require.Equal(t, nil, result)
+	require.NotNil(t, err)
 }
 
 func TestComplexArrayOperations(t *testing.T) {
@@ -114,7 +175,7 @@ func TestComplexArrayOperations(t *testing.T) {
 	require.Equal(t, "sarah@sky.net", data["friends"].([]maps.Map)[0]["email"])
 	require.Equal(t, 30, data["friends"].([]maps.Map)[0]["age"])
 
-	notes, _, err := schema.Get(data, "notes")
+	notes, err := schema.Get(data, "notes")
 	require.Equal(t, nil, data["notes"])
 	require.Equal(t, "", notes)
 	require.Nil(t, err)

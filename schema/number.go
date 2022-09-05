@@ -32,7 +32,7 @@ func (element Number) Type() reflect.Type {
 
 // DefaultValue returns the default value for this element type
 func (element Number) DefaultValue() any {
-	return element.Default.Float()
+	return element.Default.Interface()
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -44,26 +44,36 @@ func (element Number) IsRequired() bool {
  * PRIMARY INTERFACE METHODS
  ***********************************/
 
-func (element Number) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Number) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	// RULE: Cannot get sub-properties on a number
 	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.Number.Find", "Can't find sub-properties on a 'number' type", path)
 	}
 
 	// Try to convert and return the value
 	if intValue, ok := convert.FloatOk(object, 0); ok {
-		return reflect.ValueOf(intValue), element, nil
+		return reflect.ValueOf(intValue), nil
 	}
 
 	// Try to use the default value
 	if element.Default.IsPresent() {
 		defaultValue := convert.FloatDefault(object, element.Default.Float())
-		return reflect.ValueOf(defaultValue), element, nil
+		return reflect.ValueOf(defaultValue), nil
 	}
 
 	// Return nil if no value is present
-	return reflect.ValueOf(nil), element, nil
+	return reflect.ValueOf(nil), nil
+}
+
+// GetElement returns a sub-element of this schema
+func (element Number) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	return nil, derp.NewInternalError("schema.Number.GetElement", "Can't find sub-properties on an 'number' type", path)
 }
 
 // Set formats a value and applies it to the provided object/path

@@ -46,20 +46,30 @@ func (element String) IsRequired() bool {
  * PRIMARY INTERFACE METHODS
  ***********************************/
 
-func (element String) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element String) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	// RULE: Cannot get sub-properties on a string
 	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), element, derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
+		return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
 	}
 
 	// Try to convert and return the value
 	if stringValue, ok := convert.StringOk(object, ""); ok {
-		return reflect.ValueOf(stringValue), element, nil
+		return reflect.ValueOf(stringValue), nil
 	}
 
 	// Return the default value
-	return reflect.ValueOf(element.Default), element, nil
+	return reflect.ValueOf(element.Default), nil
+}
+
+// GetElement returns a sub-element of this schema
+func (element String) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	return nil, derp.NewInternalError("schema.String.GetElement", "Can't find sub-properties on an 'string' type", path)
 }
 
 // Set validates/formats a generic value using this schema
@@ -117,7 +127,7 @@ func (element String) Validate(value any) error {
 
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
-		if !compare.Contains(element.Enum, stringValue) {
+		if (stringValue != "") && (!compare.Contains(element.Enum, stringValue)) {
 			errorReport = derp.Append(errorReport, ValidationError{Message: "must match one of the required values."})
 		}
 	}

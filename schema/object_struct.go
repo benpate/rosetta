@@ -7,13 +7,13 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
-func (element Object) getFromStruct(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Object) getFromStruct(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	const location = "schema.Object.getFromStruct"
 
 	// RULE: if the path is empty, then return the entire struct
 	if path.IsEmpty() {
-		return object, element, nil
+		return object, nil
 	}
 
 	// Split the path into head and tail
@@ -23,14 +23,14 @@ func (element Object) getFromStruct(object reflect.Value, path list.List) (refle
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), element, derp.NewInternalError(location, "Sub-element does not exist for this path", path, object)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path, object)
 	}
 
 	// Retrieve and return the existing value from the struct
 	field, err := findFieldByTag(object, head)
 
 	if err != nil {
-		return reflect.ValueOf(nil), element, err
+		return reflect.ValueOf(nil), err
 	}
 
 	return property.Get(field, tail)

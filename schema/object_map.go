@@ -7,13 +7,13 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
-func (element Object) getFromMap(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Object) getFromMap(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	const location = "schema.Object.getFromMap"
 
 	// RULE: if the path is empty, then return the entire map
 	if path.IsEmpty() {
-		return object, element, nil
+		return object, nil
 	}
 
 	// Split the path into head and tail
@@ -23,7 +23,7 @@ func (element Object) getFromMap(object reflect.Value, path list.List) (reflect.
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), element, derp.NewInternalError(location, "Sub-element does not exist for this path", path)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path)
 	}
 
 	// Retrieve and return the existing value from the map

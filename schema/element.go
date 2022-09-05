@@ -21,8 +21,11 @@ type Element interface {
 	// IsRequired returns true if this a value is required for this element
 	IsRequired() bool
 
-	// Get uses the path to locate a value in an object along with the schema that defines it.
-	Get(object reflect.Value, path list.List) (reflect.Value, Element, error)
+	// Get uses the path to locate a value in an object.
+	Get(object reflect.Value, path list.List) (reflect.Value, error)
+
+	// GetElement finds the schema element that defines the property at the end of the path
+	GetElement(path list.List) (Element, error)
 
 	// Set formats a value and applies it to the provided object/path
 	Set(object reflect.Value, path list.List, value any) (reflect.Value, error)

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/benpate/rosetta/maps"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/benpate/rosetta/null"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -45,7 +45,7 @@ func TestComplexObjectSet(t *testing.T) {
 		Element: Object{
 			Properties: map[string]Element{
 				"name": String{},
-				"age":  Integer{},
+				"age":  Integer{Default: null.NewInt64(0)},
 				"contact": Object{
 					Properties: map[string]Element{
 						"email":  String{},
@@ -56,11 +56,11 @@ func TestComplexObjectSet(t *testing.T) {
 				"friends": Array{Items: Object{
 					Properties: map[string]Element{
 						"name": String{},
-						"age":  Integer{},
+						"age":  Integer{Default: null.NewInt64(0)},
 						"friends": Array{Items: Object{
 							Properties: map[string]Element{
 								"name": String{},
-								"age":  Integer{},
+								"age":  Integer{Default: null.NewInt64(0)},
 							},
 						}},
 					},
@@ -105,11 +105,11 @@ func TestComplexObjectSet2(t *testing.T) {
 				"friends": Array{Items: Object{
 					Properties: map[string]Element{
 						"name": String{},
-						"age":  Integer{},
+						"age":  Integer{Default: null.NewInt64(0)},
 						"friends": Array{Items: Object{
 							Properties: map[string]Element{
 								"name": String{},
-								"age":  Integer{},
+								"age":  Integer{Default: null.NewInt64(0)},
 							},
 						}},
 					},
@@ -302,8 +302,6 @@ func TestValidateComplexObject(t *testing.T) {
 
 func TestGroupID(t *testing.T) {
 
-	spew.Config.DisableMethods = true
-
 	value := maps.Map{
 		"rule": "private",
 		"groupIds": []string{
@@ -323,16 +321,72 @@ func TestGroupID(t *testing.T) {
 	}
 
 	{
-		result, element, err := s.Get(value, "rule")
+		element, err := s.GetElement("rule")
 		require.Nil(t, err)
-		require.NotNil(t, element)
+		require.Equal(t, s.Element.(Object).Properties["rule"], element)
+	}
+
+	{
+		result, err := s.Get(value, "rule")
+		require.Nil(t, err)
 		require.Equal(t, "private", result)
 	}
 
 	{
-		result, element, err := s.Get(value, "groupIds")
+		element, err := s.GetElement("groupIds")
 		require.Nil(t, err)
-		require.NotNil(t, element)
+		require.Equal(t, s.Element.(Object).Properties["groupIds"], element)
+	}
+
+	{
+		result, err := s.Get(value, "groupIds")
+		require.Nil(t, err)
 		require.Equal(t, []string{"5fafafafafafafafafafaf", "5fbfbfbfbfbfbfbfbfbfbf", "5fcfcfcfcfcfcfcfcfcfcf"}, result)
 	}
+}
+
+func TestMap_Get(t *testing.T) {
+
+	s := Schema{
+		Element: Object{
+			Properties: ElementMap{
+				"name": String{Enum: []string{"John", "Jane", "Dick", "Sally"}},
+			},
+		},
+	}
+
+	value := maps.New()
+
+	element, err := s.GetElement("name")
+	require.Nil(t, err)
+	require.Equal(t, s.Element.(Object).Properties["name"], element)
+
+	result, err := s.Get(value, "name")
+	require.Nil(t, err)
+	require.Equal(t, "", result)
+}
+
+func TestMap_GetNested(t *testing.T) {
+
+	s := Schema{
+		Element: Object{
+			Properties: ElementMap{
+				"data": Object{
+					Properties: ElementMap{
+						"name": String{Enum: []string{"John", "Jane", "Dick", "Sally"}},
+					},
+				},
+			},
+		},
+	}
+
+	value := maps.New()
+
+	element, err := s.GetElement("data.name")
+	require.Nil(t, err)
+	require.Equal(t, s.Element.(Object).Properties["data"].(Object).Properties["name"], element)
+
+	result, err := s.Get(value, "data.name")
+	require.Nil(t, err)
+	require.Equal(t, "", result)
 }

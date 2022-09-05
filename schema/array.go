@@ -43,7 +43,7 @@ func (element Array) IsRequired() bool {
  * PRIMARY INTERFACE METHODS
  ***********************************/
 
-func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, Element, error) {
+func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, error) {
 
 	const location = "schema.Array.Get"
 
@@ -52,7 +52,7 @@ func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, E
 
 	// If the value is invalid (nil) then return nil
 	case reflect.Invalid:
-		return reflect.ValueOf(element.DefaultValue()), element, nil
+		return reflect.ValueOf(element.DefaultValue()), nil
 
 	// Dereference interfaces
 	case reflect.Interface:
@@ -67,12 +67,12 @@ func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, E
 
 	// All other types are invalid.
 	default:
-		return reflect.ValueOf(nil), element, derp.NewBadRequestError(location, "Value must be an array, slice.", object.Kind(), path, object.Interface())
+		return reflect.ValueOf(nil), derp.NewBadRequestError(location, "Value must be an array, slice.", object.Kind(), path, object.Interface())
 	}
 
 	// If the request is for this object, then convert it from
 	if path.IsEmpty() {
-		return object, element, nil
+		return object, nil
 	}
 
 	// Get (and bounds-check) the array index
@@ -80,20 +80,37 @@ func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, E
 	index, err := strconv.Atoi(head)
 
 	if err != nil {
-		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (not an integer)", path)
+		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Array.Get", "Invalid index (not an integer)", path)
 	}
 
 	if index < 0 {
-		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Get", "Invalid index (less than zero)", path)
+		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Array.Get", "Invalid index (less than zero)", path)
 	}
 
 	if index >= object.Len() {
-		return reflect.ValueOf(nil), element, derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
+		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
 	}
 
 	//
 	subValue := object.Index(index)
 	return element.Items.Get(subValue, tail)
+}
+
+// GetElement returns a sub-element of this schema
+func (element Array) GetElement(path list.List) (Element, error) {
+
+	if path.IsEmpty() {
+		return element, nil
+	}
+
+	head, tail := path.Split()
+	_, err := strconv.Atoi(head)
+
+	if err != nil {
+		return nil, derp.NewInternalError("schema.Array.GetElement", "Invalid index (not an integer)", path)
+	}
+
+	return element.Items.GetElement(tail)
 }
 
 // Set formats/validates a generic value using this schema
