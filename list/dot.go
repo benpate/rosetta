@@ -1,11 +1,13 @@
 package list
 
+import "strings"
+
 const DelimiterDot = '.'
 
 type Dot []byte
 
-func ByDot(value string) List {
-	return List(Dot(value))
+func ByDot(value ...string) List {
+	return List(Dot(strings.Join(value, string(DelimiterDot))))
 }
 
 func (list Dot) IsEmpty() bool {

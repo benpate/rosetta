@@ -1,11 +1,13 @@
 package list
 
+import "strings"
+
 const DelimiterSlash = '/'
 
 type Slash []byte
 
-func BySlash(value string) List {
-	return Slash(value)
+func BySlash(value ...string) List {
+	return List(Slash(strings.Join(value, string(DelimiterSlash))))
 }
 
 func (list Slash) IsEmpty() bool {

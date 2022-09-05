@@ -59,7 +59,7 @@ func TestComma_At(t *testing.T) {
 
 func TestComma_Push(t *testing.T) {
 
-	list := Comma("")
+	list := ByComma("")
 	list = list.PushHead("")
 	require.Equal(t, Comma(""), list)
 

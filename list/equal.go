@@ -1,11 +1,13 @@
 package list
 
+import "strings"
+
 const DelimiterEqual = '='
 
 type Equal []byte
 
-func ByEqual(value string) List {
-	return List(Equal(value))
+func ByEqual(value ...string) List {
+	return List(Equal(strings.Join(value, string(DelimiterEqual))))
 }
 
 func (list Equal) IsEmpty() bool {

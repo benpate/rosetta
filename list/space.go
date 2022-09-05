@@ -1,11 +1,13 @@
 package list
 
+import "strings"
+
 const DelimiterSpace = ' '
 
 type Space []byte
 
-func BySpace(value string) List {
-	return Space(value)
+func BySpace(value ...string) List {
+	return List(Space(strings.Join(value, string(DelimiterSpace))))
 }
 
 func (list Space) IsEmpty() bool {
