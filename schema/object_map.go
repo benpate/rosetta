@@ -23,7 +23,7 @@ func (element Object) getFromMap(object reflect.Value, path list.List) (reflect.
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", object.Interface(), path.String())
 	}
 
 	// Retrieve and return the existing value from the map
@@ -52,7 +52,7 @@ func (element Object) setToMap(object reflect.Value, path list.List, value any) 
 	subElement, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path, value)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path.String(), value)
 	}
 
 	// Retrieve the existing value from the map
@@ -63,7 +63,7 @@ func (element Object) setToMap(object reflect.Value, path list.List, value any) 
 	mapValue, err := subElement.Set(mapValue, tail, value)
 
 	if err != nil {
-		return reflect.ValueOf(nil), derp.Wrap(err, location, "Failed to set value", path, value)
+		return reflect.ValueOf(nil), derp.Wrap(err, location, "Failed to set value", path.String(), value)
 	}
 
 	// Apply the new value back into the map.
@@ -84,7 +84,7 @@ func (element Object) removeFromMap(object reflect.Value, path list.List) (refle
 	property, ok := element.Properties[head]
 
 	if !ok {
-		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path)
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Sub-element does not exist for this path", path.String())
 	}
 
 	// Retrieve the existing value from the map
@@ -96,7 +96,7 @@ func (element Object) removeFromMap(object reflect.Value, path list.List) (refle
 		mapValue, err := property.Remove(mapValue, tail)
 
 		if err != nil {
-			return reflect.ValueOf(nil), derp.Wrap(err, location, "Failed to remove value", path)
+			return reflect.ValueOf(nil), derp.Wrap(err, location, "Failed to remove value", path.String())
 		}
 
 		// Apply the new value back into the map.
