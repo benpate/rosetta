@@ -91,8 +91,12 @@ func (element Array) Get(object reflect.Value, path list.List) (reflect.Value, e
 		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Array.Find", "Invalid index (overflow)", path)
 	}
 
-	//
+	if element.Items == nil {
+		return reflect.ValueOf(nil), derp.NewInternalError(location, "Array schema must have a sub-element defined.", element, path)
+	}
+
 	subValue := object.Index(index)
+
 	return element.Items.Get(subValue, tail)
 }
 
