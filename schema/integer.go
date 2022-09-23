@@ -16,6 +16,7 @@ type Integer struct {
 	Minimum    null.Int64 `json:"minimum"`
 	Maximum    null.Int64 `json:"maximum"`
 	MultipleOf null.Int64 `json:"multipleOf"`
+	BitSize    int        `json:"bitSize"`
 	Enum       []int      `json:"emum"`
 	Required   bool
 }
@@ -26,11 +27,16 @@ type Integer struct {
 
 // Type returns the data type of this Schema
 func (element Integer) Type() reflect.Type {
-	return reflect.TypeOf(int64(0))
+	return element.intSize(0).Type()
 }
 
 // DefaultValue returns the default value for this element type
 func (element Integer) DefaultValue() any {
+
+	if element.Default.IsPresent() {
+		return element.intSize(element.Default.Int64())
+	}
+
 	return element.Default.Interface()
 }
 
@@ -50,12 +56,12 @@ func (element Integer) Get(object reflect.Value, path list.List) (reflect.Value,
 	}
 
 	if intValue, ok := convert.Int64Ok(object, 0); ok {
-		return reflect.ValueOf(intValue), nil
+		return element.intSize(intValue), nil
 	}
 
 	if element.Default.IsPresent() {
 		defaultValue := convert.Int64Default(object, element.Default.Int64())
-		return reflect.ValueOf(defaultValue), nil
+		return element.intSize(defaultValue), nil
 	}
 
 	return reflect.ValueOf(nil), nil
@@ -86,7 +92,7 @@ func (element Integer) Set(object reflect.Value, path list.List, value any) (ref
 		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Integer.Set", "Value must be convertable to an integer", value)
 	}
 
-	return reflect.ValueOf(intValue), nil
+	return element.intSize(intValue), nil
 }
 
 // Remove removes a value from the provided object/path.  In the case of integers, this is a no-op.
@@ -136,6 +142,22 @@ func (element Integer) Validate(value any) error {
 	}
 
 	return err
+}
+
+func (element Integer) intSize(value int64) reflect.Value {
+
+	switch element.BitSize {
+	case 8:
+		return reflect.ValueOf(int8(value))
+	case 16:
+		return reflect.ValueOf(int16(value))
+	case 32:
+		return reflect.ValueOf(int32(value))
+	case 64:
+		return reflect.ValueOf(int64(value))
+	default:
+		return reflect.ValueOf(int(value))
+	}
 }
 
 /***********************************
