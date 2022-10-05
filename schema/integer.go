@@ -34,7 +34,7 @@ func (element Integer) Type() reflect.Type {
 func (element Integer) DefaultValue() any {
 
 	if element.Default.IsPresent() {
-		return element.intSize(element.Default.Int64())
+		return element.intSize(element.Default.Int64()).Interface()
 	}
 
 	return element.Default.Interface()
