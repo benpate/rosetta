@@ -169,7 +169,7 @@ func TestComplexArrayOperations(t *testing.T) {
 
 	require.Equal(t, "John Connor", data["name"])
 	require.Equal(t, "john@connor.mil", data["email"])
-	require.Equal(t, int64(30), data["age"])
+	require.Equal(t, int(30), data["age"])
 	require.Equal(t, 1, len(data["friends"].([]maps.Map)))
 	require.Equal(t, "Sarah Connor", data["friends"].([]maps.Map)[0]["name"])
 	require.Equal(t, "sarah@sky.net", data["friends"].([]maps.Map)[0]["email"])

@@ -26,7 +26,7 @@ func TestGetMap(t *testing.T) {
 	{
 		one, err := s.Get(value, "one")
 		require.Nil(t, err)
-		require.Equal(t, int64(1), one)
+		require.Equal(t, int(1), one)
 	}
 
 	{

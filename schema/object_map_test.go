@@ -76,7 +76,7 @@ func TestComplexObjectSet(t *testing.T) {
 
 	require.Equal(t, maps.Map{
 		"name": "",
-		"age":  int64(0),
+		"age":  int(0),
 		"contact": maps.Map{
 			"domain": "",
 			"email":  "john@doemain.com",
@@ -147,7 +147,7 @@ func TestComplexObjectSet2(t *testing.T) {
 
 	require.Equal(t, maps.Map{
 		"name": "John Doe",
-		"age":  int64(42),
+		"age":  int(42),
 		"contact": maps.Map{
 			"email":  "john@doe.com",
 			"phone":  "123-456-7890",
@@ -158,13 +158,13 @@ func TestComplexObjectSet2(t *testing.T) {
 			nil,
 			{
 				"name": "",
-				"age":  int64(0),
+				"age":  int(0),
 				"friends": []maps.Map{
 					nil,
 					nil,
 					{
 						"name": "John Doe",
-						"age":  int64(0),
+						"age":  int(0),
 					},
 				},
 			},

@@ -162,6 +162,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 		return derp.Wrap(err, location, "Error setting value")
 	}
 
+	// Set the value back into the original object
 	addressable.Set(result)
 
 	return err

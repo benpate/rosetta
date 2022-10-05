@@ -33,7 +33,7 @@ func TestEmptySchema(t *testing.T) {
 
 }
 
-func TestSet(t *testing.T) {
+func TestSetMap(t *testing.T) {
 
 	s := getTestSchema()
 
@@ -50,7 +50,7 @@ func TestSet(t *testing.T) {
 
 	err = s.Set(&object, "age", 21)
 	require.Nil(t, err)
-	require.Equal(t, int64(21), object["age"])
+	require.Equal(t, int(21), object["age"])
 
 	// Test values that will not get set (and should return an error)
 	err = s.Set(&object, "this-path-doesn't-exist", "so it won't get set")
@@ -63,7 +63,30 @@ func TestSet(t *testing.T) {
 	// require.Equal(t, 3, len(object))
 	require.Equal(t, "This is the title", object["title"])
 	require.Equal(t, "This is the content", object["content"])
-	require.Equal(t, int64(21), object["age"])
+	require.Equal(t, int(21), object["age"])
+}
+
+func TestSetStruct(t *testing.T) {
+
+	s := getTestSchema()
+
+	testStruct := struct {
+		Title   string `path:"title"`
+		Content string `path:"content"`
+		Age     int    `path:"age"`
+	}{}
+
+	err := s.Set(&testStruct, "title", "This is the title")
+	require.Nil(t, err)
+	require.Equal(t, "This is the title", testStruct.Title)
+
+	err = s.Set(&testStruct, "content", "This is the content")
+	require.Nil(t, err)
+	require.Equal(t, "This is the content", testStruct.Content)
+
+	err = s.Set(&testStruct, "age", 21)
+	require.Nil(t, err)
+	require.Equal(t, int(21), testStruct.Age)
 }
 
 func getTestSchema() Schema {
