@@ -17,6 +17,7 @@ type Number struct {
 	Minimum    null.Float `json:"minimum"`
 	Maximum    null.Float `json:"maximum"`
 	MultipleOf null.Float `json:"multipleOf"`
+	BitSize    int        `json:"bitSize"`
 	Enum       []float64  `json:"enum"`
 	Required   bool
 }
@@ -27,11 +28,16 @@ type Number struct {
 
 // Type returns the data type of this Element
 func (element Number) Type() reflect.Type {
-	return reflect.TypeOf(float64(0))
+	return reflect.TypeOf(element.floatSize(0))
 }
 
 // DefaultValue returns the default value for this element type
 func (element Number) DefaultValue() any {
+
+	if element.Default.IsPresent() {
+		return element.floatSize(element.Default.Float()).Interface()
+	}
+
 	return element.Default.Interface()
 }
 
@@ -53,13 +59,13 @@ func (element Number) Get(object reflect.Value, path list.List) (reflect.Value, 
 
 	// Try to convert and return the value
 	if intValue, ok := convert.FloatOk(object, 0); ok {
-		return reflect.ValueOf(intValue), nil
+		return element.floatSize(intValue), nil
 	}
 
 	// Try to use the default value
 	if element.Default.IsPresent() {
 		defaultValue := convert.FloatDefault(object, element.Default.Float())
-		return reflect.ValueOf(defaultValue), nil
+		return element.floatSize(defaultValue), nil
 	}
 
 	// Return nil if no value is present
@@ -91,7 +97,7 @@ func (element Number) Set(object reflect.Value, path list.List, value any) (refl
 		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Number.Set", "Value must be convertable to a number", value)
 	}
 
-	return reflect.ValueOf(floatValue), nil
+	return element.floatSize(floatValue), nil
 }
 
 // Remove removes a value from the provided object/path.  In the case of numbers, this is a no-op.
@@ -142,6 +148,17 @@ func (element Number) Validate(value any) error {
 	}
 
 	return err
+}
+
+func (element Number) floatSize(value float64) reflect.Value {
+	switch element.BitSize {
+	case 32:
+		return reflect.ValueOf(float32(value))
+	case 64:
+		return reflect.ValueOf(value)
+	default:
+		return reflect.ValueOf(value)
+	}
 }
 
 /***********************************
