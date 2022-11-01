@@ -84,6 +84,12 @@ func IntOk(value interface{}, defaultValue int) (int, bool) {
 		}
 		return IntDefault(v[0], defaultValue), false
 
+	case []any:
+		if len(v) == 0 {
+			return defaultValue, false
+		}
+		return IntDefault(v[0], defaultValue), false
+
 	case reflect.Value:
 		return IntOk(Interface(v), defaultValue)
 

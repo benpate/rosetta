@@ -83,6 +83,12 @@ func StringOk(value interface{}, defaultValue string) (string, bool) {
 		}
 		return v[0], false
 
+	case []any:
+		if len(v) == 0 {
+			return defaultValue, false
+		}
+		return StringDefault(v[0], defaultValue), false
+
 	case reflect.Value:
 		return StringOk(Interface(v), defaultValue)
 

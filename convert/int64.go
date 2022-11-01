@@ -85,6 +85,12 @@ func Int64Ok(value interface{}, defaultValue int64) (int64, bool) {
 		}
 		return Int64Default(v[0], defaultValue), false
 
+	case []any:
+		if len(v) == 0 {
+			return defaultValue, false
+		}
+		return Int64Default(v[0], defaultValue), false
+
 	case reflect.Value:
 		return Int64Ok(Interface(v), defaultValue)
 

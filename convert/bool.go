@@ -82,6 +82,12 @@ func BoolOk(value interface{}, defaultValue bool) (bool, bool) {
 		}
 		return BoolDefault(v[0], defaultValue), false
 
+	case []any:
+		if len(v) == 0 {
+			return defaultValue, false
+		}
+		return BoolDefault(v[0], defaultValue), false
+
 	case reflect.Value:
 		return BoolOk(Interface(v), defaultValue)
 

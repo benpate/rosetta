@@ -84,6 +84,12 @@ func FloatOk(value interface{}, defaultValue float64) (float64, bool) {
 		}
 		return FloatDefault(v[0], defaultValue), false
 
+	case []any:
+		if len(v) == 0 {
+			return defaultValue, false
+		}
+		return FloatDefault(v[0], defaultValue), false
+
 	case reflect.Value:
 		return FloatOk(Interface(v), defaultValue)
 
