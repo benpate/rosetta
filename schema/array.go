@@ -7,14 +7,13 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
-	"github.com/benpate/rosetta/null"
 )
 
 // Array represents an array data type within a JSON-Schema.
 type Array struct {
 	Items     Element
-	MinLength null.Int
-	MaxLength null.Int
+	MinLength int
+	MaxLength int
 	Required  bool
 	Delimiter string // DEPRECATED
 }
@@ -317,12 +316,12 @@ func (element Array) Validate(value any) error {
 		return Invalid("field is required")
 	}
 
-	if element.MinLength.IsPresent() && (length < element.MinLength.Int()) {
-		return Invalid("minimum length is " + element.MinLength.String())
+	if (element.MinLength > 0) && (length < element.MinLength) {
+		return Invalid("minimum length is " + convert.String(element.MinLength))
 	}
 
-	if element.MaxLength.IsPresent() && (length > element.MaxLength.Int()) {
-		return Invalid("maximum length is " + element.MaxLength.String())
+	if (element.MaxLength > 0) && (length > element.MaxLength) {
+		return Invalid("maximum length is " + convert.String(element.MaxLength))
 	}
 
 	// Verify that each item in the array/slice is also valid
@@ -335,6 +334,11 @@ func (element Array) Validate(value any) error {
 	}
 
 	return errorReport
+}
+
+func (element Array) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
 }
 
 /***********************************
@@ -363,8 +367,8 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 
 	element.Items, err = UnmarshalMap(data["items"])
 	element.Required = convert.Bool(data["required"])
-	element.MinLength = convert.NullInt(data["minLength"])
-	element.MaxLength = convert.NullInt(data["maxLength"])
+	element.MinLength = convert.Int(data["minLength"])
+	element.MaxLength = convert.Int(data["maxLength"])
 
 	return err
 }

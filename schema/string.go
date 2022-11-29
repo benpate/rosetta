@@ -8,15 +8,14 @@ import (
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
-	"github.com/benpate/rosetta/null"
 	"github.com/benpate/rosetta/schema/format"
 )
 
 // String represents a string data type within a JSON-Schema.
 type String struct {
 	Default   string
-	MinLength null.Int
-	MaxLength null.Int
+	MinLength int
+	MaxLength int
 	Enum      []string
 	Pattern   string
 	Format    string
@@ -112,16 +111,16 @@ func (element String) Validate(value any) error {
 	}
 
 	// Validate minimum length
-	if element.MinLength.IsPresent() {
-		if len(stringValue) < element.MinLength.Int() {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "minimum length is " + element.MinLength.String()})
+	if element.MinLength > 0 {
+		if len(stringValue) < element.MinLength {
+			errorReport = derp.Append(errorReport, ValidationError{Message: "minimum length is " + convert.String(element.MinLength)})
 		}
 	}
 
 	// Validate maximum length
-	if element.MaxLength.IsPresent() {
-		if len(stringValue) > element.MaxLength.Int() {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "maximum length is " + element.MaxLength.String()})
+	if element.MaxLength > 0 {
+		if len(stringValue) > element.MaxLength {
+			errorReport = derp.Append(errorReport, ValidationError{Message: "maximum length is " + convert.String(element.MaxLength)})
 		}
 	}
 
@@ -133,6 +132,11 @@ func (element String) Validate(value any) error {
 	}
 
 	return errorReport
+}
+
+func (element String) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
 }
 
 /***********************************
@@ -160,12 +164,12 @@ func (element String) MarshalMap() map[string]any {
 		result["default"] = element.Default
 	}
 
-	if element.MinLength.IsPresent() {
-		result["minLength"] = element.MinLength.Int()
+	if element.MinLength > 0 {
+		result["minLength"] = element.MinLength
 	}
 
-	if element.MaxLength.IsPresent() {
-		result["maxLength"] = element.MaxLength.Int()
+	if element.MaxLength > 0 {
+		result["maxLength"] = element.MaxLength
 	}
 
 	if element.Pattern != "" {
@@ -193,8 +197,8 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	}
 
 	element.Default = convert.String(data["default"])
-	element.MinLength = convert.NullInt(data["minLength"])
-	element.MaxLength = convert.NullInt(data["maxLength"])
+	element.MinLength = convert.Int(data["minLength"])
+	element.MaxLength = convert.Int(data["maxLength"])
 	element.Pattern = convert.String(data["pattern"])
 	element.Format = convert.String(data["format"])
 	element.Required = convert.Bool(data["required"])

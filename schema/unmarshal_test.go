@@ -15,10 +15,9 @@ func TestUnmarshal_Success(t *testing.T) {
 	require.Equal(t, "Test Unmarshal", s.Comment)
 
 	element := s.Element.(String)
-	require.True(t, element.MaxLength.IsPresent())
-	require.Equal(t, element.MaxLength.Int(), 10)
+	require.Equal(t, element.MaxLength, 10)
 
-	require.False(t, element.MinLength.IsPresent())
+	require.Zero(t, element.MinLength)
 }
 
 func TestUnmarshal_Error(t *testing.T) {

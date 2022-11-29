@@ -90,6 +90,11 @@ func (element Boolean) Validate(object any) error {
 	return nil
 }
 
+func (element Boolean) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
+}
+
 /***********************************
  * MARSHAL / UNMARSHAL METHODS
  ***********************************/

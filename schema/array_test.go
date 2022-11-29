@@ -42,7 +42,7 @@ func TestArrayGetElement(t *testing.T) {
 func TestArrayValidation(t *testing.T) {
 
 	s := New(Array{
-		Items: String{MaxLength: null.NewInt(10)},
+		Items: String{MaxLength: 10},
 	})
 
 	{

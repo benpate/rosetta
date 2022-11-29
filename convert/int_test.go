@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO: Thes tests still dont account for overflow errors.
+// TODO: LOW: These tests still don't account for overflow errors.
 
 func TestInt(t *testing.T) {
 	require.Equal(t, IntDefault(10, 10), int(10))

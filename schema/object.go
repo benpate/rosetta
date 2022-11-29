@@ -12,6 +12,7 @@ import (
 // Object represents an object data type within a JSON-Schema.
 type Object struct {
 	Properties    ElementMap
+	Unlisted      Element
 	RequiredProps []string
 	Required      bool
 }
@@ -192,6 +193,11 @@ func (element Object) Validate(value any) error {
 	}
 
 	return errorReport
+}
+
+func (element Object) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
 }
 
 /***********************************

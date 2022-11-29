@@ -12,7 +12,7 @@ import (
 
 // Integer represents an integer data type within a JSON-Schema.
 type Integer struct {
-	Default    null.Int64 `json:"default"` // TODO: Int64??
+	Default    null.Int64 `json:"default"`
 	Minimum    null.Int64 `json:"minimum"`
 	Maximum    null.Int64 `json:"maximum"`
 	MultipleOf null.Int64 `json:"multipleOf"`
@@ -142,6 +142,11 @@ func (element Integer) Validate(value any) error {
 	}
 
 	return err
+}
+
+func (element Integer) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
 }
 
 func (element Integer) intSize(value int64) reflect.Value {

@@ -6,6 +6,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestStruct_Array(t *testing.T) {
+
+	type innerStruct struct {
+		Name  string `path:"name"`
+		Email string `path:"email"`
+		Phone string `path:"phone"`
+	}
+
+	type outerStruct struct {
+		Name   string        `path:"name"`
+		Email  string        `path:"email"`
+		Inners []innerStruct `path:"inners"`
+	}
+
+	schema := New(Object{
+		Properties: ElementMap{
+			"name":  String{},
+			"email": String{},
+			"inners": Array{Items: Object{
+				Properties: ElementMap{
+					"name":  String{},
+					"email": String{},
+					"phone": String{},
+				},
+			}},
+		},
+	})
+
+	value := outerStruct{}
+
+	require.Nil(t, schema.Set(&value, "name", "John Connor"))
+	require.Equal(t, "John Connor", value.Name)
+
+	require.Nil(t, schema.Set(&value, "email", "john@connor.mil"))
+	require.Equal(t, "john@connor.mil", value.Email)
+
+	require.Nil(t, schema.Set(&value, "inners.0.name", "Sarah Connor"))
+	require.Equal(t, "Sarah Connor", value.Inners[0].Name)
+
+	require.Nil(t, schema.Set(&value, "inners.0.email", "sarah@sky.net"))
+	require.Equal(t, "sarah@sky.net", value.Inners[0].Email)
+
+}
+
 func TestStruct_Validate(t *testing.T) {
 
 	type testStruct struct {

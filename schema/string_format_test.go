@@ -3,7 +3,6 @@ package schema
 import (
 	"testing"
 
-	"github.com/benpate/rosetta/null"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,8 +15,8 @@ func TestStringUnmarshalSimple1(t *testing.T) {
 	assert.Nil(t, err)
 
 	str := st.(String)
-	assert.Equal(t, str.MinLength, null.NewInt(10))
-	assert.Equal(t, str.MaxLength, null.NewInt(100))
+	assert.Equal(t, str.MinLength, 10)
+	assert.Equal(t, str.MaxLength, 100)
 }
 
 func TestStringUnmarshalComplete1(t *testing.T) {
@@ -29,11 +28,11 @@ func TestStringUnmarshalComplete1(t *testing.T) {
 	assert.Nil(t, err)
 
 	str := st.(String)
-	assert.Equal(t, str.MinLength, null.NewInt(10))
-	assert.Equal(t, str.MaxLength, null.NewInt(100))
+	assert.Equal(t, str.MinLength, 10)
+	assert.Equal(t, str.MaxLength, 100)
 	assert.Equal(t, str.Required, true)
-	assert.Equal(t, str.Format, "date")    // TODO: this should probably be validated on entry.
-	assert.Equal(t, str.Pattern, "abc123") // TODO: this is not a valid RegEx
+	assert.Equal(t, str.Format, "date")
+	assert.Equal(t, str.Pattern, "abc123")
 }
 
 func TestStringFormatLowercase1(t *testing.T) {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/benpate/rosetta/null"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -56,14 +55,14 @@ func TestStringLength(t *testing.T) {
 
 	// Mininum Defined
 	{
-		s := String{MinLength: null.NewInt(10)}
+		s := String{MinLength: 10}
 		assert.Nil(t, s.Validate("this is ok, becuase it's more than the minimum."))
 		assert.NotNil(t, s.Validate("error"))
 	}
 
 	// Maxinum Defined
 	{
-		s := String{MaxLength: null.NewInt(10)}
+		s := String{MaxLength: 10}
 		assert.Nil(t, s.Validate("this is ok"))
 		assert.NotNil(t, s.Validate("this is a really long string and it should fail becuase it's too long."))
 	}

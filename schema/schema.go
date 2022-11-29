@@ -237,6 +237,19 @@ func (schema Schema) Remove(object any, path string) error {
 	return err
 }
 
+// Clean tries to force a particular value to fit this schema by updating
+// it (or all of its properties) to match.  If values cannot be coerced to
+// fit the schema, then an error is returned
+func (schema Schema) Clean(value any) error {
+
+	// TODO: CRITICAL: These functions are not yet implemented
+	if schema.Element == nil {
+		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
+	}
+
+	return schema.Element.Clean(value)
+}
+
 // Validate checks a particular value against this schema.  If the
 // provided value is not valid, then an error is returned.
 func (schema Schema) Validate(value any) error {

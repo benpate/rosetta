@@ -31,8 +31,8 @@ func TestStringUnmarshalComplete(t *testing.T) {
 	assert.Equal(t, str.MinLength, null.NewInt(10))
 	assert.Equal(t, str.MaxLength, null.NewInt(100))
 	assert.Equal(t, str.Required, true)
-	assert.Equal(t, str.Format, "date")    // TODO: this should probably be validated on entry.
-	assert.Equal(t, str.Pattern, "abc123") // TODO: this is not a valid RegEx
+	assert.Equal(t, str.Format, "date")
+	assert.Equal(t, str.Pattern, "abc123")
 }
 
 /*

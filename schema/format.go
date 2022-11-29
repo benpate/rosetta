@@ -50,4 +50,5 @@ func init() {
 
 	// Text
 	UseFormat("token", format.Token)
+	UseFormat("unsafe-any", format.UnsafeAny)
 }

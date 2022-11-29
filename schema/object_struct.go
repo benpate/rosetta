@@ -41,7 +41,7 @@ func (element Object) setToStruct(object reflect.Value, path list.List, value an
 	const location = "schema.Object.setToStruct"
 
 	// Allow direct setting of struct values.
-	// TODO: This should probably be validated against the schema.
+	// TODO: MEDIUM: This should probably be validated against the schema.
 	if path.IsEmpty() {
 		return object, nil
 	}

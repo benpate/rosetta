@@ -150,6 +150,11 @@ func (element Number) Validate(value any) error {
 	return err
 }
 
+func (element Number) Clean(value any) error {
+	// TODO: HIGH: Implement this
+	return nil
+}
+
 func (element Number) floatSize(value float64) reflect.Value {
 	switch element.BitSize {
 	case 32:
