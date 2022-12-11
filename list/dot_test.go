@@ -24,6 +24,7 @@ func TestDot_Empty(t *testing.T) {
 func TestDot_Head(t *testing.T) {
 
 	list := Dot("hello.there.general.kenobi")
+	require.Equal(t, list.Head(), list.First())
 	require.Equal(t, "hello", list.Head())
 
 	empty := Dot("")
@@ -59,7 +60,7 @@ func TestDot_At(t *testing.T) {
 
 func TestDot_Push(t *testing.T) {
 
-	list := List(Dot(""))
+	list := ByDot("")
 	list = list.PushHead("")
 	require.Equal(t, Dot(""), list)
 

@@ -26,6 +26,10 @@ func (list Slash) Tail() List {
 	return Tail(list, DelimiterSlash)
 }
 
+func (list Slash) First() string {
+	return Head(list, DelimiterSlash)
+}
+
 func (list Slash) Last() string {
 	return Last(list, DelimiterSlash)
 }

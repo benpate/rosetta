@@ -32,11 +32,6 @@ func LastIndex[T Stringlike](value T, delimiter byte) int {
 
 }
 
-// First returns the FIRST item in a list (alias for Head)
-func First[T Stringlike](value T, delimiter byte) string {
-	return Head(value, delimiter)
-}
-
 // Head returns the FIRST item in a list
 func Head[T Stringlike](value T, delimiter byte) string {
 
@@ -70,6 +65,11 @@ func RemoveLast[T Stringlike](value T, delimiter byte) T {
 	}
 
 	return value[:index]
+}
+
+// First returns the FIRST item in a list (alias for Head)
+func First[T Stringlike](value T, delimiter byte) string {
+	return Head(value, delimiter)
 }
 
 // Last returns the LAST item in a T-based-list

@@ -26,6 +26,10 @@ func (list Semicolon) Tail() List {
 	return Tail(list, DelimiterSemicolon)
 }
 
+func (list Semicolon) First() string {
+	return Head(list, DelimiterSemicolon)
+}
+
 func (list Semicolon) Last() string {
 	return Last(list, DelimiterSemicolon)
 }

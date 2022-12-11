@@ -26,6 +26,10 @@ func (list Dot) Tail() List {
 	return Tail(list, DelimiterDot)
 }
 
+func (list Dot) First() string {
+	return Head(list, DelimiterDot)
+}
+
 func (list Dot) Last() string {
 	return Last(list, DelimiterDot)
 }

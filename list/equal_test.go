@@ -24,6 +24,7 @@ func TestEqual_Empty(t *testing.T) {
 func TestEqual_Head(t *testing.T) {
 
 	list := Equal("hello=there=general=kenobi")
+	require.Equal(t, list.Head(), list.First())
 	require.Equal(t, "hello", list.Head())
 
 	empty := Equal("")

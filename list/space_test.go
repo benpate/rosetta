@@ -24,6 +24,7 @@ func TestSpace_Empty(t *testing.T) {
 func TestSpace_Head(t *testing.T) {
 
 	list := Space("hello there general kenobi")
+	require.Equal(t, list.Head(), list.First())
 	require.Equal(t, "hello", list.Head())
 
 	empty := Space("")

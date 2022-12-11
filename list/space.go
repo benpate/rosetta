@@ -26,6 +26,10 @@ func (list Space) Tail() List {
 	return Tail(list, DelimiterSpace)
 }
 
+func (list Space) First() string {
+	return Head(list, DelimiterSpace)
+}
+
 func (list Space) Last() string {
 	return Last(list, DelimiterSpace)
 }

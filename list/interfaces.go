@@ -10,6 +10,7 @@ type List interface {
 	IsEmptyTail() bool
 	Head() string
 	Tail() List
+	First() string
 	Last() string
 	RemoveLast() List
 	Split() (string, List)

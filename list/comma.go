@@ -26,6 +26,10 @@ func (list Comma) Tail() List {
 	return Tail(list, DelimiterComma)
 }
 
+func (list Comma) First() string {
+	return Head(list, DelimiterComma)
+}
+
 func (list Comma) Last() string {
 	return Last(list, DelimiterComma)
 }

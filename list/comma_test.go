@@ -24,6 +24,7 @@ func TestComma_Empty(t *testing.T) {
 func TestComma_Head(t *testing.T) {
 
 	list := Comma("hello,there,general,kenobi")
+	require.Equal(t, list.Head(), list.First())
 	require.Equal(t, "hello", list.Head())
 
 	empty := Comma("")
@@ -37,6 +38,14 @@ func TestComma_Tail(t *testing.T) {
 
 	empty := Comma("")
 	require.Equal(t, Comma(""), empty.Tail())
+}
+
+func TestComma_First(t *testing.T) {
+	list := Comma("hello,there,general,kenobi")
+	require.Equal(t, First(list, ','), list.First())
+	require.Equal(t, First(list, ','), list.Head())
+	require.Equal(t, First(list, ','), Head(list, ','))
+	require.Equal(t, "hello", First(list, ','))
 }
 
 func TestComma_Last(t *testing.T) {

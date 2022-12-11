@@ -26,6 +26,10 @@ func (list Equal) Tail() List {
 	return Tail(list, DelimiterEqual)
 }
 
+func (list Equal) First() string {
+	return Head(list, DelimiterEqual)
+}
+
 func (list Equal) Last() string {
 	return Last(list, DelimiterEqual)
 }
