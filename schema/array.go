@@ -362,7 +362,7 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "array" {
-		return derp.New(500, "schema.Array.UnmarshalMap", "Data is not type 'array'", data)
+		return derp.NewInternalError("schema.Array.UnmarshalMap", "Data is not type 'array'", data)
 	}
 
 	element.Items, err = UnmarshalMap(data["items"])

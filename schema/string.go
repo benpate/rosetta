@@ -193,7 +193,7 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "string" {
-		return derp.New(500, "schema.String.UnmarshalMap", "Data is not type 'string'", data)
+		return derp.NewInternalError("schema.String.UnmarshalMap", "Data is not type 'string'", data)
 	}
 
 	element.Default = convert.String(data["default"])

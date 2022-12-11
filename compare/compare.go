@@ -50,7 +50,7 @@ func WithOperator(value1 interface{}, operator string, value2 interface{}) (bool
 		return (result != 0), nil
 
 	default:
-		return false, derp.New(500, "compare.WithOperator", "Unrecognized Operator", value1, operator, value2)
+		return false, derp.NewInternalError("compare.WithOperator", "Unrecognized Operator", value1, operator, value2)
 
 	}
 }

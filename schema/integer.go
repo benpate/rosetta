@@ -214,7 +214,7 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "integer" {
-		return derp.New(500, "schema.Integer.UnmarshalMap", "Data is not type 'integer'", data)
+		return derp.NewInternalError("schema.Integer.UnmarshalMap", "Data is not type 'integer'", data)
 	}
 
 	element.Default = convert.NullInt64(data["default"])

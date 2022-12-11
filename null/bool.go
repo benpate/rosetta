@@ -94,5 +94,5 @@ func (b *Bool) UnmarshalJSON(value []byte) error {
 		return nil
 	}
 
-	return derp.New(500, "null.Bool.UnmarshalJSON", "Invalid boolean value", valueStr)
+	return derp.NewInternalError("null.Bool.UnmarshalJSON", "Invalid boolean value", valueStr)
 }

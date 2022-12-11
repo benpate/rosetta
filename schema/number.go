@@ -211,7 +211,7 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "number" {
-		return derp.New(500, "schema.Number.UnmarshalMap", "Data is not type 'number'", data)
+		return derp.NewInternalError("schema.Number.UnmarshalMap", "Data is not type 'number'", data)
 	}
 
 	element.Default = convert.NullFloat(data["default"])

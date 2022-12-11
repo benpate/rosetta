@@ -149,7 +149,7 @@ func Delete(object interface{}, name string) error {
 		return deleteMapOfInterface(name, obj)
 	}
 
-	return derp.New(500, "path.Delete", "Unable to delete from this type of record.")
+	return derp.NewInternalError("path.Delete", "Unable to delete from this type of record.")
 }
 
 // Index is useful for vetting array indices.  It attempts to convert the Head() token int
@@ -166,11 +166,11 @@ func Index(value string, maximum int) (int, error) {
 	}
 
 	if result < 0 {
-		return 0, derp.New(500, "path.Index", "Index out of bounds", "cannot be less than zero", value)
+		return 0, derp.NewInternalError("path.Index", "Index out of bounds", "cannot be less than zero", value)
 	}
 
 	if (maximum >= 0) && (result >= maximum) {
-		return 0, derp.New(500, "path.Index", "Index out of bounds", "cannot be greater than (or equal to) maximum", value, maximum)
+		return 0, derp.NewInternalError("path.Index", "Index out of bounds", "cannot be greater than (or equal to) maximum", value, maximum)
 	}
 
 	// Fall through means that this is a valid array index
