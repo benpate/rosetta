@@ -4,10 +4,10 @@ import "strings"
 
 const DelimiterEqual = '='
 
-type Equal []byte
+type Equal string
 
 func ByEqual(value ...string) List {
-	return List(Equal(strings.Join(value, string(DelimiterEqual))))
+	return Equal(strings.Join(value, string(DelimiterEqual)))
 }
 
 func (list Equal) IsEmpty() bool {
@@ -19,41 +19,39 @@ func (list Equal) IsEmptyTail() bool {
 }
 
 func (list Equal) Head() string {
-	return string(Head(list, DelimiterEqual))
+	return Head(list, DelimiterEqual)
 }
 
 func (list Equal) Tail() List {
-	return Equal(Tail(list, DelimiterEqual))
+	return Tail(list, DelimiterEqual)
 }
 
 func (list Equal) Last() string {
-	return string(Last(list, DelimiterEqual))
+	return Last(list, DelimiterEqual)
 }
 
 func (list Equal) RemoveLast() List {
-	return Equal(RemoveLast(list, DelimiterEqual))
+	return RemoveLast(list, DelimiterEqual)
 }
 
 func (list Equal) Split() (string, List) {
-	head, tail := Split(list, DelimiterEqual)
-	return string(head), Equal(tail)
+	return Split(list, DelimiterEqual)
 }
 
 func (list Equal) SplitTail() (List, string) {
-	head, tail := SplitTail(list, DelimiterEqual)
-	return Equal(head), string(tail)
+	return SplitTail(list, DelimiterEqual)
 }
 
 func (list Equal) At(index int) string {
-	return string(At(list, DelimiterEqual, index))
+	return At(list, DelimiterEqual, index)
 }
 
 func (list Equal) PushHead(value string) List {
-	return Equal(PushHead(list, []byte(value), DelimiterEqual))
+	return PushHead(list, value, DelimiterEqual)
 }
 
 func (list Equal) PushTail(value string) List {
-	return Equal(PushTail(list, []byte(value), DelimiterEqual))
+	return PushTail(list, value, DelimiterEqual)
 }
 
 func (list Equal) String() string {

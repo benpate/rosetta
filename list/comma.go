@@ -4,10 +4,10 @@ import "strings"
 
 const DelimiterComma = ','
 
-type Comma []byte
+type Comma string
 
 func ByComma(value ...string) List {
-	return List(Comma(strings.Join(value, string(DelimiterComma))))
+	return Comma(strings.Join(value, string(DelimiterComma)))
 }
 
 func (list Comma) IsEmpty() bool {
@@ -19,41 +19,39 @@ func (list Comma) IsEmptyTail() bool {
 }
 
 func (list Comma) Head() string {
-	return string(Head(list, DelimiterComma))
+	return Head(list, DelimiterComma)
 }
 
 func (list Comma) Tail() List {
-	return Comma(Tail(list, DelimiterComma))
+	return Tail(list, DelimiterComma)
 }
 
 func (list Comma) Last() string {
-	return string(Last(list, DelimiterComma))
+	return Last(list, DelimiterComma)
 }
 
 func (list Comma) RemoveLast() List {
-	return Comma(RemoveLast(list, DelimiterComma))
+	return RemoveLast(list, DelimiterComma)
 }
 
 func (list Comma) Split() (string, List) {
-	head, tail := Split(list, DelimiterComma)
-	return string(head), Comma(tail)
+	return Split(list, DelimiterComma)
 }
 
 func (list Comma) SplitTail() (List, string) {
-	head, tail := SplitTail(list, DelimiterComma)
-	return Comma(head), string(tail)
+	return SplitTail(list, DelimiterComma)
 }
 
 func (list Comma) At(index int) string {
-	return string(At(list, DelimiterComma, index))
+	return At(list, DelimiterComma, index)
 }
 
 func (list Comma) PushHead(value string) List {
-	return Comma(PushHead(list, []byte(value), DelimiterComma))
+	return PushHead(list, value, DelimiterComma)
 }
 
 func (list Comma) PushTail(value string) List {
-	return Comma(PushTail(list, []byte(value), DelimiterComma))
+	return PushTail(list, value, DelimiterComma)
 }
 
 func (list Comma) String() string {

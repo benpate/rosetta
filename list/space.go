@@ -4,10 +4,10 @@ import "strings"
 
 const DelimiterSpace = ' '
 
-type Space []byte
+type Space string
 
 func BySpace(value ...string) List {
-	return List(Space(strings.Join(value, string(DelimiterSpace))))
+	return Space(strings.Join(value, string(DelimiterSpace)))
 }
 
 func (list Space) IsEmpty() bool {
@@ -19,41 +19,39 @@ func (list Space) IsEmptyTail() bool {
 }
 
 func (list Space) Head() string {
-	return string(Head(list, DelimiterSpace))
+	return Head(list, DelimiterSpace)
 }
 
 func (list Space) Tail() List {
-	return Space(Tail(list, DelimiterSpace))
+	return Tail(list, DelimiterSpace)
 }
 
 func (list Space) Last() string {
-	return string(Last(list, DelimiterSpace))
+	return Last(list, DelimiterSpace)
 }
 
 func (list Space) RemoveLast() List {
-	return Space(RemoveLast(list, DelimiterSpace))
+	return RemoveLast(list, DelimiterSpace)
 }
 
 func (list Space) Split() (string, List) {
-	head, tail := Split(list, DelimiterSpace)
-	return string(head), Space(tail)
+	return Split(list, DelimiterSpace)
 }
 
 func (list Space) SplitTail() (List, string) {
-	head, tail := SplitTail(list, DelimiterSpace)
-	return Space(head), string(tail)
+	return SplitTail(list, DelimiterSpace)
 }
 
 func (list Space) At(index int) string {
-	return string(At(list, DelimiterSpace, index))
+	return At(list, DelimiterSpace, index)
 }
 
 func (list Space) PushHead(value string) List {
-	return Space(PushHead(list, []byte(value), DelimiterSpace))
+	return PushHead(list, value, DelimiterSpace)
 }
 
 func (list Space) PushTail(value string) List {
-	return Space(PushTail(list, []byte(value), DelimiterSpace))
+	return PushTail(list, value, DelimiterSpace)
 }
 
 func (list Space) String() string {

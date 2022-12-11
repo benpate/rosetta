@@ -4,10 +4,10 @@ import "strings"
 
 const DelimiterSlash = '/'
 
-type Slash []byte
+type Slash string
 
 func BySlash(value ...string) List {
-	return List(Slash(strings.Join(value, string(DelimiterSlash))))
+	return Slash(strings.Join(value, string(DelimiterSlash)))
 }
 
 func (list Slash) IsEmpty() bool {
@@ -19,41 +19,39 @@ func (list Slash) IsEmptyTail() bool {
 }
 
 func (list Slash) Head() string {
-	return string(Head(list, DelimiterSlash))
+	return Head(list, DelimiterSlash)
 }
 
 func (list Slash) Tail() List {
-	return Slash(Tail(list, DelimiterSlash))
+	return Tail(list, DelimiterSlash)
 }
 
 func (list Slash) Last() string {
-	return string(Last(list, DelimiterSlash))
+	return Last(list, DelimiterSlash)
 }
 
 func (list Slash) RemoveLast() List {
-	return Slash(RemoveLast(list, DelimiterSlash))
+	return RemoveLast(list, DelimiterSlash)
 }
 
 func (list Slash) Split() (string, List) {
-	head, tail := Split(list, DelimiterSlash)
-	return string(head), Slash(tail)
+	return Split(list, DelimiterSlash)
 }
 
 func (list Slash) SplitTail() (List, string) {
-	head, tail := SplitTail(list, DelimiterSlash)
-	return Slash(head), string(tail)
+	return SplitTail(list, DelimiterSlash)
 }
 
 func (list Slash) At(index int) string {
-	return string(At(list, DelimiterSlash, index))
+	return At(list, DelimiterSlash, index)
 }
 
 func (list Slash) PushHead(value string) List {
-	return Slash(PushHead(list, []byte(value), DelimiterSlash))
+	return PushHead(list, value, DelimiterSlash)
 }
 
 func (list Slash) PushTail(value string) List {
-	return Slash(PushTail(list, []byte(value), DelimiterSlash))
+	return PushTail(list, value, DelimiterSlash)
 }
 
 func (list Slash) String() string {
