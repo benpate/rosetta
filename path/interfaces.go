@@ -23,6 +23,10 @@ type BoolGetter interface {
 	GetBool(string) bool
 }
 
+type BytesGetter interface {
+	GetBytes(string) []byte
+}
+
 type FloatGetter interface {
 	GetFloat(string) float64
 }
@@ -51,6 +55,10 @@ type BoolSetter interface {
 	SetBool(string, bool) bool
 }
 
+type BytesSetter interface {
+	SetBytes(string, []byte) bool
+}
+
 type FloatSetter interface {
 	SetFloat(string, float64) bool
 }
@@ -74,6 +82,11 @@ type StringSetter interface {
 type BoolGetterSetter interface {
 	BoolGetter
 	BoolSetter
+}
+
+type BytesGetterSetter interface {
+	BytesGetter
+	BytesSetter
 }
 
 type FloatGetterSetter interface {

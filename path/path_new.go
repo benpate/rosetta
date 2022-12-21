@@ -17,6 +17,17 @@ func GetBool(object any, path string) bool {
 	return false
 }
 
+func GetBytes(object any, path string) []byte {
+
+	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(BytesGetter); ok {
+			return getter.GetBytes(path)
+		}
+	}
+
+	return nil
+}
+
 func GetFloat(object any, path string) float64 {
 
 	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
@@ -75,6 +86,21 @@ func SetBool(object any, path string, value bool) bool {
 
 	if setter, ok := leaf.(BoolSetter); ok {
 		return setter.SetBool(path, value)
+	}
+
+	return false
+}
+
+func SetBytes(object any, path string, value []byte) bool {
+
+	leaf, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
+	}
+
+	if setter, ok := leaf.(BytesSetter); ok {
+		return setter.SetBytes(path, value)
 	}
 
 	return false
