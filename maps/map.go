@@ -1,6 +1,8 @@
 package maps
 
 import (
+	"net/url"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
@@ -13,6 +15,21 @@ type Map map[string]any
 // New returns a fully initialized Map object.
 func New() Map {
 	return make(Map)
+}
+
+func FromURLValues(value url.Values) Map {
+
+	result := New()
+
+	for key := range value {
+		if len(value[key]) == 1 {
+			result[key] = value.Get(key)
+		} else {
+			result[key] = value[key]
+		}
+	}
+
+	return result
 }
 
 // AsMapOfInterface returns the underlying map datastructure
@@ -114,28 +131,46 @@ func (m Map) GetMap(name string) Map {
  ****************************/
 
 // SetBool adds a boolean value into the map
-func (m Map) SetBool(name string, value bool) {
-	m[name] = value
+func (m *Map) SetBool(name string, value bool) bool {
+	(*m)[name] = value
+	return true
 }
 
 // SetInt adds an int value into the map
-func (m Map) SetInt(name string, value int) {
-	m[name] = value
+func (m *Map) SetInt(name string, value int) bool {
+	(*m)[name] = value
+	return true
 }
 
 // SetInt64 adds an int64 value into the map
-func (m Map) SetInt64(name string, value int64) {
-	m[name] = value
+func (m *Map) SetInt64(name string, value int64) bool {
+	(*m)[name] = value
+	return true
 }
 
 // SetFloat adds an int value into the map
-func (m Map) SetFloat(name string, value float64) {
-	m[name] = value
+func (m *Map) SetFloat(name string, value float64) bool {
+	(*m)[name] = value
+	return true
 }
 
 // SetString adds an int value into the map
-func (m Map) SetString(name string, value string) {
-	m[name] = value
+func (m *Map) SetString(name string, value string) bool {
+	(*m)[name] = value
+	return true
+}
+
+/****************************
+ * Tree Traversal
+ ****************************/
+
+func (m *Map) GetChild(name string) (any, bool) {
+
+	if _, ok := (*m)[name]; !ok {
+		(*m)[name] = make(Map)
+	}
+
+	return (*m)[name], true
 }
 
 /****************************

@@ -129,6 +129,22 @@ func TestMap_SetPath(t *testing.T) {
 	}
 }
 
+func TestMapChild(t *testing.T) {
+
+	m1 := Map{"hello": "there"}
+	m2, ok := m1.GetChild("general")
+	require.True(t, ok)
+	m3 := m2.(Map)
+	require.True(t, m3.SetBool("kenobi", true))
+
+	require.Equal(t, Map{
+		"hello": "there",
+		"general": Map{
+			"kenobi": true,
+		},
+	}, m1)
+}
+
 func TestMapDelete(t *testing.T) {
 
 	{
