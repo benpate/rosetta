@@ -9,7 +9,7 @@ import (
 
 // Float forces a conversion from an arbitrary value into a float64.
 // If the value cannot be converted, then the zero value for the type (false) is used.
-func Float(value interface{}) float64 {
+func Float(value any) float64 {
 
 	result, _ := FloatOk(value, 0)
 	return result
@@ -17,7 +17,7 @@ func Float(value interface{}) float64 {
 
 // FloatDefault forces a conversion from an arbitrary value into a float64.
 // if the value cannot be converted, then the default value is used.
-func FloatDefault(value interface{}, defaultValue float64) float64 {
+func FloatDefault(value any, defaultValue float64) float64 {
 
 	result, _ := FloatOk(value, defaultValue)
 	return result
@@ -33,7 +33,7 @@ func FloatDefault(value interface{}, defaultValue float64) float64 {
 // String values are attempted to parse as a float64.  If unsuccessful, default value is returned.  For all strings, Ok=false
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
-func FloatOk(value interface{}, defaultValue float64) (float64, bool) {
+func FloatOk(value any, defaultValue float64) (float64, bool) {
 
 	if value == nil {
 		return defaultValue, false

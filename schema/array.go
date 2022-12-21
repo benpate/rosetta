@@ -337,7 +337,7 @@ func (element Array) Validate(value any) error {
 }
 
 func (element Array) Clean(value any) error {
-	// TODO: HIGH: Implement this
+	// TODO: HIGH: Implement the Clean method for Array
 	return nil
 }
 

@@ -7,7 +7,7 @@ import (
 
 // Bool forces a conversion from an arbitrary value into a boolean.
 // If the value cannot be converted, then the default value for the type is used.
-func Bool(value interface{}) bool {
+func Bool(value any) bool {
 
 	result, _ := BoolOk(value, false)
 	return result
@@ -15,7 +15,7 @@ func Bool(value interface{}) bool {
 
 // BoolDefault forces a conversion from an arbitrary value into a bool.
 // if the value cannot be converted, then the default value is used.
-func BoolDefault(value interface{}, defaultValue bool) bool {
+func BoolDefault(value any, defaultValue bool) bool {
 
 	result, _ := BoolOk(value, defaultValue)
 	return result
@@ -32,7 +32,7 @@ func BoolDefault(value interface{}, defaultValue bool) bool {
 // String values of "true" and "false" convert normall, and Ok=true.  All other strings return the default value, with Ok=false
 // Known interfaces (Booler, Inter, Floater, Stringer) are handled like their corresponding types
 // All other values return the default value with Ok=false
-func BoolOk(value interface{}, defaultValue bool) (bool, bool) {
+func BoolOk(value any, defaultValue bool) (bool, bool) {
 
 	if value == nil {
 		return defaultValue, false

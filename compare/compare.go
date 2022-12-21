@@ -5,7 +5,7 @@ import (
 )
 
 // WithOperator uses an operator to compare two values, and returns TRUE or FALSE
-func WithOperator(value1 interface{}, operator string, value2 interface{}) (bool, error) {
+func WithOperator(value1 any, operator string, value2 any) (bool, error) {
 
 	// These operations are performed outside of the "Interface" comparison
 	switch operator {
@@ -57,7 +57,7 @@ func WithOperator(value1 interface{}, operator string, value2 interface{}) (bool
 
 // Equal is a simplified version of Compare.  It ONLY returns true if the two provided values are EQUAL.
 // In all other cases (including errors) it returns FALSE
-func Equal(value1 interface{}, value2 interface{}) bool {
+func Equal(value1 any, value2 any) bool {
 
 	if result, err := Interface(value1, value2); err == nil {
 
@@ -71,7 +71,7 @@ func Equal(value1 interface{}, value2 interface{}) bool {
 
 // LessThan is a simplified version of Compare.  It ONLY returns true if value1 is verifiably LESS THAN value2.
 // In all other cases (including errors) it returns FALSE
-func LessThan(value1 interface{}, value2 interface{}) bool {
+func LessThan(value1 any, value2 any) bool {
 
 	if result, err := Interface(value1, value2); err == nil {
 
@@ -85,7 +85,7 @@ func LessThan(value1 interface{}, value2 interface{}) bool {
 
 // GreaterThan is a simplified version of Compare.  It ONLY returns true if value1 is verifiably GREATER THAN value2.
 // In all other cases (including errors) it returns FALSE
-func GreaterThan(value1 interface{}, value2 interface{}) bool {
+func GreaterThan(value1 any, value2 any) bool {
 
 	if result, err := Interface(value1, value2); err == nil {
 

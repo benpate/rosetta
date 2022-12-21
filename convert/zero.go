@@ -3,7 +3,7 @@ package convert
 import "io"
 
 // IsZeroValue returns TRUE if the value is the zero value for its datatype
-func IsZeroValue(value interface{}) bool {
+func IsZeroValue(value any) bool {
 
 	if value == nil {
 		return true
@@ -42,7 +42,7 @@ func IsZeroValue(value interface{}) bool {
 		return len(v) == 0
 	case []float64:
 		return len(v) == 0
-	case []interface{}:
+	case []any:
 		return len(v) == 0
 
 	case Nuller:

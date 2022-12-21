@@ -101,7 +101,7 @@ func TestStringerToString(t *testing.T) {
 }
 
 func TestInvalidToString(t *testing.T) {
-	result, natural := StringOk(map[string]interface{}{}, "default")
+	result, natural := StringOk(map[string]any{}, "default")
 
 	assert.False(t, natural)
 	assert.Equal(t, result, "default")

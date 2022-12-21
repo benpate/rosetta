@@ -1,7 +1,7 @@
 package convert
 
 // Bytes forces a conversion from an arbitrary value into a slice of bytes.
-func Bytes(value interface{}) []byte {
+func Bytes(value any) []byte {
 
 	if value == nil {
 		return []byte{}

@@ -105,7 +105,7 @@ func TestStringerToFloat(t *testing.T) {
 }
 
 func TestInvalidToFloat(t *testing.T) {
-	result, natural := FloatOk(map[string]interface{}{}, -1)
+	result, natural := FloatOk(map[string]any{}, -1)
 
 	assert.False(t, natural)
 	assert.Equal(t, result, float64(-1))

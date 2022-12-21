@@ -8,7 +8,7 @@ import (
 
 // Int forces a conversion from an arbitrary value into an int.
 // If the value cannot be converted, then the zero value for the type (0) is used.
-func Int(value interface{}) int {
+func Int(value any) int {
 
 	result, _ := IntOk(value, 0)
 	return result
@@ -16,7 +16,7 @@ func Int(value interface{}) int {
 
 // IntDefault forces a conversion from an arbitrary value into a int.
 // if the value cannot be converted, then the default value is used.
-func IntDefault(value interface{}, defaultValue int) int {
+func IntDefault(value any, defaultValue int) int {
 
 	result, _ := IntOk(value, defaultValue)
 	return result
@@ -33,7 +33,7 @@ func IntDefault(value interface{}, defaultValue int) int {
 // String values are attempted to parse as a int.  If unsuccessful, default value is returned.  For all strings, Ok=false
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
-func IntOk(value interface{}, defaultValue int) (int, bool) {
+func IntOk(value any, defaultValue int) (int, bool) {
 
 	if value == nil {
 		return defaultValue, false

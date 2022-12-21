@@ -4,7 +4,7 @@ import "github.com/benpate/rosetta/null"
 
 // NullBool converts a value into a nullable value.
 // The value is only set if the input value is a natural match for this data type.
-func NullBool(value interface{}) null.Bool {
+func NullBool(value any) null.Bool {
 
 	var result null.Bool
 
@@ -17,7 +17,7 @@ func NullBool(value interface{}) null.Bool {
 
 // NullInt converts a value into a nullable value.
 // The value is only set if the input value is a natural match for this data type.
-func NullInt(value interface{}) null.Int {
+func NullInt(value any) null.Int {
 
 	var result null.Int
 
@@ -31,7 +31,7 @@ func NullInt(value interface{}) null.Int {
 
 // NullInt64 converts a value into a nullable value.
 // The value is only set if the input value is a natural match for this data type.
-func NullInt64(value interface{}) null.Int64 {
+func NullInt64(value any) null.Int64 {
 
 	var result null.Int64
 
@@ -45,7 +45,7 @@ func NullInt64(value interface{}) null.Int64 {
 
 // NullFloat converts a value into a nullable value.
 // The value is only set if the input value is a natural match for this data type.
-func NullFloat(value interface{}) null.Float {
+func NullFloat(value any) null.Float {
 
 	var result null.Float
 

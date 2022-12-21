@@ -6,7 +6,7 @@ import (
 )
 
 // Match returns TRUE if the provided Getter matches the provided expression
-func Match(object interface{}, criteria exp.Expression) bool {
+func Match(object any, criteria exp.Expression) bool {
 
 	// Call criteria.Match using a custom matcher function that knows how to resolve Path values.
 	return criteria.Match(func(predicate exp.Predicate) bool {

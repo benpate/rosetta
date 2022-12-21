@@ -9,12 +9,12 @@ import (
 func TestSliceOfString(t *testing.T) {
 
 	{
-		value := []interface{}{"first", "second", "third"}
+		value := []any{"first", "second", "third"}
 		require.Equal(t, []string{"first", "second", "third"}, SliceOfString(value))
 	}
 
 	{
-		value := []interface{}{1, 2, 3}
+		value := []any{1, 2, 3}
 		require.Equal(t, []string{"1", "2", "3"}, SliceOfString(value))
 	}
 

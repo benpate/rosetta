@@ -36,7 +36,7 @@ func (f Float) String() string {
 }
 
 // Interface returns the float64 value (if present) or NIL
-func (f Float) Interface() interface{} {
+func (f Float) Interface() any {
 
 	if f.present {
 		return f.value

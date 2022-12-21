@@ -7,7 +7,7 @@ import (
 )
 
 // Contains is a simple "generic-safe" function for string comparison.  It returns TRUE if value1 contains value2
-func Contains(value1 interface{}, value2 interface{}) bool {
+func Contains(value1 any, value2 any) bool {
 
 	switch value1 := value1.(type) {
 

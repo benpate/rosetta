@@ -125,7 +125,7 @@ func TestStringerToInt(t *testing.T) {
 }
 
 func TestInvalidToInt(t *testing.T) {
-	result, natural := IntOk(map[string]interface{}{}, -1)
+	result, natural := IntOk(map[string]any{}, -1)
 
 	require.False(t, natural)
 	require.Equal(t, result, int(-1))

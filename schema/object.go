@@ -196,7 +196,7 @@ func (element Object) Validate(value any) error {
 }
 
 func (element Object) Clean(value any) error {
-	// TODO: HIGH: Implement this
+	// TODO: HIGH: Implement the Clean method for the Object type
 	return nil
 }
 

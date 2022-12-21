@@ -23,7 +23,7 @@ func TestDeleteMapOfString(t *testing.T) {
 
 func TestDeleteMapOfInterface(t *testing.T) {
 
-	value := map[string]interface{}{
+	value := map[string]any{
 		"first":  1,
 		"second": 2,
 		"third":  3,

@@ -91,7 +91,7 @@ func (element Boolean) Validate(object any) error {
 }
 
 func (element Boolean) Clean(value any) error {
-	// TODO: HIGH: Implement this
+	// TODO: HIGH: Implement the Clean() method for the Boolean element
 	return nil
 }
 

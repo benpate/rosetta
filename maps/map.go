@@ -12,7 +12,7 @@ type Map map[string]any
 
 // New returns a fully initialized Map object.
 func New() Map {
-	return Map(map[string]any{})
+	return make(Map)
 }
 
 // AsMapOfInterface returns the underlying map datastructure

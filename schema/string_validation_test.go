@@ -15,7 +15,7 @@ func TestStringType(t *testing.T) {
 	assert.Nil(t, s.Validate("I'm a string"))
 	assert.Nil(t, s.Validate(0))
 	assert.Nil(t, s.Validate([]string{}))
-	assert.Nil(t, s.Validate(map[string]interface{}{}))
+	assert.Nil(t, s.Validate(map[string]any{}))
 }
 
 func TestStringUnmarshal(t *testing.T) {

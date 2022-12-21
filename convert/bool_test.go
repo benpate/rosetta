@@ -304,7 +304,7 @@ func TestStringerToBool(t *testing.T) {
 
 func TestInvalidToBool(t *testing.T) {
 
-	result, natural := BoolOk(map[string]interface{}{}, true)
+	result, natural := BoolOk(map[string]any{}, true)
 
 	assert.False(t, natural)
 	assert.True(t, result)

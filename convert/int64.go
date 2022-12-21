@@ -8,7 +8,7 @@ import (
 
 // Int64 forces a conversion from an arbitrary value into an int.
 // If the value cannot be converted, then the zero value for the type (0) is used.
-func Int64(value interface{}) int64 {
+func Int64(value any) int64 {
 
 	result, _ := Int64Ok(value, 0)
 	return result
@@ -16,7 +16,7 @@ func Int64(value interface{}) int64 {
 
 // Int64Default forces a conversion from an arbitrary value into a int.
 // if the value cannot be converted, then the default value is used.
-func Int64Default(value interface{}, defaultValue int64) int64 {
+func Int64Default(value any, defaultValue int64) int64 {
 
 	result, _ := Int64Ok(value, defaultValue)
 	return result
@@ -33,7 +33,7 @@ func Int64Default(value interface{}, defaultValue int64) int64 {
 // String values are attempted to parse as a int.  If unsuccessful, default value is returned.  For all strings, Ok=false
 // Known interfaces (Int64er, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
-func Int64Ok(value interface{}, defaultValue int64) (int64, bool) {
+func Int64Ok(value any, defaultValue int64) (int64, bool) {
 
 	if value == nil {
 		return defaultValue, false

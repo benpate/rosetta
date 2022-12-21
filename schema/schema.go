@@ -242,7 +242,7 @@ func (schema Schema) Remove(object any, path string) error {
 // fit the schema, then an error is returned
 func (schema Schema) Clean(value any) error {
 
-	// TODO: CRITICAL: These functions are not yet implemented
+	// TODO: CRITICAL: "Clean" functions are not yet implemented
 	if schema.Element == nil {
 		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
 	}

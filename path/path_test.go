@@ -68,7 +68,7 @@ type testStruct struct {
 	Relatives testStructArray
 }
 
-func (d testStruct) GetPath(path string) (interface{}, bool) {
+func (d testStruct) GetPath(path string) (any, bool) {
 
 	if path == "" {
 		return d, true
@@ -93,7 +93,7 @@ func (d testStruct) GetPath(path string) (interface{}, bool) {
 
 type testStructArray []testStruct
 
-func (d testStructArray) GetPath(path string) (interface{}, bool) {
+func (d testStructArray) GetPath(path string) (any, bool) {
 
 	if path == "" {
 		return d, true
@@ -135,15 +135,15 @@ func getTestStruct() testStruct {
 	}
 }
 
-func getTestData() map[string]interface{} {
+func getTestData() map[string]any {
 
-	return map[string]interface{}{
+	return map[string]any{
 		"name":  "John Connor",
 		"email": "john@connor.mil",
-		"relatives": map[string]interface{}{
+		"relatives": map[string]any{
 			"mom": "Sarah Connor",
 			"dad": "Kyle Reese",
 		},
-		"enemies": []interface{}{"T-1000", "T-3000", "T-5000"},
+		"enemies": []any{"T-1000", "T-3000", "T-5000"},
 	}
 }

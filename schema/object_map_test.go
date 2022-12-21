@@ -69,7 +69,7 @@ func TestComplexObjectSet(t *testing.T) {
 		},
 	}
 
-	var data interface{}
+	var data any
 
 	err = schema.Set(&data, "contact.email", "john@doemain.com")
 	require.Nil(t, err)

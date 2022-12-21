@@ -9,7 +9,7 @@ import (
 )
 
 // SetAll adds every path from the dataset into the object.  It returns an aggregate error containing all errors generated.
-func SetAll(object interface{}, dataset map[string]interface{}) error {
+func SetAll(object any, dataset map[string]any) error {
 
 	var errorReport error
 
@@ -24,7 +24,7 @@ func SetAll(object interface{}, dataset map[string]interface{}) error {
 }
 
 // Get tries to return the value of the object at this path.
-func Get(object interface{}, path string) interface{} {
+func Get(object any, path string) any {
 
 	result, _ := GetOK(object, path)
 	return result
@@ -32,7 +32,7 @@ func Get(object interface{}, path string) interface{} {
 
 // GetOK returns the value of the object at the provided path.
 // If a value does not already exist, then the OK boolean is false.
-func GetOK(object interface{}, path string) (interface{}, bool) {
+func GetOK(object any, path string) (any, bool) {
 
 	// If the object is empty, then there's nothing left to traverse.
 	if object == nil {
@@ -92,7 +92,7 @@ func GetOK(object interface{}, path string) (interface{}, bool) {
 }
 
 // Set tries to return the value of the object at this path.
-func Set(object interface{}, name string, value interface{}) error {
+func Set(object any, name string, value any) error {
 
 	switch obj := object.(type) {
 
@@ -108,13 +108,13 @@ func Set(object interface{}, name string, value interface{}) error {
 	case []int:
 		return setSliceOfInt(name, obj, value)
 
-	case []interface{}:
+	case []any:
 		return setSliceOfInterface(name, obj, value)
 
 	case map[string]string:
 		return setMapOfString(name, obj, value)
 
-	case map[string]interface{}:
+	case map[string]any:
 		return setMapOfInterface(name, obj, value)
 
 	default:
@@ -123,7 +123,7 @@ func Set(object interface{}, name string, value interface{}) error {
 }
 
 // Delete tries to remove a value from ths object at this path
-func Delete(object interface{}, name string) error {
+func Delete(object any, name string) error {
 
 	switch obj := object.(type) {
 
@@ -136,7 +136,7 @@ func Delete(object interface{}, name string) error {
 	case []int:
 		return deleteSliceOfInt(name, obj)
 
-	case []interface{}:
+	case []any:
 		return deleteSliceOfInterface(name, obj)
 
 	case []Deleter:
@@ -145,7 +145,7 @@ func Delete(object interface{}, name string) error {
 	case map[string]string:
 		return deleteMapOfString(name, obj)
 
-	case map[string]interface{}:
+	case map[string]any:
 		return deleteMapOfInterface(name, obj)
 	}
 

@@ -16,7 +16,7 @@ func deleteSliceOfDeleter(path string, object []Deleter) error {
 	return derp.NewInternalError("path.deleteSliceOfString", "Unimplemented")
 }
 
-func deleteSliceOfInterface(path string, object []interface{}) error {
+func deleteSliceOfInterface(path string, object []any) error {
 	return derp.NewInternalError("path.deleteSliceOfString", "Unimplemented")
 }
 
@@ -32,7 +32,7 @@ func deleteMapOfString(path string, object map[string]string) error {
 	return nil
 }
 
-func deleteMapOfInterface(name string, object map[string]interface{}) error {
+func deleteMapOfInterface(name string, object map[string]any) error {
 
 	head, tail := Split(name)
 

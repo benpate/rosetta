@@ -6,9 +6,9 @@ import (
 )
 
 // SliceOfString converts the value into a slice of strings.
-// It works with interface{}, []interface{}, []string, and string values.
+// It works with any, []any, []string, and string values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfString(value interface{}) []string {
+func SliceOfString(value any) []string {
 
 	switch value := value.(type) {
 
@@ -39,7 +39,7 @@ func SliceOfString(value interface{}) []string {
 		}
 		return result
 
-	case []interface{}:
+	case []any:
 		result := make([]string, len(value))
 		for index, v := range value {
 			result[index] = String(v)
@@ -91,16 +91,16 @@ func SplitSliceOfString(value any, sep string) []string {
 }
 
 // SliceOfInt converts the value into a slice of ints.
-// It works with interface{}, []interface{}, []string, []int, and int values.
+// It works with any, []any, []string, []int, and int values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfInt(value interface{}) []int {
+func SliceOfInt(value any) []int {
 
 	switch value := value.(type) {
 
 	case []int:
 		return value
 
-	case []interface{}:
+	case []any:
 		result := make([]int, len(value))
 		for index, v := range value {
 			result[index] = Int(v)
@@ -122,13 +122,13 @@ func SliceOfInt(value interface{}) []int {
 }
 
 // SliceOfFloat converts the value into a slice of floats.
-// It works with interface{}, []interface{}, []float64, and float64 values.
+// It works with any, []any, []float64, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfFloat(value interface{}) []float64 {
+func SliceOfFloat(value any) []float64 {
 
 	switch value := value.(type) {
 
-	case []interface{}:
+	case []any:
 		result := make([]float64, len(value))
 		for index, v := range value {
 			result[index] = Float(v)
@@ -145,38 +145,38 @@ func SliceOfFloat(value interface{}) []float64 {
 	return make([]float64, 0)
 }
 
-// SliceOfMap converts the value into a slice of map[string]interface{}.
-// It works with []interface{}, []map[string]interface{}.
+// SliceOfMap converts the value into a slice of map[string]any.
+// It works with []any, []map[string]any.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfMap(value interface{}) []map[string]interface{} {
+func SliceOfMap(value any) []map[string]any {
 
 	switch value := value.(type) {
 
-	case []map[string]interface{}:
+	case []map[string]any:
 		return value
 
-	case []interface{}:
-		result := make([]map[string]interface{}, len(value))
+	case []any:
+		result := make([]map[string]any, len(value))
 		for index, v := range value {
 			result[index] = MapOfInterface(v)
 		}
 		return result
 	}
 
-	return make([]map[string]interface{}, 0)
+	return make([]map[string]any, 0)
 }
 
-// SliceOfBool converts the value into a slice of interface{}.
-// It works with interface{}, []interface{}, []string, []int, []float64, string, int, and float64 values.
+// SliceOfBool converts the value into a slice of any.
+// It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfBool(value interface{}) []bool {
+func SliceOfBool(value any) []bool {
 
 	switch value := value.(type) {
 
 	case []bool:
 		return value
 
-	case []interface{}:
+	case []any:
 		result := make([]bool, len(value))
 		for index, v := range value {
 			result[index] = Bool(v)
@@ -211,43 +211,43 @@ func SliceOfBool(value interface{}) []bool {
 	return make([]bool, 0)
 }
 
-// SliceOfInterface converts the value into a slice of interface{}.
-// It works with interface{}, []interface{}, []string, []int, []float64, string, int, and float64 values.
+// SliceOfInterface converts the value into a slice of any.
+// It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfInterface(value interface{}) []interface{} {
+func SliceOfInterface(value any) []any {
 
 	if value == nil {
-		return make([]interface{}, 0)
+		return make([]any, 0)
 	}
 
 	switch value := value.(type) {
 
-	case []interface{}:
+	case []any:
 		return value
 
 	case []string:
-		result := make([]interface{}, len(value))
+		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
 		return result
 
 	case []int:
-		result := make([]interface{}, len(value))
+		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
 		return result
 
 	case []float64:
-		result := make([]interface{}, len(value))
+		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
 		return result
 
 	case string, int, float64:
-		return []interface{}{value}
+		return []any{value}
 	}
 
 	// Use reflection to see if this is even aa array/slice
@@ -259,7 +259,7 @@ func SliceOfInterface(value interface{}) []interface{} {
 
 	case reflect.Array, reflect.Slice:
 		length := valueOf.Len()
-		result := make([]interface{}, length)
+		result := make([]any, length)
 		for index := 0; index < length; index++ {
 			result[index] = valueOf.Index(index).Interface()
 		}
@@ -267,10 +267,10 @@ func SliceOfInterface(value interface{}) []interface{} {
 	}
 
 	// Fall through means this isn't even an array/slice.  Admit defeat and go home.
-	return make([]interface{}, 0)
+	return make([]any, 0)
 }
 
-func SliceLength(value interface{}) int {
+func SliceLength(value any) int {
 
 	if value == nil {
 		return 0

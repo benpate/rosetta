@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func GetWithReflection(object reflect.Value, path string) (interface{}, bool) {
+func GetWithReflection(object reflect.Value, path string) (any, bool) {
 
 	kind := object.Kind()
 
@@ -31,7 +31,7 @@ func GetWithReflection(object reflect.Value, path string) (interface{}, bool) {
 }
 
 // GetFromMap uses reflection to set a value into a map
-func GetFromMap(object reflect.Value, path string) (interface{}, bool) {
+func GetFromMap(object reflect.Value, path string) (any, bool) {
 
 	head, tail := Split(path)
 	index := reflect.ValueOf(head)
@@ -41,7 +41,7 @@ func GetFromMap(object reflect.Value, path string) (interface{}, bool) {
 
 // GetFromStructreturns a value from a struct.  The struct MUST have "path" tags
 // that identify how each field is to be addressed.
-func GetFromStruct(object reflect.Value, path string) (interface{}, bool) {
+func GetFromStruct(object reflect.Value, path string) (any, bool) {
 
 	// Get reflect meta-data for this value
 	head, tail := Split(path)
@@ -55,7 +55,7 @@ func GetFromStruct(object reflect.Value, path string) (interface{}, bool) {
 	return nil, false
 }
 
-func GetFromSlice(object reflect.Value, path string) (interface{}, bool) {
+func GetFromSlice(object reflect.Value, path string) (any, bool) {
 
 	head, tail := Split(path)
 	index, err := strconv.Atoi(head)

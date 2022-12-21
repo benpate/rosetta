@@ -34,7 +34,7 @@ func (b Bool) String() string {
 }
 
 // Interface returns the boolean value (if present) or NIL
-func (b Bool) Interface() interface{} {
+func (b Bool) Interface() any {
 
 	if b.present {
 		return b.value

@@ -8,7 +8,7 @@ import (
 )
 
 // SetWithReflection uses a "path" to apply a value to a generic variable.
-func SetWithReflection(object reflect.Value, path string, value interface{}) error {
+func SetWithReflection(object reflect.Value, path string, value any) error {
 
 	kind := object.Kind()
 
@@ -77,7 +77,7 @@ func SetWithReflection(object reflect.Value, path string, value interface{}) err
 }
 
 // SetToMap uses reflection to set a value into a map
-func SetToMap(object reflect.Value, path string, value interface{}) error {
+func SetToMap(object reflect.Value, path string, value any) error {
 	head, tail := Split(path)
 
 	if tail != "" {
@@ -90,7 +90,7 @@ func SetToMap(object reflect.Value, path string, value interface{}) error {
 }
 
 // SetToSlice uses reflection to set a value into a slice/array variable.
-func SetToSlice(object reflect.Value, path string, value interface{}) error {
+func SetToSlice(object reflect.Value, path string, value any) error {
 	head, tail := Split(path)
 	max := object.Len()
 
@@ -104,7 +104,7 @@ func SetToSlice(object reflect.Value, path string, value interface{}) error {
 }
 
 // SetToStruct sets a map reflection value
-func SetToStruct(object reflect.Value, path string, value interface{}) error {
+func SetToStruct(object reflect.Value, path string, value any) error {
 
 	head, tail := Split(path)
 

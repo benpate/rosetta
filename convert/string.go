@@ -10,14 +10,14 @@ import (
 
 // String forces a conversion from an arbitrary value into an string.
 // If the value cannot be converted, then the default value for the type is used.
-func String(value interface{}) string {
+func String(value any) string {
 	result, _ := StringOk(value, "")
 	return result
 }
 
 // StringDefault forces a conversion from an arbitrary value into a string.
 // if the value cannot be converted, then the default value is used.
-func StringDefault(value interface{}, defaultValue string) string {
+func StringDefault(value any, defaultValue string) string {
 	result, _ := StringOk(value, defaultValue)
 	return result
 }
@@ -34,7 +34,7 @@ func StringDefault(value interface{}, defaultValue string) string {
 // String are passed through directly, with Ok=true
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
-func StringOk(value interface{}, defaultValue string) (string, bool) {
+func StringOk(value any, defaultValue string) (string, bool) {
 
 	if value == nil {
 		return defaultValue, false

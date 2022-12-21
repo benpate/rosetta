@@ -53,7 +53,7 @@ func (i Int) IsNull() bool {
 }
 
 // Interface returns the int value (if present) or NIL
-func (i Int) Interface() interface{} {
+func (i Int) Interface() any {
 
 	if i.present {
 		return i.value

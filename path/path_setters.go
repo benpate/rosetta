@@ -5,7 +5,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-func setSliceOfString(path string, object []string, value interface{}) error {
+func setSliceOfString(path string, object []string, value any) error {
 
 	head, tail := Split(path)
 	index, err := Index(head, len(object))
@@ -22,7 +22,7 @@ func setSliceOfString(path string, object []string, value interface{}) error {
 	return derp.NewInternalError("path.Set", "Invalid Path", path)
 }
 
-func setSliceOfInt(path string, object []int, value interface{}) error {
+func setSliceOfInt(path string, object []int, value any) error {
 
 	head, tail := Split(path)
 	index, err := Index(head, len(object))
@@ -39,7 +39,7 @@ func setSliceOfInt(path string, object []int, value interface{}) error {
 	return derp.NewInternalError("path.Set", "Invalid Path", path)
 }
 
-func setSliceOfInterface(path string, object []interface{}, value interface{}) error {
+func setSliceOfInterface(path string, object []any, value any) error {
 
 	head, tail := Split(path)
 	index, err := Index(head, len(object))
@@ -56,7 +56,7 @@ func setSliceOfInterface(path string, object []interface{}, value interface{}) e
 	return Set(&object[index], tail, value)
 }
 
-func setSliceOfSetter(path string, object []Setter, value interface{}) error {
+func setSliceOfSetter(path string, object []Setter, value any) error {
 
 	head, tail := Split(path)
 	index, err := Index(head, len(object))
@@ -77,7 +77,7 @@ func setSliceOfSetter(path string, object []Setter, value interface{}) error {
 	return Set(object[index], tail, value)
 }
 
-func setMapOfInterface(path string, object map[string]interface{}, value interface{}) error {
+func setMapOfInterface(path string, object map[string]any, value any) error {
 
 	head, tail := Split(path)
 
@@ -89,7 +89,7 @@ func setMapOfInterface(path string, object map[string]interface{}, value interfa
 	return Set(object[head], tail, value)
 }
 
-func setMapOfString(path string, object map[string]string, value interface{}) error {
+func setMapOfString(path string, object map[string]string, value any) error {
 
 	head, tail := Split(path)
 

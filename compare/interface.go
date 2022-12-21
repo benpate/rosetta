@@ -9,7 +9,7 @@ import "github.com/benpate/derp"
 // If the two values are not compatable, then it returns 0, [DERP] with an explanation of the error.
 // Currently, this function ONLLY compares identical numeric or string types.  In the future, it *may*
 // be expanded to perform simple type converstions between similar types.
-func Interface(value1 interface{}, value2 interface{}) (int, error) {
+func Interface(value1 any, value2 any) (int, error) {
 
 	switch v1 := value1.(type) {
 

@@ -20,7 +20,7 @@ func String(value1 string, value2 string) int {
 }
 
 // BeginsWith is a simple "generic-safe" function for string comparison.  It returns TRUE if value1 begins with value2
-func BeginsWith(value1 interface{}, value2 interface{}) bool {
+func BeginsWith(value1 any, value2 any) bool {
 
 	if value1, ok := value1.(string); ok {
 
@@ -44,7 +44,7 @@ func BeginsWith(value1 interface{}, value2 interface{}) bool {
 }
 
 // EndsWith is a simple "generic-safe" function for string comparison.  It returns TRUE if value1 ends with value2
-func EndsWith(value1 interface{}, value2 interface{}) bool {
+func EndsWith(value1 any, value2 any) bool {
 
 	if value1, ok := value1.(string); ok {
 

@@ -140,7 +140,7 @@ func TestMapDelete(t *testing.T) {
 		require.Nil(t, there["general"])
 	}
 	{
-		m := Map{"hello": map[string]interface{}{
+		m := Map{"hello": map[string]any{
 			"the":    1337,
 			"answer": 69,
 			"is":     42,
@@ -148,7 +148,7 @@ func TestMapDelete(t *testing.T) {
 
 		path.Delete(m, "hello.answer")
 
-		hello := m["hello"].(map[string]interface{})
+		hello := m["hello"].(map[string]any)
 		require.Equal(t, 1337, hello["the"])
 		require.Equal(t, 42, hello["is"])
 		require.Nil(t, hello["answer"])

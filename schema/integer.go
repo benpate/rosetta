@@ -145,7 +145,7 @@ func (element Integer) Validate(value any) error {
 }
 
 func (element Integer) Clean(value any) error {
-	// TODO: HIGH: Implement this
+	// TODO: HIGH: Implement the "Clean" method for Integer
 	return nil
 }
 
