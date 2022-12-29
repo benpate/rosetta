@@ -61,3 +61,7 @@ func (list Semicolon) PushTail(value string) List {
 func (list Semicolon) String() string {
 	return string(list)
 }
+
+func (list Semicolon) Bytes() []byte {
+	return []byte(list)
+}

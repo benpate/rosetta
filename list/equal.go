@@ -61,3 +61,7 @@ func (list Equal) PushTail(value string) List {
 func (list Equal) String() string {
 	return string(list)
 }
+
+func (list Equal) Bytes() []byte {
+	return []byte(list)
+}

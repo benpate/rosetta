@@ -61,3 +61,7 @@ func (list Comma) PushTail(value string) List {
 func (list Comma) String() string {
 	return string(list)
 }
+
+func (list Comma) Bytes() []byte {
+	return []byte(list)
+}

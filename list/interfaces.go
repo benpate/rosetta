@@ -19,4 +19,5 @@ type List interface {
 	PushHead(value string) List
 	PushTail(value string) List
 	String() string
+	Bytes() []byte
 }

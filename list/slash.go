@@ -61,3 +61,7 @@ func (list Slash) PushTail(value string) List {
 func (list Slash) String() string {
 	return string(list)
 }
+
+func (list Slash) Bytes() []byte {
+	return []byte(list)
+}

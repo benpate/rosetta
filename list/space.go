@@ -61,3 +61,7 @@ func (list Space) PushTail(value string) List {
 func (list Space) String() string {
 	return string(list)
 }
+
+func (list Space) Bytes() []byte {
+	return []byte(list)
+}
