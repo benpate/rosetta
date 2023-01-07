@@ -108,7 +108,7 @@ func (x *Any) GetChild(key string) (any, bool) {
 	}
 
 	for index >= len(*x) {
-		return nil, false
+		*x = append(*x, nil)
 	}
 
 	return &(*x)[index], true
