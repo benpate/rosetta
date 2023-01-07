@@ -1,38 +1,29 @@
 package path
 
-import "github.com/benpate/rosetta/list"
+import (
+	"github.com/benpate/rosetta/list"
+)
 
-/*************************
+/*************************************************
  * New Style Getters
- *************************/
+ *************************************************/
 
 func GetBool(object any, path string) bool {
 
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
 		if getter, ok := leaf.(BoolGetter); ok {
-			return getter.GetBool(path)
+			return getter.GetBool(last)
 		}
 	}
 
 	return false
 }
 
-func GetBytes(object any, path string) []byte {
-
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
-		if getter, ok := leaf.(BytesGetter); ok {
-			return getter.GetBytes(path)
-		}
-	}
-
-	return nil
-}
-
 func GetFloat(object any, path string) float64 {
 
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
 		if getter, ok := leaf.(FloatGetter); ok {
-			return getter.GetFloat(path)
+			return getter.GetFloat(last)
 		}
 	}
 
@@ -41,9 +32,9 @@ func GetFloat(object any, path string) float64 {
 
 func GetInt(object any, path string) int {
 
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
 		if getter, ok := leaf.(IntGetter); ok {
-			return getter.GetInt(path)
+			return getter.GetInt(last)
 		}
 	}
 
@@ -52,9 +43,9 @@ func GetInt(object any, path string) int {
 
 func GetInt64(object any, path string) int64 {
 
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
 		if getter, ok := leaf.(Int64Getter); ok {
-			return getter.GetInt64(path)
+			return getter.GetInt64(last)
 		}
 	}
 
@@ -63,44 +54,29 @@ func GetInt64(object any, path string) int64 {
 
 func GetString(object any, path string) string {
 
-	if leaf, ok := getLeaf(object, list.Dot(path)); ok {
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
 		if getter, ok := leaf.(StringGetter); ok {
-			return getter.GetString(path)
+			return getter.GetString(last)
 		}
 	}
 
 	return ""
 }
 
-/*************************
+/*************************************************
  * New Style Setters
- *************************/
+ *************************************************/
 
 func SetBool(object any, path string, value bool) bool {
 
-	leaf, ok := getLeaf(object, list.Dot(path))
+	leaf, last, ok := getLeaf(object, list.Dot(path))
 
 	if !ok {
 		return false
 	}
 
 	if setter, ok := leaf.(BoolSetter); ok {
-		return setter.SetBool(path, value)
-	}
-
-	return false
-}
-
-func SetBytes(object any, path string, value []byte) bool {
-
-	leaf, ok := getLeaf(object, list.Dot(path))
-
-	if !ok {
-		return false
-	}
-
-	if setter, ok := leaf.(BytesSetter); ok {
-		return setter.SetBytes(path, value)
+		return setter.SetBool(last, value)
 	}
 
 	return false
@@ -108,14 +84,14 @@ func SetBytes(object any, path string, value []byte) bool {
 
 func SetFloat(object any, path string, value float64) bool {
 
-	leaf, ok := getLeaf(object, list.Dot(path))
+	leaf, last, ok := getLeaf(object, list.Dot(path))
 
 	if !ok {
 		return false
 	}
 
 	if setter, ok := leaf.(FloatSetter); ok {
-		return setter.SetFloat(path, value)
+		return setter.SetFloat(last, value)
 	}
 
 	return false
@@ -123,14 +99,14 @@ func SetFloat(object any, path string, value float64) bool {
 
 func SetInt(object any, path string, value int) bool {
 
-	leaf, ok := getLeaf(object, list.Dot(path))
+	leaf, last, ok := getLeaf(object, list.Dot(path))
 
 	if !ok {
 		return false
 	}
 
 	if setter, ok := leaf.(IntSetter); ok {
-		return setter.SetInt(path, value)
+		return setter.SetInt(last, value)
 	}
 
 	return false
@@ -138,14 +114,14 @@ func SetInt(object any, path string, value int) bool {
 
 func SetInt64(object any, path string, value int64) bool {
 
-	leaf, ok := getLeaf(object, list.Dot(path))
+	leaf, last, ok := getLeaf(object, list.Dot(path))
 
 	if !ok {
 		return false
 	}
 
 	if setter, ok := leaf.(Int64Setter); ok {
-		return setter.SetInt64(path, value)
+		return setter.SetInt64(last, value)
 	}
 
 	return false
@@ -153,25 +129,29 @@ func SetInt64(object any, path string, value int64) bool {
 
 func SetString(object any, path string, value string) bool {
 
-	leaf, ok := getLeaf(object, list.Dot(path))
+	leaf, last, ok := getLeaf(object, list.Dot(path))
 
 	if !ok {
 		return false
 	}
 
 	if setter, ok := leaf.(StringSetter); ok {
-		return setter.SetString(path, value)
+		return setter.SetString(last, value)
 	}
 
 	return false
 }
 
-func getLeaf(object any, path list.List) (any, bool) {
+/*************************************************
+ * Tree Traversal
+ *************************************************/
+
+func getLeaf(object any, path list.List) (any, string, bool) {
 
 	head, tail := path.Split()
 
 	if tail.IsEmpty() {
-		return object, true
+		return object, head, true
 	}
 
 	if childGetter, ok := object.(ChildGetter); ok {
@@ -181,5 +161,5 @@ func getLeaf(object any, path list.List) (any, bool) {
 		}
 	}
 
-	return nil, false
+	return nil, "", false
 }
