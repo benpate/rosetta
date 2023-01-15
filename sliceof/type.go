@@ -7,6 +7,44 @@ import (
 type Type[T any] []T
 
 /****************************************
+ * Accessors
+ ****************************************/
+
+func (x Type[T]) Length() int {
+	return len(x)
+}
+
+func (x Type[T]) IsLength(length int) bool {
+	return len(x) == length
+}
+
+func (x Type[T]) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Type[T]) First() T {
+	if len(x) > 0 {
+		return x[0]
+	}
+	var result T
+	return result
+}
+
+func (x Type[T]) Last() T {
+	if len(x) > 0 {
+		return x[len(x)-1]
+	}
+	var result T
+	return result
+}
+
+func (x Type[T]) Reverse() {
+	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
+		x[i], x[j] = x[j], x[i]
+	}
+}
+
+/****************************************
  * Path Getters
  ****************************************/
 

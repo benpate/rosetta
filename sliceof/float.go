@@ -4,6 +4,46 @@ import "strconv"
 
 type Float []float64
 
+/****************************************
+ * Accessors
+ ****************************************/
+
+func (x Float) Len() int {
+	return len(x)
+}
+
+func (x Float) IsLength(length int) bool {
+	return len(x) == length
+}
+
+func (x Float) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Float) First() float64 {
+	if len(x) > 0 {
+		return x[0]
+	}
+	return 0
+}
+
+func (x Float) Last() float64 {
+	if len(x) > 0 {
+		return x[len(x)-1]
+	}
+	return 0
+}
+
+func (x Float) Reverse() {
+	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
+		x[i], x[j] = x[j], x[i]
+	}
+}
+
+/****************************************
+ * Getters/Setters
+ ****************************************/
+
 func (x Float) GetFloat(key string) float64 {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
