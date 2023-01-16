@@ -35,13 +35,13 @@ func TestIntegerEnum(t *testing.T) {
 
 func TestIntegerRequired(t *testing.T) {
 
-	j := []byte(`{"type":"integer", "required":true}`)
-	s := Schema{}
+	j := []byte(`{"type":"integer","required":true}`)
+	s := Integer{}
 
 	err := json.Unmarshal(j, &s)
 	require.Nil(t, err)
 
-	require.True(t, s.Element.(Integer).Required)
+	require.True(t, s.Required)
 
 	require.Nil(t, s.Validate(10))
 	require.Nil(t, s.Validate(20))

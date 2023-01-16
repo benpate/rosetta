@@ -1,12 +1,9 @@
 package schema
 
 import (
-	"reflect"
-
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
 )
 
@@ -21,23 +18,25 @@ type Integer struct {
 	Required   bool
 }
 
-/***********************************
- * ELEMENT META-DATA
- ***********************************/
-
-// Type returns the data type of this Schema
-func (element Integer) Type() reflect.Type {
-	return element.intSize(0).Type()
-}
+/******************************************
+ * Element Interface
+ ******************************************/
 
 // DefaultValue returns the default value for this element type
 func (element Integer) DefaultValue() any {
 
-	if element.Default.IsPresent() {
-		return element.intSize(element.Default.Int64()).Interface()
+	switch element.BitSize {
+	case 8:
+		return int8(element.Default.Int64())
+	case 16:
+		return int16(element.Default.Int64())
+	case 32:
+		return int32(element.Default.Int64())
+	case 64:
+		return int64(element.Default.Int64())
+	default:
+		return int(element.Default.Int64())
 	}
-
-	return element.Default.Interface()
 }
 
 // IsRequired returns TRUE if this element is a required field
@@ -45,128 +44,64 @@ func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-/***********************************
- * PRIMARY INTERFACE METHODS
- ***********************************/
-
-func (element Integer) Get(object reflect.Value, path list.List) (reflect.Value, error) {
-
-	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), derp.NewInternalError("schema.Integer.Find", "Can't find sub-properties on an 'integer' type", path)
-	}
-
-	if intValue, ok := convert.Int64Ok(object, 0); ok {
-		return element.intSize(intValue), nil
-	}
-
-	if element.Default.IsPresent() {
-		defaultValue := convert.Int64Default(object, element.Default.Int64())
-		return element.intSize(defaultValue), nil
-	}
-
-	return reflect.ValueOf(nil), nil
-}
-
-// GetElement returns a sub-element of this schema
-func (element Integer) GetElement(path list.List) (Element, error) {
-
-	if path.IsEmpty() {
-		return element, nil
-	}
-
-	return nil, derp.NewInternalError("schema.Integer.GetElement", "Can't find sub-properties on an 'integer' type", path)
-}
-
-// Set formats a value and applies it to the provided object/path
-func (element Integer) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
-
-	// RULE: Cannot set sub-properties of an Integer
-	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), derp.NewInternalError("schema.Integer.Set", "Can't set sub-properties on an integer", path, value)
-	}
-
-	// Convert and return the new value
-	intValue, ok := convert.Int64Ok(value, element.Default.Int64())
-
-	if !ok {
-		return reflect.ValueOf(nil), derp.NewBadRequestError("schema.Integer.Set", "Value must be convertable to an integer", value)
-	}
-
-	return element.intSize(intValue), nil
-}
-
-// Remove removes a value from the provided object/path.  In the case of integers, this is a no-op.
-func (element Integer) Remove(_ reflect.Value, _ list.List) (reflect.Value, error) {
-	return reflect.ValueOf(nil), derp.NewInternalError("schema.Integer.Remove", "Can't remove properties from a integer.  This should never happen.")
-}
-
 // Validate validates a value using this schema
-func (element Integer) Validate(value any) error {
+func (element Integer) Validate(value any) derp.MultiError {
 
-	var err error
+	var err derp.MultiError
+	var intValue int64
 
-	intValue, ok := convert.Int64Ok(value, element.Default.Int64())
-
-	if !ok {
-		return ValidationError{Message: "field must be an integer"}
+	if v, ok := toInt64(value); ok {
+		intValue = v
+	} else {
+		err.Append(derp.NewValidationError(" must be an integer"))
+		return err
 	}
 
 	if element.Required {
 		if intValue == 0 {
-			return ValidationError{Message: "field is required"}
+			err.Append(derp.NewValidationError("integer value is required"))
+			return err
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if intValue < element.Minimum.Int64() {
-			err = derp.Append(err, ValidationError{Message: "minimum value is " + convert.String(element.Minimum)})
+			err.Append(derp.NewValidationError("minimum integer value is " + convert.String(element.Minimum)))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if intValue > element.Maximum.Int64() {
-			err = derp.Append(err, ValidationError{Message: "maximum value is " + convert.String(element.Maximum)})
+			err.Append(derp.NewValidationError("maximum integer value is " + convert.String(element.Maximum)))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if (intValue % element.MultipleOf.Int64()) != 0 {
-			err = derp.Append(err, ValidationError{Message: "must be a multiple of " + convert.String(element.MultipleOf)})
+			err.Append(derp.NewValidationError("must be a multiple of " + convert.String(element.MultipleOf)))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, intValue) {
-			err = derp.Append(err, ValidationError{Message: "must contain one of the specified values"})
+			err.Append(derp.NewValidationError("must contain one of the specified values"))
 		}
 	}
 
 	return err
 }
 
-func (element Integer) Clean(value any) error {
+func (element Integer) Clean(value any) derp.MultiError {
 	// TODO: HIGH: Implement the "Clean" method for Integer
 	return nil
 }
 
-func (element Integer) intSize(value int64) reflect.Value {
-
-	switch element.BitSize {
-	case 8:
-		return reflect.ValueOf(int8(value))
-	case 16:
-		return reflect.ValueOf(int16(value))
-	case 32:
-		return reflect.ValueOf(int32(value))
-	case 64:
-		return reflect.ValueOf(int64(value))
-	default:
-		return reflect.ValueOf(int(value))
-	}
+func (element Integer) getProperty(_ string) (Element, bool) {
+	return nil, false
 }
 
 /***********************************
- * ENUMERATOR INTERFACE
+ * Enumerator Interface
  ***********************************/
 
 // Enumerate implements the "Enumerator" interface
@@ -175,7 +110,7 @@ func (element Integer) Enumerate() []string {
 }
 
 /***********************************
- * MARSHAL / UNMARSHAL METHODS
+ * Marshal / Unmarshal Methods
  ***********************************/
 
 // MarshalMap populates object data into a map[string]any
@@ -225,4 +160,22 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	element.Enum = convert.SliceOfInt(data["enum"])
 
 	return err
+}
+
+func toInt64(value any) (int64, bool) {
+	switch typed := value.(type) {
+
+	case int:
+		return int64(typed), true
+	case int8:
+		return int64(typed), true
+	case int16:
+		return int64(typed), true
+	case int32:
+		return int64(typed), true
+	case int64:
+		return int64(typed), true
+	default:
+		return 0, false
+	}
 }

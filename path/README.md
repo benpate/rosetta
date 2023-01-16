@@ -10,25 +10,6 @@
 
 This is an experimental library for reading/writing values into arbitrary data structures, specifically the `map[string]any` and `[]any` values returned by Go's `json.Unmarshal()` functions.  It is inspired by the JSON-path standard, but has a very simplified syntax -- using a series of strings separated by dots.
 
-## Example Code
-
-```go
-
-s := map[string]any{
-    "name":  "John Connor",
-    "email": "john@connor.mil",
-    "relatives": map[string]any{
-        "mom": "Sarah Connor",
-        "dad": "Kyle Reese",
-    },
-    "enemies": []any{"T-1000", "T-3000", "T-5000"},
-}
-
-name, err := path.Get(s, "name") // John Connor
-email, err := path.Get(s, "email") // john@connor.mil
-sarah, err := path.Get(s, "relatives.0") // t-1000
-
-```
 
 ## Pull Requests Welcome
 

@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"reflect"
 	"strings"
 
 	"github.com/benpate/derp"
@@ -23,13 +22,8 @@ type String struct {
 }
 
 /***********************************
- * ELEMENT META-DATA
+ * Element Interface
  ***********************************/
-
-// Type returns the data type of this Element
-func (element String) Type() reflect.Type {
-	return reflect.TypeOf(string(""))
-}
 
 // DefaultValue returns the default value for this element type
 func (element String) DefaultValue() any {
@@ -41,102 +35,63 @@ func (element String) IsRequired() bool {
 	return element.Required
 }
 
-/***********************************
- * PRIMARY INTERFACE METHODS
- ***********************************/
-
-func (element String) Get(object reflect.Value, path list.List) (reflect.Value, error) {
-
-	// RULE: Cannot get sub-properties on a string
-	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Find", "Can't find sub-properties on a 'string' type", path)
-	}
-
-	// Try to convert and return the value
-	if stringValue, ok := convert.StringOk(object, ""); ok {
-		return reflect.ValueOf(stringValue), nil
-	}
-
-	// Return the default value
-	return reflect.ValueOf(element.Default), nil
-}
-
-// GetElement returns a sub-element of this schema
-func (element String) GetElement(path list.List) (Element, error) {
-
-	if path.IsEmpty() {
-		return element, nil
-	}
-
-	return nil, derp.NewInternalError("schema.String.GetElement", "Can't find sub-properties on an 'string' type", path)
-}
-
-// Set validates/formats a generic value using this schema
-func (element String) Set(object reflect.Value, path list.List, value any) (reflect.Value, error) {
-
-	// RULE: Cannot set sub-properties on a string
-	if !path.IsEmpty() {
-		return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Set", "Can't set sub-properties on a string", path, value)
-	}
-
-	// Convert and return the new value
-	stringValue := convert.StringDefault(value, element.Default)
-	return reflect.ValueOf(stringValue), nil
-}
-
-// Remove removes a value from the provided object/path.  In the case of strings, this is a no-op.
-func (element String) Remove(_ reflect.Value, _ list.List) (reflect.Value, error) {
-	return reflect.ValueOf(nil), derp.NewInternalError("schema.String.Remove", "Can't remove properties from a string.  This should never happen.")
-}
-
 // Validate compares a generic data value using this Schema
-func (element String) Validate(value any) error {
+func (element String) Validate(value any) derp.MultiError {
 
-	var errorReport error
+	var err derp.MultiError
 
-	stringValue := convert.StringDefault(value, element.Default)
+	stringValue, ok := value.(string)
+
+	if !ok {
+		err.Append(derp.NewValidationError(" must be a string"))
+		return err
+	}
 
 	// Validate against all formatting functions
 	for _, format := range element.formatFunctions() {
-		if _, err := format(stringValue); err != nil {
-			errorReport = derp.Append(errorReport, err)
+		if _, inner := format(stringValue); inner != nil {
+			err.Append(inner)
 		}
 	}
 
 	// Verify required fields (after format functions are applied)
 	if element.Required {
 		if stringValue == "" {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "field is required"})
+			err.Append(derp.NewValidationError(" string field is required"))
 		}
 	}
 
 	// Validate minimum length
 	if element.MinLength > 0 {
 		if len(stringValue) < element.MinLength {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "minimum length is " + convert.String(element.MinLength)})
+			err.Append(derp.NewValidationError(" minimum string length is " + convert.String(element.MinLength)))
 		}
 	}
 
 	// Validate maximum length
 	if element.MaxLength > 0 {
 		if len(stringValue) > element.MaxLength {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "maximum length is " + convert.String(element.MaxLength)})
+			err.Append(derp.NewValidationError(" maximum string length is " + convert.String(element.MaxLength)))
 		}
 	}
 
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (stringValue != "") && (!compare.Contains(element.Enum, stringValue)) {
-			errorReport = derp.Append(errorReport, ValidationError{Message: "must match one of the required values."})
+			err.Append(derp.NewValidationError(" string must match one of the required values."))
 		}
 	}
 
-	return errorReport
+	return err
 }
 
-func (element String) Clean(value any) error {
+func (element String) Clean(value any) derp.MultiError {
 	// TODO: HIGH: Implement the "Clean" method for the String type
 	return nil
+}
+
+func (element String) getProperty(_ string) (Element, bool) {
+	return nil, false
 }
 
 /***********************************

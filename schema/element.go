@@ -2,18 +2,13 @@ package schema
 
 import (
 	"encoding/json"
-	"reflect"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 )
 
 // Element interface wraps all of the methods required for schema elements.
 type Element interface {
-
-	// Type returns the Type of this particular schema element
-	Type() reflect.Type
 
 	// Default returns the default value for this element
 	DefaultValue() any
@@ -21,26 +16,17 @@ type Element interface {
 	// IsRequired returns true if this a value is required for this element
 	IsRequired() bool
 
-	// Get uses the path to locate a value in an object.
-	Get(object reflect.Value, path list.List) (reflect.Value, error)
-
-	// GetElement finds the schema element that defines the property at the end of the path
-	GetElement(path list.List) (Element, error)
-
-	// Set formats a value and applies it to the provided object/path
-	Set(object reflect.Value, path list.List, value any) (reflect.Value, error)
-
-	// Remove removes the value from the object at the designated path
-	Remove(object reflect.Value, path list.List) (reflect.Value, error)
-
 	// Validate validates the provided value
-	Validate(value any) error
+	Validate(value any) derp.MultiError
 
 	// Clean updates a value to match the schema.  The value must be a pointer.
-	Clean(value any) error
+	Clean(value any) derp.MultiError
 
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
+
+	// getProperty returns a named sub-element of this element, if it exists.
+	getProperty(string) (Element, bool)
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.

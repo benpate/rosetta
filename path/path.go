@@ -1,184 +1,165 @@
 package path
 
 import (
-	"reflect"
-	"strconv"
-
-	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/list"
 )
 
-// SetAll adds every path from the dataset into the object.  It returns an aggregate error containing all errors generated.
-func SetAll(object any, dataset map[string]any) error {
+/*************************************************
+ * New Style Getters
+ *************************************************/
 
-	var errorReport error
+func GetBool(object any, path string) bool {
 
-	// Put approved form data into the stream
-	for key, value := range dataset {
-		if err := Set(object, key, value); err != nil {
-			errorReport = derp.Append(errorReport, err)
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(BoolGetter); ok {
+			return getter.GetBool(last)
 		}
 	}
 
-	return errorReport
+	return false
 }
 
-// Get tries to return the value of the object at this path.
-func Get(object any, path string) any {
+func GetFloat(object any, path string) float64 {
 
-	result, _ := GetOK(object, path)
-	return result
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(FloatGetter); ok {
+			return getter.GetFloat(last)
+		}
+	}
+
+	return 0
 }
 
-// GetOK returns the value of the object at the provided path.
-// If a value does not already exist, then the OK boolean is false.
-func GetOK(object any, path string) (any, bool) {
+func GetInt(object any, path string) int {
 
-	// If the object is empty, then there's nothing left to traverse.
-	if object == nil {
-		return nil, false
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(IntGetter); ok {
+			return getter.GetInt(last)
+		}
 	}
 
-	// If the path is empty, then we have arrived at the correct value.
-	if path == "" {
-		return object, true
-	}
-
-	// Next steps depend on the type of object we're working with.
-	switch obj := object.(type) {
-
-	case Getter:
-		return obj.GetPath(path)
-
-	case []Getter:
-		return getFromSliceGeneric(obj, path)
-
-	case []string:
-		return getFromSliceGeneric(obj, path)
-
-	case []int:
-		return getFromSliceGeneric(obj, path)
-
-	case []int64:
-		return getFromSliceGeneric(obj, path)
-
-	case []float64:
-		return getFromSliceGeneric(obj, path)
-
-	case []any:
-		return getFromSliceGeneric(obj, path)
-
-	case map[string]Getter:
-		return getFromMapOfGeneric(obj, path)
-
-	case map[string]string:
-		return getFromMapOfGeneric(obj, path)
-
-	case map[string]int:
-		return getFromMapOfGeneric(obj, path)
-
-	case map[string]int64:
-		return getFromMapOfGeneric(obj, path)
-
-	case map[string]float64:
-		return getFromMapOfGeneric(obj, path)
-
-	case map[string]any:
-		return getFromMapOfGeneric(obj, path)
-
-	default:
-		return GetWithReflection(reflect.ValueOf(obj), path)
-	}
+	return 0
 }
 
-// Set tries to return the value of the object at this path.
-func Set(object any, name string, value any) error {
+func GetInt64(object any, path string) int64 {
 
-	switch obj := object.(type) {
-
-	case Setter:
-		return obj.SetPath(name, value)
-
-	case []Setter:
-		return setSliceOfSetter(name, obj, value)
-
-	case []string:
-		return setSliceOfString(name, obj, value)
-
-	case []int:
-		return setSliceOfInt(name, obj, value)
-
-	case []any:
-		return setSliceOfInterface(name, obj, value)
-
-	case map[string]string:
-		return setMapOfString(name, obj, value)
-
-	case map[string]any:
-		return setMapOfInterface(name, obj, value)
-
-	default:
-		return SetWithReflection(reflect.ValueOf(object), name, value)
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(Int64Getter); ok {
+			return getter.GetInt64(last)
+		}
 	}
+
+	return 0
 }
 
-// Delete tries to remove a value from ths object at this path
-func Delete(object any, name string) error {
+func GetString(object any, path string) string {
 
-	switch obj := object.(type) {
-
-	case Deleter:
-		return obj.DeletePath(name)
-
-	case []string:
-		return deleteSliceOfString(name, obj)
-
-	case []int:
-		return deleteSliceOfInt(name, obj)
-
-	case []any:
-		return deleteSliceOfInterface(name, obj)
-
-	case []Deleter:
-		return deleteSliceOfDeleter(name, obj)
-
-	case map[string]string:
-		return deleteMapOfString(name, obj)
-
-	case map[string]any:
-		return deleteMapOfInterface(name, obj)
+	if leaf, last, ok := getLeaf(object, list.Dot(path)); ok {
+		if getter, ok := leaf.(StringGetter); ok {
+			return getter.GetString(last)
+		}
 	}
 
-	return derp.NewInternalError("path.Delete", "Unable to delete from this type of record.")
+	return ""
 }
 
-// Index is useful for vetting array indices.  It attempts to convert the Head() token int
-// an integer, and then check that the integer is within the designated array bounds (is greater than zero,
-// and less than the maximum value provided to the function).
-//
-// It returns the array index and an error
-func Index(value string, maximum int) (int, error) {
+/*************************************************
+ * New Style Setters
+ *************************************************/
 
-	result, err := strconv.Atoi(value)
+func SetBool(object any, path string, value bool) bool {
 
-	if err != nil {
-		return 0, derp.Wrap(err, "path.Index", "Index must be an integer", value, maximum)
+	leaf, last, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
 	}
 
-	if result < 0 {
-		return 0, derp.NewInternalError("path.Index", "Index out of bounds", "cannot be less than zero", value)
+	if setter, ok := leaf.(BoolSetter); ok {
+		return setter.SetBool(last, value)
 	}
 
-	if (maximum >= 0) && (result >= maximum) {
-		return 0, derp.NewInternalError("path.Index", "Index out of bounds", "cannot be greater than (or equal to) maximum", value, maximum)
-	}
-
-	// Fall through means that this is a valid array index
-	return result, nil
+	return false
 }
 
-// Split splits the path into head and tail strings (separated by ".")
-func Split(path string) (string, string) {
-	head, tail := list.Dot(path).Split()
-	return head, tail.String()
+func SetFloat(object any, path string, value float64) bool {
+
+	leaf, last, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
+	}
+
+	if setter, ok := leaf.(FloatSetter); ok {
+		return setter.SetFloat(last, value)
+	}
+
+	return false
+}
+
+func SetInt(object any, path string, value int) bool {
+
+	leaf, last, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
+	}
+
+	if setter, ok := leaf.(IntSetter); ok {
+		return setter.SetInt(last, value)
+	}
+
+	return false
+}
+
+func SetInt64(object any, path string, value int64) bool {
+
+	leaf, last, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
+	}
+
+	if setter, ok := leaf.(Int64Setter); ok {
+		return setter.SetInt64(last, value)
+	}
+
+	return false
+}
+
+func SetString(object any, path string, value string) bool {
+
+	leaf, last, ok := getLeaf(object, list.Dot(path))
+
+	if !ok {
+		return false
+	}
+
+	if setter, ok := leaf.(StringSetter); ok {
+		return setter.SetString(last, value)
+	}
+
+	return false
+}
+
+/*************************************************
+ * Tree Traversal
+ *************************************************/
+
+func getLeaf(object any, path list.List) (any, string, bool) {
+
+	head, tail := path.Split()
+
+	if tail.IsEmpty() {
+		return object, head, true
+	}
+
+	if propertyGetter, ok := object.(ObjectGetter); ok {
+		child, ok := propertyGetter.GetObject(head)
+		if ok {
+			return getLeaf(child, tail)
+		}
+	}
+
+	return nil, "", false
 }

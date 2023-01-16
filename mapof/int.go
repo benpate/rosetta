@@ -3,10 +3,16 @@ package mapof
 type Int map[string]int
 
 func (x Int) GetInt(key string) int {
-	return x[key]
+	result, _ := x.GetIntOK(key)
+	return result
 }
 
-func (x *Int) SetInt(key string, value int) bool {
+func (x Int) GetIntOK(key string) (int, bool) {
+	result, ok := x[key]
+	return result, ok
+}
+
+func (x *Int) SetIntOK(key string, value int) bool {
 	(*x)[key] = value
 	return true
 }

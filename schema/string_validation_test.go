@@ -13,9 +13,9 @@ func TestStringType(t *testing.T) {
 	s := String{}
 
 	assert.Nil(t, s.Validate("I'm a string"))
-	assert.Nil(t, s.Validate(0))
-	assert.Nil(t, s.Validate([]string{}))
-	assert.Nil(t, s.Validate(map[string]any{}))
+	assert.NotNil(t, s.Validate(0))
+	assert.NotNil(t, s.Validate([]string{}))
+	assert.NotNil(t, s.Validate(map[string]any{}))
 }
 
 func TestStringUnmarshal(t *testing.T) {
@@ -34,13 +34,10 @@ func TestStringUnmarshal(t *testing.T) {
 
 func TestStringRequired(t *testing.T) {
 
-	// Required schema
-	{
-		s := String{Required: true}
+	s := String{Required: true}
 
-		assert.Nil(t, s.Validate("present"))
-		assert.NotNil(t, s.Validate(""))
-	}
+	require.NotNil(t, s.Validate(""))
+	require.Nil(t, s.Validate("present"))
 }
 
 func TestStringLength(t *testing.T) {
@@ -80,16 +77,4 @@ func TestStringEnum(t *testing.T) {
 	require.Nil(t, s.Validate("Mary"))
 	require.NotNil(t, s.Validate("Mr. Black"))
 	require.NotNil(t, s.Validate(3.14159265358979323846))
-}
-
-func TestStringEnumUnmarshal(t *testing.T) {
-
-	s, err := UnmarshalJSON([]byte(`{"type":"string", "enum":["John", "Sarah", "Kyle"]}`))
-
-	require.Nil(t, err)
-
-	require.Nil(t, s.Validate("John"))
-	require.Nil(t, s.Validate("Sarah"))
-	require.Nil(t, s.Validate("Kyle"))
-	require.NotNil(t, s.Validate("Anyone Else"))
 }

@@ -1,22 +1,7 @@
 package path
 
-// Getter interface allows other objects to make it easy to trace through their property trees, and get values from them.
-type Getter interface {
-	GetPath(string) (any, bool)
-}
-
-// Setter interface allows other objects to make it easy to trace through their property trees, and set values into them.
-type Setter interface {
-	SetPath(string, any) error
-}
-
-// Deleter interface allows other objects to make it easy to trace through their property trees, and delete values from them.
-type Deleter interface {
-	DeletePath(string) error
-}
-
 /**************************
- * New Style Getters
+ * Getter Interfaces
  **************************/
 
 type BoolGetter interface {
@@ -43,12 +28,12 @@ type StringGetter interface {
 	GetString(string) string
 }
 
-type ChildGetter interface {
-	GetChild(string) (any, bool)
+type ObjectGetter interface {
+	GetObject(string) (any, bool)
 }
 
 /**************************
- * New Style Setters
+ * Setter Interfaces
  **************************/
 
 type BoolSetter interface {
@@ -76,7 +61,7 @@ type StringSetter interface {
 }
 
 /**************************
- * New Style Getter/Setters
+ * Getter/Setter Interfaces
  **************************/
 
 type BoolGetterSetter interface {
@@ -107,4 +92,11 @@ type Int64GetterSetter interface {
 type StringGetterSetter interface {
 	StringGetter
 	StringSetter
+}
+
+/**************************
+ * Deleter Interface
+ **************************/
+type Deleter interface {
+	Delete(string) bool
 }

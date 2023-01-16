@@ -1,14 +1,14 @@
 package format
 
 import (
-	"errors"
 	"strconv"
+
+	"github.com/benpate/derp"
 )
 
 func HasLowercase(arg string) StringFormat {
 
 	return func(value string) (string, error) {
-
 		return countCharacters(arg, value, func(ch byte) bool {
 			return ((ch >= 'a') && (ch <= 'z'))
 		})
@@ -18,7 +18,6 @@ func HasLowercase(arg string) StringFormat {
 func HasUppercase(arg string) StringFormat {
 
 	return func(value string) (string, error) {
-
 		return countCharacters(arg, value, func(ch byte) bool {
 			return ((ch >= 'A') && (ch <= 'Z'))
 		})
@@ -70,7 +69,7 @@ func countCharacters(arg string, value string, fn func(byte) bool) (string, erro
 	}
 
 	if minCount > count {
-		return "", errors.New("value does not meet criteria")
+		return "", derp.NewValidationError("value does not meet criteria")
 	}
 
 	return value, nil

@@ -3,10 +3,7 @@ package maps
 import (
 	"net/url"
 
-	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
-	"github.com/benpate/rosetta/path"
 )
 
 // Map implements some quality of life extensions to a standard map[string]any
@@ -161,6 +158,15 @@ func (m *Map) SetString(name string, value string) bool {
 }
 
 /****************************
+ * Deleter
+ ****************************/
+
+func (m *Map) Delete(name string) bool {
+	delete(*m, name)
+	return true
+}
+
+/****************************
  * Tree Traversal
  ****************************/
 
@@ -171,55 +177,4 @@ func (m *Map) GetChild(name string) (any, bool) {
 	}
 
 	return (*m)[name], true
-}
-
-/****************************
- * Path interfaces
- ****************************/
-
-// GetPath implements the path.Getter interface
-func (m Map) GetPath(name string) (any, bool) {
-
-	head, tail := list.Dot(name).Split()
-
-	if tail.IsEmpty() {
-		result, ok := m[head]
-		return result, ok
-	}
-
-	return path.GetOK(m[head], tail.String())
-}
-
-// SetPath implements the path.Setter interface
-func (m Map) SetPath(name string, value any) error {
-
-	head, tail := list.Dot(name).Split()
-
-	if tail.IsEmpty() {
-		m[head] = value
-		return nil
-	}
-
-	return path.Set(m[head], tail.String(), value)
-}
-
-// DeletePath implements the path.Deleter interface
-func (m Map) DeletePath(name string) error {
-
-	head, tail := list.Dot(name).Split()
-
-	if tail.IsEmpty() {
-		delete(m, head)
-		return nil
-	}
-
-	temp := m[head]
-
-	if err := path.Delete(temp, tail.String()); err != nil {
-		return derp.Wrap(err, "maps.Map.DeletePath", "Error deleting from child element")
-	}
-
-	m[head] = temp
-
-	return nil
 }
