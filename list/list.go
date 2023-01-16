@@ -11,7 +11,7 @@ func IsEmptyTail[T Stringlike](value T, delimiter byte) bool {
 	return (place == -1) || (place == len(value)-1)
 }
 
-// Index finds the first occurrance of the delimiter (-1 if not found)
+// Index finds the first occurrence of the delimiter (-1 if not found)
 func Index[T Stringlike](value T, delimiter byte) int {
 	for i := 0; i < len(value); i++ {
 		if value[i] == delimiter {
@@ -21,7 +21,7 @@ func Index[T Stringlike](value T, delimiter byte) int {
 	return -1
 }
 
-// LastIndex finds the last occurrance of the delimiter (-1 if not found)
+// LastIndex finds the last occurrence of the delimiter (-1 if not found)
 func LastIndex[T Stringlike](value T, delimiter byte) int {
 	for i := len(value) - 1; i >= 0; i-- {
 		if value[i] == delimiter {

@@ -53,7 +53,7 @@ func TestStringLength(t *testing.T) {
 	// Mininum Defined
 	{
 		s := String{MinLength: 10}
-		assert.Nil(t, s.Validate("this is ok, becuase it's more than the minimum."))
+		assert.Nil(t, s.Validate("this is ok, because it's more than the minimum."))
 		assert.NotNil(t, s.Validate("error"))
 	}
 
@@ -61,7 +61,7 @@ func TestStringLength(t *testing.T) {
 	{
 		s := String{MaxLength: 10}
 		assert.Nil(t, s.Validate("this is ok"))
-		assert.NotNil(t, s.Validate("this is a really long string and it should fail becuase it's too long."))
+		assert.NotNil(t, s.Validate("this is a really long string and it should fail because it's too long."))
 	}
 }
 
