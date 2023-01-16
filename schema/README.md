@@ -3,7 +3,7 @@
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/schema)
 [![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/schema.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/schema)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/schema?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/schema)
-[![Version](https://img.shields.io/github/v/release/benpate/rosetta/schema?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/schema/releases)
+[![Version](https://img.shields.io/github/v/release/benpate/rosetta?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/releases)
 
 ## Simplified JSON-Schema
 
