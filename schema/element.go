@@ -25,8 +25,8 @@ type Element interface {
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
 
-	// getProperty returns a named sub-element of this element, if it exists.
-	getProperty(string) (Element, bool)
+	// getElement returns a named sub-element of this element, if it exists.
+	getElement(string) (Element, bool)
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.

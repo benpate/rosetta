@@ -22,22 +22,9 @@ func New(element Element) Schema {
 	}
 }
 
-/***********************************
+/******************************************
  * Validation Methods
- ***********************************/
-
-// Clean tries to force a particular value to fit this schema by updating
-// it (or all of its properties) to match.  If values cannot be coerced to
-// fit the schema, then an error is returned
-func (schema Schema) Clean(value any) error {
-
-	// TODO: CRITICAL: "Clean" functions are not yet implemented
-	if isNil(schema.Element) {
-		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
-	}
-
-	return schema.Element.Clean(value)
-}
+ ******************************************/
 
 // Validate checks a particular value against this schema.  If the
 // provided value is not valid, then an error is returned.
@@ -53,6 +40,36 @@ func (schema Schema) Validate(value any) error {
 		return derp.Wrap(err, "schema.Schema.Validate", "Error validating value", value)
 	}
 }
+
+// Clean tries to force a particular value to fit this schema by updating
+// it (or all of its properties) to match.  If values cannot be coerced to
+// fit the schema, then an error is returned
+func (schema Schema) Clean(value any) error {
+
+	// TODO: CRITICAL: "Clean" functions are not yet implemented
+	if isNil(schema.Element) {
+		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
+	}
+
+	return schema.Element.Clean(value)
+}
+
+/******************************************
+ * Other Data Access Methods
+ ******************************************/
+
+func (schema Schema) GetElement(path string) (Element, bool) {
+
+	if isNil(schema.Element) {
+		return nil, false
+	}
+
+	return schema.Element.getElement(path)
+}
+
+/******************************************
+ * Marshaling Methods
+ ******************************************/
 
 // MarshalJSON converts a schema into JSON.
 func (schema Schema) MarshalJSON() ([]byte, error) {

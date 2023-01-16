@@ -3,6 +3,7 @@ package schema
 import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
 )
 
@@ -18,14 +19,20 @@ type Object struct {
  * Container Interface
  ***********************************/
 
-func (element Object) getProperty(name string) (Element, bool) {
+func (element Object) getElement(name string) (Element, bool) {
 
-	if element, ok := element.Properties[name]; ok {
+	if name == "" {
 		return element, true
 	}
 
+	head, tail := list.Split(name, list.DelimiterDot)
+
+	if child, ok := element.Properties[head]; ok {
+		return child.getElement(tail)
+	}
+
 	if element.Wildcard != nil {
-		return element.Wildcard, true
+		return element.Wildcard.getElement(tail)
 	}
 
 	return nil, false

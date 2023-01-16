@@ -41,7 +41,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 
 	head, tail := path.Split()
 
-	subElement, ok := element.getProperty(head)
+	subElement, ok := element.getElement(head)
 
 	if !ok {
 		return derp.NewInternalError("schema.Schema.set", "Unknown property", head)

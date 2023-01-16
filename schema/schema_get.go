@@ -19,7 +19,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 
 	head, tail := path.Split()
 
-	subElement, ok := element.getProperty(head)
+	subElement, ok := element.getElement(head)
 
 	if !ok {
 		return nil, derp.NewInternalError("schema.Schema.get", "Unknown property", head)

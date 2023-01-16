@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 )
 
 // Array represents an array data type within a JSON-Schema.
@@ -95,10 +96,16 @@ func (element Array) Clean(value any) derp.MultiError {
 	return nil
 }
 
-func (element Array) getProperty(name string) (Element, bool) {
+func (element Array) getElement(name string) (Element, bool) {
 
-	if _, ok := Index(name, element.MaxLength); ok {
-		return element.Items, true
+	if name == "" {
+		return element, true
+	}
+
+	head, tail := list.Split(name, list.DelimiterDot)
+
+	if _, ok := Index(head, element.MaxLength); ok {
+		return element.Items.getElement(tail)
 	}
 
 	return nil, false

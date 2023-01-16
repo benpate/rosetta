@@ -96,7 +96,10 @@ func (element Integer) Clean(value any) derp.MultiError {
 	return nil
 }
 
-func (element Integer) getProperty(_ string) (Element, bool) {
+func (element Integer) getElement(name string) (Element, bool) {
+	if name == "" {
+		return element, true
+	}
 	return nil, false
 }
 

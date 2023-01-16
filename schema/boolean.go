@@ -51,7 +51,11 @@ func (element Boolean) Clean(value any) derp.MultiError {
 	return nil
 }
 
-func (element Boolean) getProperty(name string) (Element, bool) {
+func (element Boolean) getElement(name string) (Element, bool) {
+
+	if name == "" {
+		return element, true
+	}
 	return nil, false
 }
 
