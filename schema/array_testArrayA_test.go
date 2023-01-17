@@ -46,3 +46,16 @@ func (t *testArrayA) SetStringOK(path string, value string) bool {
 
 	return false
 }
+
+func (t *testArrayA) Remove(path string) bool {
+
+	if index, ok := Index(path); ok {
+
+		if index < len(*t) {
+			*t = append((*t)[:index], (*t)[index+1:]...)
+			return true
+		}
+	}
+
+	return false
+}
