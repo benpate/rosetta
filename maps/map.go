@@ -47,19 +47,17 @@ func (m Map) GetKeys() []string {
 	return result
 }
 
+/******************************************
+ * Schema Getter Interfaces
+ ******************************************/
+
 // GetInterface returns a named option without any conversion.  You get what you get.
 func (m Map) GetInterface(name string) any {
 	return m[name]
 }
 
-// GetString returns a named option as a string type.
-func (m Map) GetString(name string) string {
-	return convert.String(m[name])
-}
-
-// GetBytes returns a named option as a slice of bytes.
-func (m Map) GetBytes(name string) []byte {
-	return convert.Bytes(m[name])
+func (m Map) GetBoolOK(name string) (bool, bool) {
+	return convert.BoolOk(m[name], false)
 }
 
 // GetBool returns a named option as a bool type.
@@ -67,9 +65,17 @@ func (m Map) GetBool(name string) bool {
 	return convert.Bool(m[name])
 }
 
+func (m Map) GetIntOK(name string) (int, bool) {
+	return convert.IntOk(m[name], 0)
+}
+
 // GetInt returns a named option as an int type.
 func (m Map) GetInt(name string) int {
 	return convert.Int(m[name])
+}
+
+func (m Map) GetInt64OK(name string) (int64, bool) {
+	return convert.Int64Ok(m[name], 0)
 }
 
 // GetInt64 returns a named option as an int64 type.
@@ -77,10 +83,27 @@ func (m Map) GetInt64(name string) int64 {
 	return convert.Int64(m[name])
 }
 
+func (m Map) GetFloatOK(name string) (float64, bool) {
+	return convert.FloatOk(m[name], 0)
+}
+
 // GetFloat returns a named option as a float type.
 func (m Map) GetFloat(name string) float64 {
 	return convert.Float(m[name])
 }
+
+func (m Map) GetStringOK(name string) (string, bool) {
+	return convert.StringOk(m[name], "")
+}
+
+// GetString returns a named option as a string type.
+func (m Map) GetString(name string) string {
+	return convert.String(m[name])
+}
+
+/******************************************
+ * Other Getter Interfaces
+ ******************************************/
 
 // GetSliceOfString returns a named option as a slice of strings
 func (m Map) GetSliceOfString(name string) []string {
@@ -123,54 +146,74 @@ func (m Map) GetMap(name string) Map {
 	return Map{}
 }
 
-/****************************
- * Setters
- ****************************/
+/******************************************
+ * Schema Setter Interfaces
+ ******************************************/
 
-// SetBool adds a boolean value into the map
+// SetBoolOK adds a boolean value into the map
+func (m *Map) SetBoolOK(name string, value bool) bool {
+	(*m)[name] = value
+	return true
+}
+
 func (m *Map) SetBool(name string, value bool) bool {
+	return m.SetBoolOK(name, value)
+}
+
+// SetIntOK adds an int value into the map
+func (m *Map) SetIntOK(name string, value int) bool {
 	(*m)[name] = value
 	return true
 }
 
-// SetInt adds an int value into the map
 func (m *Map) SetInt(name string, value int) bool {
+	return m.SetIntOK(name, value)
+}
+
+// SetInt64OK adds an int64 value into the map
+func (m *Map) SetInt64OK(name string, value int64) bool {
 	(*m)[name] = value
 	return true
 }
 
-// SetInt64 adds an int64 value into the map
 func (m *Map) SetInt64(name string, value int64) bool {
+	return m.SetInt64OK(name, value)
+}
+
+// SetFloatOK adds an int value into the map
+func (m *Map) SetFloatOK(name string, value float64) bool {
 	(*m)[name] = value
 	return true
 }
 
-// SetFloat adds an int value into the map
 func (m *Map) SetFloat(name string, value float64) bool {
+	return m.SetFloatOK(name, value)
+}
+
+// SetStringOK adds an int value into the map
+func (m *Map) SetStringOK(name string, value string) bool {
 	(*m)[name] = value
 	return true
 }
 
-// SetString adds an int value into the map
 func (m *Map) SetString(name string, value string) bool {
-	(*m)[name] = value
-	return true
+	return m.SetStringOK(name, value)
 }
 
-/****************************
- * Deleter
- ****************************/
+/******************************************
+ * Schema Remover Interfaces
+ ******************************************/
 
-func (m *Map) Delete(name string) bool {
+func (m *Map) Remove(name string) bool {
 	delete(*m, name)
 	return true
 }
 
-/****************************
+/******************************************
  * Tree Traversal
- ****************************/
+ ******************************************/
 
-func (m *Map) GetChild(name string) (any, bool) {
+func (m *Map) GetObjectOK(name string) (any, bool) {
 
 	if _, ok := (*m)[name]; !ok {
 		(*m)[name] = make(Map)
