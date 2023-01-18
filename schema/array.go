@@ -104,7 +104,16 @@ func (element Array) getElement(name string) (Element, bool) {
 
 	head, tail := list.Split(name, list.DelimiterDot)
 
-	if _, ok := Index(head, element.MaxLength); ok {
+	var ok bool
+
+	if element.MaxLength > 0 {
+		_, ok = Index(head, element.MaxLength)
+
+	} else {
+		_, ok = Index(head)
+	}
+
+	if ok {
 		return element.Items.getElement(tail)
 	}
 
