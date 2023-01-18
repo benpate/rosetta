@@ -2,6 +2,7 @@ package schema
 
 import (
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 )
 
@@ -57,7 +58,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 		}
 
 	case Boolean:
-		if boolValue, ok := value.(bool); ok {
+		if boolValue, ok := convert.BoolOk(value, false); ok {
 			if setter, ok := object.(BoolSetter); ok {
 				if setter.SetBoolOK(head, boolValue) {
 					return nil
@@ -67,7 +68,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 
 	case Integer:
 		if typed.BitSize == 64 {
-			if int64Value, ok := value.(int64); ok {
+			if int64Value, ok := convert.Int64Ok(value, 0); ok {
 				if setter, ok := object.(Int64Setter); ok {
 					if setter.SetInt64OK(head, int64Value) {
 						return nil
@@ -76,7 +77,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 			}
 		}
 
-		if intValue, ok := value.(int); ok {
+		if intValue, ok := convert.IntOk(value, 0); ok {
 			if setter, ok := object.(IntSetter); ok {
 				if setter.SetIntOK(head, intValue) {
 					return nil
@@ -85,7 +86,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 		}
 
 	case Number:
-		if floatValue, ok := value.(float64); ok {
+		if floatValue, ok := convert.FloatOk(value, 0); ok {
 			if setter, ok := object.(FloatSetter); ok {
 				if setter.SetFloatOK(head, floatValue) {
 					return nil
@@ -94,7 +95,7 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 		}
 
 	case String:
-		if stringValue, ok := value.(string); ok {
+		if stringValue, ok := convert.StringOk(value, ""); ok {
 			if setter, ok := object.(StringSetter); ok {
 				if setter.SetStringOK(head, stringValue) {
 					return nil
