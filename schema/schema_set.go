@@ -58,48 +58,43 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 		}
 
 	case Boolean:
-		if boolValue, ok := convert.BoolOk(value, false); ok {
-			if setter, ok := object.(BoolSetter); ok {
-				if setter.SetBoolOK(head, boolValue) {
-					return nil
-				}
+		boolValue, _ := convert.BoolOk(value, false)
+		if setter, ok := object.(BoolSetter); ok {
+			if setter.SetBoolOK(head, boolValue) {
+				return nil
 			}
 		}
 
 	case Integer:
 		if typed.BitSize == 64 {
-			if int64Value, ok := convert.Int64Ok(value, 0); ok {
-				if setter, ok := object.(Int64Setter); ok {
-					if setter.SetInt64OK(head, int64Value) {
-						return nil
-					}
+			int64Value, _ := convert.Int64Ok(value, 0)
+			if setter, ok := object.(Int64Setter); ok {
+				if setter.SetInt64OK(head, int64Value) {
+					return nil
 				}
 			}
 		}
 
-		if intValue, ok := convert.IntOk(value, 0); ok {
-			if setter, ok := object.(IntSetter); ok {
-				if setter.SetIntOK(head, intValue) {
-					return nil
-				}
+		intValue, _ := convert.IntOk(value, 0)
+		if setter, ok := object.(IntSetter); ok {
+			if setter.SetIntOK(head, intValue) {
+				return nil
 			}
 		}
 
 	case Number:
-		if floatValue, ok := convert.FloatOk(value, 0); ok {
-			if setter, ok := object.(FloatSetter); ok {
-				if setter.SetFloatOK(head, floatValue) {
-					return nil
-				}
+		floatValue, _ := convert.FloatOk(value, 0)
+		if setter, ok := object.(FloatSetter); ok {
+			if setter.SetFloatOK(head, floatValue) {
+				return nil
 			}
 		}
 
 	case String:
-		if stringValue, ok := convert.StringOk(value, ""); ok {
-			if setter, ok := object.(StringSetter); ok {
-				if setter.SetStringOK(head, stringValue) {
-					return nil
-				}
+		stringValue, _ := convert.StringOk(value, "")
+		if setter, ok := object.(StringSetter); ok {
+			if setter.SetStringOK(head, stringValue) {
+				return nil
 			}
 		}
 	}

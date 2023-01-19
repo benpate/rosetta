@@ -51,7 +51,11 @@ func (schema Schema) Clean(value any) error {
 		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
 	}
 
-	return schema.Element.Clean(value)
+	if err := schema.Element.Clean(value); err.IsEmpty() {
+		return nil
+	} else {
+		return derp.Wrap(err, "schema.Schema.Clean", "Error cleaning value", value)
+	}
 }
 
 /******************************************
