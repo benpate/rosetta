@@ -1,6 +1,10 @@
 package sliceof
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/benpate/rosetta/convert"
+)
 
 type Float []float64
 
@@ -44,17 +48,17 @@ func (x Float) Reverse() {
  * Getters/Setters
  ****************************************/
 
-func (x Float) GetFloat(key string) float64 {
+func (x Float) GetFloatOK(key string) (float64, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
-			return x[index]
+			return x[index], true
 		}
 	}
 
-	return 0
+	return 0, false
 }
 
-func (s *Float) SetFloat(key string, value float64) bool {
+func (s *Float) SetFloatOK(key string, value float64) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value
@@ -63,4 +67,9 @@ func (s *Float) SetFloat(key string, value float64) bool {
 	}
 
 	return false
+}
+
+func (s *Float) SetValue(value any) error {
+	*s = convert.SliceOfFloat(value)
+	return nil
 }

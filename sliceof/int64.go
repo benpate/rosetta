@@ -1,6 +1,10 @@
 package sliceof
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/benpate/rosetta/convert"
+)
 
 type Int64 []int64
 
@@ -44,17 +48,17 @@ func (x Int64) Reverse() {
  * Getters/Setters
  ****************************************/
 
-func (x Int64) GetInt64(key string) int64 {
+func (x Int64) GetInt64OK(key string) (int64, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
-			return x[index]
+			return x[index], true
 		}
 	}
 
-	return 0
+	return 0, false
 }
 
-func (s *Int64) SetInt64(key string, value int64) bool {
+func (s *Int64) SetInt64OK(key string, value int64) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value
@@ -63,4 +67,9 @@ func (s *Int64) SetInt64(key string, value int64) bool {
 	}
 
 	return false
+}
+
+func (s *Int64) SetValue(value any) error {
+	*s = convert.SliceOfInt64(value)
+	return nil
 }

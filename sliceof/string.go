@@ -1,6 +1,10 @@
 package sliceof
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/benpate/rosetta/convert"
+)
 
 type String []string
 
@@ -44,17 +48,17 @@ func (x String) Reverse() {
  * Getters/Setters
  ****************************************/
 
-func (x String) GetString(key string) string {
+func (x String) GetStringOK(key string) (string, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
-			return x[index]
+			return x[index], true
 		}
 	}
 
-	return ""
+	return "", false
 }
 
-func (s *String) SetString(key string, value string) bool {
+func (s *String) SetStringOK(key string, value string) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value
@@ -63,4 +67,9 @@ func (s *String) SetString(key string, value string) bool {
 	}
 
 	return false
+}
+
+func (s *String) SetValue(value any) error {
+	*s = convert.SliceOfString(value)
+	return nil
 }

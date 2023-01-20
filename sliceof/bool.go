@@ -1,6 +1,10 @@
 package sliceof
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/benpate/rosetta/convert"
+)
 
 type Bool []bool
 
@@ -44,17 +48,17 @@ func (x Bool) Reverse() {
  * Getters/Setters
  ****************************************/
 
-func (x Bool) GetBool(key string) bool {
+func (x Bool) GetBoolOK(key string) (bool, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
-			return x[index]
+			return x[index], true
 		}
 	}
 
-	return false
+	return false, false
 }
 
-func (s *Bool) SetBool(key string, value bool) bool {
+func (s *Bool) SetBoolOK(key string, value bool) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value
@@ -63,4 +67,9 @@ func (s *Bool) SetBool(key string, value bool) bool {
 	}
 
 	return false
+}
+
+func (s *Bool) SetValue(value any) error {
+	*s = convert.SliceOfBool(value)
+	return nil
 }
