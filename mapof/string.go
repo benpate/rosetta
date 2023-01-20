@@ -13,6 +13,9 @@ func (x String) GetStringOK(key string) (string, bool) {
 }
 
 func (x *String) SetStringOK(key string, value string) bool {
+	if *x == nil {
+		*x = make(String)
+	}
 	(*x)[key] = value
 	return true
 }

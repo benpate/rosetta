@@ -37,33 +37,45 @@ func (x Any) GetString(key string) string {
  ****************************************/
 
 func (x *Any) SetAny(key string, value any) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
 func (x *Any) SetBool(key string, value bool) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
 func (x *Any) SetFloat(key string, value float64) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
 func (x *Any) SetInt(key string, value int) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
 func (x *Any) SetInt64(key string, value Int64) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
 func (x *Any) SetString(key string, value string) bool {
+	x.makeNotNil()
 	(*x)[key] = value
 	return true
+}
+
+func (x *Any) makeNotNil() {
+	if *x == nil {
+		*x = make(Any)
+	}
 }
 
 /****************************************

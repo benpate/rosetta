@@ -13,6 +13,9 @@ func (x Int) GetIntOK(key string) (int, bool) {
 }
 
 func (x *Int) SetIntOK(key string, value int) bool {
+	if *x == nil {
+		*x = make(Int)
+	}
 	(*x)[key] = value
 	return true
 }

@@ -13,6 +13,9 @@ func (x Bool) GetBoolOK(key string) (bool, bool) {
 }
 
 func (x *Bool) SetBoolOK(key string, value bool) bool {
+	if *x == nil {
+		*x = make(Bool)
+	}
 	(*x)[key] = value
 	return true
 }

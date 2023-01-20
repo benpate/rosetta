@@ -13,6 +13,9 @@ func (x Float) GetFloatOK(key string) (float64, bool) {
 }
 
 func (x *Float) SetFloatOK(key string, value float64) bool {
+	if *x == nil {
+		*x = make(Float)
+	}
 	(*x)[key] = value
 	return true
 }
