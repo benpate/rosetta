@@ -28,25 +28,22 @@ func (element Boolean) IsRequired() bool {
 }
 
 // Validate validates a generic value using this schema
-func (element Boolean) Validate(object any) derp.MultiError {
+func (element Boolean) Validate(object any) error {
 
-	var err derp.MultiError
 	boolValue, ok := object.(bool)
 
 	if !ok {
-		err.Append(derp.NewValidationError(" must be a boolean"))
-		return err
+		return derp.NewValidationError(" must be a boolean")
 	}
 
 	if element.Required && (!boolValue) {
-		err.Append(derp.NewValidationError(" boolean value is required"))
-		return err
+		return derp.NewValidationError(" boolean value is required")
 	}
 
 	return nil
 }
 
-func (element Boolean) Clean(value any) derp.MultiError {
+func (element Boolean) Clean(value any) error {
 	// TODO: HIGH: Implement the Clean() method for the Boolean element
 	return nil
 }

@@ -43,54 +43,48 @@ func (element Number) IsRequired() bool {
 }
 
 // Validate validates a value against this schema
-func (element Number) Validate(value any) derp.MultiError {
+func (element Number) Validate(value any) error {
 
-	var err derp.MultiError
+	floatValue, ok := toFloat(value)
 
-	var floatValue float64
-
-	if v, ok := toFloat(value); ok {
-		floatValue = v
-	} else {
-		err.Append(derp.NewValidationError(" must be a float"))
-		return err
+	if !ok {
+		return derp.NewValidationError(" must be a float")
 	}
 
 	if element.Required {
 		if floatValue == 0 {
-			err.Append(derp.NewValidationError(" float field is required"))
-			return err
+			return derp.NewValidationError(" float field is required")
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if floatValue < element.Minimum.Float() {
-			err.Append(derp.NewValidationError(" minimum float value is " + convert.String(element.Minimum)))
+			return derp.NewValidationError(" minimum float value is " + convert.String(element.Minimum))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if floatValue > element.Maximum.Float() {
-			err.Append(derp.NewValidationError(" maximum float value is " + convert.String(element.Maximum)))
+			return derp.NewValidationError(" maximum float value is " + convert.String(element.Maximum))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if math.Remainder(floatValue, element.MultipleOf.Float()) != 0 {
-			err.Append(derp.NewValidationError(" float must be a multiple of " + convert.String(element.MultipleOf)))
+			return derp.NewValidationError(" float must be a multiple of " + convert.String(element.MultipleOf))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, floatValue) {
-			err.Append(derp.NewValidationError(" float must contain one of the specified values"))
+			return derp.NewValidationError(" float must contain one of the specified values")
 		}
 	}
 
-	return err
+	return nil
 }
 
-func (element Number) Clean(value any) derp.MultiError {
+func (element Number) Clean(value any) error {
 	// TODO: HIGH: Implement the "Clean" method for the Number type
 	return nil
 }

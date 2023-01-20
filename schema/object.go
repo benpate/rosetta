@@ -61,18 +61,18 @@ func (element Object) IsRequired() bool {
 }
 
 // Validate validates a value against this schema
-func (element Object) Validate(object any) derp.MultiError {
-
-	err := make(derp.MultiError, 0)
+func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
-		err.Append(validate(subElement, object, name))
+		if err := validate(subElement, object, name); err != nil {
+			return err
+		}
 	}
 
-	return err
+	return nil
 }
 
-func (element Object) Clean(value any) derp.MultiError {
+func (element Object) Clean(value any) error {
 	// TODO: HIGH: Implement the Clean method for the Object type
 	return nil
 }

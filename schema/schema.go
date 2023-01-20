@@ -34,11 +34,11 @@ func (schema Schema) Validate(value any) error {
 		return derp.NewInternalError("schema.Schema.Validate", "Schema is nil")
 	}
 
-	if err := schema.Element.Validate(value); err.IsEmpty() {
-		return nil
-	} else {
+	if err := schema.Element.Validate(value); err != nil {
 		return derp.Wrap(err, "schema.Schema.Validate", "Error validating value", value)
 	}
+
+	return nil
 }
 
 // Clean tries to force a particular value to fit this schema by updating
@@ -51,11 +51,11 @@ func (schema Schema) Clean(value any) error {
 		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
 	}
 
-	if err := schema.Element.Clean(value); err.IsEmpty() {
-		return nil
-	} else {
+	if err := schema.Element.Clean(value); err != nil {
 		return derp.Wrap(err, "schema.Schema.Clean", "Error cleaning value", value)
 	}
+
+	return nil
 }
 
 /******************************************

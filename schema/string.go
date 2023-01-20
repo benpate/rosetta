@@ -36,56 +36,53 @@ func (element String) IsRequired() bool {
 }
 
 // Validate compares a generic data value using this Schema
-func (element String) Validate(value any) derp.MultiError {
-
-	var err derp.MultiError
+func (element String) Validate(value any) error {
 
 	stringValue, ok := value.(string)
 
 	if !ok {
-		err.Append(derp.NewValidationError(" must be a string"))
-		return err
+		return derp.NewValidationError(" must be a string")
 	}
 
 	// Validate against all formatting functions
 	for _, format := range element.formatFunctions() {
-		if _, inner := format(stringValue); inner != nil {
-			err.Append(inner)
+		if _, err := format(stringValue); err != nil {
+			return err
 		}
 	}
 
 	// Verify required fields (after format functions are applied)
 	if element.Required {
 		if stringValue == "" {
-			err.Append(derp.NewValidationError(" string field is required"))
+			return derp.NewValidationError(" string field is required")
 		}
 	}
 
 	// Validate minimum length
 	if element.MinLength > 0 {
 		if len(stringValue) < element.MinLength {
-			err.Append(derp.NewValidationError(" minimum string length is " + convert.String(element.MinLength)))
+			return derp.NewValidationError(" minimum string length is " + convert.String(element.MinLength))
 		}
 	}
 
 	// Validate maximum length
 	if element.MaxLength > 0 {
 		if len(stringValue) > element.MaxLength {
-			err.Append(derp.NewValidationError(" maximum string length is " + convert.String(element.MaxLength)))
+			return derp.NewValidationError(" maximum string length is " + convert.String(element.MaxLength))
 		}
 	}
 
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (stringValue != "") && (!compare.Contains(element.Enum, stringValue)) {
-			err.Append(derp.NewValidationError(" string must match one of the required values."))
+			return derp.NewValidationError(" string must match one of the required values.")
 		}
 	}
 
-	return err
+	return nil
 }
 
-func (element String) Clean(value any) derp.MultiError {
+func (element String) Clean(value any) error {
 	// TODO: HIGH: Implement the "Clean" method for the String type
 	return nil
 }

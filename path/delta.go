@@ -119,7 +119,7 @@ func (d *Delta) HasChanged() bool {
 	return d.changed
 }
 
-// Error returns derp.MultiError containing all errors that have been collected
+// Error returns an error containing all errors that have been collected
 func (d *Delta) Error() error {
 	return d.errors
 }

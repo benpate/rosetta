@@ -45,53 +45,48 @@ func (element Integer) IsRequired() bool {
 }
 
 // Validate validates a value using this schema
-func (element Integer) Validate(value any) derp.MultiError {
+func (element Integer) Validate(value any) error {
 
-	var err derp.MultiError
-	var intValue int64
+	intValue, ok := toInt64(value)
 
-	if v, ok := toInt64(value); ok {
-		intValue = v
-	} else {
-		err.Append(derp.NewValidationError(" must be an integer"))
-		return err
+	if !ok {
+		return derp.NewValidationError(" must be an integer")
 	}
 
 	if element.Required {
 		if intValue == 0 {
-			err.Append(derp.NewValidationError("integer value is required"))
-			return err
+			return derp.NewValidationError("integer value is required")
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if intValue < element.Minimum.Int64() {
-			err.Append(derp.NewValidationError("minimum integer value is " + convert.String(element.Minimum)))
+			return derp.NewValidationError("minimum integer value is " + convert.String(element.Minimum))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if intValue > element.Maximum.Int64() {
-			err.Append(derp.NewValidationError("maximum integer value is " + convert.String(element.Maximum)))
+			return derp.NewValidationError("maximum integer value is " + convert.String(element.Maximum))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if (intValue % element.MultipleOf.Int64()) != 0 {
-			err.Append(derp.NewValidationError("must be a multiple of " + convert.String(element.MultipleOf)))
+			return derp.NewValidationError("must be a multiple of " + convert.String(element.MultipleOf))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, intValue) {
-			err.Append(derp.NewValidationError("must contain one of the specified values"))
+			return derp.NewValidationError("must contain one of the specified values")
 		}
 	}
 
-	return err
+	return nil
 }
 
-func (element Integer) Clean(value any) derp.MultiError {
+func (element Integer) Clean(value any) error {
 	// TODO: HIGH: Implement the "Clean" method for Integer
 	return nil
 }

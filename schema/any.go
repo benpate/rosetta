@@ -20,12 +20,12 @@ func (element Any) IsRequired() bool {
 }
 
 // Validate validates the provided value
-func (element Any) Validate(value any) derp.MultiError {
+func (element Any) Validate(value any) error {
 	return nil
 }
 
 // Clean updates a value to match the schema.  The value must be a pointer.
-func (element Any) Clean(value any) derp.MultiError {
+func (element Any) Clean(value any) error {
 	return nil
 }
 
