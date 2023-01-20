@@ -122,7 +122,6 @@ func TestObject_Validate(t *testing.T) {
 	{
 		err := schema.Validate(&object)
 		spew.Config.DisableMethods = true
-		spew.Dump(err)
 		require.Nil(t, err)
 	}
 }
