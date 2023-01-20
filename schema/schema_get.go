@@ -14,7 +14,7 @@ func (schema Schema) Get(object any, path string) (any, error) {
 func (schema Schema) get(object any, element Element, path list.List) (any, error) {
 
 	if path.IsEmpty() {
-		return nil, derp.NewInternalError("schema.Schema.get", "Cannot get values on empty path")
+		return object, nil
 	}
 
 	head, tail := path.Split()
