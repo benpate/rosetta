@@ -121,6 +121,47 @@ func SliceOfInt(value any) []int {
 	return make([]int, 0)
 }
 
+// SliceOfInt64 converts the value into a slice of int64s.
+// It works with any, []any, []string, []int, and int values.
+// If the passed value cannot be converted, then an empty slice is returned.
+func SliceOfInt64(value any) []int64 {
+
+	switch value := value.(type) {
+
+	case []int64:
+		return value
+
+	case []int:
+		result := make([]int64, len(value))
+		for index, v := range value {
+			result[index] = Int64(v)
+		}
+		return result
+
+	case []any:
+		result := make([]int64, len(value))
+		for index, v := range value {
+			result[index] = Int64(v)
+		}
+		return result
+
+	case []string:
+		result := make([]int64, len(value))
+		for index, v := range value {
+			result[index] = Int64(v)
+		}
+		return result
+
+	case int:
+		return []int64{int64(value)}
+
+	case int64:
+		return []int64{value}
+	}
+
+	return make([]int64, 0)
+}
+
 // SliceOfFloat converts the value into a slice of floats.
 // It works with any, []any, []float64, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
