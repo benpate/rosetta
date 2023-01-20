@@ -68,7 +68,7 @@ func (schema Schema) GetElement(path string) (Element, bool) {
 		return nil, false
 	}
 
-	return schema.Element.getElement(path)
+	return schema.Element.GetElement(path)
 }
 
 /******************************************

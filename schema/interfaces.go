@@ -1,5 +1,7 @@
 package schema
 
+import "github.com/benpate/rosetta/list"
+
 // Nullable interface wraps the IsNull method, that helps an object
 // to identify if it contains a null value or not.  This mirrors
 // the null.Nullable interface here, for convenience.
@@ -31,6 +33,10 @@ type Int64Getter interface {
 	GetInt64OK(string) (int64, bool)
 }
 
+type ObjectGetter interface {
+	GetObjectOK(string) (any, bool)
+}
+
 type StringGetter interface {
 	GetStringOK(string) (string, bool)
 }
@@ -38,10 +44,6 @@ type StringGetter interface {
 /******************************************
  * Special-Case Getter Interfaces
  ******************************************/
-
-type ObjectGetter interface {
-	GetObjectOK(string) (any, bool)
-}
 
 // LengthGetter allows arrays to report their total length
 type LengthGetter interface {
@@ -68,8 +70,16 @@ type Int64Setter interface {
 	SetInt64OK(string, int64) bool
 }
 
+type ObjectSetter interface {
+	SetObject(Element, list.List, any) error
+}
+
 type StringSetter interface {
 	SetStringOK(string, string) bool
+}
+
+type ValueSetter interface {
+	SetValue(any) error
 }
 
 /******************************************

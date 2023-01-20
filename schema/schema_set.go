@@ -7,7 +7,7 @@ import (
 )
 
 func (schema Schema) Set(object any, path string, value any) error {
-	return schema.set(object, schema.Element, list.ByDot(path), value)
+	return SetElement(object, schema.Element, list.ByDot(path), value)
 }
 
 // SetAll iterates over Set to apply all of the values to the object one at a time, stopping
@@ -34,26 +34,44 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 	return nil
 }
 
-func (schema Schema) set(object any, element Element, path list.List, value any) error {
+func SetElement(object any, element Element, path list.List, value any) error {
 
+	// In rare cases, we may need to set an entire element in one call.
+	// If the path is empty, then we're setting the entire element, which
+	// must implement the "ValueSetter" interface
 	if path.IsEmpty() {
-		return derp.NewInternalError("schema.Schema.set", "Cannot set values on empty path")
+		if setter, ok := object.(ValueSetter); ok {
+			if err := setter.SetValue(value); err != nil {
+				return derp.Wrap(err, "schema.SetElement", "Error setting value", object, value)
+			}
+			return nil
+		}
+		return derp.NewInternalError("schema.SetElement", "Cannot set values on empty path")
 	}
+
+	// Otherwise, we're setting a sub-element within the object:
 
 	head, tail := path.Split()
-
-	subElement, ok := element.getElement(head)
+	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.NewInternalError("schema.Schema.set", "Unknown property", head)
+		return derp.NewInternalError("schema.SetElement", "Unknown property", head, element)
 	}
 
+	// Different interfaces are required for different types of objects
 	switch typed := subElement.(type) {
 
 	case Array, Object:
+
+		// ObjectSetter interface is required for Maps
+		if setter, ok := object.(ObjectSetter); ok {
+			return setter.SetObject(element, path, value)
+		}
+
+		// ObjectGetter works for Structs, Slices, and Arrays
 		if getter, ok := object.(ObjectGetter); ok {
 			if subObject, ok := getter.GetObjectOK(head); ok {
-				return schema.set(subObject, typed, tail, value)
+				return SetElement(subObject, typed, tail, value)
 			}
 		}
 
@@ -99,5 +117,5 @@ func (schema Schema) set(object any, element Element, path list.List, value any)
 		}
 	}
 
-	return derp.NewInternalError("schema.Schema.set", "Unable to set property", path, object)
+	return derp.NewInternalError("schema.SetElement", "Unable to set property", path, object)
 }

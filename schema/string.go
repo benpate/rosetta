@@ -90,7 +90,7 @@ func (element String) Clean(value any) derp.MultiError {
 	return nil
 }
 
-func (element String) getElement(name string) (Element, bool) {
+func (element String) GetElement(name string) (Element, bool) {
 	if name == "" {
 		return element, true
 	}

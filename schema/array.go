@@ -96,7 +96,7 @@ func (element Array) Clean(value any) derp.MultiError {
 	return nil
 }
 
-func (element Array) getElement(name string) (Element, bool) {
+func (element Array) GetElement(name string) (Element, bool) {
 
 	if name == "" {
 		return element, true
@@ -114,7 +114,7 @@ func (element Array) getElement(name string) (Element, bool) {
 	}
 
 	if ok {
-		return element.Items.getElement(tail)
+		return element.Items.GetElement(tail)
 	}
 
 	return nil, false

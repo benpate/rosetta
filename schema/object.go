@@ -19,7 +19,7 @@ type Object struct {
  * Container Interface
  ***********************************/
 
-func (element Object) getElement(name string) (Element, bool) {
+func (element Object) GetElement(name string) (Element, bool) {
 
 	if name == "" {
 		return element, true
@@ -28,11 +28,11 @@ func (element Object) getElement(name string) (Element, bool) {
 	head, tail := list.Split(name, list.DelimiterDot)
 
 	if child, ok := element.Properties[head]; ok {
-		return child.getElement(tail)
+		return child.GetElement(tail)
 	}
 
 	if element.Wildcard != nil {
-		return element.Wildcard.getElement(tail)
+		return element.Wildcard.GetElement(tail)
 	}
 
 	return nil, false
