@@ -4,9 +4,9 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
-/*************************************************
+/************************************************
  * New Style Getters
- *************************************************/
+ ************************************************/
 
 func GetBool(object any, path string) bool {
 
@@ -63,9 +63,9 @@ func GetString(object any, path string) string {
 	return ""
 }
 
-/*************************************************
+/************************************************
  * New Style Setters
- *************************************************/
+ ************************************************/
 
 func SetBool(object any, path string, value bool) bool {
 
@@ -142,9 +142,9 @@ func SetString(object any, path string, value string) bool {
 	return false
 }
 
-/*************************************************
+/************************************************
  * Tree Traversal
- *************************************************/
+ ************************************************/
 
 func getLeaf(object any, path list.List) (any, string, bool) {
 

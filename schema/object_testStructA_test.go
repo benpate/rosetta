@@ -28,7 +28,7 @@ func testStructA_Schema() Element {
 }
 
 /******************************************
- * Getters
+ * Getter Interfaces
  ******************************************/
 
 func (t testStructA) GetBoolOK(path string) (bool, bool) {
@@ -60,7 +60,7 @@ func (t testStructA) GetStringOK(path string) (string, bool) {
 }
 
 /******************************************
- * Setters
+ * Setter Interfaces
  ******************************************/
 
 func (t *testStructA) SetBoolOK(path string, value bool) bool {

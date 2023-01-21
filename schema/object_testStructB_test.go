@@ -28,7 +28,7 @@ func testStructB_Schema() Element {
 }
 
 /******************************************
- * Getters
+ * Getter Interfaces
  ******************************************/
 
 func (t testStructB) GetIntOK(path string) (int, bool) {
@@ -60,7 +60,7 @@ func (t testStructB) GetStringOK(path string) (string, bool) {
 }
 
 /******************************************
- * Setters
+ * Setter Interfaces
  ******************************************/
 
 func (t *testStructB) SetIntOK(path string, value int) bool {
