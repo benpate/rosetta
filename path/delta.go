@@ -8,7 +8,6 @@ import (
 // Delta tracks changes to an object
 type Delta struct {
 	object  any
-	errors  error
 	changed bool
 }
 
@@ -20,7 +19,7 @@ func NewDelta(object any) Delta {
 }
 
 // SetBool tracks changes to a bool value and collects errors
-func (d *Delta) SetBool(path string, value bool) {
+func (d *Delta) SetBool(path string, value bool) error {
 
 	if leaf, last, ok := getLeaf(d.object, list.Dot(path)); ok {
 
@@ -31,15 +30,15 @@ func (d *Delta) SetBool(path string, value bool) {
 				d.changed = true
 			}
 
-			return
+			return nil
 		}
 	}
 
-	d.errors = derp.Append(d.errors, derp.NewInternalError("delta.SetBool", "Unable to set bool", path, value))
+	return derp.NewInternalError("delta.SetBool", "Unable to set bool", path, value)
 }
 
 // SetFloat tracks changes to a float value and collects errors
-func (d *Delta) SetFloat(path string, value float64) {
+func (d *Delta) SetFloat(path string, value float64) error {
 
 	if leaf, last, ok := getLeaf(d.object, list.Dot(path)); ok {
 
@@ -50,15 +49,15 @@ func (d *Delta) SetFloat(path string, value float64) {
 				d.changed = true
 			}
 
-			return
+			return nil
 		}
 	}
 
-	d.errors = derp.Append(d.errors, derp.NewInternalError("delta.SetBool", "Unable to set float", path, value))
+	return derp.NewInternalError("delta.SetBool", "Unable to set float", path, value)
 }
 
 // SetInt tracks changes to an int value and collects errors
-func (d *Delta) SetInt(path string, value int) {
+func (d *Delta) SetInt(path string, value int) error {
 
 	if leaf, last, ok := getLeaf(d.object, list.Dot(path)); ok {
 
@@ -69,15 +68,15 @@ func (d *Delta) SetInt(path string, value int) {
 				d.changed = true
 			}
 
-			return
+			return nil
 		}
 	}
 
-	d.errors = derp.Append(d.errors, derp.NewInternalError("delta.SetBool", "Unable to set int", path, value))
+	return derp.NewInternalError("delta.SetBool", "Unable to set int", path, value)
 }
 
 // SetInt64 tracks changes to an int64 value and collects errors
-func (d *Delta) SetInt64(path string, value int64) {
+func (d *Delta) SetInt64(path string, value int64) error {
 
 	if leaf, last, ok := getLeaf(d.object, list.Dot(path)); ok {
 
@@ -88,15 +87,15 @@ func (d *Delta) SetInt64(path string, value int64) {
 				d.changed = true
 			}
 
-			return
+			return nil
 		}
 	}
 
-	d.errors = derp.Append(d.errors, derp.NewInternalError("delta.SetBool", "Unable to set int64", path, value))
+	return derp.NewInternalError("delta.SetBool", "Unable to set int64", path, value)
 }
 
 // SetString tracks changes to a string value and collects errors
-func (d *Delta) SetString(path string, value string) {
+func (d *Delta) SetString(path string, value string) error {
 
 	if leaf, last, ok := getLeaf(d.object, list.Dot(path)); ok {
 
@@ -107,19 +106,14 @@ func (d *Delta) SetString(path string, value string) {
 				d.changed = true
 			}
 
-			return
+			return nil
 		}
 	}
 
-	d.errors = derp.Append(d.errors, derp.NewInternalError("delta.SetBool", "Unable to set string", path, value))
+	return derp.NewInternalError("delta.SetBool", "Unable to set string", path, value)
 }
 
 // HasChanged returns TRUE if any of the values have been changed
 func (d *Delta) HasChanged() bool {
 	return d.changed
-}
-
-// Error returns an error containing all errors that have been collected
-func (d *Delta) Error() error {
-	return d.errors
 }
