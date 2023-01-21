@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type Float []float64
@@ -12,7 +13,7 @@ type Float []float64
  * Accessors
  ****************************************/
 
-func (x Float) Len() int {
+func (x Float) Length() int {
 	return len(x)
 }
 
@@ -45,7 +46,7 @@ func (x Float) Reverse() {
 }
 
 /****************************************
- * Getters/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 func (x Float) GetFloatOK(key string) (float64, bool) {
@@ -72,4 +73,14 @@ func (s *Float) SetFloatOK(key string, value float64) bool {
 func (s *Float) SetValue(value any) error {
 	*s = convert.SliceOfFloat(value)
 	return nil
+}
+
+func (s *Float) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, s.Length()); ok {
+		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
 }

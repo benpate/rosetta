@@ -24,9 +24,7 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 		return derp.NewInternalError("mapof.Object.SetObject", "Cannot set values on empty path")
 	}
 
-	if *object == nil {
-		*object = make(Object[T])
-	}
+	object.makeNotNil()
 
 	head, tail := path.Split()
 
@@ -54,4 +52,16 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 	(*object)[head] = tempValue
 
 	return nil
+}
+
+func (x *Object[T]) Remove(key string) bool {
+	x.makeNotNil()
+	delete(*x, key)
+	return true
+}
+
+func (x *Object[T]) makeNotNil() {
+	if *x == nil {
+		*x = make(Object[T])
+	}
 }

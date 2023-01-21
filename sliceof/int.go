@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type Int []int
@@ -12,7 +13,7 @@ type Int []int
  * Accessors
  ****************************************/
 
-func (x Int) Len() int {
+func (x Int) Length() int {
 	return len(x)
 }
 
@@ -45,7 +46,7 @@ func (x Int) Reverse() {
 }
 
 /****************************************
- * Getters/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 func (x Int) GetIntOK(key string) (int, bool) {
@@ -72,4 +73,14 @@ func (s *Int) SetIntOK(key string, value int) bool {
 func (s *Int) SetValue(value any) error {
 	*s = convert.SliceOfInt(value)
 	return nil
+}
+
+func (s *Int) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, s.Length()); ok {
+		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
 }

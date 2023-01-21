@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type Any []any
@@ -12,7 +13,7 @@ type Any []any
  * Accessors
  ****************************************/
 
-func (x Any) Len() int {
+func (x Any) Length() int {
 	return len(x)
 }
 
@@ -167,4 +168,14 @@ func (x *Any) SetStringOK(key string, value string) (bool, bool) {
 func (x *Any) SetValue(value any) error {
 	*x = convert.SliceOfInterface(value)
 	return nil
+}
+
+func (x *Any) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, x.Length()); ok {
+		*x = append((*x)[:index], (*x)[index+1:]...)
+		return true
+	}
+
+	return false
 }

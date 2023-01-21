@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type Bool []bool
@@ -12,7 +13,7 @@ type Bool []bool
  * Accessors
  ****************************************/
 
-func (x Bool) Len() int {
+func (x Bool) Length() int {
 	return len(x)
 }
 
@@ -45,7 +46,7 @@ func (x Bool) Reverse() {
 }
 
 /****************************************
- * Getters/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 func (x Bool) GetBoolOK(key string) (bool, bool) {
@@ -72,4 +73,14 @@ func (s *Bool) SetBoolOK(key string, value bool) bool {
 func (s *Bool) SetValue(value any) error {
 	*s = convert.SliceOfBool(value)
 	return nil
+}
+
+func (s *Bool) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, s.Length()); ok {
+		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
 }

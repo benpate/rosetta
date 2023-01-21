@@ -13,9 +13,19 @@ func (x Int) GetIntOK(key string) (int, bool) {
 }
 
 func (x *Int) SetIntOK(key string, value int) bool {
+	x.makeNotNil()
+	(*x)[key] = value
+	return true
+}
+
+func (x *Int) Remove(key string) bool {
+	x.makeNotNil()
+	delete(*x, key)
+	return true
+}
+
+func (x *Int) makeNotNil() {
 	if *x == nil {
 		*x = make(Int)
 	}
-	(*x)[key] = value
-	return true
 }

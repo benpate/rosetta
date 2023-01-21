@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type String []string
@@ -45,7 +46,7 @@ func (x String) Reverse() {
 }
 
 /****************************************
- * Getters/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 func (x String) GetStringOK(key string) (string, bool) {
@@ -72,4 +73,14 @@ func (s *String) SetStringOK(key string, value string) bool {
 func (s *String) SetValue(value any) error {
 	*s = convert.SliceOfString(value)
 	return nil
+}
+
+func (s *String) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, s.Length()); ok {
+		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
 }

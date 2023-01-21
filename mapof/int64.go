@@ -13,9 +13,19 @@ func (x Int64) GetInt64OK(key string) (int64, bool) {
 }
 
 func (x *Int64) SetInt64OK(key string, value int64) bool {
+	x.makeNotNil()
+	(*x)[key] = value
+	return true
+}
+
+func (x *Int64) Remove(key string) bool {
+	x.makeNotNil()
+	delete(*x, key)
+	return true
+}
+
+func (x *Int64) makeNotNil() {
 	if *x == nil {
 		*x = make(Int64)
 	}
-	(*x)[key] = value
-	return true
 }

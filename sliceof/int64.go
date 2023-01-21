@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/schema"
 )
 
 type Int64 []int64
@@ -12,7 +13,7 @@ type Int64 []int64
  * Accessors
  ****************************************/
 
-func (x Int64) Len() int {
+func (x Int64) Length() int {
 	return len(x)
 }
 
@@ -45,7 +46,7 @@ func (x Int64) Reverse() {
 }
 
 /****************************************
- * Getters/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 func (x Int64) GetInt64OK(key string) (int64, bool) {
@@ -72,4 +73,14 @@ func (s *Int64) SetInt64OK(key string, value int64) bool {
 func (s *Int64) SetValue(value any) error {
 	*s = convert.SliceOfInt64(value)
 	return nil
+}
+
+func (s *Int64) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, s.Length()); ok {
+		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
 }

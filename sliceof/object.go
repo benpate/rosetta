@@ -66,3 +66,18 @@ func (x *Object[T]) GetObjectOK(name string) (any, bool) {
 	// Failure!!
 	return nil, false
 }
+
+func (x *Object[T]) Remove(key string) bool {
+
+	if index, ok := schema.Index(key, x.Length()); ok {
+
+		// Remove the item
+		*x = append((*x)[:index], (*x)[index+1:]...)
+
+		// Success!
+		return true
+	}
+
+	// Failure!!
+	return false
+}

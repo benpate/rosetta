@@ -13,9 +13,19 @@ func (x Bool) GetBoolOK(key string) (bool, bool) {
 }
 
 func (x *Bool) SetBoolOK(key string, value bool) bool {
+	x.makeNotNil()
+	(*x)[key] = value
+	return true
+}
+
+func (x *Bool) Remove(key string) bool {
+	x.makeNotNil()
+	delete(*x, key)
+	return true
+}
+
+func (x *Bool) makeNotNil() {
 	if *x == nil {
 		*x = make(Bool)
 	}
-	(*x)[key] = value
-	return true
 }

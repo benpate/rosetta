@@ -13,9 +13,19 @@ func (x String) GetStringOK(key string) (string, bool) {
 }
 
 func (x *String) SetStringOK(key string, value string) bool {
+	x.makeNotNil()
+	(*x)[key] = value
+	return true
+}
+
+func (x *String) Remove(key string) bool {
+	x.makeNotNil()
+	delete(*x, key)
+	return true
+}
+
+func (x *String) makeNotNil() {
 	if *x == nil {
 		*x = make(String)
 	}
-	(*x)[key] = value
-	return true
 }
