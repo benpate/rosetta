@@ -17,38 +17,121 @@ func TestMap_Get(t *testing.T) {
 	m := Map{"hello": "there", "general": "kenobi", "intValue": 69, "boolValue": true, "floatValue": 42.1}
 
 	// stringValues
-	require.Equal(t, "true", m.GetString("boolValue"))
-	require.Equal(t, "69", m.GetString("intValue"))
-	require.Equal(t, "42.1", m.GetString("floatValue"))
-	require.Equal(t, "there", m.GetString("hello"))
-	require.Equal(t, "kenobi", m.GetString("general"))
-	require.Equal(t, "", m.GetString("missing"))
+	{
+		result, ok := m.GetString("boolValue")
+		require.True(t, ok)
+		require.Equal(t, "true", result)
+
+		result, ok = m.GetString("intValue")
+		require.True(t, ok)
+		require.Equal(t, "69", result)
+
+		result, ok = m.GetString("floatValue")
+		require.True(t, ok)
+		require.Equal(t, "42.1", result)
+
+		result, ok = m.GetString("hello")
+		require.True(t, ok)
+		require.Equal(t, "there", result)
+
+		result, ok = m.GetString("general")
+		require.True(t, ok)
+		require.Equal(t, "kenobi", result)
+
+		result, ok = m.GetString("missing")
+		require.False(t, ok)
+		require.Equal(t, "", result)
+	}
 
 	// boolValues
-	require.True(t, m.GetBool("boolValue"))
-	require.True(t, m.GetBool("intValue"))
-	require.True(t, m.GetBool("floatValue"))
-	require.False(t, m.GetBool("hello"))
-	require.False(t, m.GetBool("missing"))
+	{
+		result, ok := m.GetBool("boolValue")
+		require.True(t, ok)
+		require.True(t, result)
+
+		result, ok = m.GetBool("intValue")
+		require.True(t, ok)
+		require.True(t, result)
+
+		result, ok = m.GetBool("floatValue")
+		require.True(t, ok)
+		require.True(t, result)
+
+		result, ok = m.GetBool("hello")
+		require.True(t, ok)
+		require.False(t, result)
+
+		result, ok = m.GetBool("missing")
+		require.False(t, ok)
+		require.False(t, result)
+	}
 
 	// intValues
-	require.Equal(t, 1, m.GetInt("boolValue"))
-	require.Equal(t, 69, m.GetInt("intValue"))
-	require.Equal(t, 42, m.GetInt("floatValue"))
-	require.Zero(t, m.GetInt("hello"))
-	require.Zero(t, m.GetInt("missing"))
+	{
+		result, ok := m.GetInt("boolValue")
+		require.True(t, ok)
+		require.Equal(t, 1, result)
+
+		result, ok = m.GetInt("intValue")
+		require.True(t, ok)
+		require.Equal(t, 69, result)
+
+		result, ok = m.GetInt("floatValue")
+		require.True(t, ok)
+		require.Equal(t, 42, result)
+
+		result, ok = m.GetInt("hello")
+		require.True(t, ok)
+		require.Zero(t, result)
+
+		result, ok = m.GetInt("missing")
+		require.False(t, ok)
+		require.Zero(t, result)
+	}
 
 	// floatValues
-	require.Equal(t, float64(1), m.GetFloat("boolValue"))
-	require.Equal(t, float64(69), m.GetFloat("intValue"))
-	require.Equal(t, float64(42.1), m.GetFloat("floatValue"))
-	require.Zero(t, m.GetInt("hello"))
-	require.Zero(t, m.GetInt("missing"))
+	{
+		result, ok := m.GetFloat("boolValue")
+		require.True(t, ok)
+		require.Equal(t, float64(1), result)
+
+		result, ok = m.GetFloat("intValue")
+		require.True(t, ok)
+		require.Equal(t, float64(69), result)
+
+		result, ok = m.GetFloat("floatValue")
+		require.True(t, ok)
+		require.Equal(t, float64(42.1), result)
+
+		result, ok = m.GetFloat("hello")
+		require.False(t, ok)
+		require.Zero(t, result)
+
+		result, ok = m.GetFloat("missing")
+		require.False(t, ok)
+		require.Zero(t, result)
+	}
 
 	// interfaceValues
-	require.Equal(t, "there", m.GetInterface("hello"))
-	require.Equal(t, 69, m.GetInterface("intValue"))
-	require.Equal(t, float64(42.1), m.GetInterface("floatValue"))
-	require.Equal(t, true, m.GetInterface("boolValue"))
-	require.Nil(t, m.GetInterface("mising"))
+	{
+		result, ok := m.GetInterface("hello")
+		require.True(t, ok)
+		require.Equal(t, "there", result)
+
+		result, ok = m.GetInterface("intValue")
+		require.True(t, ok)
+		require.Equal(t, 69, result)
+
+		result, ok = m.GetInterface("floatValue")
+		require.True(t, ok)
+		require.Equal(t, float64(42.1), result)
+
+		result, ok = m.GetInterface("boolValue")
+		require.True(t, ok)
+		require.Equal(t, true, result)
+
+		result, ok = m.GetInterface("mising")
+		require.False(t, ok)
+		require.Nil(t, result)
+	}
 }

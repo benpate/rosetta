@@ -31,28 +31,28 @@ func testStructA_Schema() Element {
  * Getter Interfaces
  ******************************************/
 
-func (t testStructA) GetBoolOK(path string) (bool, bool) {
+func (t testStructA) GetBool(path string) (bool, bool) {
 	if path == "active" {
 		return t.Active, true
 	}
 	return false, false
 }
 
-func (t testStructA) GetFloatOK(path string) (float64, bool) {
+func (t testStructA) GetFloat(path string) (float64, bool) {
 	if path == "latitude" {
 		return t.Latitude, true
 	}
 	return 0, false
 }
 
-func (t *testStructA) GetObjectOK(path string) (any, bool) {
+func (t *testStructA) GetObject(path string) (any, bool) {
 	if path == "array" {
 		return &t.Array, true
 	}
 	return nil, false
 }
 
-func (t testStructA) GetStringOK(path string) (string, bool) {
+func (t testStructA) GetString(path string) (string, bool) {
 	if path == "name" {
 		return t.Name, true
 	}
@@ -63,7 +63,7 @@ func (t testStructA) GetStringOK(path string) (string, bool) {
  * Setter Interfaces
  ******************************************/
 
-func (t *testStructA) SetBoolOK(path string, value bool) bool {
+func (t *testStructA) SetBool(path string, value bool) bool {
 	if path == "active" {
 		t.Active = value
 		return true
@@ -71,7 +71,7 @@ func (t *testStructA) SetBoolOK(path string, value bool) bool {
 	return false
 }
 
-func (t *testStructA) SetFloatOK(path string, value float64) bool {
+func (t *testStructA) SetFloat(path string, value float64) bool {
 	if path == "latitude" {
 		t.Latitude = value
 		return true
@@ -79,7 +79,7 @@ func (t *testStructA) SetFloatOK(path string, value float64) bool {
 	return false
 }
 
-func (t *testStructA) SetStringOK(path string, value string) bool {
+func (t *testStructA) SetString(path string, value string) bool {
 	if path == "name" {
 		t.Name = value
 		return true

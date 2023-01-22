@@ -49,7 +49,7 @@ func (x Int64) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x Int64) GetInt64OK(key string) (int64, bool) {
+func (x Int64) GetInt64(key string) (int64, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
 			return x[index], true
@@ -59,7 +59,7 @@ func (x Int64) GetInt64OK(key string) (int64, bool) {
 	return 0, false
 }
 
-func (s *Int64) SetInt64OK(key string, value int64) bool {
+func (s *Int64) SetInt64(key string, value int64) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value

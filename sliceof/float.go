@@ -49,7 +49,7 @@ func (x Float) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x Float) GetFloatOK(key string) (float64, bool) {
+func (x Float) GetFloat(key string) (float64, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
 			return x[index], true
@@ -59,7 +59,7 @@ func (x Float) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
-func (s *Float) SetFloatOK(key string, value float64) bool {
+func (s *Float) SetFloat(key string, value float64) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value

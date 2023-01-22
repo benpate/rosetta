@@ -49,7 +49,7 @@ func (x String) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x String) GetStringOK(key string) (string, bool) {
+func (x String) GetString(key string) (string, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
 			return x[index], true
@@ -59,7 +59,7 @@ func (x String) GetStringOK(key string) (string, bool) {
 	return "", false
 }
 
-func (s *String) SetStringOK(key string, value string) bool {
+func (s *String) SetString(key string, value string) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value

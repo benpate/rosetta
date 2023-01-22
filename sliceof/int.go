@@ -49,7 +49,7 @@ func (x Int) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x Int) GetIntOK(key string) (int, bool) {
+func (x Int) GetInt(key string) (int, bool) {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(x)) {
 			return x[index], true
@@ -59,7 +59,7 @@ func (x Int) GetIntOK(key string) (int, bool) {
 	return 0, false
 }
 
-func (s *Int) SetIntOK(key string, value int) bool {
+func (s *Int) SetInt(key string, value int) bool {
 	if index, err := strconv.Atoi(key); err == nil {
 		if (index >= 0) && (index < len(*s)) {
 			(*s)[index] = value

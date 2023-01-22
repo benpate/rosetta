@@ -8,28 +8,47 @@ type Any map[string]any
  * Path Getters
  ****************************************/
 
-func (x Any) GetAny(key string) any {
-	return convert.Interface(x[key])
+func (x Any) GetAny(key string) (any, bool) {
+	if value, ok := x[key]; ok {
+		return convert.Interface(value), true
+	}
+	return nil, false
+
 }
 
-func (x Any) GetBool(key string) bool {
-	return convert.Bool(x[key])
+func (x Any) GetBool(key string) (bool, bool) {
+	if value, ok := x[key]; ok {
+		return convert.BoolOk(value, false)
+	}
+	return false, false
 }
 
-func (x Any) GetFloat(key string) float64 {
-	return convert.Float(x[key])
+func (x Any) GetFloat(key string) (float64, bool) {
+	if value, ok := x[key]; ok {
+		return convert.FloatOk(value, 0)
+	}
+	return 0, false
 }
 
-func (x Any) GetInt(key string) int {
-	return convert.Int(x[key])
+func (x Any) GetInt(key string) (int, bool) {
+	if value, ok := x[key]; ok {
+		return convert.IntOk(value, 0)
+	}
+	return 0, false
 }
 
-func (x Any) GetInt64(key string) int64 {
-	return convert.Int64(x[key])
+func (x Any) GetInt64(key string) (int64, bool) {
+	if value, ok := x[key]; ok {
+		return convert.Int64Ok(value, 0)
+	}
+	return 0, false
 }
 
-func (x Any) GetString(key string) string {
-	return convert.String(x[key])
+func (x Any) GetString(key string) (string, bool) {
+	if value, ok := x[key]; ok {
+		return convert.StringOk(value, "")
+	}
+	return "", false
 }
 
 /****************************************

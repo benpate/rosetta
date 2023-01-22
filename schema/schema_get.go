@@ -34,7 +34,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be an ObjectGetter", object)
 		}
 
-		subObject, ok := getter.GetObjectOK(head)
+		subObject, ok := getter.GetObject(head)
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get object", head, object)
 		}
@@ -49,7 +49,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a BoolGetter", object)
 		}
 
-		result, ok := getter.GetBoolOK(head)
+		result, ok := getter.GetBool(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get bool", head, object)
@@ -67,7 +67,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 				return nil, derp.NewInternalError("schema.Schema.get", "Object must be a Int64Getter", object)
 			}
 
-			result, ok := getter.GetInt64OK(head)
+			result, ok := getter.GetInt64(head)
 
 			if !ok {
 				return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int64", head, object)
@@ -82,7 +82,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a IntGetter", object)
 		}
 
-		result, ok := getter.GetIntOK(head)
+		result, ok := getter.GetInt(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int", head, object)
@@ -98,7 +98,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a FloatGetter", object)
 		}
 
-		result, ok := getter.GetFloatOK(head)
+		result, ok := getter.GetFloat(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get float", head, object)
@@ -114,7 +114,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a StringGetter", object)
 		}
 
-		result, ok := getter.GetStringOK(head)
+		result, ok := getter.GetString(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get string", head, object)

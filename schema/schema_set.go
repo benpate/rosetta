@@ -70,7 +70,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 
 		// ObjectGetter works for Structs, Slices, and Arrays
 		if getter, ok := object.(ObjectGetter); ok {
-			if subObject, ok := getter.GetObjectOK(head); ok {
+			if subObject, ok := getter.GetObject(head); ok {
 				return SetElement(subObject, typed, tail, value)
 			}
 		}
@@ -78,7 +78,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	case Boolean:
 		boolValue, _ := convert.BoolOk(value, false)
 		if setter, ok := object.(BoolSetter); ok {
-			if setter.SetBoolOK(head, boolValue) {
+			if setter.SetBool(head, boolValue) {
 				return nil
 			}
 		}
@@ -87,7 +87,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 		if typed.BitSize == 64 {
 			int64Value, _ := convert.Int64Ok(value, 0)
 			if setter, ok := object.(Int64Setter); ok {
-				if setter.SetInt64OK(head, int64Value) {
+				if setter.SetInt64(head, int64Value) {
 					return nil
 				}
 			}
@@ -95,7 +95,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 
 		intValue, _ := convert.IntOk(value, 0)
 		if setter, ok := object.(IntSetter); ok {
-			if setter.SetIntOK(head, intValue) {
+			if setter.SetInt(head, intValue) {
 				return nil
 			}
 		}
@@ -103,7 +103,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	case Number:
 		floatValue, _ := convert.FloatOk(value, 0)
 		if setter, ok := object.(FloatSetter); ok {
-			if setter.SetFloatOK(head, floatValue) {
+			if setter.SetFloat(head, floatValue) {
 				return nil
 			}
 		}
@@ -111,7 +111,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	case String:
 		stringValue, _ := convert.StringOk(value, "")
 		if setter, ok := object.(StringSetter); ok {
-			if setter.SetStringOK(head, stringValue) {
+			if setter.SetString(head, stringValue) {
 				return nil
 			}
 		}

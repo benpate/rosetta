@@ -2,17 +2,14 @@ package mapof
 
 type Bool map[string]bool
 
-func (x Bool) GetBool(key string) bool {
-	result, _ := x.GetBoolOK(key)
-	return result
+func (x Bool) GetBool(key string) (bool, bool) {
+	if result, ok := x[key]; ok {
+		return result, true
+	}
+	return false, false
 }
 
-func (x Bool) GetBoolOK(key string) (bool, bool) {
-	result, ok := x[key]
-	return result, ok
-}
-
-func (x *Bool) SetBoolOK(key string, value bool) bool {
+func (x *Bool) SetBool(key string, value bool) bool {
 	x.makeNotNil()
 	(*x)[key] = value
 	return true

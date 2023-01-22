@@ -18,27 +18,27 @@ type Enumerator interface {
  ******************************************/
 
 type BoolGetter interface {
-	GetBoolOK(string) (bool, bool)
+	GetBool(string) (bool, bool)
 }
 
 type FloatGetter interface {
-	GetFloatOK(string) (float64, bool)
+	GetFloat(string) (float64, bool)
 }
 
 type IntGetter interface {
-	GetIntOK(string) (int, bool)
+	GetInt(string) (int, bool)
 }
 
 type Int64Getter interface {
-	GetInt64OK(string) (int64, bool)
+	GetInt64(string) (int64, bool)
 }
 
 type ObjectGetter interface {
-	GetObjectOK(string) (any, bool)
+	GetObject(string) (any, bool)
 }
 
 type StringGetter interface {
-	GetStringOK(string) (string, bool)
+	GetString(string) (string, bool)
 }
 
 /******************************************
@@ -55,19 +55,19 @@ type LengthGetter interface {
  ******************************************/
 
 type BoolSetter interface {
-	SetBoolOK(string, bool) bool
+	SetBool(string, bool) bool
 }
 
 type FloatSetter interface {
-	SetFloatOK(string, float64) bool
+	SetFloat(string, float64) bool
 }
 
 type IntSetter interface {
-	SetIntOK(string, int) bool
+	SetInt(string, int) bool
 }
 
 type Int64Setter interface {
-	SetInt64OK(string, int64) bool
+	SetInt64(string, int64) bool
 }
 
 type ObjectSetter interface {
@@ -75,7 +75,7 @@ type ObjectSetter interface {
 }
 
 type StringSetter interface {
-	SetStringOK(string, string) bool
+	SetString(string, string) bool
 }
 
 type ValueSetter interface {

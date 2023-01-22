@@ -24,7 +24,7 @@ func (t testArrayA) Length() int {
 	return len(t)
 }
 
-func (t testArrayA) GetStringOK(path string) (string, bool) {
+func (t testArrayA) GetString(path string) (string, bool) {
 	if index, ok := Index(path, len(t)); ok {
 		return t[index], true
 	}
@@ -32,7 +32,7 @@ func (t testArrayA) GetStringOK(path string) (string, bool) {
 	return "", false
 }
 
-func (t *testArrayA) SetStringOK(path string, value string) bool {
+func (t *testArrayA) SetString(path string, value string) bool {
 
 	if index, ok := Index(path); ok {
 

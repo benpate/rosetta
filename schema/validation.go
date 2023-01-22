@@ -37,7 +37,7 @@ func validate(element Element, object any, name string) error {
 func validate_array(element Array, object any, name string) error {
 
 	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObjectOK(name); ok {
+		if value, ok := getter.GetObject(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -50,7 +50,7 @@ func validate_array(element Array, object any, name string) error {
 func validate_boolean(element Boolean, object any, name string) error {
 
 	if getter, ok := object.(BoolGetter); ok {
-		if value, ok := getter.GetBoolOK(name); ok {
+		if value, ok := getter.GetBool(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -71,7 +71,7 @@ func validate_integer(element Integer, object any, name string) error {
 // validate_number specifically validates int32 sub-elements
 func validate_int32(element Integer, object any, name string) error {
 	if getter, ok := object.(IntGetter); ok {
-		if value, ok := getter.GetIntOK(name); ok {
+		if value, ok := getter.GetInt(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -82,7 +82,7 @@ func validate_int32(element Integer, object any, name string) error {
 // validate_number specifically validates int64 sub-elements
 func validate_int64(element Integer, object any, name string) error {
 	if getter, ok := object.(Int64Getter); ok {
-		if value, ok := getter.GetInt64OK(name); ok {
+		if value, ok := getter.GetInt64(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -93,7 +93,7 @@ func validate_int64(element Integer, object any, name string) error {
 // validate_number specifically validates Number sub-elements
 func validate_number(element Number, object any, name string) error {
 	if getter, ok := object.(FloatGetter); ok {
-		if value, ok := getter.GetFloatOK(name); ok {
+		if value, ok := getter.GetFloat(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -105,7 +105,7 @@ func validate_number(element Number, object any, name string) error {
 func validate_object(element Object, object any, name string) error {
 
 	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObjectOK(name); ok {
+		if value, ok := getter.GetObject(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -116,7 +116,7 @@ func validate_object(element Object, object any, name string) error {
 // validate_string specifically validates String sub-elements
 func validate_string(element String, object any, name string) error {
 	if getter, ok := object.(StringGetter); ok {
-		if value, ok := getter.GetStringOK(name); ok {
+		if value, ok := getter.GetString(name); ok {
 			return element.Validate(value)
 		}
 	}

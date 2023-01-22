@@ -48,7 +48,7 @@ func (x Object[T]) Reverse() {
  * Tree Traversal
  ****************************************/
 
-func (x *Object[T]) GetObjectOK(name string) (any, bool) {
+func (x *Object[T]) GetObject(name string) (any, bool) {
 
 	// Get a valid index for the slice
 	if index, ok := schema.Index(name); ok {
