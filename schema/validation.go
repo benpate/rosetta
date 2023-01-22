@@ -37,7 +37,7 @@ func validate(element Element, object any, name string) error {
 func validate_array(element Array, object any, name string) error {
 
 	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObject(name); ok {
+		if value, ok := getter.GetObjectOK(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -93,7 +93,7 @@ func validate_int64(element Integer, object any, name string) error {
 // validate_number specifically validates Number sub-elements
 func validate_number(element Number, object any, name string) error {
 	if getter, ok := object.(FloatGetter); ok {
-		if value, ok := getter.GetFloat(name); ok {
+		if value, ok := getter.GetFloatOK(name); ok {
 			return element.Validate(value)
 		}
 	}
@@ -105,7 +105,7 @@ func validate_number(element Number, object any, name string) error {
 func validate_object(element Object, object any, name string) error {
 
 	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObject(name); ok {
+		if value, ok := getter.GetObjectOK(name); ok {
 			return element.Validate(value)
 		}
 	}

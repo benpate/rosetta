@@ -13,7 +13,7 @@ func NewObject[T any]() Object[T] {
 	return make(Object[T])
 }
 
-func (object Object[T]) GetObject(name string) (any, bool) {
+func (object Object[T]) GetObjectOK(name string) (any, bool) {
 	value, ok := object[name]
 	return value, ok
 }

@@ -86,7 +86,7 @@ func (x Any) GetInt64(key string) (int64, bool) {
 	return 0, false
 }
 
-func (x Any) GetFloat(key string) (float64, bool) {
+func (x Any) GetFloatOK(key string) (float64, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		if typed, ok := value.(float64); ok {
 			return typed, true
@@ -143,7 +143,7 @@ func (x *Any) SetFloat(key string, value float64) (bool, bool) {
 	return x.SetAnyOK(key, value)
 }
 
-func (x *Any) GetObject(key string) (any, bool) {
+func (x *Any) GetObjectOK(key string) (any, bool) {
 	index, err := strconv.Atoi(key)
 
 	if err != nil {

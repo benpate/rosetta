@@ -38,14 +38,14 @@ func (t testStructA) GetBool(path string) (bool, bool) {
 	return false, false
 }
 
-func (t testStructA) GetFloat(path string) (float64, bool) {
+func (t testStructA) GetFloatOK(path string) (float64, bool) {
 	if path == "latitude" {
 		return t.Latitude, true
 	}
 	return 0, false
 }
 
-func (t *testStructA) GetObject(path string) (any, bool) {
+func (t *testStructA) GetObjectOK(path string) (any, bool) {
 	if path == "array" {
 		return &t.Array, true
 	}

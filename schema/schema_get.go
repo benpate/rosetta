@@ -34,7 +34,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be an ObjectGetter", object)
 		}
 
-		subObject, ok := getter.GetObject(head)
+		subObject, ok := getter.GetObjectOK(head)
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get object", head, object)
 		}
@@ -98,7 +98,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a FloatGetter", object)
 		}
 
-		result, ok := getter.GetFloat(head)
+		result, ok := getter.GetFloatOK(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get float", head, object)

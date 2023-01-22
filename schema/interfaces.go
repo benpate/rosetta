@@ -22,7 +22,7 @@ type BoolGetter interface {
 }
 
 type FloatGetter interface {
-	GetFloat(string) (float64, bool)
+	GetFloatOK(string) (float64, bool)
 }
 
 type IntGetter interface {
@@ -34,7 +34,7 @@ type Int64Getter interface {
 }
 
 type ObjectGetter interface {
-	GetObject(string) (any, bool)
+	GetObjectOK(string) (any, bool)
 }
 
 type StringGetter interface {
