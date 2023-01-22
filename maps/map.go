@@ -169,7 +169,7 @@ func (m *Map) Remove(name string) bool {
  * Tree Traversal
  ******************************************/
 
-func (m *Map) GetObjectOK(name string) (any, bool) {
+func (m *Map) GetObject(name string) (any, bool) {
 
 	if _, ok := (*m)[name]; !ok {
 		(*m)[name] = make(Map)

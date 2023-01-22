@@ -70,7 +70,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 
 		// ObjectGetter works for Structs, Slices, and Arrays
 		if getter, ok := object.(ObjectGetter); ok {
-			if subObject, ok := getter.GetObjectOK(head); ok {
+			if subObject, ok := getter.GetObject(head); ok {
 				return SetElement(subObject, typed, tail, value)
 			}
 		}

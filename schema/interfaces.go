@@ -34,7 +34,7 @@ type Int64Getter interface {
 }
 
 type ObjectGetter interface {
-	GetObjectOK(string) (any, bool)
+	GetObject(string) (any, bool)
 }
 
 type StringGetter interface {

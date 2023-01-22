@@ -143,7 +143,7 @@ func (x *Any) SetFloat(key string, value float64) (bool, bool) {
 	return x.SetAnyOK(key, value)
 }
 
-func (x *Any) GetObjectOK(key string) (any, bool) {
+func (x *Any) GetObject(key string) (any, bool) {
 	index, err := strconv.Atoi(key)
 
 	if err != nil {

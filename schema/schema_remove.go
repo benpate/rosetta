@@ -17,7 +17,7 @@ func (schema Schema) remove(object any, path list.List) bool {
 
 		if getter, ok := object.(ObjectGetter); ok {
 
-			if child, ok := getter.GetObjectOK(head); ok {
+			if child, ok := getter.GetObject(head); ok {
 				return schema.remove(child, tail)
 			}
 		}
