@@ -1,13 +1,14 @@
 package sliceof
 
 import (
-	"strconv"
-
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/schema"
 )
 
 type Float []float64
+
+func NewFloat() Float {
+	return make(Float, 0)
+}
 
 /****************************************
  * Accessors
@@ -49,22 +50,24 @@ func (x Float) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
+func (x Float) GetFloat(key string) float64 {
+	result, _ := x.GetFloatOK(key)
+	return result
+}
+
 func (x Float) GetFloatOK(key string) (float64, bool) {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(x)) {
-			return x[index], true
-		}
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
 	}
 
 	return 0, false
 }
 
 func (s *Float) SetFloat(key string, value float64) bool {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(*s)) {
-			(*s)[index] = value
-			return true
-		}
+	if index, ok := sliceIndex(key); ok {
+		growSlice(s, index)
+		(*s)[index] = value
+		return true
 	}
 
 	return false
@@ -77,7 +80,7 @@ func (s *Float) SetValue(value any) error {
 
 func (s *Float) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, s.Length()); ok {
+	if index, ok := sliceIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
 		return true
 	}

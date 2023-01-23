@@ -31,7 +31,7 @@ func testStructA_Schema() Element {
  * Getter Interfaces
  ******************************************/
 
-func (t testStructA) GetBool(path string) (bool, bool) {
+func (t testStructA) GetBoolOK(path string) (bool, bool) {
 	if path == "active" {
 		return t.Active, true
 	}
@@ -52,7 +52,7 @@ func (t *testStructA) GetObject(path string) (any, bool) {
 	return nil, false
 }
 
-func (t testStructA) GetString(path string) (string, bool) {
+func (t testStructA) GetStringOK(path string) (string, bool) {
 	if path == "name" {
 		return t.Name, true
 	}

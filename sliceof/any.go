@@ -1,16 +1,17 @@
 package sliceof
 
 import (
-	"strconv"
-
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/schema"
 )
 
 type Any []any
 
+func NewAny() Any {
+	return make(Any, 0)
+}
+
 /****************************************
- * Accessors
+ * Slice Manipulations
  ****************************************/
 
 func (x Any) Length() int {
@@ -45,124 +46,125 @@ func (x Any) Reverse() {
 	}
 }
 
-/****************************************
- * Path Getters
- ****************************************/
+/******************************************
+ * Getter Interfaces
+ ******************************************/
+
+func (x Any) GetAny(key string) any {
+	result, _ := x.GetAnyOK(key)
+	return result
+}
 
 func (x Any) GetAnyOK(key string) (any, bool) {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(x)) {
-			return x[index], true
-		}
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
 	}
 	return nil, false
 }
 
-func (x Any) GetBool(key string) (bool, bool) {
+func (x Any) GetBool(key string) bool {
+	result, _ := x.GetBoolOK(key)
+	return result
+}
+
+func (x Any) GetBoolOK(key string) (bool, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
-		if typed, ok := value.(bool); ok {
-			return typed, true
-		}
+		return convert.BoolOk(value, false)
 	}
 	return false, false
 }
 
-func (x Any) GetInt(key string) (int, bool) {
+func (x Any) GetInt(key string) int {
+	result, _ := x.GetIntOK(key)
+	return result
+}
+
+func (x Any) GetIntOK(key string) (int, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
-		if typed, ok := value.(int); ok {
-			return typed, true
-		}
+		return convert.IntOk(value, 0)
 	}
 
 	return 0, false
 }
 
-func (x Any) GetInt64(key string) (int64, bool) {
+func (x Any) GetInt64(key string) int64 {
+	result, _ := x.GetInt64OK(key)
+	return result
+}
+
+func (x Any) GetInt64OK(key string) (int64, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
-		if typed, ok := value.(int64); ok {
-			return typed, true
-		}
+		return convert.Int64Ok(value, 0)
 	}
 	return 0, false
+}
+
+func (x Any) GetFloat(key string) float64 {
+	result, _ := x.GetFloatOK(key)
+	return result
 }
 
 func (x Any) GetFloatOK(key string) (float64, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
-		if typed, ok := value.(float64); ok {
-			return typed, true
-		}
+		return convert.FloatOk(value, 0)
 	}
 	return 0, false
 }
 
-func (x Any) GetString(key string) (string, bool) {
+func (x *Any) GetObject(key string) (any, bool) {
+	if index, ok := sliceIndex(key); ok {
+		growSlice(x, index)
+		return &(*x)[index], true
+	}
+
+	return nil, false
+}
+
+func (x Any) GetString(key string) string {
+	result, _ := x.GetStringOK(key)
+	return result
+}
+
+func (x Any) GetStringOK(key string) (string, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
-		if typed, ok := value.(string); ok {
-			return typed, true
-		}
+		return convert.StringOk(value, "")
 	}
 	return "", false
 }
 
-/****************************************
- * Path Getters
- ****************************************/
+/******************************************
+ * Setter Interfaces
+ ******************************************/
 
-func (x *Any) SetAnyOK(key string, value any) (bool, bool) {
-	index, err := strconv.Atoi(key)
+func (x *Any) SetAny(key string, value any) bool {
 
-	if err != nil {
-		return false, false
+	if index, ok := sliceIndex(key); ok {
+		growSlice(x, index)
+		(*x)[index] = value
+		return true
 	}
 
-	if index < 0 {
-		return false, false
-	}
-
-	for index >= len(*x) {
-		*x = append(*x, nil)
-	}
-
-	(*x)[index] = value
-	return true, true
+	return false
 }
 
-func (x *Any) SetBool(key string, value bool) (bool, bool) {
-	return x.SetAnyOK(key, value)
+func (x *Any) SetBool(key string, value bool) bool {
+	return x.SetAny(key, value)
 }
 
-func (x *Any) SetInt(key string, value int) (bool, bool) {
-	return x.SetAnyOK(key, value)
+func (x *Any) SetInt(key string, value int) bool {
+	return x.SetAny(key, value)
 }
 
-func (x *Any) SetInt64(key string, value int64) (bool, bool) {
-	return x.SetAnyOK(key, value)
+func (x *Any) SetInt64(key string, value int64) bool {
+	return x.SetAny(key, value)
 }
 
-func (x *Any) SetFloat(key string, value float64) (bool, bool) {
-	return x.SetAnyOK(key, value)
+func (x *Any) SetFloat(key string, value float64) bool {
+	return x.SetAny(key, value)
 }
 
-func (x *Any) GetObject(key string) (any, bool) {
-	index, err := strconv.Atoi(key)
-
-	if err != nil {
-		return nil, false
-	}
-
-	if index < 0 {
-		return nil, false
-	}
-
-	for index >= len(*x) {
-		*x = append(*x, nil)
-	}
-
-	return &(*x)[index], true
-}
-
-func (x *Any) SetString(key string, value string) (bool, bool) {
-	return x.SetAnyOK(key, value)
+func (x *Any) SetString(key string, value string) bool {
+	return x.SetAny(key, value)
 }
 
 func (x *Any) SetValue(value any) error {
@@ -172,7 +174,7 @@ func (x *Any) SetValue(value any) error {
 
 func (x *Any) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, x.Length()); ok {
+	if index, ok := sliceIndex(key, x.Length()); ok {
 		*x = append((*x)[:index], (*x)[index+1:]...)
 		return true
 	}

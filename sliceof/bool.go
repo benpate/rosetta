@@ -1,17 +1,18 @@
 package sliceof
 
 import (
-	"strconv"
-
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/schema"
 )
 
 type Bool []bool
 
-/****************************************
- * Accessors
- ****************************************/
+func NewBool() Bool {
+	return make(Bool, 0)
+}
+
+/******************************************
+ * Slice Manipulations
+ ******************************************/
 
 func (x Bool) Length() int {
 	return len(x)
@@ -46,25 +47,27 @@ func (x Bool) Reverse() {
 }
 
 /****************************************
- * Getter Interfaces/Setters
+ * Getter/Setter Interfaces
  ****************************************/
 
-func (x Bool) GetBool(key string) (bool, bool) {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(x)) {
-			return x[index], true
-		}
+func (x Bool) GetBool(key string) bool {
+	result, _ := x.GetBoolOK(key)
+	return result
+}
+
+func (x Bool) GetBoolOK(key string) (bool, bool) {
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
 	}
 
 	return false, false
 }
 
 func (s *Bool) SetBool(key string, value bool) bool {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(*s)) {
-			(*s)[index] = value
-			return true
-		}
+	if index, ok := sliceIndex(key); ok {
+		growSlice(s, index)
+		(*s)[index] = value
+		return true
 	}
 
 	return false
@@ -77,7 +80,7 @@ func (s *Bool) SetValue(value any) error {
 
 func (s *Bool) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, s.Length()); ok {
+	if index, ok := sliceIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
 		return true
 	}

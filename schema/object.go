@@ -4,7 +4,6 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
-	"github.com/benpate/rosetta/maps"
 )
 
 // Object represents an object data type within a JSON-Schema.
@@ -46,7 +45,7 @@ func (element Object) GetElement(name string) (Element, bool) {
 // which can be represented as both Go structs and maps, this returns a map[string]any that has been
 // populated with any known default keys.
 func (element Object) DefaultValue() any {
-	result := maps.Map{}
+	result := make(map[string]any)
 
 	for key, element := range element.Properties {
 		result[key] = element.DefaultValue()
@@ -84,13 +83,13 @@ func (element Object) Clean(value any) error {
 // MarshalMap populates object data into a map[string]any
 func (element Object) MarshalMap() map[string]any {
 
-	properties := make(maps.Map, len(element.Properties))
+	properties := make(map[string]any, len(element.Properties))
 
 	for key, element := range element.Properties {
 		properties[key] = element.MarshalMap()
 	}
 
-	result := maps.Map{
+	result := map[string]any{
 		"type":       TypeObject,
 		"properties": properties,
 		"required":   element.RequiredProps,

@@ -1,14 +1,14 @@
 package sliceof
 
-import (
-	"github.com/benpate/rosetta/schema"
-)
-
 type Object[T any] []T
 
-/****************************************
- * Accessors
- ****************************************/
+func NewObject[T any]() Object[T] {
+	return make(Object[T], 0)
+}
+
+/******************************************
+ * Slice Manipulations
+ ******************************************/
 
 func (x Object[T]) Length() int {
 	return len(x)
@@ -51,13 +51,8 @@ func (x Object[T]) Reverse() {
 func (x *Object[T]) GetObject(name string) (any, bool) {
 
 	// Get a valid index for the slice
-	if index, ok := schema.Index(name); ok {
-
-		// Grow if necessary
-		for index >= len(*x) {
-			var newValue T
-			*x = append(*x, newValue)
-		}
+	if index, ok := sliceIndex(name); ok {
+		growSlice(x, index)
 
 		// Return result
 		return &(*x)[index], true
@@ -69,7 +64,7 @@ func (x *Object[T]) GetObject(name string) (any, bool) {
 
 func (x *Object[T]) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, x.Length()); ok {
+	if index, ok := sliceIndex(key, x.Length()); ok {
 
 		// Remove the item
 		*x = append((*x)[:index], (*x)[index+1:]...)

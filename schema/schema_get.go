@@ -49,7 +49,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a BoolGetter", object)
 		}
 
-		result, ok := getter.GetBool(head)
+		result, ok := getter.GetBoolOK(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get bool", head, object)
@@ -67,7 +67,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 				return nil, derp.NewInternalError("schema.Schema.get", "Object must be a Int64Getter", object)
 			}
 
-			result, ok := getter.GetInt64(head)
+			result, ok := getter.GetInt64OK(head)
 
 			if !ok {
 				return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int64", head, object)
@@ -82,7 +82,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a IntGetter", object)
 		}
 
-		result, ok := getter.GetInt(head)
+		result, ok := getter.GetIntOK(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int", head, object)
@@ -114,7 +114,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a StringGetter", object)
 		}
 
-		result, ok := getter.GetString(head)
+		result, ok := getter.GetStringOK(head)
 
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get string", head, object)

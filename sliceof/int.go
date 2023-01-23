@@ -1,13 +1,14 @@
 package sliceof
 
 import (
-	"strconv"
-
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/schema"
 )
 
 type Int []int
+
+func NewInt() Int {
+	return make(Int, 0)
+}
 
 /****************************************
  * Accessors
@@ -49,22 +50,24 @@ func (x Int) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x Int) GetInt(key string) (int, bool) {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(x)) {
-			return x[index], true
-		}
+func (x Int) GetInt(key string) int {
+	result, _ := x.GetIntOK(key)
+	return result
+}
+
+func (x Int) GetIntOK(key string) (int, bool) {
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
 	}
 
 	return 0, false
 }
 
 func (s *Int) SetInt(key string, value int) bool {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(*s)) {
-			(*s)[index] = value
-			return true
-		}
+	if index, ok := sliceIndex(key); ok {
+		growSlice(s, index)
+		(*s)[index] = value
+		return true
 	}
 
 	return false
@@ -77,7 +80,7 @@ func (s *Int) SetValue(value any) error {
 
 func (s *Int) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, s.Length()); ok {
+	if index, ok := sliceIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
 		return true
 	}

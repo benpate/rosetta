@@ -2,7 +2,16 @@ package mapof
 
 type Bool map[string]bool
 
-func (x Bool) GetBool(key string) (bool, bool) {
+func NewBool() Bool {
+	return make(Bool)
+}
+
+func (x Bool) GetBool(key string) bool {
+	result, _ := x.GetBoolOK(key)
+	return result
+}
+
+func (x Bool) GetBoolOK(key string) (bool, bool) {
 	if result, ok := x[key]; ok {
 		return result, true
 	}

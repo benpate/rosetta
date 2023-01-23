@@ -31,14 +31,14 @@ func testStructB_Schema() Element {
  * Getter Interfaces
  ******************************************/
 
-func (t testStructB) GetInt(path string) (int, bool) {
+func (t testStructB) GetIntOK(path string) (int, bool) {
 	if path == "age" {
 		return t.Age, true
 	}
 	return 0, false
 }
 
-func (t testStructB) GetInt64(path string) (int64, bool) {
+func (t testStructB) GetInt64OK(path string) (int64, bool) {
 	if path == "published" {
 		return t.Published, true
 	}
@@ -52,7 +52,7 @@ func (t *testStructB) GetObject(path string) (any, bool) {
 	return nil, false
 }
 
-func (t testStructB) GetString(path string) (string, bool) {
+func (t testStructB) GetStringOK(path string) (string, bool) {
 	if path == "name" {
 		return t.Name, true
 	}

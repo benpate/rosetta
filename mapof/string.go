@@ -2,7 +2,16 @@ package mapof
 
 type String map[string]string
 
-func (x String) GetString(key string) (string, bool) {
+func NewString() String {
+	return make(String)
+}
+
+func (x String) GetString(key string) string {
+	result, _ := x.GetStringOK(key)
+	return result
+}
+
+func (x String) GetStringOK(key string) (string, bool) {
 	result, ok := x[key]
 	return result, ok
 }

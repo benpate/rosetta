@@ -2,7 +2,16 @@ package mapof
 
 type Int64 map[string]int64
 
-func (x Int64) GetInt64(key string) (int64, bool) {
+func NewInt64() Int64 {
+	return make(Int64)
+}
+
+func (x Int64) GetInt64(key string) int64 {
+	result, _ := x.GetInt64OK(key)
+	return result
+}
+
+func (x Int64) GetInt64OK(key string) (int64, bool) {
 	result, ok := x[key]
 	return result, ok
 }

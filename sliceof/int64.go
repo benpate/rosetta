@@ -1,13 +1,14 @@
 package sliceof
 
 import (
-	"strconv"
-
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/schema"
 )
 
 type Int64 []int64
+
+func NewInt64() Int64 {
+	return make(Int64, 0)
+}
 
 /****************************************
  * Accessors
@@ -49,22 +50,24 @@ func (x Int64) Reverse() {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x Int64) GetInt64(key string) (int64, bool) {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(x)) {
-			return x[index], true
-		}
+func (x Int64) GetInt64(key string) int64 {
+	result, _ := x.GetInt64OK(key)
+	return result
+}
+
+func (x Int64) GetInt64OK(key string) (int64, bool) {
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
 	}
 
 	return 0, false
 }
 
 func (s *Int64) SetInt64(key string, value int64) bool {
-	if index, err := strconv.Atoi(key); err == nil {
-		if (index >= 0) && (index < len(*s)) {
-			(*s)[index] = value
-			return true
-		}
+	if index, ok := sliceIndex(key); ok {
+		growSlice(s, index)
+		(*s)[index] = value
+		return true
 	}
 
 	return false
@@ -77,7 +80,7 @@ func (s *Int64) SetValue(value any) error {
 
 func (s *Int64) Remove(key string) bool {
 
-	if index, ok := schema.Index(key, s.Length()); ok {
+	if index, ok := sliceIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
 		return true
 	}

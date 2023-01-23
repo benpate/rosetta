@@ -2,6 +2,15 @@ package mapof
 
 type Float map[string]float64
 
+func NewFloat() Float {
+	return make(Float)
+}
+
+func (x Float) GetFloat(key string) float64 {
+	result, _ := x.GetFloatOK(key)
+	return result
+}
+
 func (x Float) GetFloatOK(key string) (float64, bool) {
 	result, ok := x[key]
 	return result, ok

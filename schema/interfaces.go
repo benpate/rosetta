@@ -18,7 +18,7 @@ type Enumerator interface {
  ******************************************/
 
 type BoolGetter interface {
-	GetBool(string) (bool, bool)
+	GetBoolOK(string) (bool, bool)
 }
 
 type FloatGetter interface {
@@ -26,11 +26,11 @@ type FloatGetter interface {
 }
 
 type IntGetter interface {
-	GetInt(string) (int, bool)
+	GetIntOK(string) (int, bool)
 }
 
 type Int64Getter interface {
-	GetInt64(string) (int64, bool)
+	GetInt64OK(string) (int64, bool)
 }
 
 type ObjectGetter interface {
@@ -38,7 +38,7 @@ type ObjectGetter interface {
 }
 
 type StringGetter interface {
-	GetString(string) (string, bool)
+	GetStringOK(string) (string, bool)
 }
 
 /******************************************
