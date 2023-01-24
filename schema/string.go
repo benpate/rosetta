@@ -44,13 +44,6 @@ func (element String) Validate(value any) error {
 		return derp.NewValidationError(" must be a string")
 	}
 
-	// Validate against all formatting functions
-	for _, format := range element.formatFunctions() {
-		if _, err := format(stringValue); err != nil {
-			return err
-		}
-	}
-
 	// Verify required fields (after format functions are applied)
 	if element.Required {
 		if stringValue == "" {
@@ -75,7 +68,14 @@ func (element String) Validate(value any) error {
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (stringValue != "") && (!compare.Contains(element.Enum, stringValue)) {
-			return derp.NewValidationError(" string must match one of the required values.")
+			return derp.NewValidationError(" string must match one of the required values", stringValue, element.Enum)
+		}
+	}
+
+	// Validate against all formatting functions
+	for _, format := range element.formatFunctions() {
+		if _, err := format(stringValue); err != nil {
+			return err
 		}
 	}
 
