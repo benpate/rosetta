@@ -75,6 +75,17 @@ func TestStringEnum(t *testing.T) {
 	require.Nil(t, s.Validate("Simon"))
 	require.Nil(t, s.Validate("Sara"))
 	require.Nil(t, s.Validate("Mary"))
+	require.Nil(t, s.Validate(""))
 	require.NotNil(t, s.Validate("Mr. Black"))
 	require.NotNil(t, s.Validate(3.14159265358979323846))
+}
+
+func TestStringEnumRequired(t *testing.T) {
+
+	s := String{
+		Required: true,
+		Enum:     []string{"Joseph", "Simon", "Sara", "Mary"},
+	}
+
+	require.NotNil(t, s.Validate(""))
 }
