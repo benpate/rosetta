@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/slice"
 )
 
 type Bool []bool
@@ -44,6 +45,14 @@ func (x Bool) Reverse() {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
+}
+
+func (x Bool) Contains(value bool) bool {
+	return slice.Contains(x, value)
+}
+
+func (x Bool) Equal(value []bool) bool {
+	return slice.Equal(x, value)
 }
 
 /****************************************

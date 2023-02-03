@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/slice"
 )
 
 type Int []int
@@ -11,7 +12,7 @@ func NewInt() Int {
 }
 
 /****************************************
- * Accessors
+ * Slice Manipulations
  ****************************************/
 
 func (x Int) Length() int {
@@ -46,8 +47,16 @@ func (x Int) Reverse() {
 	}
 }
 
+func (x Int) Contains(value int) bool {
+	return slice.Contains(x, value)
+}
+
+func (x Int) Equal(value []int) bool {
+	return slice.Equal(x, value)
+}
+
 /****************************************
- * Getter Interfaces/Setters
+ * Getter/Setter Interfaces
  ****************************************/
 
 func (x Int) GetInt(key string) int {

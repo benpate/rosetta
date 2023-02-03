@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/slice"
 )
 
 type Float []float64
@@ -11,7 +12,7 @@ func NewFloat() Float {
 }
 
 /****************************************
- * Accessors
+ * Slice Manipulations
  ****************************************/
 
 func (x Float) Length() int {
@@ -46,8 +47,16 @@ func (x Float) Reverse() {
 	}
 }
 
+func (x Float) Contains(value float64) bool {
+	return slice.Contains(x, value)
+}
+
+func (x Float) Equal(value []float64) bool {
+	return slice.Equal(x, value)
+}
+
 /****************************************
- * Getter Interfaces/Setters
+ * Getter/Setter Interfaces
  ****************************************/
 
 func (x Float) GetFloat(key string) float64 {

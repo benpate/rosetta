@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/slice"
 )
 
 type Int64 []int64
@@ -46,8 +47,16 @@ func (x Int64) Reverse() {
 	}
 }
 
+func (x Int64) Contains(value int64) bool {
+	return slice.Contains(x, value)
+}
+
+func (x Int64) Equal(value []int64) bool {
+	return slice.Equal(x, value)
+}
+
 /****************************************
- * Getter Interfaces/Setters
+ * Getter/Setter Interfaces
  ****************************************/
 
 func (x Int64) GetInt64(key string) int64 {
