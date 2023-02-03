@@ -13,6 +13,22 @@ func NewObject[T any]() Object[T] {
 	return make(Object[T])
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Object[T]) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (object Object[T]) GetObject(name string) (any, bool) {
 	value, ok := object[name]
 	return value, ok

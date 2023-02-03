@@ -6,6 +6,22 @@ func NewInt() Int {
 	return make(Int)
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Int) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (x Int) GetInt(key string) int {
 	result, _ := x.GetIntOK(key)
 	return result

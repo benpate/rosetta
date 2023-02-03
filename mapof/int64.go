@@ -6,6 +6,22 @@ func NewInt64() Int64 {
 	return make(Int64)
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Int64) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (x Int64) GetInt64(key string) int64 {
 	result, _ := x.GetInt64OK(key)
 	return result

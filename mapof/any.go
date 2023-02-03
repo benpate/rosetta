@@ -13,9 +13,21 @@ func NewAny() Any {
 	return make(Any)
 }
 
-/****************************************
- * Path Getters
- ****************************************/
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Any) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter Interfaces
+ ******************************************/
 
 func (x Any) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
@@ -91,7 +103,7 @@ func (x Any) GetStringOK(key string) (string, bool) {
 }
 
 /****************************************
- * Path Setters
+ * Setter Interfaces
  ****************************************/
 
 func (x *Any) SetAny(key string, value any) bool {
@@ -187,23 +199,6 @@ func (x *Any) Remove(key string) bool {
 	x.makeNotNil()
 	delete(*x, key)
 	return true
-}
-
-/****************************************
- * Other Getters
- ****************************************/
-
-// GetKeys returns all keys of the underlying map
-func (m Any) Keys() []string {
-	result := make([]string, len(m))
-
-	index := 0
-	for key := range m {
-		result[index] = key
-		index = index + 1
-	}
-
-	return result
 }
 
 /******************************************

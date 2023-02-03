@@ -6,6 +6,22 @@ func NewString() String {
 	return make(String)
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x String) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (x String) GetString(key string) string {
 	result, _ := x.GetStringOK(key)
 	return result

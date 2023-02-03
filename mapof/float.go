@@ -6,6 +6,22 @@ func NewFloat() Float {
 	return make(Float)
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Float) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (x Float) GetFloat(key string) float64 {
 	result, _ := x.GetFloatOK(key)
 	return result

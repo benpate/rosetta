@@ -6,6 +6,22 @@ func NewBool() Bool {
 	return make(Bool)
 }
 
+/******************************************
+ * Map Manipulations
+ ******************************************/
+
+func (x Bool) Keys() []string {
+	keys := make([]string, 0, len(x))
+	for key := range x {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+/******************************************
+ * Getter/Setter Interfaces
+ ******************************************/
+
 func (x Bool) GetBool(key string) bool {
 	result, _ := x.GetBoolOK(key)
 	return result
