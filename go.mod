@@ -6,7 +6,7 @@ require (
 	github.com/benpate/derp v0.27.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.22
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 )
 
 require (
