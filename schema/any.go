@@ -33,6 +33,10 @@ func (element Any) GetElement(name string) (Element, bool) {
 	return element, true
 }
 
+func (element Any) Inherit(parent Element) {
+	// Do nothing
+}
+
 // MarshalMap populates the object data into a map[string]any
 func (element Any) MarshalMap() map[string]any {
 

@@ -27,6 +27,8 @@ type Element interface {
 
 	// getElement returns a named sub-element of this element, if it exists.
 	GetElement(string) (Element, bool)
+
+	Inherit(Element)
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.

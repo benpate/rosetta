@@ -27,7 +27,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 
 	switch typed := subElement.(type) {
 
-	case Array, Object:
+	case Any, Array, Object:
 
 		getter, ok := object.(ObjectGetter)
 		if !ok {

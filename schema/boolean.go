@@ -56,6 +56,10 @@ func (element Boolean) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
+func (element Boolean) Inherit(parent Element) {
+	// Do nothing
+}
+
 /***********************************
  * MARSHAL / UNMARSHAL METHODS
  ***********************************/

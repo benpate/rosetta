@@ -64,7 +64,7 @@ func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
 		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Error validating property", name)
+			return derp.Wrap(err, "schema.Object.Validate", "Error validating property", object, name, element)
 		}
 	}
 
@@ -74,6 +74,21 @@ func (element Object) Validate(object any) error {
 func (element Object) Clean(value any) error {
 	// TODO: HIGH: Implement the Clean method for the Object type
 	return nil
+}
+
+func (element Object) Inherit(parent Element) {
+
+	// Inherit each property from the parent
+	if parentObject, ok := parent.(Object); ok {
+		for propertyName, parentProperty := range parentObject.Properties {
+			if property, ok := element.Properties[propertyName]; ok {
+				property.Inherit(parentProperty)
+				element.Properties[propertyName] = property
+			} else {
+				element.Properties[propertyName] = parentProperty
+			}
+		}
+	}
 }
 
 /***********************************

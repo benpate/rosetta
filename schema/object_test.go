@@ -125,3 +125,15 @@ func TestObject_Validate(t *testing.T) {
 		require.Nil(t, err)
 	}
 }
+
+func TestObject_Wildcard(t *testing.T) {
+
+	schema := New(Object{
+		Wildcard: String{Format: "email", MinLength: 42},
+	})
+
+	element, ok := schema.GetElement("does-not-exist")
+
+	require.True(t, ok)
+	require.Equal(t, String{Format: "email", MinLength: 42}, element)
+}

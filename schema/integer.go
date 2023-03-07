@@ -98,6 +98,10 @@ func (element Integer) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
+func (element Integer) Inherit(parent Element) {
+	// Do nothing
+}
+
 /***********************************
  * Enumerator Interface
  ***********************************/

@@ -71,6 +71,15 @@ func (schema Schema) GetElement(path string) (Element, bool) {
 	return schema.Element.GetElement(path)
 }
 
+func (schema *Schema) Inherit(parent Schema) {
+
+	if isNil(schema.Element) {
+		schema.Element = parent.Element
+	} else {
+		schema.Element.Inherit(parent.Element)
+	}
+}
+
 /******************************************
  * Marshaling Methods
  ******************************************/

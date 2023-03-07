@@ -117,6 +117,10 @@ func (element Array) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
+func (element Array) Inherit(parent Element) {
+	// Do nothing
+}
+
 /***********************************
  * MARSHAL / UNMARSHAL METHODS
  ***********************************/
