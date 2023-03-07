@@ -25,3 +25,8 @@ func TestString(t *testing.T) {
 	require.False(t, s.Remove("0"))
 	require.Zero(t, s.Length())
 }
+
+func TestStringConversion(t *testing.T) {
+	var value []string = NewString()
+	t.Log(value)
+}

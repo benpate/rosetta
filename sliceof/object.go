@@ -44,6 +44,10 @@ func (x Object[T]) Reverse() {
 	}
 }
 
+func (x *Object[T]) Append(values ...T) {
+	*x = append(*x, values...)
+}
+
 /****************************************
  * Tree Traversal
  ****************************************/

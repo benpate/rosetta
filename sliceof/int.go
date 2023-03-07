@@ -55,6 +55,10 @@ func (x Int) Equal(value []int) bool {
 	return slice.Equal(x, value)
 }
 
+func (x *Int) Append(values ...int) {
+	*x = append(*x, values...)
+}
+
 /****************************************
  * Getter/Setter Interfaces
  ****************************************/

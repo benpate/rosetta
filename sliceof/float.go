@@ -55,6 +55,10 @@ func (x Float) Equal(value []float64) bool {
 	return slice.Equal(x, value)
 }
 
+func (x *Float) Append(values ...float64) {
+	*x = append(*x, values...)
+}
+
 /****************************************
  * Getter/Setter Interfaces
  ****************************************/

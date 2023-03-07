@@ -46,6 +46,10 @@ func (x Any) Reverse() {
 	}
 }
 
+func (x *Any) Append(values ...any) {
+	*x = append(*x, values...)
+}
+
 /******************************************
  * Getter Interfaces
  ******************************************/
