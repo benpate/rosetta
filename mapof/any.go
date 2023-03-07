@@ -152,47 +152,51 @@ func (x *Any) makeNotNil() {
  * Tree Traversal
  ****************************************/
 
-func (x *Any) GetObject(key string) (any, bool) {
-	result, ok := (*x)[key]
+func (x Any) GetObject(key string) (any, bool) {
+	result, ok := x[key]
 	return result, ok
 }
 
 func (x *Any) SetObject(element schema.Element, path list.List, value any) error {
 
-	return derp.NewInternalError("mapof.Object.SetObject", "Cannot set object values in mapo.Any")
+	if path.IsEmpty() {
+		return derp.NewInternalError("mapof.Any.SetObject", "Cannot set values on empty path")
+	}
 
-	/*
+	x.makeNotNil()
 
-		if path.IsEmpty() {
-			return derp.NewInternalError("mapof.Object.SetObject", "Cannot set values on empty path")
-		}
+	head, tail := path.Split()
 
-		x.makeNotNil()
-
-		head, tail := path.Split()
-
-		if tail.IsEmpty() {
-			(*x)[head] = value
-			return nil
-		}
-
-		subElement, ok := element.GetElement(head)
-
-		if !ok {
-			return derp.NewInternalError("mapof.Object.SetObject", "Unknown property", head)
-		}
-
-		tempValue := (*x)[head]
-
-		if err := schema.SetElement(&tempValue, subElement, tail, value); err != nil {
-			return derp.Wrap(err, "mapof.Object.SetObject", "Error setting value", path)
-		}
-
-		// Reapply the updated value to the map
-		(*x)[head] = tempValue
-
+	if tail.IsEmpty() {
+		(*x)[head] = value
 		return nil
-	*/
+	}
+
+	// Fall through means we need to make a child map and set the remaining value in it.
+	subElement, ok := element.GetElement(head)
+
+	if !ok {
+		return derp.NewInternalError("mapof.Any.SetObject", "Unknown property", head)
+	}
+
+	var tempValue Any
+
+	// If we already have a mapof.Any, then it's ok to append to it
+	if subValue, ok := (*x)[head].(Any); ok {
+		tempValue = subValue
+	} else {
+		// Otherwise, initialize a new mapof.Any
+		tempValue = make(Any)
+	}
+
+	if err := schema.SetElement(&tempValue, subElement, tail, value); err != nil {
+		return derp.Wrap(err, "mapof.Any.SetObject", "Error setting value", path)
+	}
+
+	// Reapply the updated value to the map
+	(*x)[head] = tempValue
+
+	return nil
 }
 
 func (x *Any) Remove(key string) bool {

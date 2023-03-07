@@ -19,3 +19,22 @@ func TestAny(t *testing.T) {
 
 	require.NotNil(t, s.Set(&v, "foo.bar", "baz"))
 }
+
+func TestAny_Any(t *testing.T) {
+
+	s := schema.New(schema.Object{
+		Wildcard: schema.Any{},
+	})
+
+	v := NewAny()
+
+	require.Nil(t, testTable(s, &v, []testTableItem{
+		{"foo.bar", "baz"},
+		{"itsy.bitsy.spider.went", "up the water spout"},
+		{"string", "value"},
+		{"int", int(42)},
+		{"int64", int64(42)},
+		{"float64", float64(42)},
+		{"bool", true},
+	}))
+}

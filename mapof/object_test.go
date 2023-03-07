@@ -57,3 +57,8 @@ func TestObject(t *testing.T) {
 		require.Equal(t, "subvalue.2.2", value)
 	}
 }
+
+func TestObjectConversion(t *testing.T) {
+	var value map[string][]string = make(Object[[]string])
+	t.Log(value)
+}
