@@ -29,6 +29,10 @@ func (element Any) Clean(value any) error {
 	return nil
 }
 
+func (element Any) GetElement(name string) (Element, bool) {
+	return element, true
+}
+
 // MarshalMap populates the object data into a map[string]any
 func (element Any) MarshalMap() map[string]any {
 
