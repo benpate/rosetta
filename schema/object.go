@@ -64,7 +64,7 @@ func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
 		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Error validating property", object, name, element)
+			return derp.Wrap(err, "schema.Object.Validate", "Error validating property", name)
 		}
 	}
 
