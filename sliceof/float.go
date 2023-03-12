@@ -41,10 +41,12 @@ func (x Float) Last() float64 {
 	return 0
 }
 
-func (x Float) Reverse() {
+func (x Float) Reverse() Float {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
+
+	return x
 }
 
 func (x Float) Contains(value float64) bool {

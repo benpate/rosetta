@@ -41,10 +41,12 @@ func (x Bool) Last() bool {
 	return false
 }
 
-func (x Bool) Reverse() {
+func (x Bool) Reverse() Bool {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
+
+	return x
 }
 
 func (x Bool) Contains(value bool) bool {

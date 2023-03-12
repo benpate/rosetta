@@ -40,10 +40,12 @@ func (x Any) Last() any {
 	return nil
 }
 
-func (x Any) Reverse() {
+func (x Any) Reverse() Any {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
+
+	return x
 }
 
 func (x *Any) Append(values ...any) {

@@ -38,10 +38,12 @@ func (x Object[T]) Last() T {
 	return result
 }
 
-func (x Object[T]) Reverse() {
+func (x Object[T]) Reverse() Object[T] {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
+
+	return x
 }
 
 func (x *Object[T]) Append(values ...T) {
