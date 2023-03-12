@@ -17,7 +17,11 @@ func TestAny(t *testing.T) {
 
 	v := NewAny()
 
-	require.NotNil(t, s.Set(&v, "foo.bar", "baz"))
+	require.Nil(t, s.Set(&v, "foo.bar", "baz"))
+
+	value, err := s.Get(&v, "foo.bar")
+	require.Nil(t, err)
+	require.Equal(t, "baz", value)
 }
 
 func TestAny_Any(t *testing.T) {
