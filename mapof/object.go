@@ -1,6 +1,7 @@
 package mapof
 
 import (
+	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 
 	"github.com/benpate/derp"
@@ -70,14 +71,22 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 	return nil
 }
 
-func (x *Object[T]) Remove(key string) bool {
-	x.makeNotNil()
-	delete(*x, key)
+func (object *Object[T]) Remove(key string) bool {
+	object.makeNotNil()
+	delete(*object, key)
 	return true
 }
 
-func (x *Object[T]) makeNotNil() {
-	if *x == nil {
-		*x = make(Object[T])
+func (object *Object[T]) makeNotNil() {
+	if *object == nil {
+		*object = make(Object[T])
 	}
+}
+
+/******************************************
+ * Other Methods
+ ******************************************/
+
+func (object Object[T]) IsZeroValue(name string) bool {
+	return convert.IsZeroValue(object[name])
 }

@@ -209,6 +209,10 @@ func (x *Any) Remove(key string) bool {
  * Other Getter Interfaces
  ******************************************/
 
+func (m Any) IsZeroValue(name string) bool {
+	return convert.IsZeroValue(m[name])
+}
+
 // GetSliceOfString returns a named option as a slice of strings
 func (m Any) GetSliceOfString(name string) []string {
 	return convert.SliceOfString(m[name])

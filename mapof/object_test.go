@@ -62,3 +62,12 @@ func TestObjectConversion(t *testing.T) {
 	var value map[string][]string = make(Object[[]string])
 	t.Log(value)
 }
+
+func TestObjectZero(t *testing.T) {
+	var value = NewObject[string]()
+	require.Equal(t, "", value["this-is-zero"])
+	require.True(t, value.IsZeroValue("this-is-zero"))
+
+	value["exists"] = "true"
+	require.False(t, value.IsZeroValue("exists"))
+}

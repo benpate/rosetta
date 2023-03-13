@@ -42,3 +42,12 @@ func TestAny_Any(t *testing.T) {
 		{"bool", true},
 	}))
 }
+
+func TestAny_Zero(t *testing.T) {
+	var value = NewAny()
+	require.Equal(t, nil, value["this-is-zero"])
+	require.True(t, value.IsZeroValue("this-is-zero"))
+
+	value["exists"] = "true"
+	require.False(t, value.IsZeroValue("exists"))
+}
