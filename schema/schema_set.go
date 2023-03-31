@@ -57,7 +57,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.NewInternalError(location, "Unknown property", head, element)
+		return derp.NewInternalError(location, "Unknown property", head)
 	}
 
 	// Different interfaces are required for different types of objects

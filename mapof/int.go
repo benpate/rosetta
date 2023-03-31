@@ -18,6 +18,22 @@ func (x Int) Keys() []string {
 	return keys
 }
 
+func (x Int) Equal(value Int) bool {
+	// Lengths must be identical
+	if len(x) != len(value) {
+		return false
+	}
+
+	// Items at each index must be identical
+	for key := range x {
+		if x[key] != value[key] {
+			return false
+		}
+	}
+
+	return true
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/
