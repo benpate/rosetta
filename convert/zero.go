@@ -45,6 +45,9 @@ func IsZeroValue(value any) bool {
 	case []any:
 		return len(v) == 0
 
+	case LengthGetter:
+		return v.Length() == 0
+
 	case Nuller:
 		return v.IsNull()
 	case Inter:
