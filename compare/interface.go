@@ -1,6 +1,9 @@
 package compare
 
-import "github.com/benpate/derp"
+import (
+	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/convert"
+)
 
 // Interface tries its best to muscle value2 and value2 into compatable types so that they can be compared.
 // If value1 is LESS THAN value2, it returns -1, nil
@@ -12,6 +15,9 @@ import "github.com/benpate/derp"
 func Interface(value1 any, value2 any) (int, error) {
 
 	switch v1 := value1.(type) {
+
+	case bool:
+		return Bool(v1, convert.Bool(value2)), nil
 
 	case int:
 

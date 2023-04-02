@@ -6,6 +6,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestInterfaceBool(t *testing.T) {
+
+	require.True(t, Equal(true, true))
+	require.False(t, Equal(true, false))
+	require.False(t, Equal(false, true))
+	require.True(t, Equal(false, false))
+}
+
 func TestInterfaceInt(t *testing.T) {
 
 	{
