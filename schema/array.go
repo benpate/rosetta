@@ -4,16 +4,18 @@ import (
 	"strconv"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/exp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 )
 
 // Array represents an array data type within a JSON-Schema.
 type Array struct {
-	Items     Element
-	MinLength int
-	MaxLength int
-	Required  bool
+	Items      Element `json:"items"`
+	MinLength  int     `json:"minLength"`
+	MaxLength  int     `json:"maxLength"`
+	Required   bool    `json:"required"`
+	RequiredIf string  `json:"required-if"`
 }
 
 /***********************************
@@ -88,6 +90,42 @@ func (element Array) Validate(object any) error {
 	return nil
 }
 
+func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+
+	if element.RequiredIf != "" {
+
+		localValue, err := schema.get(globalValue, element, path)
+
+		if err != nil {
+			return derp.Wrap(err, "schema.Any.ValidateRequiredIf", "Error getting value for path", path)
+		}
+
+		lengthGetter, ok := localValue.(LengthGetter)
+
+		if !ok {
+			return derp.NewValidationError("Array must implement LengthGetter interface")
+		}
+
+		length := lengthGetter.Length()
+
+		if length == 0 {
+			if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			}
+		}
+
+		for index := 0; index < length; index++ {
+			subPath := path.PushTail(strconv.Itoa(index))
+
+			if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
+				return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
+			}
+		}
+	}
+
+	return nil
+}
+
 func (element Array) Clean(value any) error {
 	// TODO: HIGH: Implement the Clean method for Array
 	return nil
@@ -129,10 +167,12 @@ func (element Array) Inherit(parent Element) {
 func (element Array) MarshalMap() map[string]any {
 
 	return map[string]any{
-		"type":      TypeArray,
-		"items":     element.Items.MarshalMap(),
-		"minLength": element.MinLength,
-		"maxLength": element.MaxLength,
+		"type":        TypeArray,
+		"items":       element.Items.MarshalMap(),
+		"minLength":   element.MinLength,
+		"maxLength":   element.MaxLength,
+		"required":    element.Required,
+		"required-if": element.RequiredIf,
 	}
 }
 
@@ -146,9 +186,10 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 	}
 
 	element.Items, err = UnmarshalMap(data["items"])
-	element.Required = convert.Bool(data["required"])
 	element.MinLength = convert.Int(data["minLength"])
 	element.MaxLength = convert.Int(data["maxLength"])
+	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	return err
 }

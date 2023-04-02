@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/exp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
@@ -12,13 +13,14 @@ import (
 
 // String represents a string data type within a JSON-Schema.
 type String struct {
-	Default   string
-	MinLength int
-	MaxLength int
-	Enum      []string
-	Pattern   string
-	Format    string
-	Required  bool
+	Default    string   `json:"default"`
+	MinLength  int      `json:"minLength"`
+	MaxLength  int      `json:"maxLength"`
+	Enum       []string `json:"enum"`
+	Pattern    string   `json:"pattern"`
+	Format     string   `json:"format"`
+	Required   bool     `json:"required"`
+	RequiredIf string   `json:"required-if"`
 }
 
 /***********************************
@@ -82,12 +84,27 @@ func (element String) Validate(value any) error {
 	return nil
 }
 
+// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element String) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+	if element.RequiredIf != "" {
+		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
+				return derp.Wrap(err, "schema.String.ValidateRequiredIf", "Error getting value for path", path)
+			} else if convert.IsZeroValue(localValue) {
+				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			}
+		}
+	}
+	return nil
+}
+
 func (element String) Clean(value any) error {
 	// TODO: HIGH: Implement the "Clean" method for the String type
 	return nil
 }
 
 func (element String) GetElement(name string) (Element, bool) {
+
 	if name == "" {
 		return element, true
 	}
@@ -143,6 +160,10 @@ func (element String) MarshalMap() map[string]any {
 		result["enum"] = element.Enum
 	}
 
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
+	}
+
 	return result
 }
 
@@ -160,8 +181,9 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.MaxLength = convert.Int(data["maxLength"])
 	element.Pattern = convert.String(data["pattern"])
 	element.Format = convert.String(data["format"])
-	element.Required = convert.Bool(data["required"])
 	element.Enum = convert.SliceOfString(data["enum"])
+	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	return err
 }

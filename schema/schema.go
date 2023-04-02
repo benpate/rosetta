@@ -5,7 +5,10 @@ import (
 	"reflect"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/exp"
+	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 )
 
 // Schema defines a (simplified) JSON-Schema object, that can be Marshalled/Unmarshalled to JSON.
@@ -30,12 +33,19 @@ func New(element Element) Schema {
 // provided value is not valid, then an error is returned.
 func (schema Schema) Validate(value any) error {
 
+	// RULE: Schema element cannot be nil
 	if isNil(schema.Element) {
 		return derp.NewInternalError("schema.Schema.Validate", "Schema is nil")
 	}
 
+	// Validate all elements in the value
 	if err := schema.Element.Validate(value); err != nil {
 		return derp.Wrap(err, "schema.Schema.Validate", "Error validating value", value)
+	}
+
+	// Handle special cases for "required-if" fields
+	if err := schema.ValidateRequiredIf(value); err != nil {
+		return derp.Wrap(err, "schema.Schema.Validate", "Error validating required-if fields", value)
 	}
 
 	return nil
@@ -46,16 +56,59 @@ func (schema Schema) Validate(value any) error {
 // fit the schema, then an error is returned
 func (schema Schema) Clean(value any) error {
 
-	// TODO: CRITICAL: "Clean" functions are not yet implemented
+	// RULE: Schema element cannot be nil
 	if isNil(schema.Element) {
 		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
 	}
 
+	// TODO: CRITICAL: "Clean" functions are not yet implemented
 	if err := schema.Element.Clean(value); err != nil {
 		return derp.Wrap(err, "schema.Schema.Clean", "Error cleaning value", value)
 	}
 
+	// Handle special cases for "required-if" fields
+	if err := schema.ValidateRequiredIf(value); err != nil {
+		return derp.Wrap(err, "schema.Schema.Validate", "Error validating required-if fields", value)
+	}
+
 	return nil
+}
+
+// Match returns TRUE if the provided value (as accessed via this schema) matches
+// the provided expression.  This is useful for server-side data validation.
+func (schema Schema) Match(value any, expression exp.Expression) bool {
+
+	// Evaluate the predicate
+	return expression.Match(func(predicate exp.Predicate) bool {
+
+		fieldValue, err := schema.Get(value, predicate.Field)
+
+		if err != nil {
+			return false
+		}
+
+		switch predicate.Operator {
+		case exp.OperatorEqual:
+			return compare.Equal(fieldValue, predicate.Value)
+		case exp.OperatorGreaterThan:
+			return compare.GreaterThan(fieldValue, predicate.Value)
+		case exp.OperatorLessThan:
+			return compare.LessThan(fieldValue, predicate.Value)
+
+		case exp.OperatorNotEqual:
+			return !compare.Equal(fieldValue, predicate.Value)
+		case exp.OperatorGreaterOrEqual:
+			return !compare.LessThan(fieldValue, predicate.Value)
+		case exp.OperatorLessOrEqual:
+			return !compare.GreaterThan(fieldValue, predicate.Value)
+		}
+
+		return false
+	})
+}
+
+func (schema Schema) ValidateRequiredIf(value any) error {
+	return schema.Element.ValidateRequiredIf(schema, list.ByDot(""), value)
 }
 
 /******************************************

@@ -114,18 +114,6 @@ func TestObject_Create(t *testing.T) {
 	require.Equal(t, "Sarah Connor", result)
 }
 
-func TestObject_Validate(t *testing.T) {
-
-	object := newTestStructA()
-	schema := New(testStructA_Schema())
-
-	{
-		err := schema.Validate(&object)
-		spew.Config.DisableMethods = true
-		require.Nil(t, err)
-	}
-}
-
 func TestObject_Wildcard(t *testing.T) {
 
 	schema := New(Object{
@@ -136,4 +124,16 @@ func TestObject_Wildcard(t *testing.T) {
 
 	require.True(t, ok)
 	require.Equal(t, String{Format: "email", MinLength: 42}, element)
+}
+
+func TestObject_Validate(t *testing.T) {
+
+	object := newTestStructA()
+	schema := New(testStructA_Schema())
+
+	{
+		err := schema.Validate(&object)
+		spew.Config.DisableMethods = true
+		require.Nil(t, err)
+	}
 }

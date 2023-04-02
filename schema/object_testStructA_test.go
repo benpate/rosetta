@@ -5,6 +5,7 @@ type testStructA struct {
 	Active   bool
 	Latitude float64
 	Array    testArrayA
+	Optional string
 }
 
 func newTestStructA() testStructA {
@@ -13,6 +14,7 @@ func newTestStructA() testStructA {
 		Active:   true,
 		Latitude: 45.123456,
 		Array:    newTestArrayA(),
+		Optional: "",
 	}
 }
 
@@ -23,6 +25,7 @@ func testStructA_Schema() Element {
 			"active":   Boolean{},
 			"latitude": Number{BitSize: 64},
 			"array":    testArrayA_Schema(),
+			"optional": String{RequiredIf: "name is Aethelflad"},
 		},
 	}
 }
@@ -53,8 +56,11 @@ func (t *testStructA) GetObject(path string) (any, bool) {
 }
 
 func (t testStructA) GetStringOK(path string) (string, bool) {
-	if path == "name" {
+	switch path {
+	case "name":
 		return t.Name, true
+	case "optional":
+		return t.Optional, true
 	}
 	return "", false
 }
@@ -80,8 +86,12 @@ func (t *testStructA) SetFloat(path string, value float64) bool {
 }
 
 func (t *testStructA) SetString(path string, value string) bool {
-	if path == "name" {
+	switch path {
+	case "name":
 		t.Name = value
+		return true
+	case "optional":
+		t.Optional = value
 		return true
 	}
 	return false

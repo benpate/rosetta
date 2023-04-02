@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 )
 
 // Element interface wraps all of the methods required for schema elements.
@@ -18,6 +19,9 @@ type Element interface {
 
 	// Validate validates the provided value
 	Validate(value any) error
+
+	// ValidateRequiredIf handles conditional validation of a required field
+	ValidateRequiredIf(schema Schema, path list.List, globalValue any) error
 
 	// Clean updates a value to match the schema.  The value must be a pointer.
 	Clean(value any) error

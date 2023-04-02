@@ -8,10 +8,10 @@ import (
 
 // Object represents an object data type within a JSON-Schema.
 type Object struct {
-	Properties    ElementMap
-	Wildcard      Element
-	RequiredProps []string
-	Required      bool
+	Properties ElementMap `json:"properties"`
+	Wildcard   Element    `json:"wildcard"`
+	Required   bool       `json:"required"`
+	RequiredIF string     `json:"required-if"`
 }
 
 /***********************************
@@ -71,6 +71,19 @@ func (element Object) Validate(object any) error {
 	return nil
 }
 
+// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+
+	for name, subElement := range element.Properties {
+		subPath := path.PushTail(name)
+		if err := subElement.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
+			return derp.Wrap(err, "schema.Object.ValidateRequiredIf", "Error validating property", subPath.String())
+		}
+	}
+
+	return nil
+}
+
 func (element Object) Clean(value any) error {
 	// TODO: HIGH: Implement the Clean method for the Object type
 	return nil
@@ -107,11 +120,18 @@ func (element Object) MarshalMap() map[string]any {
 	result := map[string]any{
 		"type":       TypeObject,
 		"properties": properties,
-		"required":   element.RequiredProps,
 	}
 
 	if element.Wildcard != nil {
 		result["wildcard"] = element.Wildcard.MarshalMap()
+	}
+
+	if element.Required {
+		result["required"] = true
+	}
+
+	if element.RequiredIF != "" {
+		result["required-if"] = element.RequiredIF
 	}
 
 	return result
@@ -156,33 +176,6 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 	if wildcard, ok := data["wildcard"].(map[string]any); ok {
 		if wildcardObject, err := UnmarshalMap(wildcard); err == nil {
 			element.Wildcard = wildcardObject
-		}
-	}
-
-	// Handle "standards" required as an array of strings.
-	if required, ok := data["required"].([]any); ok {
-
-		element.RequiredProps = convert.SliceOfString(required)
-
-		for _, name := range element.RequiredProps {
-
-			if property, ok := element.Properties[name]; ok {
-
-				switch p := property.(type) {
-				case Array:
-					p.Required = true
-				case Boolean:
-					p.Required = true
-				case Integer:
-					p.Required = true
-				case Number:
-					p.Required = true
-				case Object:
-					p.Required = true
-				case String:
-					p.Required = true
-				}
-			}
 		}
 	}
 

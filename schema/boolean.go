@@ -4,14 +4,17 @@ import (
 	"encoding/json"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/exp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
 )
 
 // Boolean represents a boolean data type within a JSON-Schema.
 type Boolean struct {
-	Default  null.Bool `json:"default"`
-	Required bool
+	Default    null.Bool `json:"default"`
+	Required   bool      `json:"required"`
+	RequiredIf string    `json:"required-if"`
 }
 
 /***********************************
@@ -40,6 +43,20 @@ func (element Boolean) Validate(object any) error {
 		return derp.NewValidationError(" boolean value is required")
 	}
 
+	return nil
+}
+
+// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+	if element.RequiredIf != "" {
+		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
+				return derp.Wrap(err, "schema.Boolean.ValidateRequiredIf", "Error getting value for path", path)
+			} else if convert.IsZeroValue(localValue) {
+				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			}
+		}
+	}
 	return nil
 }
 
@@ -82,6 +99,10 @@ func (element Boolean) MarshalMap() map[string]any {
 
 	if element.Required {
 		result["required"] = true
+	}
+
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
 	}
 
 	return result

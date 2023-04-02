@@ -4,8 +4,10 @@ import (
 	"math"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/exp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
 )
 
@@ -17,7 +19,8 @@ type Number struct {
 	MultipleOf null.Float `json:"multipleOf"`
 	BitSize    int        `json:"bitSize"`
 	Enum       []float64  `json:"enum"`
-	Required   bool
+	Required   bool       `json:"required"`
+	RequiredIf string     `json:"required-if"`
 }
 
 /***********************************
@@ -84,6 +87,20 @@ func (element Number) Validate(value any) error {
 	return nil
 }
 
+// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element Number) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+	if element.RequiredIf != "" {
+		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
+				return derp.Wrap(err, "schema.Number.ValidateRequiredIf", "Error getting value for path", path)
+			} else if convert.IsZeroValue(localValue) {
+				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			}
+		}
+	}
+	return nil
+}
+
 func (element Number) Clean(value any) error {
 	// TODO: HIGH: Implement the "Clean" method for the Number type
 	return nil
@@ -136,6 +153,14 @@ func (element Number) MarshalMap() map[string]any {
 		result["enum"] = element.Enum
 	}
 
+	if element.Required {
+		result["required"] = true
+	}
+
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
+	}
+
 	return result
 }
 
@@ -151,8 +176,9 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	element.Default = convert.NullFloat(data["default"])
 	element.Minimum = convert.NullFloat(data["minimum"])
 	element.Maximum = convert.NullFloat(data["maximum"])
-	element.Required = convert.Bool(data["required"])
 	element.Enum = convert.SliceOfFloat(data["enum"])
+	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	return err
 }
