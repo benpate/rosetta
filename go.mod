@@ -3,7 +3,7 @@ module github.com/benpate/rosetta
 go 1.18
 
 require (
-	github.com/benpate/derp v0.27.0
+	github.com/benpate/derp v0.27.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.22
 	github.com/stretchr/testify v1.8.2
