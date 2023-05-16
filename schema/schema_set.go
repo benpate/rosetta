@@ -65,7 +65,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 
 	case Any:
 
-		// ObjectSetter interface is required for Maps
+		// ObjectSetter interface is required to set values inside of Maps (grr...)
 		if setter, ok := object.(ObjectSetter); ok {
 			return setter.SetObject(element, path, value)
 		}

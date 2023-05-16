@@ -42,10 +42,6 @@ func validate_array(element Array, object any, name string) error {
 	if getter, ok := object.(PointerGetter); ok {
 		if value, ok := getter.GetPointer(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_array", "Required array property is missing", element, object, name)
-		} else {
-			return nil
 		}
 	}
 
@@ -59,10 +55,14 @@ func validate_boolean(element Boolean, object any, name string) error {
 	if getter, ok := object.(BoolGetter); ok {
 		if value, ok := getter.GetBoolOK(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_boolean", "Required bool property is missing", element, object, name)
-		} else {
-			return nil
+		}
+	}
+
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
+			if typed, ok := value.(*bool); ok {
+				return element.Validate(*typed)
+			}
 		}
 	}
 
@@ -84,10 +84,14 @@ func validate_int32(element Integer, object any, name string) error {
 	if getter, ok := object.(IntGetter); ok {
 		if value, ok := getter.GetIntOK(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_int32", "Required int32 property is missing", element, object, name)
-		} else {
-			return nil
+		}
+	}
+
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
+			if typed, ok := value.(*int); ok {
+				return element.Validate(*typed)
+			}
 		}
 	}
 
@@ -99,10 +103,14 @@ func validate_int64(element Integer, object any, name string) error {
 	if getter, ok := object.(Int64Getter); ok {
 		if value, ok := getter.GetInt64OK(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_int64", "Required int64 property is missing", element, object, name)
-		} else {
-			return nil
+		}
+	}
+
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
+			if typed, ok := value.(*int64); ok {
+				return element.Validate(*typed)
+			}
 		}
 	}
 
@@ -111,17 +119,22 @@ func validate_int64(element Integer, object any, name string) error {
 
 // validate_number specifically validates Number sub-elements
 func validate_number(element Number, object any, name string) error {
+
 	if getter, ok := object.(FloatGetter); ok {
 		if value, ok := getter.GetFloatOK(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_number", "Required number property is missing", element, object, name)
-		} else {
-			return nil
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_number", "To validate this property, the Object must be a 'FloatGetter'", object, name)
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
+			if typed, ok := value.(*float64); ok {
+				return element.Validate(*typed)
+			}
+		}
+	}
+
+	return derp.NewInternalError("schema.validate_number", "To validate this property, the Object must be a 'PointerGetter' or a 'FloatGetter'", object, name)
 }
 
 // validate_object specifically validates Object sub-elements
@@ -130,10 +143,6 @@ func validate_object(element Object, object any, name string) error {
 	if getter, ok := object.(PointerGetter); ok {
 		if value, ok := getter.GetPointer(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_object", "Required object property is missing", element, object, name)
-		} else {
-			return nil
 		}
 	}
 
@@ -145,12 +154,20 @@ func validate_string(element String, object any, name string) error {
 	if getter, ok := object.(StringGetter); ok {
 		if value, ok := getter.GetStringOK(name); ok {
 			return element.Validate(value)
-		} else if element.Required {
-			return derp.NewInternalError("schema.validate_string", "Required string property is missing", element, object, name)
-		} else {
-			return nil
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_string", "To validate this property, the Object must be a 'StringGetter'", element, object, name)
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
+			if typed, ok := value.(*string); ok {
+				return element.Validate(*typed)
+			}
+		}
+	}
+
+	if element.Required {
+		return derp.NewValidationError("schema.validate_string", "Required string property is missing", element, object, name)
+	}
+
+	return derp.NewInternalError("schema.validate_string", "To validate this property, the Object must be a 'PointerGetter' or a 'StringGetter'", element, object, name)
 }
