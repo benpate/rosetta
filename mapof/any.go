@@ -152,7 +152,7 @@ func (x *Any) makeNotNil() {
  * Tree Traversal
  ****************************************/
 
-func (x Any) GetObject(key string) (any, bool) {
+func (x Any) GetPointer(key string) (any, bool) {
 	result, ok := x[key]
 	return result, ok
 }

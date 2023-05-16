@@ -33,10 +33,6 @@ type Int64Getter interface {
 	GetInt64OK(string) (int64, bool)
 }
 
-type ObjectGetter interface {
-	GetObject(string) (any, bool)
-}
-
 type StringGetter interface {
 	GetStringOK(string) (string, bool)
 }
@@ -44,6 +40,11 @@ type StringGetter interface {
 /******************************************
  * Special-Case Getter Interfaces
  ******************************************/
+
+// PointerGetter allows objects to return a pointer to a child object
+type PointerGetter interface {
+	GetPointer(string) (any, bool)
+}
 
 // LengthGetter allows arrays to report their total length
 type LengthGetter interface {

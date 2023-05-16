@@ -117,7 +117,7 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
-func (x *Any) GetObject(key string) (any, bool) {
+func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceIndex(key); ok {
 		growSlice(x, index)
 		return &(*x)[index], true
@@ -174,7 +174,7 @@ func (x *Any) SetString(key string, value string) bool {
 }
 
 func (x *Any) SetValue(value any) error {
-	*x = convert.SliceOfInterface(value)
+	*x = convert.SliceOfAny(value)
 	return nil
 }
 

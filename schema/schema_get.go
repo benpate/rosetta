@@ -29,12 +29,12 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 
 	case Any, Array, Object:
 
-		getter, ok := object.(ObjectGetter)
+		getter, ok := object.(PointerGetter)
 		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be an ObjectGetter", object)
+			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a PointerGetter", object)
 		}
 
-		subObject, ok := getter.GetObject(head)
+		subObject, ok := getter.GetPointer(head)
 		if !ok {
 			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get object", head, object)
 		}
@@ -43,84 +43,94 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 
 	case Boolean:
 
-		getter, ok := object.(BoolGetter)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a BoolGetter", object)
+		if getter, ok := object.(BoolGetter); ok {
+			if result, ok := getter.GetBoolOK(head); ok {
+				return result, nil
+			}
 		}
 
-		result, ok := getter.GetBoolOK(head)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get bool", head, object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*bool); ok {
+					return *value, nil
+				}
+			}
 		}
 
-		return result, nil
+		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get bool from BoolGetter or a PointerGettter", object)
 
 	case Integer:
 
 		if typed.BitSize == 64 {
 
-			getter, ok := object.(Int64Getter)
-
-			if !ok {
-				return nil, derp.NewInternalError("schema.Schema.get", "Object must be a Int64Getter", object)
+			if getter, ok := object.(Int64Getter); ok {
+				if result, ok := getter.GetInt64OK(head); ok {
+					return result, nil
+				}
 			}
 
-			result, ok := getter.GetInt64OK(head)
-
-			if !ok {
-				return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int64", head, object)
+			if getter, ok := object.(PointerGetter); ok {
+				if pointer, ok := getter.GetPointer(head); ok {
+					if value, ok := pointer.(*int64); ok {
+						return *value, nil
+					}
+				}
 			}
-			return result, nil
 
+			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int64 from Int64Getter or PointerGetter", object)
 		}
 
-		getter, ok := object.(IntGetter)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a IntGetter", object)
+		if getter, ok := object.(IntGetter); ok {
+			if result, ok := getter.GetIntOK(head); ok {
+				return result, nil
+			}
 		}
 
-		result, ok := getter.GetIntOK(head)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int", head, object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*int); ok {
+					return *value, nil
+				}
+			}
 		}
 
-		return result, nil
+		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int from IntGetter or PointerGetter", object)
 
 	case Number:
 
-		getter, ok := object.(FloatGetter)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a FloatGetter", object)
+		if getter, ok := object.(FloatGetter); ok {
+			if result, ok := getter.GetFloatOK(head); ok {
+				return result, nil
+			}
 		}
 
-		result, ok := getter.GetFloatOK(head)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get float", head, object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*float64); ok {
+					return *value, nil
+				}
+			}
 		}
 
-		return result, nil
+		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get float from FloatGetter or PointerGetter", object)
 
 	case String:
 
-		getter, ok := object.(StringGetter)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a StringGetter", object)
+		if getter, ok := object.(StringGetter); ok {
+			if result, ok := getter.GetStringOK(head); ok {
+				return result, nil
+			}
 		}
 
-		result, ok := getter.GetStringOK(head)
-
-		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get string", head, object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*string); ok {
+					return *value, nil
+				}
+			}
 		}
 
-		return result, nil
+		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get string from StringGetter or PointerGetter", object)
 	}
 
 	return nil, derp.NewInternalError("schema.Schema.get", "Unable to get property", path, object)

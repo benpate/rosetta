@@ -30,7 +30,7 @@ func (x Object[T]) Keys() []string {
  * Getter/Setter Interfaces
  ******************************************/
 
-func (object Object[T]) GetObject(name string) (any, bool) {
+func (object Object[T]) GetPointer(name string) (any, bool) {
 	value, ok := object[name]
 	return value, ok
 }

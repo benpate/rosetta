@@ -39,8 +39,8 @@ func validate(element Element, object any, name string) error {
 // validate_array specifically validates Array sub-elements
 func validate_array(element Array, object any, name string) error {
 
-	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObject(name); ok {
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
 			return element.Validate(value)
 		} else if element.Required {
 			return derp.NewInternalError("schema.validate_array", "Required array property is missing", element, object, name)
@@ -49,8 +49,8 @@ func validate_array(element Array, object any, name string) error {
 		}
 	}
 
-	// Fall through means that we don't have an ObjectGetter.  That's bad...
-	return derp.NewInternalError("schema.validate_array", "To validate this property, the Object must be an 'ObjectGetter'", object, name)
+	// Fall through means that we don't have a PointerGetter.  That's bad...
+	return derp.NewInternalError("schema.validate_array", "To validate this property, the Object must be a 'PointerGetter'", object, name)
 }
 
 // validate_boolean specifically validates Boolean sub-elements
@@ -127,8 +127,8 @@ func validate_number(element Number, object any, name string) error {
 // validate_object specifically validates Object sub-elements
 func validate_object(element Object, object any, name string) error {
 
-	if getter, ok := object.(ObjectGetter); ok {
-		if value, ok := getter.GetObject(name); ok {
+	if getter, ok := object.(PointerGetter); ok {
+		if value, ok := getter.GetPointer(name); ok {
 			return element.Validate(value)
 		} else if element.Required {
 			return derp.NewInternalError("schema.validate_object", "Required object property is missing", element, object, name)
@@ -137,7 +137,7 @@ func validate_object(element Object, object any, name string) error {
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_object", "To validate this property, the Object must be an 'ObjectGetter'", object, name)
+	return derp.NewInternalError("schema.validate_object", "To validate this property, the Object must be a 'PointerGetter'", object, name)
 }
 
 // validate_string specifically validates String sub-elements

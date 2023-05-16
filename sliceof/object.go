@@ -54,7 +54,7 @@ func (x *Object[T]) Append(values ...T) {
  * Tree Traversal
  ****************************************/
 
-func (x *Object[T]) GetObject(name string) (any, bool) {
+func (x *Object[T]) GetPointer(name string) (any, bool) {
 
 	// Get a valid index for the slice
 	if index, ok := sliceIndex(name); ok {

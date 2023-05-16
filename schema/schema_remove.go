@@ -15,9 +15,9 @@ func (schema Schema) remove(object any, path list.List) bool {
 	// keep digging into it before we can remove the value.
 	if !tail.IsEmpty() {
 
-		if getter, ok := object.(ObjectGetter); ok {
+		if getter, ok := object.(PointerGetter); ok {
 
-			if child, ok := getter.GetObject(head); ok {
+			if child, ok := getter.GetPointer(head); ok {
 				return schema.remove(child, tail)
 			}
 		}

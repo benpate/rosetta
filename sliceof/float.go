@@ -53,6 +53,14 @@ func (x Float) Contains(value float64) bool {
 	return slice.Contains(x, value)
 }
 
+func (x Float) ContainsAny(values ...float64) bool {
+	return slice.ContainsAny(x, values...)
+}
+
+func (x Float) ContainsAll(values ...float64) bool {
+	return slice.ContainsAll(x, values...)
+}
+
 func (x Float) Equal(value []float64) bool {
 	return slice.Equal(x, value)
 }

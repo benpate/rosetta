@@ -12,3 +12,23 @@ func Contains[T comparable](slice []T, value T) bool {
 
 	return false
 }
+
+// ContainsAny returns TRUE if the slice contains ANY of the provided values
+func ContainsAny[T comparable](slice []T, values ...T) bool {
+	for _, value := range values {
+		if Contains(slice, value) {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsAll returns TRUE if the slice contains ALL of the provided values
+func ContainsAll[T comparable](slice []T, values ...T) bool {
+	for _, value := range values {
+		if !Contains(slice, value) {
+			return false
+		}
+	}
+	return true
+}

@@ -57,7 +57,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.NewInternalError(location, "Unknown property", head)
+		return derp.NewInternalError(location, "Property does not exist in schema", head)
 	}
 
 	// Different interfaces are required for different types of objects
@@ -78,72 +78,110 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			return setter.SetObject(element, path, value)
 		}
 
-		// ObjectGetter works for Structs, Slices, and Arrays
-		if getter, ok := object.(ObjectGetter); ok {
-			if subObject, ok := getter.GetObject(head); ok {
-				return SetElement(subObject, typed, tail, value)
+		// PointerGetter works for Structs, Slices, and Arrays
+		if getter, ok := object.(PointerGetter); ok {
+			if subPointer, ok := getter.GetPointer(head); ok {
+				return SetElement(subPointer, typed, tail, value)
 			}
 		}
 
-		return derp.NewInternalError(location, "To set an 'Array' or 'Object' value, the target Object must be an ObjectSetter or ObjectGetter", object)
+		return derp.NewInternalError(location, "To set an 'Array' or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", object)
 
 	case Boolean:
+		boolValue, _ := convert.BoolOk(value, false)
 		if setter, ok := object.(BoolSetter); ok {
-			boolValue, _ := convert.BoolOk(value, false)
 			if setter.SetBool(head, boolValue) {
 				return nil
-			} else {
-				return derp.NewInternalError(location, "Unable to set boolean value", path, subElement, object)
 			}
 		}
 
-		return derp.NewInternalError(location, "To set a 'Boolean' value, the target Object must be a BoolSetter", object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*bool); ok {
+					*value = boolValue
+					return nil
+				}
+			}
+		}
+
+		return derp.NewInternalError(location, "To set a 'Boolean' value, the target Object must be a BoolSetter or PointerGetter", object)
 
 	case Integer:
 		if typed.BitSize == 64 {
+			int64Value, _ := convert.Int64Ok(value, 0)
 			if setter, ok := object.(Int64Setter); ok {
-				int64Value, _ := convert.Int64Ok(value, 0)
 				if setter.SetInt64(head, int64Value) {
 					return nil
-				} else {
-					return derp.NewInternalError(location, "Unable to set int64 value", path, subElement, object)
 				}
 			}
-			return derp.NewInternalError(location, "To set a 64-bit 'Integer' value, the target Object must be an Int64Setter", object)
+
+			if getter, ok := object.(PointerGetter); ok {
+				if pointer, ok := getter.GetPointer(head); ok {
+					if value, ok := pointer.(*int64); ok {
+						*value = int64Value
+						return nil
+					}
+				}
+			}
+
+			return derp.NewInternalError(location, "To set a 64-bit 'Integer' value, the target Object must be an Int64Setter or PointerGetter", object)
 		}
 
 		intValue, _ := convert.IntOk(value, 0)
 		if setter, ok := object.(IntSetter); ok {
 			if setter.SetInt(head, intValue) {
 				return nil
-			} else {
-				return derp.NewInternalError(location, "Unable to set int value", path, subElement, object)
 			}
 		}
-		return derp.NewInternalError(location, "To set an 'Integer' value, the target Object must be an IntSetter", object)
+
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*int); ok {
+					*value = intValue
+					return nil
+				}
+			}
+		}
+
+		return derp.NewInternalError(location, "To set an 'Integer' value, the target Object must be an IntSetter or PointerGetter", object)
 
 	case Number:
 		floatValue, _ := convert.FloatOk(value, 0)
 		if setter, ok := object.(FloatSetter); ok {
 			if setter.SetFloat(head, floatValue) {
 				return nil
-			} else {
-				return derp.NewInternalError(location, "Unable to set float value", path, subElement, object)
 			}
 		}
-		return derp.NewInternalError(location, "To set a 'Number' value, the target Object must be a FloatSetter", object)
+
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*float64); ok {
+					*value = floatValue
+					return nil
+				}
+			}
+		}
+
+		return derp.NewInternalError(location, "To set a 'Number' value, the target Object must be a FloatSetter or PointerGetter", object)
 
 	case String:
 		stringValue, _ := convert.StringOk(value, "")
 		if setter, ok := object.(StringSetter); ok {
 			if setter.SetString(head, stringValue) {
 				return nil
-			} else {
-				return derp.NewInternalError(location, "Unable to set string value", path, subElement, object)
 			}
 		}
 
-		return derp.NewInternalError(location, "To set a 'String' value, the target Object must be a StringSetter", object)
+		if getter, ok := object.(PointerGetter); ok {
+			if pointer, ok := getter.GetPointer(head); ok {
+				if value, ok := pointer.(*string); ok {
+					*value = stringValue
+					return nil
+				}
+			}
+		}
+
+		return derp.NewInternalError(location, "To set a 'String' value, the target Object must be a StringSetter or PointerGetter", object)
 	}
 
 	return derp.NewInternalError(location, "Unsupported element type", path, subElement, object)

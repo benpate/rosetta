@@ -199,7 +199,7 @@ func SliceOfMap(value any) []map[string]any {
 	case []any:
 		result := make([]map[string]any, len(value))
 		for index, v := range value {
-			result[index] = MapOfInterface(v)
+			result[index] = MapOfAny(v)
 		}
 		return result
 	}
@@ -252,10 +252,10 @@ func SliceOfBool(value any) []bool {
 	return make([]bool, 0)
 }
 
-// SliceOfInterface converts the value into a slice of any.
+// SliceOfAny converts the value into a slice of any.
 // It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
-func SliceOfInterface(value any) []any {
+func SliceOfAny(value any) []any {
 
 	if value == nil {
 		return make([]any, 0)
@@ -266,7 +266,7 @@ func SliceOfInterface(value any) []any {
 	case []any:
 		return value
 
-	case []string:
+	case []bool:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
@@ -280,6 +280,13 @@ func SliceOfInterface(value any) []any {
 		}
 		return result
 
+	case []int64:
+		result := make([]any, len(value))
+		for index, v := range value {
+			result[index] = v
+		}
+		return result
+
 	case []float64:
 		result := make([]any, len(value))
 		for index, v := range value {
@@ -287,7 +294,14 @@ func SliceOfInterface(value any) []any {
 		}
 		return result
 
-	case string, int, float64:
+	case []string:
+		result := make([]any, len(value))
+		for index, v := range value {
+			result[index] = v
+		}
+		return result
+
+	case bool, int, int64, float64, string:
 		return []any{value}
 	}
 
@@ -296,7 +310,7 @@ func SliceOfInterface(value any) []any {
 
 	switch valueOf.Kind() {
 	case reflect.Pointer:
-		return SliceOfInterface(valueOf.Elem().Interface())
+		return SliceOfAny(valueOf.Elem().Interface())
 
 	case reflect.Array, reflect.Slice:
 		length := valueOf.Len()

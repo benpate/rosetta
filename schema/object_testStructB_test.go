@@ -45,7 +45,7 @@ func (t testStructB) GetInt64OK(path string) (int64, bool) {
 	return 0, false
 }
 
-func (t *testStructB) GetObject(path string) (any, bool) {
+func (t *testStructB) GetPointer(path string) (any, bool) {
 	if path == "array" {
 		return &t.Array, true
 	}
