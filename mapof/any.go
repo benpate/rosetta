@@ -142,6 +142,25 @@ func (x *Any) SetString(key string, value string) bool {
 	return true
 }
 
+// Append adds a new value to the provided key. If a value already exists for this key
+// then it will be forced into a slice of values.
+func (x *Any) Append(key string, value any) {
+	x.makeNotNil()
+
+	if original, ok := (*x)[key]; ok {
+
+		if list, ok := original.([]any); ok {
+			(*x)[key] = append(list, value)
+			return
+		}
+
+		(*x)[key] = []any{original, value}
+		return
+	}
+
+	(*x)[key] = []any{value}
+}
+
 func (x *Any) makeNotNil() {
 	if *x == nil {
 		*x = make(Any)
