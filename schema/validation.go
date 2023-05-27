@@ -66,7 +66,11 @@ func validate_boolean(element Boolean, object any, name string) error {
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_boolean", "To validate this property, the Object must be a 'BoolGetter'", object, name)
+	if element.Required {
+		return derp.NewValidationError("schema.validate_boolean", "Required boolean property is missing", element, object, name)
+	}
+
+	return nil
 }
 
 // validate_integer specifically validates Integer sub-elements
@@ -95,7 +99,11 @@ func validate_int32(element Integer, object any, name string) error {
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_int32", "To validate this property, the Object must be an 'IntGetter'", object, name)
+	if element.Required {
+		return derp.NewValidationError("schema.validate_int32", "Required int32 property is missing", element, object, name)
+	}
+
+	return nil
 }
 
 // validate_number specifically validates int64 sub-elements
@@ -114,7 +122,11 @@ func validate_int64(element Integer, object any, name string) error {
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_int64", "To validate this property, the Object must be an 'Int64Getter'", object, name)
+	if element.Required {
+		return derp.NewValidationError("schema.validate_int64", "Required int64 property is missing", element, object, name)
+	}
+
+	return nil
 }
 
 // validate_number specifically validates Number sub-elements
@@ -134,7 +146,11 @@ func validate_number(element Number, object any, name string) error {
 		}
 	}
 
-	return derp.NewInternalError("schema.validate_number", "To validate this property, the Object must be a 'PointerGetter' or a 'FloatGetter'", object, name)
+	if element.Required {
+		return derp.NewValidationError("schema.validate_number", "Required number property is missing", element, object, name)
+	}
+
+	return nil
 }
 
 // validate_object specifically validates Object sub-elements
@@ -169,5 +185,5 @@ func validate_string(element String, object any, name string) error {
 		return derp.NewValidationError("schema.validate_string", "Required string property is missing", element, object, name)
 	}
 
-	return derp.NewInternalError("schema.validate_string", "To validate this property, the Object must be a 'PointerGetter' or a 'StringGetter'", element, object, name)
+	return nil
 }
