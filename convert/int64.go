@@ -74,7 +74,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 			return result, true
 		}
 
-		return result, true
+		return defaultValue, false
 
 		// []string is useful for parsing url.Values data
 	case []string:
