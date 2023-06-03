@@ -76,7 +76,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 
 		return defaultValue, false
 
-		// []string is useful for parsing url.Values data
+	// []string is useful for parsing url.Values data
 	case []string:
 		if len(v) == 0 {
 			return defaultValue, false
@@ -92,7 +92,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 	case reflect.Value:
 		return Int64Ok(Interface(v), defaultValue)
 
-		// Use standard interfaces, if available
+	// Use standard interfaces, if available
 	case Inter:
 		return int64(v.Int()), true
 
