@@ -70,10 +70,8 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 		return int64(v), hasDecimal(v)
 
 	case string:
-		result, err := strconv.ParseInt(v, 10, 64)
-
-		if err != nil {
-			return defaultValue, false
+		if result, err := strconv.ParseInt(v, 10, 64); err == nil {
+			return result, true
 		}
 
 		return result, true
