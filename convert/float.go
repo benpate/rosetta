@@ -10,7 +10,6 @@ import (
 // Float forces a conversion from an arbitrary value into a float64.
 // If the value cannot be converted, then the zero value for the type (false) is used.
 func Float(value any) float64 {
-
 	result, _ := FloatOk(value, 0)
 	return result
 }
@@ -18,7 +17,6 @@ func Float(value any) float64 {
 // FloatDefault forces a conversion from an arbitrary value into a float64.
 // if the value cannot be converted, then the default value is used.
 func FloatDefault(value any, defaultValue float64) float64 {
-
 	result, _ := FloatOk(value, defaultValue)
 	return result
 }
