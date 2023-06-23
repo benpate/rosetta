@@ -1,6 +1,8 @@
 package convert
 
-import "time"
+import (
+	"time"
+)
 
 func Time(value any) time.Time {
 	result, _ := TimeOk(value, time.Time{})
@@ -21,8 +23,12 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
 	case string:
 
-		if parsed, err := time.Parse(time.RFC3339, typed); err == nil {
-			return parsed, true
+		timeFormats := []string{time.RFC3339, time.RFC3339Nano, "2006-01-02T15:04:05", "2006-01-02 15:04:05", "2006-01-02", time.RFC1123, time.RFC1123Z, time.RubyDate, time.UnixDate, time.RFC822, time.RFC822Z}
+
+		for _, timeFormat := range timeFormats {
+			if parsed, err := time.Parse(timeFormat, typed); err == nil {
+				return parsed, true
+			}
 		}
 
 	case int:

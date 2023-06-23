@@ -55,3 +55,18 @@ func TestTimeInt(t *testing.T) {
 		require.Equal(t, oneTime, result)
 	}
 }
+
+func TestTimeString(t *testing.T) {
+	result := Time("2022-09-25T14:50:32.000Z")
+	require.Equal(t, time.Date(2022, 9, 25, 14, 50, 32, 0, time.UTC), result)
+}
+
+func TestTimeString2(t *testing.T) {
+	result := Time("2022-09-25")
+	require.Equal(t, time.Date(2022, 9, 25, 0, 0, 0, 0, time.UTC), result)
+}
+
+func TestTimeString3(t *testing.T) {
+	result := Time("2023-06-20T00:00:00")
+	require.Equal(t, time.Date(2023, 6, 20, 0, 0, 0, 0, time.UTC), result)
+}
