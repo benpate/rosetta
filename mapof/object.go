@@ -26,6 +26,14 @@ func (x Object[T]) Keys() []string {
 	return keys
 }
 
+func (x Object[T]) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Object[T]) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/

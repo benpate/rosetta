@@ -34,6 +34,14 @@ func (x String) Equal(value String) bool {
 	return true
 }
 
+func (x String) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x String) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/

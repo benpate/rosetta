@@ -27,6 +27,10 @@ func (x Int64) IsEmpty() bool {
 	return len(x) == 0
 }
 
+func (x Int64) NotEmpty() bool {
+	return len(x) > 0
+}
+
 func (x Int64) First() int64 {
 	if len(x) > 0 {
 		return x[0]

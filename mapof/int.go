@@ -34,6 +34,14 @@ func (x Int) Equal(value Int) bool {
 	return true
 }
 
+func (x Int) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Int) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/

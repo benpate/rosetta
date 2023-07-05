@@ -34,6 +34,14 @@ func (x Float) Equal(value Float) bool {
 	return true
 }
 
+func (x Float) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Float) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/

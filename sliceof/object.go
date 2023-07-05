@@ -22,6 +22,10 @@ func (x Object[T]) IsEmpty() bool {
 	return len(x) == 0
 }
 
+func (x Object[T]) NotEmpty() bool {
+	return len(x) > 0
+}
+
 func (x Object[T]) First() T {
 	if len(x) > 0 {
 		return x[0]

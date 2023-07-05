@@ -34,6 +34,14 @@ func (x Int64) Equal(value Int64) bool {
 	return true
 }
 
+func (x Int64) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Int64) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter/Setter Interfaces
  ******************************************/

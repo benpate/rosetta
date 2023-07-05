@@ -27,6 +27,10 @@ func (x Float) IsEmpty() bool {
 	return len(x) == 0
 }
 
+func (x Float) NotEmpty() bool {
+	return len(x) > 0
+}
+
 func (x Float) First() float64 {
 	if len(x) > 0 {
 		return x[0]

@@ -25,6 +25,14 @@ func (x Any) Keys() []string {
 	return keys
 }
 
+func (x Any) IsEmpty() bool {
+	return len(x) == 0
+}
+
+func (x Any) NotEmpty() bool {
+	return len(x) > 0
+}
+
 /******************************************
  * Getter Interfaces
  ******************************************/
