@@ -256,53 +256,58 @@ func SliceOfBool(value any) []bool {
 // It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfAny(value any) []any {
+	result, _ := SliceOfAnyOk(value)
+	return result
+}
+
+func SliceOfAnyOk(value any) ([]any, bool) {
 
 	if value == nil {
-		return make([]any, 0)
+		return make([]any, 0), false
 	}
 
 	switch value := value.(type) {
 
 	case []any:
-		return value
+		return value, true
 
 	case []bool:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
-		return result
+		return result, true
 
 	case []int:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
-		return result
+		return result, true
 
 	case []int64:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
-		return result
+		return result, true
 
 	case []float64:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
-		return result
+		return result, true
 
 	case []string:
 		result := make([]any, len(value))
 		for index, v := range value {
 			result[index] = v
 		}
-		return result
+		return result, true
 
 	case bool, int, int64, float64, string:
-		return []any{value}
+		return []any{value}, false
 	}
 
 	// Use reflection to see if this is even aa array/slice
@@ -310,7 +315,7 @@ func SliceOfAny(value any) []any {
 
 	switch valueOf.Kind() {
 	case reflect.Pointer:
-		return SliceOfAny(valueOf.Elem().Interface())
+		return SliceOfAny(valueOf.Elem().Interface()), true
 
 	case reflect.Array, reflect.Slice:
 		length := valueOf.Len()
@@ -318,11 +323,11 @@ func SliceOfAny(value any) []any {
 		for index := 0; index < length; index++ {
 			result[index] = valueOf.Index(index).Interface()
 		}
-		return result
+		return result, true
 	}
 
 	// Fall through means this isn't even an array/slice.  Admit defeat and go home.
-	return make([]any, 0)
+	return make([]any, 0), false
 }
 
 func SliceLength(value any) int {
