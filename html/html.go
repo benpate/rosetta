@@ -17,8 +17,6 @@ var styles *regexp.Regexp
 var tags *regexp.Regexp
 
 func init() {
-	fmt.Print("init html.go... ")
-
 	findHTML = regexp.MustCompile(`(?i)<[A-Z]+.*?>`)
 	spaces = regexp.MustCompile(`[[:space:]]+`)
 	breaks = regexp.MustCompile(`(?i)<br[^>]*>`)
