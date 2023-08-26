@@ -38,11 +38,11 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
 		// Assume Seconds
 		if typed < 10000000000 {
-			return time.Unix(typed, 0), true
+			return time.Unix(typed, 0).In(time.UTC), true
 		}
 
 		// Assume Miliseconds
-		return time.UnixMilli(typed), true
+		return time.UnixMilli(typed).In(time.UTC), true
 	}
 
 	return defaultValue, false

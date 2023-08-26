@@ -11,7 +11,7 @@ func TestTimeInt(t *testing.T) {
 
 	zeroTime := time.Time{}
 	oneTime := zeroTime.Add(time.Second)
-	baseTime := time.Date(2023, 1, 2, 3, 4, 5, 0, time.Local)
+	baseTime := time.Date(2023, 1, 2, 3, 4, 5, 0, time.UTC)
 
 	// Test time (echo)
 	{
