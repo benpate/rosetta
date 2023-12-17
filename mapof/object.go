@@ -1,7 +1,7 @@
 package mapof
 
 import (
-	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/list"
 
 	"github.com/benpate/derp"
@@ -96,5 +96,5 @@ func (object *Object[T]) makeNotNil() {
  ******************************************/
 
 func (object Object[T]) IsZeroValue(name string) bool {
-	return convert.IsZeroValue(object[name])
+	return compare.IsZero(object[name])
 }

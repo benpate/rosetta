@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/exp"
+	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/null"
@@ -52,7 +53,7 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, "schema.Boolean.ValidateRequiredIf", "Error getting value for path", path)
-			} else if convert.IsZeroValue(localValue) {
+			} else if compare.IsZero(localValue) {
 				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}

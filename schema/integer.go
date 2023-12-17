@@ -95,7 +95,7 @@ func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalV
 		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, "schema.Integer.ValidateRequiredIf", "Error getting value for path", path)
-			} else if convert.IsZeroValue(localValue) {
+			} else if compare.IsZero(localValue) {
 				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}

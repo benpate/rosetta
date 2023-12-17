@@ -1,15 +1,20 @@
-package convert
+package compare
 
-import "io"
+import (
+	"io"
 
-// IsZeroValue returns TRUE if the value is the zero value for its datatype
-func IsZeroValue(value any) bool {
+	"github.com/benpate/rosetta/convert"
+)
 
-	if value == nil {
+// IsZero returns TRUE if the value is the ZERO VALUE for its datatype or NIL
+func IsZero(value any) bool {
+
+	if IsNil(value) {
 		return true
 	}
 
 	switch v := value.(type) {
+
 	case bool:
 		return !v
 	case string:
@@ -51,16 +56,21 @@ func IsZeroValue(value any) bool {
 	case Nuller:
 		return v.IsNull()
 	case Inter:
-		return IsZeroValue(v.Int())
+		return IsZero(v.Int())
 	case Floater:
-		return IsZeroValue(v.Float())
+		return IsZero(v.Float())
 	case Hexer:
-		return IsZeroValue(Int64(v))
+		return IsZero(convert.Int64(v))
 	case Stringer:
-		return IsZeroValue(v.String())
+		return IsZero(v.String())
 	case io.Reader:
-		return IsZeroValue(String(v))
+		return IsZero(convert.String(v))
 	}
 
 	return false
+}
+
+// NotZero returns TRUE if the value is NOT the zero value for its datatype
+func NotZero(value any) bool {
+	return !IsZero(value)
 }

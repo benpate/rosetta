@@ -2,6 +2,7 @@ package mapof
 
 import (
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/schema"
@@ -237,7 +238,7 @@ func (x *Any) Remove(key string) bool {
  ******************************************/
 
 func (m Any) IsZeroValue(name string) bool {
-	return convert.IsZeroValue(m[name])
+	return compare.IsZero(m[name])
 }
 
 // GetSliceOfString returns a named option as a slice of strings

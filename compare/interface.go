@@ -415,8 +415,3 @@ func Interface(value1 any, value2 any) (int, error) {
 
 	return 0, derp.NewInternalError("compare.Interface", "Incompatible Types", value1, value2)
 }
-
-// Stringer is an interface for types that can be converted to String
-type Stringer interface {
-	String() string
-}
