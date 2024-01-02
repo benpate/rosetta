@@ -1,7 +1,6 @@
 package html
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"unicode/utf8"
@@ -25,7 +24,6 @@ func init() {
 	divs = regexp.MustCompile(`(?i)<\/div>`)
 	styles = regexp.MustCompile(`(?i)<style>(.*?)</style>`)
 	tags = regexp.MustCompile(`<[^>]+>`)
-	fmt.Println("DONE.")
 }
 
 // IsHTML returns TRUE if the string provided "looks like" HTML, in that, it has
