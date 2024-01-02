@@ -5,6 +5,38 @@ import (
 	"strings"
 )
 
+// IsSlice returns TRUE if the value is a slice or array (Uses Reflection)
+func IsSlice(value any) bool {
+
+	// Get the obvious checks out of the way.
+	switch value.(type) {
+	case []any,
+		[]bool,
+		[]int,
+		[]int64,
+		[]float64,
+		[]string:
+		return true
+	}
+
+	// Otherwise, use reflection to see what's inside there...
+	valueOf := reflect.ValueOf(value)
+
+	switch valueOf.Kind() {
+
+	// Dereference pointers (if necessary)
+	case reflect.Pointer:
+		return IsSlice(valueOf.Elem().Interface())
+
+	// Arrays and slices are both valid
+	case reflect.Array, reflect.Slice:
+		return true
+	}
+
+	// Otherwise, nah.
+	return false
+}
+
 // SliceOfString converts the value into a slice of strings.
 // It works with any, []any, []string, and string values.
 // If the passed value cannot be converted, then an empty slice is returned.
