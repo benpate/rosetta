@@ -1,6 +1,8 @@
 package sliceof
 
 import (
+	"strings"
+
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/slice"
 )
@@ -67,6 +69,10 @@ func (x String) ContainsAll(values ...string) bool {
 
 func (x String) Equal(value []string) bool {
 	return slice.Equal(x, value)
+}
+
+func (x String) Join(delimiter string) string {
+	return strings.Join(x, delimiter)
 }
 
 func (x *String) Append(values ...string) {
