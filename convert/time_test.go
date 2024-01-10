@@ -70,3 +70,8 @@ func TestTimeString3(t *testing.T) {
 	result := Time("2023-06-20T00:00:00")
 	require.Equal(t, time.Date(2023, 6, 20, 0, 0, 0, 0, time.UTC), result)
 }
+
+func TestTimeString4(t *testing.T) {
+	result := Time("2024-01-10T05:18:54Z")
+	require.Equal(t, time.Date(2024, 1, 10, 5, 18, 54, 0, time.UTC), result)
+}
