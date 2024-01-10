@@ -1,5 +1,7 @@
 package convert
 
+import "time"
+
 // Booler interface wraps the Bool() method that enables custom types to convert themselves to bool.
 type Booler interface {
 
@@ -33,6 +35,12 @@ type Stringer interface {
 
 	// String returns the string value of the underlying object
 	String() string
+}
+
+// Timer interface wraps the Time() method that returns the time.Time value of the underlying object
+type Timer interface {
+	// Time returns the time.Time value of the underlying object
+	Time() time.Time
 }
 
 // Length interface wraps the Length() method that returns the length of an array or map

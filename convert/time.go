@@ -21,6 +21,9 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 	case time.Time:
 		return typed, true
 
+	case Timer:
+		return typed.Time(), true
+
 	case string:
 
 		timeFormats := []string{time.RFC3339, time.RFC3339Nano, "2006-01-02T15:04:05", "2006-01-02 15:04:05", "2006-01-02", time.RFC1123, time.RFC1123Z, time.RubyDate, time.UnixDate, time.RFC822, time.RFC822Z}
