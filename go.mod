@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/benpate/derp v0.30.0
-	github.com/benpate/exp v0.8.1
+	github.com/benpate/exp v0.8.3
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/stretchr/testify v1.8.4
