@@ -6,15 +6,15 @@ import "github.com/davecgh/go-spew/spew"
 // It can be used to debug a channel's contents without disrupting the flow of data.
 func Beep[T any](in <-chan T) <-chan T {
 
-	out := make(chan T)
+	result := make(chan T)
 
 	go func() {
-		defer close(out)
+		defer close(result)
 		for value := range in {
 			spew.Dump(value)
-			out <- value
+			result <- value
 		}
 	}()
 
-	return out
+	return result
 }

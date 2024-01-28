@@ -7,6 +7,7 @@ func Map[Input any, Output any](input <-chan Input, mapper func(Input) Output) <
 	result := make(chan Output, 1)
 
 	go func() {
+		defer close(result)
 		for value := range input {
 			result <- mapper(value)
 		}
