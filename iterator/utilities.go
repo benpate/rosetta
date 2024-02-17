@@ -40,13 +40,14 @@ func Channel[T any](iterator Iterator, constructor func() T) chan T {
 
 	go func() {
 
+		defer close(result)
+
 		value := constructor()
 
 		for iterator.Next(&value) {
 			result <- value
 			value = constructor()
 		}
-		close(result)
 	}()
 
 	return result
@@ -59,12 +60,12 @@ func ChannelWithCancel[T any](iterator Iterator, constructor func() T, cancel <-
 	result := make(chan T, 1) // Length of 1 to prevent blocking on the first item.
 
 	go func() {
+		defer close(result)
 		value := constructor()
 
 		for iterator.Next(&value) {
 			select {
 			case <-cancel:
-				close(result)
 				return
 
 			default:
@@ -73,8 +74,6 @@ func ChannelWithCancel[T any](iterator Iterator, constructor func() T, cancel <-
 
 			value = constructor()
 		}
-
-		close(result)
 	}()
 
 	return result
