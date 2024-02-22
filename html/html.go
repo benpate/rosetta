@@ -13,6 +13,7 @@ var paragraphs *regexp.Regexp
 var divs *regexp.Regexp
 var headings *regexp.Regexp
 var styles *regexp.Regexp
+var anchors *regexp.Regexp
 var tags *regexp.Regexp
 
 func init() {
@@ -23,6 +24,7 @@ func init() {
 	headings = regexp.MustCompile(`(?i)<\/?h[0-9][^>]*>`)
 	divs = regexp.MustCompile(`(?i)<\/div>`)
 	styles = regexp.MustCompile(`(?i)<style>(.*?)</style>`)
+	anchors = regexp.MustCompile(`(?i)<a[^>]*>(.*?)</a>`)
 	tags = regexp.MustCompile(`<[^>]+>`)
 }
 
@@ -48,6 +50,29 @@ func ToText(html string) string {
 	result = tags.ReplaceAllLiteralString(result, "")
 
 	// Replace HTML entities
+	result = RemoveSpecialCharacters(result)
+	result = strings.Trim(result, " ")
+
+	return result
+}
+
+// ToSearchText removes tags in a way that is suitable to text searches.
+// This means that it will remove all tags, but adds regular whitespace in between them.
+func ToSearchText(html string) string {
+	result := html
+	result = strings.Replace(result, "<", " <", -1) // Add space before every HTML tag
+	result = RemoveTags(result)
+	result = RemoveSpecialCharacters(result)
+	return result
+}
+
+// RemoveSpecialCharacters removes special Unicode characters from a string
+func RemoveSpecialCharacters(html string) string {
+
+	result := html
+
+	result = strings.Replace(result, "\u00a0", " ", -1)
+
 	result = strings.Replace(result, "&#60;", "<", -1)
 	result = strings.Replace(result, "&lt;", "<", -1)
 
@@ -103,9 +128,12 @@ func ToText(html string) string {
 	result = strings.Replace(result, "&#8250;", ">", -1)
 	result = strings.Replace(result, "&rsaquo;", "<", -1)
 
-	result = strings.Trim(result, " ")
-
 	return result
+}
+
+// RemoveAnchors strips all HTML anchor tags from a string.
+func RemoveAnchors(html string) string {
+	return string(anchors.ReplaceAll([]byte(html), []byte("$1")))
 }
 
 // RemoveTags aggressively strips HTML tags from a string.  It will only keep anything between `>` and `<`.
