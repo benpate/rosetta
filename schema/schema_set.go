@@ -22,6 +22,7 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 
 		// Errors are intentionally ignored here.
 		// Unallowed data does not make it through the schema filter
+		// nolint: errcheck
 		schema.Set(object, path, value)
 	}
 
