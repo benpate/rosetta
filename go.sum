@@ -1,7 +1,7 @@
 github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuPk=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
-github.com/benpate/derp v0.30.0 h1:cvb3+Q1n/3FWhOGT4eVmHEtRWIleVnxoCani4Ex9oQo=
-github.com/benpate/derp v0.30.0/go.mod h1:y+PJWv5VOBOnd1y4CGk/c7xVS0Pwxg9BGQE5r/SGc8w=
+github.com/benpate/derp v0.31.0 h1:Vo3oQrD+eDLY/FQ4W3HUtV1Et7lkm8OEF6rJQlSd6xg=
+github.com/benpate/derp v0.31.0/go.mod h1:y+PJWv5VOBOnd1y4CGk/c7xVS0Pwxg9BGQE5r/SGc8w=
 github.com/benpate/exp v0.8.3 h1:rxlXtdLxc+XU5ySoAFEt7YKOjhOE7YRMz15YUePBLJk=
 github.com/benpate/exp v0.8.3/go.mod h1:VWDkZ1uM4HyXJVi+NDA1QvVklsgFE7T9L5lCeZBento=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
