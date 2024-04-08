@@ -58,7 +58,12 @@ func (x String) GetStringOK(key string) (string, bool) {
 
 func (x *String) SetString(key string, value string) bool {
 	x.makeNotNil()
-	(*x)[key] = value
+
+	if value == "" {
+		delete(*x, key)
+	} else {
+		(*x)[key] = value
+	}
 	return true
 }
 

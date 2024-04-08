@@ -58,7 +58,11 @@ func (x Int) GetIntOK(key string) (int, bool) {
 
 func (x *Int) SetInt(key string, value int) bool {
 	x.makeNotNil()
-	(*x)[key] = value
+	if value == 0 {
+		(*x)[key] = value
+	} else {
+		delete(*x, key)
+	}
 	return true
 }
 

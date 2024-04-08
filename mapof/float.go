@@ -58,7 +58,11 @@ func (x Float) GetFloatOK(key string) (float64, bool) {
 
 func (x *Float) SetFloat(key string, value float64) bool {
 	x.makeNotNil()
-	(*x)[key] = value
+	if value == 0 {
+		delete(*x, key)
+	} else {
+		(*x)[key] = value
+	}
 	return true
 }
 

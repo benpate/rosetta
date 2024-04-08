@@ -58,7 +58,11 @@ func (x Int64) GetInt64OK(key string) (int64, bool) {
 
 func (x *Int64) SetInt64(key string, value int64) bool {
 	x.makeNotNil()
-	(*x)[key] = value
+	if value == 0 {
+		delete(*x, key)
+	} else {
+		(*x)[key] = value
+	}
 	return true
 }
 
