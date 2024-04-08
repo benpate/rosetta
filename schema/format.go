@@ -49,6 +49,7 @@ func init() {
 	UseFormat("notin", format.NotIn)
 
 	// Text
+	UseFormat("color", format.Color)
 	UseFormat("token", format.Token)
 	UseFormat("unsafe-any", format.UnsafeAny)
 }
