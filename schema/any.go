@@ -42,11 +42,6 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, globalValue
 	return nil
 }
 
-// Clean updates a value to match the schema.  The value must be a pointer.
-func (element Any) Clean(value any) error {
-	return nil
-}
-
 func (element Any) GetElement(name string) (Element, bool) {
 	return element, true
 }

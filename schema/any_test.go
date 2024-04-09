@@ -17,9 +17,8 @@ func TestAny(t *testing.T) {
 		"baz": 123,
 	}
 
-	// Validate and Clean
+	// Validate the data
 	require.Nil(t, schema.Validate(data))
-	require.Nil(t, schema.Clean(data))
 
 	require.Equal(t, "bar", data["foo"])
 	require.Equal(t, 123, data["baz"])

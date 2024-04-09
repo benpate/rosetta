@@ -84,11 +84,6 @@ func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	return nil
 }
 
-func (element Object) Clean(value any) error {
-	// TODO: HIGH: Implement the Clean method for the Object type
-	return nil
-}
-
 func (element Object) Inherit(parent Element) {
 
 	// Inherit each property from the parent

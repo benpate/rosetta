@@ -126,11 +126,6 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	return nil
 }
 
-func (element Array) Clean(value any) error {
-	// TODO: HIGH: Implement the Clean method for Array
-	return nil
-}
-
 func (element Array) GetElement(name string) (Element, bool) {
 
 	if name == "" {

@@ -98,11 +98,6 @@ func (element String) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	return nil
 }
 
-func (element String) Clean(value any) error {
-	// TODO: HIGH: Implement the "Clean" method for the String type
-	return nil
-}
-
 func (element String) GetElement(name string) (Element, bool) {
 
 	if name == "" {

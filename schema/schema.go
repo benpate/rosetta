@@ -29,8 +29,9 @@ func New(element Element) Schema {
  * Validation Methods
  ******************************************/
 
-// Validate checks a particular value against this schema.  If the
-// provided value is not valid, then an error is returned.
+// Validate checks a particular value against this schema, updating values when
+// possible so that they pass validation.  If the provided value is not valid
+// (and cannot be coerced into being valid) then it returns an error.
 func (schema Schema) Validate(value any) error {
 
 	// RULE: Schema element cannot be nil
@@ -41,29 +42,6 @@ func (schema Schema) Validate(value any) error {
 	// Validate all elements in the value
 	if err := schema.Element.Validate(value); err != nil {
 		return derp.Wrap(err, "schema.Schema.Validate", "Error validating value", value)
-	}
-
-	// Handle special cases for "required-if" fields
-	if err := schema.ValidateRequiredIf(value); err != nil {
-		return derp.Wrap(err, "schema.Schema.Validate", "Error validating required-if fields", value)
-	}
-
-	return nil
-}
-
-// Clean tries to force a particular value to fit this schema by updating
-// it (or all of its properties) to match.  If values cannot be coerced to
-// fit the schema, then an error is returned
-func (schema Schema) Clean(value any) error {
-
-	// RULE: Schema element cannot be nil
-	if isNil(schema.Element) {
-		return derp.NewInternalError("schema.Schema.Clean", "Schema is nil")
-	}
-
-	// TODO: CRITICAL: "Clean" functions are not yet implemented
-	if err := schema.Element.Clean(value); err != nil {
-		return derp.Wrap(err, "schema.Schema.Clean", "Error cleaning value", value)
 	}
 
 	// Handle special cases for "required-if" fields

@@ -61,11 +61,6 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 	return nil
 }
 
-func (element Boolean) Clean(value any) error {
-	// TODO: HIGH: Implement the Clean() method for the Boolean element
-	return nil
-}
-
 func (element Boolean) GetElement(name string) (Element, bool) {
 
 	if name == "" {
