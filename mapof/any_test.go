@@ -108,7 +108,7 @@ func TestAny_EmptyInt64(t *testing.T) {
 
 	m.SetAny("key", 69)
 	require.Equal(t, int64(69), m.GetInt64("key"))
-	require.Equal(t, int64(69), m.GetAny("key"))
+	require.Equal(t, 69, m.GetAny("key"))
 	require.Equal(t, 1, len(m))
 
 	m.SetAny("key", int64(0))
