@@ -301,3 +301,11 @@ func (m Any) GetSliceOfMap(name string) []Any {
 
 	return result
 }
+
+func (m Any) MapOfAny() map[string]any {
+	return m
+}
+
+func (m Any) MapOfString() map[string]string {
+	return convert.MapOfString(m.MapOfAny())
+}

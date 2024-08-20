@@ -1,5 +1,7 @@
 package mapof
 
+import "github.com/benpate/rosetta/convert"
+
 type String map[string]string
 
 func NewString() String {
@@ -77,4 +79,12 @@ func (x *String) makeNotNil() {
 	if *x == nil {
 		*x = make(String)
 	}
+}
+
+func (x String) MapOfAny() map[string]any {
+	return convert.MapOfAny(x.MapOfString())
+}
+
+func (x String) MapOfString() map[string]string {
+	return x
 }
