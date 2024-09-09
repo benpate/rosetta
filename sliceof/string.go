@@ -1,6 +1,7 @@
 package sliceof
 
 import (
+	"math/rand"
 	"strings"
 
 	"github.com/benpate/rosetta/convert"
@@ -77,6 +78,14 @@ func (x String) Join(delimiter string) string {
 
 func (x *String) Append(values ...string) {
 	*x = append(*x, values...)
+}
+
+// Shuffle randomizes the order of the elements in the slice
+func (x String) Shuffle() String {
+	rand.Shuffle(len(x), func(i, j int) {
+		x[i], x[j] = x[j], x[i]
+	})
+	return x
 }
 
 /****************************************

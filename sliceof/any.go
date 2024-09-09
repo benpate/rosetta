@@ -1,7 +1,10 @@
 package sliceof
 
 import (
+	"math/rand"
+
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/slice"
 )
 
 type Any []any
@@ -14,22 +17,27 @@ func NewAny() Any {
  * Slice Manipulations
  ****************************************/
 
+// Length returns the number of elements in the slice
 func (x Any) Length() int {
 	return len(x)
 }
 
+// IsLength returns TRUE if the slice contains exactly "length" elements
 func (x Any) IsLength(length int) bool {
 	return len(x) == length
 }
 
+// IsEmpty returns TRUE if the slice contains no elements
 func (x Any) IsEmpty() bool {
 	return len(x) == 0
 }
 
+// NotEmpty returns TRUE if the slice contains at least one element
 func (x Any) NotEmpty() bool {
 	return len(x) > 0
 }
 
+// First returns the first element in the slice, or nil if the slice is empty
 func (x Any) First() any {
 	if len(x) > 0 {
 		return x[0]
@@ -37,6 +45,16 @@ func (x Any) First() any {
 	return nil
 }
 
+// FirstN returns the first "n" elements in the slice, or all elements if "n" is greater than the length of the slice
+func (x Any) FirstN(n int) Any {
+	if n > len(x) {
+		n = len(x)
+	}
+
+	return x[:n]
+}
+
+// Last returns the last element in the slice, or nil if the slice is empty
 func (x Any) Last() any {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -44,6 +62,7 @@ func (x Any) Last() any {
 	return nil
 }
 
+// Reverse returns a new slice with the elements in reverse order
 func (x Any) Reverse() Any {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
@@ -52,8 +71,37 @@ func (x Any) Reverse() Any {
 	return x
 }
 
+// Contains returns TRUE if the slice contains the specified value
+func (x Any) Contains(value any) bool {
+	return slice.Contains(x, value)
+}
+
+// ContainsAny returns TRUE if the slice contains any of the specified values
+func (x Any) ContainsAny(values ...any) bool {
+	return slice.ContainsAny(x, values...)
+}
+
+// ContainsAll returns TRUE if the slice contains all of the specified values
+func (x Any) ContainsAll(values ...any) bool {
+	return slice.ContainsAll(x, values...)
+}
+
+// Equal returns TRUE if the slice contains exactly the same elements as the specified value
+func (x Any) Equal(value []any) bool {
+	return slice.Equal(x, value)
+}
+
+// Append adds one or more elements to the end of the slice
 func (x *Any) Append(values ...any) {
 	*x = append(*x, values...)
+}
+
+// Shuffle randomizes the order of the elements in the slice
+func (x Any) Shuffle() Any {
+	rand.Shuffle(len(x), func(i, j int) {
+		x[i], x[j] = x[j], x[i]
+	})
+	return x
 }
 
 /******************************************
