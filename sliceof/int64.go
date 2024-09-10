@@ -62,6 +62,12 @@ func (x Int64) Last() int64 {
 	return 0
 }
 
+// At returns a bound-safe element from the slice.  If the index
+// is out of bounds, then `At` returns the zero value for the slice type
+func (x Int64) At(index int) int64 {
+	return slice.At(x, index)
+}
+
 // Reverse returns a new slice with all elements in the opposite order
 func (x Int64) Reverse() Int64 {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {

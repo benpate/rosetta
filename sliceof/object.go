@@ -1,6 +1,10 @@
 package sliceof
 
-import "math/rand"
+import (
+	"math/rand"
+
+	"github.com/benpate/rosetta/slice"
+)
 
 type Object[T any] []T
 
@@ -57,6 +61,12 @@ func (x Object[T]) Last() T {
 	}
 	var result T
 	return result
+}
+
+// At returns a bound-safe element from the slice.  If the index
+// is out of bounds, then `At` returns the zero value for the slice type
+func (x Object[T]) At(index int) T {
+	return slice.At(x, index)
 }
 
 // Reverse returns a new slice with the elements in reverse order
