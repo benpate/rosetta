@@ -50,6 +50,17 @@ func (element Any) Inherit(parent Element) {
 	// Do nothing
 }
 
+// AllProperties returns a map of all properties for this element
+func (element Any) AllProperties() ElementMap {
+	return ElementMap{
+		"": element,
+	}
+}
+
+/***********************************
+ * MARSHAL / UNMARSHAL METHODS
+ ***********************************/
+
 // MarshalMap populates the object data into a map[string]any
 func (element Any) MarshalMap() map[string]any {
 

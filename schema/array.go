@@ -18,9 +18,9 @@ type Array struct {
 	RequiredIf string  `json:"required-if"`
 }
 
-/***********************************
+/******************************************
  * Container Interface
- ***********************************/
+ ******************************************/
 
 func (element Array) GetProperty(name string) (Element, error) {
 
@@ -41,9 +41,9 @@ func (element Array) GetProperty(name string) (Element, error) {
 	return element.Items, nil
 }
 
-/***********************************
+/******************************************
  * Element Interface
- ***********************************/
+ ******************************************/
 
 func (element Array) DefaultValue() any {
 	// TODO: We can make a better default than this.
@@ -58,15 +58,13 @@ func (element Array) IsRequired() bool {
 // Validate validates a value against this schema
 func (element Array) Validate(object any) error {
 
-	lengthGetter, ok := object.(LengthGetter)
+	length, ok := getLength(object)
 
 	if !ok {
 		return derp.NewValidationError("Array must implement LengthGetter interface")
 	}
 
 	// Check minimum/maximum lengths
-	length := lengthGetter.Length()
-
 	if element.Required && length == 0 {
 		return derp.NewValidationError(" array value is required")
 	}
@@ -100,13 +98,11 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 			return derp.Wrap(err, "schema.Any.ValidateRequiredIf", "Error getting value for path", path)
 		}
 
-		lengthGetter, ok := localValue.(LengthGetter)
+		length, ok := getLength(localValue)
 
 		if !ok {
 			return derp.NewValidationError("Array must implement LengthGetter interface")
 		}
-
-		length := lengthGetter.Length()
 
 		if length == 0 {
 			if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
@@ -154,9 +150,40 @@ func (element Array) Inherit(parent Element) {
 	// Do nothing
 }
 
-/***********************************
- * MARSHAL / UNMARSHAL METHODS
- ***********************************/
+// AllProperties returns a map of all properties for this element
+func (element Array) AllProperties() ElementMap {
+	return ElementMap{
+		"": element,
+	}
+}
+
+/******************************************
+ * Array-Specific Methods
+ ******************************************/
+
+// GetLength returns the length of the array value (if the object implements ArrayGetter)
+func (element Array) GetLength(value any) (int, bool) {
+	return getLength(value)
+}
+
+// GetIndex returns the value at a specific index in the array (if the object implements ArrayGetter)
+func (element Array) GetIndex(value any, index int) (any, bool) {
+	return getIndex(value, index)
+}
+
+// SetIndex sets the value at a specific index in the array (if the object implements ArraySetter)
+func (element Array) SetIndex(value any, index int, item any) bool {
+
+	if setter, ok := value.(ArraySetter); ok {
+		return setter.SetIndex(index, item)
+	}
+
+	return false
+}
+
+/******************************************
+ * Marshal / Unmarshal Methods
+ ******************************************/
 
 // MarshalMap populates object data into a map[string]any
 func (element Array) MarshalMap() map[string]any {

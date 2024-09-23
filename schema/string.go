@@ -110,6 +110,13 @@ func (element String) Inherit(parent Element) {
 	// Do nothing
 }
 
+// AllProperties returns a map of all properties for this element
+func (element String) AllProperties() ElementMap {
+	return ElementMap{
+		"": element,
+	}
+}
+
 /***********************************
  * ENUMERATOR INTERFACE
  ***********************************/

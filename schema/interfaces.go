@@ -17,6 +17,10 @@ type Enumerator interface {
  * Getter Interfaces
  ******************************************/
 
+type AnyGetter interface {
+	GetAnyOK(string) (any, bool)
+}
+
 type BoolGetter interface {
 	GetBoolOK(string) (bool, bool)
 }
@@ -46,14 +50,25 @@ type PointerGetter interface {
 	GetPointer(string) (any, bool)
 }
 
-// LengthGetter allows arrays to report their total length
+type KeysGetter interface {
+	Keys() []string
+}
+
 type LengthGetter interface {
 	Length() int
+}
+
+type ArrayGetter interface {
+	GetIndex(int) (any, bool)
 }
 
 /******************************************
  * Setter Interfaces
  ******************************************/
+
+type AnySetter interface {
+	SetAny(string, any) bool
+}
 
 type BoolSetter interface {
 	SetBool(string, bool) bool
@@ -81,6 +96,15 @@ type StringSetter interface {
 
 type ValueSetter interface {
 	SetValue(any) error
+}
+
+/******************************************
+ * Special-Case Setter Interfaces
+ ******************************************/
+
+type ArraySetter interface {
+	SetIndex(int, any) bool
+	Length() int
 }
 
 /******************************************

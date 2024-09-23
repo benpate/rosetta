@@ -25,6 +25,12 @@ func New(element Element) Schema {
 	}
 }
 
+func Wildcard() Schema {
+	return Schema{
+		Element: Any{},
+	}
+}
+
 /******************************************
  * Validation Methods
  ******************************************/
@@ -93,6 +99,7 @@ func (schema Schema) ValidateRequiredIf(value any) error {
  * Other Data Access Methods
  ******************************************/
 
+// GetElement returns the element at the specified path, or FALSE if the element does not exist
 func (schema Schema) GetElement(path string) (Element, bool) {
 
 	if isNil(schema.Element) {
@@ -102,6 +109,82 @@ func (schema Schema) GetElement(path string) (Element, bool) {
 	return schema.Element.GetElement(path)
 }
 
+// GetArrayElement returns the array element at the specified path, or FALSE if invalid
+func (schema Schema) GetArrayElement(path string) (Array, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		switch typed := element.(type) {
+		case Array:
+			return typed, true
+		case Any:
+			return Array{Items: Any{}}, true
+		}
+	}
+
+	return Array{}, false
+}
+
+// GetBooleanElement returns the boolean element at the specified path, or FALSE if invalide
+func (schema Schema) GetBooleanElement(path string) (Boolean, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		if booleanElement, ok := element.(Boolean); ok {
+			return booleanElement, true
+		}
+	}
+
+	return Boolean{}, false
+}
+
+// GetIntegerElement returns the integer element at the specified path, or FALSE if invalid
+func (schema Schema) GetIntegerElement(path string) (Integer, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		if integerElement, ok := element.(Integer); ok {
+			return integerElement, true
+		}
+	}
+
+	return Integer{}, false
+}
+
+// GetNumberElement returns the number element at the specified path, or FALSE if invalid
+func (schema Schema) GetNumberElement(path string) (Number, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		if numberElement, ok := element.(Number); ok {
+			return numberElement, true
+		}
+	}
+
+	return Number{}, false
+}
+
+// GetObjectElement returns the object element at the specified path, or FALSE if invalid
+func (schema Schema) GetObjectElement(path string) (Object, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		if objectElement, ok := element.(Object); ok {
+			return objectElement, true
+		}
+	}
+
+	return Object{}, false
+}
+
+// GetStringElement returns the string element at the specified path, or FALSE if invalid
+func (schema Schema) GetStringElement(path string) (String, bool) {
+
+	if element, ok := schema.GetElement(path); ok {
+		if stringElement, ok := element.(String); ok {
+			return stringElement, true
+		}
+	}
+
+	return String{}, false
+}
+
+// Inherit updates this schema with properties from the parent schema
 func (schema *Schema) Inherit(parent Schema) {
 
 	if isNil(schema.Element) {
@@ -109,6 +192,11 @@ func (schema *Schema) Inherit(parent Schema) {
 	} else {
 		schema.Element.Inherit(parent.Element)
 	}
+}
+
+// AllProperties returns a flat slice of all properties in this schema
+func (schema *Schema) AllProperties() ElementMap {
+	return schema.Element.AllProperties()
 }
 
 /******************************************

@@ -49,7 +49,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			}
 			return nil
 		}
-		return derp.NewInternalError(location, "Cannot set values on empty path")
+		return derp.NewInternalError(location, "Cannot set values on empty path", object, element, path, value)
 	}
 
 	// Otherwise, we're setting a sub-element within the object:

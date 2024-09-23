@@ -73,6 +73,13 @@ func (element Boolean) Inherit(parent Element) {
 	// Do nothing
 }
 
+// AllProperties returns a map of all properties for this element
+func (element Boolean) AllProperties() ElementMap {
+	return ElementMap{
+		"": element,
+	}
+}
+
 /***********************************
  * MARSHAL / UNMARSHAL METHODS
  ***********************************/

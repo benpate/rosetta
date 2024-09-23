@@ -99,6 +99,28 @@ func (element Object) Inherit(parent Element) {
 	}
 }
 
+// AllProperties returns a flat slice of all properties in this element
+// (in this case, it returns all properties of this object)
+func (element Object) AllProperties() ElementMap {
+
+	result := make(ElementMap, len(element.Properties))
+
+	for name, property := range element.Properties {
+
+		if object, ok := property.(Object); ok {
+
+			for subName, subProperty := range object.AllProperties() {
+				result[name+"."+subName] = subProperty
+			}
+
+		} else {
+			result[name] = property
+		}
+	}
+
+	return result
+}
+
 /***********************************
  * MARSHAL / UNMARSHAL METHODS
  ***********************************/

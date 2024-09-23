@@ -112,6 +112,13 @@ func (element Number) Inherit(parent Element) {
 	// Do nothing
 }
 
+// AllProperties returns a map of all properties for this element
+func (element Number) AllProperties() ElementMap {
+	return ElementMap{
+		"": element,
+	}
+}
+
 /***********************************
  * Enumerator Interface
  ***********************************/

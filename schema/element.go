@@ -30,6 +30,8 @@ type Element interface {
 	GetElement(string) (Element, bool)
 
 	Inherit(Element)
+
+	AllProperties() ElementMap
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.
