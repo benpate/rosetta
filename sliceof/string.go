@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/benpate/rosetta/convert"
@@ -116,9 +117,29 @@ func (x String) Shuffle() String {
 	return x
 }
 
+// Keys returns a slice of strings representing the indexes of this slice
+func (x String) Keys() []string {
+	keys := make([]string, len(x))
+
+	for i := range x {
+		keys[i] = strconv.Itoa(i)
+	}
+
+	return keys
+}
+
 /****************************************
  * Getter Interfaces/Setters
  ****************************************/
+
+func (x String) GetAny(key string) any {
+	result, _ := x.GetStringOK(key)
+	return result
+}
+
+func (x String) GetAnyOK(key string) (any, bool) {
+	return x.GetStringOK(key)
+}
 
 func (x String) GetString(key string) string {
 	result, _ := x.GetStringOK(key)
@@ -126,8 +147,13 @@ func (x String) GetString(key string) string {
 }
 
 func (x String) GetStringOK(key string) (string, bool) {
+
 	if index, ok := sliceIndex(key, x.Length()); ok {
 		return x[index], true
+	}
+
+	if key == "last" {
+		return x.Last(), true
 	}
 
 	return "", false
@@ -138,6 +164,14 @@ func (s *String) SetString(key string, value string) bool {
 		growSlice(s, index)
 		(*s)[index] = value
 		return true
+	}
+
+	switch key {
+
+	case "last":
+		return s.SetString(strconv.Itoa(s.Length()-1), value)
+	case "next":
+		return s.SetString(strconv.Itoa(s.Length()), value)
 	}
 
 	return false

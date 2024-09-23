@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"math/rand"
+	"strconv"
 
 	"github.com/benpate/rosetta/slice"
 )
@@ -69,6 +70,10 @@ func (x Object[T]) At(index int) T {
 	return slice.At(x, index)
 }
 
+func (x Object[T]) AtOK(index int) (T, bool) {
+	return slice.AtOK(x, index)
+}
+
 // Reverse returns a new slice with the elements in reverse order
 func (x Object[T]) Reverse() Object[T] {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
@@ -91,9 +96,41 @@ func (x Object[T]) Shuffle() Object[T] {
 	return x
 }
 
-/****************************************
- * Tree Traversal
- ****************************************/
+// Keys returns a slice of strings representing the indexes of this slice
+func (x Object[T]) Keys() []string {
+	keys := make([]string, len(x))
+
+	for i := range x {
+		keys[i] = strconv.Itoa(i)
+	}
+
+	return keys
+}
+
+/******************************************
+ * Getter Interfaces
+ ******************************************/
+
+func (x Object[T]) GetAny(key string) any {
+	result, _ := x.GetAnyOK(key)
+	return result
+}
+
+func (x Object[T]) GetAnyOK(key string) (any, bool) {
+	if index, ok := sliceIndex(key, x.Length()); ok {
+		return x[index], true
+	}
+
+	switch key {
+
+	case "last":
+		return x.AtOK(x.Length() - 1)
+	case "next":
+		return x.AtOK(x.Length())
+	}
+
+	return nil, false
+}
 
 func (x *Object[T]) GetPointer(name string) (any, bool) {
 
@@ -105,6 +142,14 @@ func (x *Object[T]) GetPointer(name string) (any, bool) {
 		return &(*x)[index], true
 	}
 
+	switch name {
+
+	case "last":
+		return x.GetPointer(strconv.Itoa(x.Length() - 1))
+	case "next":
+		return x.GetPointer(strconv.Itoa(x.Length()))
+	}
+
 	// Failure!!
 	return nil, false
 }
@@ -112,14 +157,9 @@ func (x *Object[T]) GetPointer(name string) (any, bool) {
 func (x *Object[T]) Remove(key string) bool {
 
 	if index, ok := sliceIndex(key, x.Length()); ok {
-
-		// Remove the item
 		*x = append((*x)[:index], (*x)[index+1:]...)
-
-		// Success!
 		return true
 	}
 
-	// Failure!!
 	return false
 }

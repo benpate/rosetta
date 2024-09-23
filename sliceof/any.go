@@ -2,6 +2,7 @@ package sliceof
 
 import (
 	"math/rand"
+	"strconv"
 
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/slice"
@@ -110,9 +111,24 @@ func (x Any) Shuffle() Any {
 	return x
 }
 
+// Keys returns a slice of strings representing the indexes of this slice
+func (x Any) Keys() []string {
+	keys := make([]string, len(x))
+
+	for i := range x {
+		keys[i] = strconv.Itoa(i)
+	}
+
+	return keys
+}
+
 /******************************************
  * Getter Interfaces
  ******************************************/
+
+func (x Any) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
 
 func (x Any) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
@@ -120,9 +136,20 @@ func (x Any) GetAny(key string) any {
 }
 
 func (x Any) GetAnyOK(key string) (any, bool) {
+
 	if index, ok := sliceIndex(key, x.Length()); ok {
 		return x[index], true
 	}
+
+	switch key {
+
+	case "last":
+		return x.GetIndex(x.Length() - 1)
+
+	case "next":
+		return x.GetIndex(x.Length())
+	}
+
 	return nil, false
 }
 
@@ -179,6 +206,12 @@ func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceIndex(key); ok {
 		growSlice(x, index)
 		return &(*x)[index], true
+	}
+
+	switch key {
+
+	case "last":
+		return x.GetPointer(strconv.Itoa(x.Length() - 1))
 	}
 
 	return nil, false
