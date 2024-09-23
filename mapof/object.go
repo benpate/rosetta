@@ -3,6 +3,7 @@ package mapof
 import (
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/list"
+	"github.com/benpate/rosetta/maps"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/schema"
@@ -19,11 +20,7 @@ func NewObject[T any]() Object[T] {
  ******************************************/
 
 func (x Object[T]) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Object[T]) IsEmpty() bool {

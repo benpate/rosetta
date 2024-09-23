@@ -1,5 +1,7 @@
 package mapof
 
+import "github.com/benpate/rosetta/maps"
+
 type Float map[string]float64
 
 func NewFloat() Float {
@@ -11,11 +13,7 @@ func NewFloat() Float {
  ******************************************/
 
 func (x Float) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Float) Equal(value Float) bool {

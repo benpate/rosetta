@@ -1,5 +1,7 @@
 package mapof
 
+import "github.com/benpate/rosetta/maps"
+
 type Int map[string]int
 
 func NewInt() Int {
@@ -11,11 +13,7 @@ func NewInt() Int {
  ******************************************/
 
 func (x Int) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Int) Equal(value Int) bool {

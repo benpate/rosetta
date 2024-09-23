@@ -1,5 +1,7 @@
 package mapof
 
+import "github.com/benpate/rosetta/maps"
+
 type Int64 map[string]int64
 
 func NewInt64() Int64 {
@@ -11,11 +13,7 @@ func NewInt64() Int64 {
  ******************************************/
 
 func (x Int64) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Int64) Equal(value Int64) bool {

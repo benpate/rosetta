@@ -5,6 +5,7 @@ import (
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
+	"github.com/benpate/rosetta/maps"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -19,11 +20,7 @@ func NewAny() Any {
  ******************************************/
 
 func (x Any) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Any) IsEmpty() bool {
@@ -45,7 +42,7 @@ func (x Any) GetAny(key string) any {
 
 func (x Any) GetAnyOK(key string) (any, bool) {
 	if value, ok := x[key]; ok {
-		return convert.Interface(value), true
+		return value, true
 	}
 	return nil, false
 
@@ -171,6 +168,16 @@ func (x *Any) SetString(key string, value string) bool {
 	return true
 }
 
+func (x *Any) SetValue(value any) error {
+
+	if mapOfAny, ok := MapOfAny(value); ok {
+		*x = mapOfAny
+		return nil
+	}
+
+	return derp.NewInternalError("mapof.Any.SetValue", "Cannot convert value to mapof.Any", value)
+}
+
 // Append adds a new value to the provided key. If a value already exists for this key
 // then it will be forced into a slice of values.
 func (x *Any) Append(key string, value any) {
@@ -292,11 +299,24 @@ func (m Any) GetMap(name string) Any {
 
 // GetSliceOfMap returns a named option as a slice of mapof.Any objects.
 func (m Any) GetSliceOfMap(name string) []Any {
-	value := convert.SliceOfMap(m[name])
-	result := make([]Any, len(value))
 
-	for index := range value {
-		result[index] = Any(value[index])
+	value := m[name]
+
+	switch typed := value.(type) {
+
+	case []Any:
+		return typed
+
+	case *[]Any:
+		return *typed
+	}
+
+	// Re-cast the value in a slice of Any objects
+	mapOfAny := convert.SliceOfMap(value)
+	result := make([]Any, len(mapOfAny))
+
+	for index := range mapOfAny {
+		result[index] = Any(mapOfAny[index])
 	}
 
 	return result

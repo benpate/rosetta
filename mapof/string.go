@@ -1,6 +1,9 @@
 package mapof
 
-import "github.com/benpate/rosetta/convert"
+import (
+	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/maps"
+)
 
 type String map[string]string
 
@@ -13,11 +16,7 @@ func NewString() String {
  ******************************************/
 
 func (x String) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x String) Equal(value String) bool {

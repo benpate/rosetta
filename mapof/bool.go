@@ -1,5 +1,7 @@
 package mapof
 
+import "github.com/benpate/rosetta/maps"
+
 type Bool map[string]bool
 
 func NewBool() Bool {
@@ -11,11 +13,7 @@ func NewBool() Bool {
  ******************************************/
 
 func (x Bool) Keys() []string {
-	keys := make([]string, 0, len(x))
-	for key := range x {
-		keys = append(keys, key)
-	}
-	return keys
+	return maps.KeysSorted(x)
 }
 
 func (x Bool) Equal(value Bool) bool {
