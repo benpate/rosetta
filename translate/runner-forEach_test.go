@@ -35,30 +35,32 @@ func TestForEach(t *testing.T) {
 	// MAPPING RULES
 	rules := New(
 		ForEach("", "", "", []mapof.Any{
-			{"path": "name", "target": "fullName"},
-			{"path": "email", "target": "emailAddress"},
+			{"path": "value.name", "target": "fullName"},
+			{"path": "value.email", "target": "emailAddress"},
 			{"value": "person", "target": "type"},
-			{"expression": "{{.name}} <{{.email}}>", "target": "comment"},
+			{"expression": "{{.value.name}} <{{.value.email}}>", "target": "comment"},
 		}),
 	)
 
 	err := rules.Execute(schema.Wildcard(), &sourceValue, targetSchema, &targetValue)
 	require.Nil(t, err)
-
 	require.Equal(t, 3, len(targetValue))
 
-	require.Equal(t, "Alice", targetValue[0]["fullName"])
-	require.Equal(t, "alice@wonderland.com", targetValue[0]["emailAddress"])
-	require.Equal(t, "person", targetValue[0]["type"])
-	require.Equal(t, "Alice <alice@wonderland.com>", targetValue[0]["comment"])
+	value0 := targetValue[0]
+	require.Equal(t, "Alice", value0["fullName"])
+	require.Equal(t, "alice@wonderland.com", value0["emailAddress"])
+	require.Equal(t, "person", value0["type"])
+	require.Equal(t, "Alice <alice@wonderland.com>", value0["comment"])
 
-	require.Equal(t, "John Connor", targetValue[1]["fullName"])
-	require.Equal(t, "john@connor.mil", targetValue[1]["emailAddress"])
-	require.Equal(t, "person", targetValue[1]["type"])
-	require.Equal(t, "John Connor <john@connor.mil>", targetValue[1]["comment"])
+	value1 := targetValue[1]
+	require.Equal(t, "John Connor", value1["fullName"])
+	require.Equal(t, "john@connor.mil", value1["emailAddress"])
+	require.Equal(t, "person", value1["type"])
+	require.Equal(t, "John Connor <john@connor.mil>", value1["comment"])
 
-	require.Equal(t, "Sarah Connor", targetValue[2]["fullName"])
-	require.Equal(t, "sarah@sky.net", targetValue[2]["emailAddress"])
-	require.Equal(t, "person", targetValue[2]["type"])
-	require.Equal(t, "Sarah Connor <sarah@sky.net>", targetValue[2]["comment"])
+	value2 := targetValue[2]
+	require.Equal(t, "Sarah Connor", value2["fullName"])
+	require.Equal(t, "sarah@sky.net", value2["emailAddress"])
+	require.Equal(t, "person", value2["type"])
+	require.Equal(t, "Sarah Connor <sarah@sky.net>", value2["comment"])
 }

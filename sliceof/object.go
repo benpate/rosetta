@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strconv"
 
+	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/slice"
 )
 
@@ -152,6 +153,16 @@ func (x *Object[T]) GetPointer(name string) (any, bool) {
 
 	// Failure!!
 	return nil, false
+}
+
+func (s *Object[T]) SetValue(value any) error {
+
+	if typed, ok := value.(Object[T]); ok {
+		*s = typed
+		return nil
+	}
+
+	return derp.NewInternalError("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
 }
 
 func (x *Object[T]) Remove(key string) bool {
