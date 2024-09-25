@@ -13,6 +13,8 @@ func (schema Schema) Get(object any, path string) (any, error) {
 
 func (schema Schema) get(object any, element Element, path list.List) (any, error) {
 
+	const location = "schema.Schema.get"
+
 	if path.IsEmpty() {
 		return object, nil
 	}
@@ -22,7 +24,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return nil, derp.NewInternalError("schema.Schema.get", "Unknown property", head)
+		return nil, derp.NewInternalError(location, "Unknown property", head)
 	}
 
 	switch typed := subElement.(type) {
@@ -31,12 +33,12 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 
 		getter, ok := object.(PointerGetter)
 		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Object must be a PointerGetter", object)
+			return nil, derp.NewInternalError(location, "Object must be a PointerGetter", object)
 		}
 
 		subObject, ok := getter.GetPointer(head)
 		if !ok {
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get object", head, object)
+			return nil, derp.NewInternalError(location, "Unable to get object", head, object)
 		}
 
 		return schema.get(subObject, typed, tail)
@@ -57,7 +59,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			}
 		}
 
-		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get bool from BoolGetter or a PointerGettter", object)
+		return nil, derp.NewInternalError(location, "Unable to get bool from BoolGetter or a PointerGettter", object)
 
 	case Integer:
 
@@ -77,7 +79,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 				}
 			}
 
-			return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int64 from Int64Getter or PointerGetter", object)
+			return nil, derp.NewInternalError(location, "Unable to get int64 from Int64Getter or PointerGetter", object)
 		}
 
 		if getter, ok := object.(IntGetter); ok {
@@ -94,7 +96,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			}
 		}
 
-		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get int from IntGetter or PointerGetter", object)
+		return nil, derp.NewInternalError(location, "Unable to get int from IntGetter or PointerGetter", object)
 
 	case Number:
 
@@ -112,7 +114,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			}
 		}
 
-		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get float from FloatGetter or PointerGetter", object)
+		return nil, derp.NewInternalError(location, "Unable to get float from FloatGetter or PointerGetter", object)
 
 	case String:
 
@@ -130,8 +132,8 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			}
 		}
 
-		return nil, derp.NewInternalError("schema.Schema.get", "Unable to get string from StringGetter or PointerGetter", object)
+		return nil, derp.NewInternalError(location, "Unable to get string from StringGetter or PointerGetter", object)
 	}
 
-	return nil, derp.NewInternalError("schema.Schema.get", "Unable to get property", path, object)
+	return nil, derp.NewInternalError(location, "Unable to get property", path, object)
 }
