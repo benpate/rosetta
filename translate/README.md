@@ -1,4 +1,4 @@
-# translate 🔗
+# translate 🗺️
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/translate)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/benpate/rosetta/go.yml?branch=main&style=flat-square)](https://github.com/benpate/rosetta/actions/workflows/go.yml)
@@ -36,4 +36,4 @@ This library maps data from one variable into another.  requires a `schema` for 
 
 ## Pull Requests Welcome
 
-This library is a work in progress, and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making this library better, send in a pull request.  We're all in this together! 🔗
+This library is a work in progress, and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making this library better, send in a pull request.  We're all in this together! 🗺️
