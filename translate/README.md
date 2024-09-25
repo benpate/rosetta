@@ -3,7 +3,7 @@
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/translate)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/benpate/rosetta/go.yml?branch=main&style=flat-square)](https://github.com/benpate/rosetta/actions/workflows/go.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/translate.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/translate)
-[![Go Report Card](https://goreportcard.com/badge/github.com/benpate/translate/mapper?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/translate)
+[![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta)
 [![Version](https://img.shields.io/github/v/release/benpate/rosetta?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/releases)
 
 ## Object TranslationUtilities for Go
