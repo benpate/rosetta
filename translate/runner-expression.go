@@ -5,7 +5,6 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/schema"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // expressionRunner is a Runner that executes a template expression
@@ -42,7 +41,6 @@ func newExpressionRunner(expression string, target string) (expressionRunner, er
 func (runner expressionRunner) Execute(_ schema.Schema, sourceValue any, targetSchema schema.Schema, targetValue any) error {
 
 	value := executeTemplate(runner.Expression, sourceValue)
-	spew.Dump("expression...", sourceValue, value)
 
 	if err := targetSchema.Set(targetValue, runner.Target, value); err != nil {
 		return derp.Wrap(err, "mapper.expressionRunner.Set", "Error setting value in target", runner.Target)

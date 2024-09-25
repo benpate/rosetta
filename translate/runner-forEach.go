@@ -9,7 +9,6 @@ import (
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 	"github.com/benpate/rosetta/sliceof"
-	"github.com/davecgh/go-spew/spew"
 )
 
 // forEachRunner retrieves a value from the input object, and writes it to the output object
@@ -79,7 +78,6 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 	sourceGetter, ok := sourceArray.(schema.KeysGetter)
 
 	if !ok {
-		spew.Dump(sourceArray)
 		return derp.NewInternalError(location, "Source value must implement schema.KeysGetter", sourceValue)
 	}
 
