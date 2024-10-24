@@ -25,6 +25,10 @@ func SliceOfStringOk(value any) ([]string, bool) {
 	// Known types
 	switch typed := value.(type) {
 
+	case bool:
+		result, ok := StringOk(typed, "false")
+		return []string{result}, ok
+
 	case float64:
 		result, ok := StringOk(typed, "")
 		return []string{result}, ok
@@ -59,6 +63,9 @@ func SliceOfStringOk(value any) ([]string, bool) {
 		return []string{typed.String()}, true
 
 	case []any:
+		return sliceOfStringOk(typed)
+
+	case []bool:
 		return sliceOfStringOk(typed)
 
 	case []float64:

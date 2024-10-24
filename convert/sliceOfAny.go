@@ -23,6 +23,9 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 	// Known types
 	switch typed := value.(type) {
 
+	case bool:
+		return []any{typed}, true
+
 	case float64:
 		return []any{typed}, true
 
@@ -55,6 +58,9 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 
 	case []any:
 		return typed, true
+
+	case []bool:
+		return sliceOfAnyOk(typed)
 
 	case []int:
 		return sliceOfAnyOk(typed)
