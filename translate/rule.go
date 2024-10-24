@@ -15,7 +15,7 @@ type Rule struct {
 // UnmarshalJSON implements the json.Unmarshaller interface
 func (rule *Rule) UnmarshalJSON(data []byte) error {
 
-	const location = "mapper.Rule.UnmarshalJSON"
+	const location = "rosetta.translate.Rule.UnmarshalJSON"
 
 	temp := mapof.NewAny()
 
@@ -29,7 +29,7 @@ func (rule *Rule) UnmarshalJSON(data []byte) error {
 // UnmarshalMap populates this object from a mapof.Any
 func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
-	const location = "mapper.Rule.UnmarshalMap"
+	const location = "rosetta.translate.Rule.UnmarshalMap"
 
 	// Condition Runner
 	if condition := data.GetString("if"); condition != "" {

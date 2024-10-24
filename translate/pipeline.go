@@ -24,7 +24,7 @@ func NewFromMap(rules ...mapof.Any) (Pipeline, error) {
 	for index, data := range rules {
 
 		if err := result[index].UnmarshalMap(data); err != nil {
-			return result, derp.Wrap(err, "mapper.NewPipeline", "Error unmarshalling rule", data)
+			return result, derp.Wrap(err, "rosetta.translate.NewPipeline", "Error unmarshalling rule", data)
 		}
 	}
 
@@ -36,7 +36,7 @@ func NewFromJSON(jsonString string) (Pipeline, error) {
 	result := make([]Rule, 0)
 
 	if err := json.Unmarshal([]byte(jsonString), &result); err != nil {
-		return result, derp.Wrap(err, "mapper.Parse", "Error parsing JSON", jsonString)
+		return result, derp.Wrap(err, "rosetta.translate.Parse", "Error parsing JSON", jsonString)
 	}
 
 	return result, nil
@@ -47,7 +47,7 @@ func (pipeline Pipeline) Execute(inSchema schema.Schema, inObject any, outSchema
 
 	for _, rule := range pipeline {
 		if err := rule.Execute(inSchema, inObject, outSchema, outObject); err != nil {
-			return derp.Wrap(err, "mapper.Pipeline.Execute", "Error executing rule")
+			return derp.Wrap(err, "rosetta.translate.Pipeline.Execute", "Error executing rule")
 		}
 	}
 	return nil

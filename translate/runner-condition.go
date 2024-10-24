@@ -34,7 +34,7 @@ func Condition(condition string, thenRules []Rule, elseRules []Rule) Rule {
 // newConditionRunner returns a fully initialized conditionRunner
 func newConditionRunner(condition string, thenMap []mapof.Any, elseMap []mapof.Any) (conditionRunner, error) {
 
-	const location = "mapper.newConditionRunner"
+	const location = "rosetta.translate.newConditionRunner"
 
 	// Parse the "if" template
 	conditionTemplate, err := template.New("").Parse(condition)
@@ -67,7 +67,7 @@ func newConditionRunner(condition string, thenMap []mapof.Any, elseMap []mapof.A
 // Execute implements the Runner interface
 func (runner conditionRunner) Execute(sourceSchema schema.Schema, sourceValue any, targetSchema schema.Schema, targetValue any) error {
 
-	const location = "mapper.conditionRunner.Execute"
+	const location = "rosetta.translate.conditionRunner.Execute"
 
 	condition := executeTemplate(runner.Condition, sourceValue)
 

@@ -27,7 +27,7 @@ func newPathRunner(path string, target string) pathRunner {
 // Execute implements the Runner interface
 func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, targetSchema schema.Schema, targetObject any) error {
 
-	const location = "mapper.pathRunner.Execute"
+	const location = "rosetta.translate.pathRunner.Execute"
 
 	value, err := sourceSchema.Get(sourceObject, runner.Path)
 

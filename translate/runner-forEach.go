@@ -34,7 +34,7 @@ func newForEachRunner(sourcePath string, targetPath string, filter string, rules
 	pipeline, err := NewFromMap(rulesMap...)
 
 	if err != nil {
-		return forEachRunner{}, derp.Wrap(err, "mapper.newForEachRunner", "Error creating Pipeline", rulesMap)
+		return forEachRunner{}, derp.Wrap(err, "rosetta.translate.newForEachRunner", "Error creating Pipeline", rulesMap)
 	}
 
 	result := forEachRunner{
@@ -48,7 +48,7 @@ func newForEachRunner(sourcePath string, targetPath string, filter string, rules
 		filterTemplate, err := template.New("").Parse(filter)
 
 		if err != nil {
-			return forEachRunner{}, derp.Wrap(err, "mapper.newForEachRunner", "Error parsing template", filter)
+			return forEachRunner{}, derp.Wrap(err, "rosetta.translate.newForEachRunner", "Error parsing template", filter)
 		}
 		result.Filter = filterTemplate
 	}
@@ -59,7 +59,7 @@ func newForEachRunner(sourcePath string, targetPath string, filter string, rules
 // Execute implements the Runner interface
 func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any, targetSchema schema.Schema, targetValue any) error {
 
-	const location = "mapper.forEachRunner.Execute"
+	const location = "rosetta.translate.forEachRunner.Execute"
 
 	// Get the source element from the sourceSchema
 	sourceElement, ok := sourceSchema.GetArrayElement(runner.SourcePath)

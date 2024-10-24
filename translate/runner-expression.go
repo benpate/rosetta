@@ -28,7 +28,7 @@ func newExpressionRunner(expression string, target string) (expressionRunner, er
 	t, err := template.New("expression").Parse(expression)
 
 	if err != nil {
-		return expressionRunner{}, derp.Wrap(err, "mapper.NewexpressionRunner", "Error parsing template", expression)
+		return expressionRunner{}, derp.Wrap(err, "rosetta.translate.NewexpressionRunner", "Error parsing template", expression)
 	}
 
 	return expressionRunner{
@@ -43,7 +43,7 @@ func (runner expressionRunner) Execute(_ schema.Schema, sourceValue any, targetS
 	value := executeTemplate(runner.Expression, sourceValue)
 
 	if err := targetSchema.Set(targetValue, runner.Target, value); err != nil {
-		return derp.Wrap(err, "mapper.expressionRunner.Set", "Error setting value in target", runner.Target)
+		return derp.Wrap(err, "rosetta.translate.expressionRunner.Set", "Error setting value in target", runner.Target)
 	}
 
 	return nil
