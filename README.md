@@ -9,7 +9,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta)
 [![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta)
 
-## A Collection of Data Manipulation Tools
+## A Collection of Translation and Data Manipulation Tools
 
 Rosetta combines several different data manipulation tools into a single module.  While each was useful on its own, the dependencies between them made updates hellish, so this collection was born.  
 
