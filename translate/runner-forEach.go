@@ -105,11 +105,7 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 
 		// Get the value of the source array at the current index
 		sourcePath := list.ByDot(runner.SourcePath).PushTail(key).String()
-		sourceItemValue, err := sourceSchema.Get(sourceValue, sourcePath)
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error getting value from source", sourcePath)
-		}
+		sourceItemValue, _ := sourceSchema.Get(sourceValue, sourcePath)
 
 		// If the filter exists, and returns false, then skip this record
 		if runner.Filter != nil {
