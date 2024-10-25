@@ -2,6 +2,7 @@ package translate
 
 import (
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -29,11 +30,9 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
 
 	const location = "rosetta.translate.pathRunner.Execute"
 
-	value, err := sourceSchema.Get(sourceObject, runner.Path)
+	value, _ := sourceSchema.Get(sourceObject, runner.Path)
 
-	if err != nil {
-		return derp.Wrap(err, location, "Error getting value from source", runner.Path)
-	}
+	value = convert.Element(value)
 
 	if err := targetSchema.Set(targetObject, runner.Target, value); err != nil {
 		return derp.Wrap(err, location, "Error setting value in target", runner.Target)
