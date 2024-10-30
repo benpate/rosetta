@@ -50,9 +50,14 @@ func TestArray_Validation(t *testing.T) {
 		v := testArrayA{"one", "two", "three", "invalid because its way too long"}
 		require.NotNil(t, s.Validate(&v))
 	}
+}
 
-	{
-		err := s.Validate(17)
-		require.NotNil(t, err)
-	}
+func TestArray_Validation_Fail(t *testing.T) {
+
+	s := New(Array{
+		Items: String{MaxLength: 10},
+	})
+
+	err := s.Validate(17)
+	require.NotNil(t, err)
 }
