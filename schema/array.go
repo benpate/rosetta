@@ -58,30 +58,27 @@ func (element Array) IsRequired() bool {
 // Validate validates a value against this schema
 func (element Array) Validate(object any) error {
 
-	length, ok := getLength(object)
+	if length, isLengthGetter := getLength(object); isLengthGetter {
 
-	if !ok {
-		return derp.NewValidationError("Array must implement LengthGetter interface")
-	}
+		// Check minimum/maximum lengths
+		if element.Required && length == 0 {
+			return derp.NewValidationError(" array value is required")
+		}
 
-	// Check minimum/maximum lengths
-	if element.Required && length == 0 {
-		return derp.NewValidationError(" array value is required")
-	}
+		if (element.MinLength > 0) && (length < element.MinLength) {
+			return derp.NewValidationError(" minimum array length is " + convert.String(element.MinLength))
+		}
 
-	if (element.MinLength > 0) && (length < element.MinLength) {
-		return derp.NewValidationError(" minimum array length is " + convert.String(element.MinLength))
-	}
+		if (element.MaxLength > 0) && (length > element.MaxLength) {
+			return derp.NewValidationError(" maximum array length is " + convert.String(element.MaxLength))
+		}
 
-	if (element.MaxLength > 0) && (length > element.MaxLength) {
-		return derp.NewValidationError(" maximum array length is " + convert.String(element.MaxLength))
-	}
+		for index := 0; index < length; index = index + 1 {
+			indexString := strconv.Itoa(index)
 
-	for index := 0; index < length; index = index + 1 {
-		indexString := strconv.Itoa(index)
-
-		if err := validate(element.Items, object, indexString); err != nil {
-			return derp.Wrap(err, "schema.Array.Validate", "Error Validating object at index", index)
+			if err := validate(element.Items, object, indexString); err != nil {
+				return derp.Wrap(err, "schema.Array.Validate", "Error Validating object at index", index)
+			}
 		}
 	}
 
