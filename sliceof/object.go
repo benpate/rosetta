@@ -65,6 +65,11 @@ func (x Object[T]) Last() T {
 	return result
 }
 
+// Find returns the first element in the slice that satisfies the provided function.
+func (x Object[T]) Find(fn func(T) bool) (T, bool) {
+	return slice.Find(x, fn)
+}
+
 // At returns a bound-safe element from the slice.  If the index
 // is out of bounds, then `At` returns the zero value for the slice type
 func (x Object[T]) At(index int) T {

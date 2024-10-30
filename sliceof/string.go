@@ -64,6 +64,11 @@ func (x String) Last() string {
 	return ""
 }
 
+// Find returns the first element in the slice that satisfies the provided function.
+func (x String) Find(fn func(string) bool) (string, bool) {
+	return slice.Find(x, fn)
+}
+
 // At returns a bound-safe element from the slice.  If the index
 // is out of bounds, then `At` returns the zero value for the slice type
 func (x String) At(index int) string {
