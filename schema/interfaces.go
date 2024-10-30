@@ -41,6 +41,10 @@ type StringGetter interface {
 	GetStringOK(string) (string, bool)
 }
 
+type ValueGetter interface {
+	GetValue() any
+}
+
 /******************************************
  * Special-Case Getter Interfaces
  ******************************************/

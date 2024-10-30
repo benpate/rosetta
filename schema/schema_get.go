@@ -16,6 +16,11 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 	const location = "schema.Schema.get"
 
 	if path.IsEmpty() {
+
+		if getter, ok := object.(ValueGetter); ok {
+			return getter.GetValue(), nil
+		}
+
 		return object, nil
 	}
 
