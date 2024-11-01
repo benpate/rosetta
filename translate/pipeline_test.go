@@ -141,7 +141,7 @@ func ExampleNewFromJSON() {
 func ExampleNewFromMap() {
 
 	// Define rules as a mapof.Any
-	rules := []mapof.Any{
+	rules := []map[string]any{
 		{"expression": "{{.firstName}} {{.lastName}}", "target": "fullName"},
 		{"path": "email", "target": "email"},
 		{"value": "person", "target": "type"},

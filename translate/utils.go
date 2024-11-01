@@ -5,6 +5,7 @@ import (
 	"text/template"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/mapof"
 )
 
 func executeTemplate(t *template.Template, data any) string {
@@ -16,6 +17,10 @@ func executeTemplate(t *template.Template, data any) string {
 	}
 
 	return buffer.String()
+}
+
+func toPlainMap(value mapof.Any) map[string]any {
+	return value.MapOfAny()
 }
 
 /* These functions are unused for now.  Hiding them so that the linter doesn't lose its mind.

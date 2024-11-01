@@ -34,7 +34,7 @@ func TestForEach(t *testing.T) {
 
 	// MAPPING RULES
 	rules := New(
-		ForEach("", "", "", []mapof.Any{
+		ForEach("", "", "", []map[string]any{
 			{"path": "value.name", "target": "fullName"},
 			{"path": "value.email", "target": "emailAddress"},
 			{"value": "person", "target": "type"},

@@ -5,7 +5,6 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -32,7 +31,7 @@ func Condition(condition string, thenRules []Rule, elseRules []Rule) Rule {
 }
 
 // newConditionRunner returns a fully initialized conditionRunner
-func newConditionRunner(condition string, thenMap []mapof.Any, elseMap []mapof.Any) (conditionRunner, error) {
+func newConditionRunner(condition string, thenMap []map[string]any, elseMap []map[string]any) (conditionRunner, error) {
 
 	const location = "rosetta.translate.newConditionRunner"
 

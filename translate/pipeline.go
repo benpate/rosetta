@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/benpate/derp"
-	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -17,7 +16,7 @@ func New(rules ...Rule) Pipeline {
 }
 
 // NewFromMap parses a slice of mapof.Any objects into a Pipeline
-func NewFromMap(rules ...mapof.Any) (Pipeline, error) {
+func NewFromMap(rules ...map[string]any) (Pipeline, error) {
 
 	result := make(Pipeline, len(rules))
 

@@ -20,7 +20,7 @@ type forEachRunner struct {
 }
 
 // ForEach creates a new Rule that copies a value from one location to another
-func ForEach(sourcePath string, targetPath string, filter string, rulesMap []mapof.Any) Rule {
+func ForEach(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) Rule {
 
 	r, err := newForEachRunner(sourcePath, targetPath, filter, rulesMap)
 	derp.Report(err)
@@ -29,7 +29,7 @@ func ForEach(sourcePath string, targetPath string, filter string, rulesMap []map
 }
 
 // newForEachRunner returns a fully initialized forEachRunner object
-func newForEachRunner(sourcePath string, targetPath string, filter string, rulesMap []mapof.Any) (forEachRunner, error) {
+func newForEachRunner(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) (forEachRunner, error) {
 
 	pipeline, err := NewFromMap(rulesMap...)
 

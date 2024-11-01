@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
+	"github.com/benpate/rosetta/slice"
 )
 
 // Rule represents a single mapping rule
@@ -34,8 +35,8 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 	// Condition Runner
 	if condition := data.GetString("if"); condition != "" {
 
-		thenMap := data.GetSliceOfMap("then")
-		elseMap := data.GetSliceOfMap("else")
+		thenMap := slice.Map(data.GetSliceOfMap("then"), toPlainMap)
+		elseMap := slice.Map(data.GetSliceOfMap("else"), toPlainMap)
 
 		runner, err := newConditionRunner(condition, thenMap, elseMap)
 
@@ -52,7 +53,7 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
 		targetPath := data.GetString("target")
 		filter := data.GetString("filter")
-		rulesMap := data.GetSliceOfMap("rules")
+		rulesMap := slice.Map(data.GetSliceOfMap("rules"), toPlainMap)
 
 		runner, err := newForEachRunner(sourcePath, targetPath, filter, rulesMap)
 

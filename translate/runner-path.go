@@ -35,7 +35,7 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
 	value = convert.Element(value)
 
 	if err := targetSchema.Set(targetObject, runner.Target, value); err != nil {
-		return derp.Wrap(err, location, "Error setting value in target", runner.Target)
+		return derp.Wrap(err, location, "Error setting value in target", runner.Target, value)
 	}
 
 	return nil

@@ -268,6 +268,11 @@ func (m Any) IsZeroValue(name string) bool {
 	return compare.IsZero(m[name])
 }
 
+// GetSliceofAny returns a named option as a slice of any values
+func (m Any) GetSliceOfAny(name string) []any {
+	return convert.SliceOfAny(m[name])
+}
+
 // GetSliceOfString returns a named option as a slice of strings
 func (m Any) GetSliceOfString(name string) []string {
 	return convert.SliceOfString(m[name])
