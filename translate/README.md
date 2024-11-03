@@ -24,7 +24,7 @@ This library maps data from one variable into another.  requires a `schema` for 
 
 ### Expression
 
-`{"path":"{{go template expression}}", "target":"target.path"}`
+`{"expression":"{{go template expression}}", "target":"target.path"}`
 
 ### Conditionals
 
