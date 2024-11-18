@@ -5,12 +5,29 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
-	"github.com/benpate/rosetta/slice"
 )
 
 // Rule represents a single mapping rule
 type Rule struct {
 	Runner
+}
+
+func (rule *Rule) MarshalJSON() ([]byte, error) {
+
+	if rule.Runner == nil {
+		return []byte("null"), nil
+	}
+
+	return json.Marshal(rule.Runner)
+}
+
+func (rule *Rule) MarshalMap() map[string]any {
+
+	if rule.Runner == nil {
+		return make(map[string]any)
+	}
+
+	return rule.Runner.MarshalMap()
 }
 
 // UnmarshalJSON implements the json.Unmarshaller interface
@@ -35,13 +52,10 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 	// Condition Runner
 	if condition := data.GetString("if"); condition != "" {
 
-		thenMap := slice.Map(data.GetSliceOfMap("then"), toPlainMap)
-		elseMap := slice.Map(data.GetSliceOfMap("else"), toPlainMap)
+		runner := conditionRunner{}
 
-		runner, err := newConditionRunner(condition, thenMap, elseMap)
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error creating ConditionRunner", data)
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling ConditionRunner", data)
 		}
 
 		rule.Runner = runner
@@ -51,14 +65,10 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 	// ForEach Runner
 	if sourcePath := data.GetString("forEach"); sourcePath != "" {
 
-		targetPath := data.GetString("target")
-		filter := data.GetString("filter")
-		rulesMap := slice.Map(data.GetSliceOfMap("rules"), toPlainMap)
+		runner := forEachRunner{}
 
-		runner, err := newForEachRunner(sourcePath, targetPath, filter, rulesMap)
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error creating ForEachRunner", data)
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling ForEachRunner", data)
 		}
 
 		rule.Runner = runner
@@ -66,20 +76,25 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 	}
 
 	// From Runner
-	if path, ok := data.GetStringOK("path"); ok {
-		targetPath := data.GetString("target")
-		rule.Runner = newPathRunner(path, targetPath)
+	if path := data.GetString("path"); path != "" {
+
+		runner := pathRunner{}
+
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling ForEachRunner", data)
+		}
+
+		rule.Runner = runner
 		return nil
 	}
 
 	// Expression Runner
 	if expression := data.GetString("expression"); expression != "" {
 
-		targetPath := data.GetString("target")
-		runner, err := newExpressionRunner(expression, targetPath)
+		runner := expressionRunner{}
 
-		if err != nil {
-			return derp.Wrap(err, location, "Error creating ExpressionRunner", expression)
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling ExpressionRunner", data)
 		}
 
 		rule.Runner = runner
@@ -88,8 +103,14 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
 	// Value Runner
 	if value := data.GetAny("value"); value != nil {
-		targetPath := data.GetString("target")
-		rule.Runner = newValueRunner(value, targetPath)
+
+		runner := valueRunner{}
+
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling ValueRunner", data)
+		}
+
+		rule.Runner = runner
 		return nil
 	}
 

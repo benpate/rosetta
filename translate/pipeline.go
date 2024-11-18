@@ -30,6 +30,28 @@ func NewFromMap(rules ...map[string]any) (Pipeline, error) {
 	return result, nil
 }
 
+// NewSliceOfPipelines parses a slice of maps into a slice of Pipelines.
+// If any of the maps DOES NOT represent a valid Pipeline, then the function will return an error.
+func NewSliceOfPipelines(slices [][]map[string]any) ([]Pipeline, error) {
+
+	const location = "rosetta.translate.NewSliceOfPipelines"
+
+	result := make([]Pipeline, len(slices))
+
+	for index, item := range slices {
+
+		pipeline, err := NewFromMap(item...)
+
+		if err != nil {
+			return result, derp.Wrap(err, location, "Error creating metadata pipeline", item)
+		}
+
+		result[index] = pipeline
+	}
+
+	return result, nil
+}
+
 // NewFromJSON reads a JSON string and returns a Pipeline object
 func NewFromJSON(jsonString string) (Pipeline, error) {
 	result := make([]Rule, 0)
@@ -58,4 +80,23 @@ func (pipeline Pipeline) IsEmpty() bool {
 
 func (pipeline Pipeline) NotEmpty() bool {
 	return len(pipeline) > 0
+}
+
+/******************************************
+ * Serialization Methods
+ ******************************************/
+
+func (pipeline Pipeline) MarshalJSON() ([]byte, error) {
+	return json.Marshal(pipeline.MarshalSliceOfMap())
+}
+
+func (pipeline Pipeline) MarshalSliceOfMap() []map[string]any {
+
+	result := make([]map[string]any, len(pipeline))
+
+	for index, rule := range pipeline {
+		result[index] = rule.MarshalMap()
+	}
+
+	return result
 }

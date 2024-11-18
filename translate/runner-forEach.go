@@ -16,44 +16,17 @@ type forEachRunner struct {
 	SourcePath string
 	TargetPath string
 	Filter     *template.Template
+	FilterRaw  string
 	Pipeline   Pipeline
 }
 
 // ForEach creates a new Rule that copies a value from one location to another
 func ForEach(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) Rule {
 
-	r, err := newForEachRunner(sourcePath, targetPath, filter, rulesMap)
+	runner := forEachRunner{}
+	err := runner.populate(sourcePath, targetPath, filter, rulesMap)
 	derp.Report(err)
-
-	return Rule{r}
-}
-
-// newForEachRunner returns a fully initialized forEachRunner object
-func newForEachRunner(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) (forEachRunner, error) {
-
-	pipeline, err := NewFromMap(rulesMap...)
-
-	if err != nil {
-		return forEachRunner{}, derp.Wrap(err, "rosetta.translate.newForEachRunner", "Error creating Pipeline", rulesMap)
-	}
-
-	result := forEachRunner{
-		SourcePath: sourcePath,
-		TargetPath: targetPath,
-		Pipeline:   pipeline,
-	}
-
-	// IF filter is defined, then parse the template and add it to the result
-	if filter != "" {
-		filterTemplate, err := template.New("").Parse(filter)
-
-		if err != nil {
-			return forEachRunner{}, derp.Wrap(err, "rosetta.translate.newForEachRunner", "Error parsing template", filter)
-		}
-		result.Filter = filterTemplate
-	}
-
-	return result, nil
+	return Rule{runner}
 }
 
 // Execute implements the Runner interface
@@ -137,6 +110,60 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 			return derp.Wrap(err, location, "Error setting value in target", runner.TargetPath)
 		}
 	}
+
+	return nil
+}
+
+/******************************************
+ * Serialization Methods
+ ******************************************/
+
+func (runner forEachRunner) MarshalMap() map[string]any {
+	return map[string]any{
+		"forEach": runner.SourcePath,
+		"target":  runner.TargetPath,
+		"filter":  runner.FilterRaw,
+		"rules":   runner.Pipeline.MarshalSliceOfMap(),
+	}
+}
+
+func (runner *forEachRunner) UnmarshalMap(data mapof.Any) error {
+
+	return runner.populate(
+		data.GetString("forEach"),
+		data.GetString("target"),
+		data.GetString("filter"),
+		data.GetSliceOfPlainMap("rules"),
+	)
+}
+
+func (runner *forEachRunner) populate(source string, target string, filter string, rules []map[string]any) error {
+
+	// Populate Filter
+	runner.Filter = nil
+	if runner.FilterRaw != "" {
+		filterTemplate, err := template.New("").Parse(runner.FilterRaw)
+
+		if err != nil {
+			return derp.Wrap(err, "rosetta.translate.forEachRunner.populate", "Error parsing `filter` template", runner.FilterRaw)
+		}
+		runner.Filter = filterTemplate
+	} else {
+		runner.Filter = nil
+	}
+
+	// Parse Rules
+	pipeline, err := NewFromMap(rules...)
+
+	if err != nil {
+		return derp.Wrap(err, "rosetta.translate.forEachRunner.populate", "Error creating Pipeline", rules)
+	}
+
+	// Populate remaining fields
+	runner.SourcePath = source
+	runner.TargetPath = target
+	runner.FilterRaw = filter
+	runner.Pipeline = pipeline
 
 	return nil
 }

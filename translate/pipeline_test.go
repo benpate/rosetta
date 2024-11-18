@@ -26,6 +26,16 @@ func TestPipelineUnmarshal(t *testing.T) {
 	}
 
 	require.Equal(t, 3, len(rules))
+
+	require.Equal(t, "name1", rules[0].Runner.(pathRunner).Path)
+	require.Equal(t, "name1", rules[0].Runner.(pathRunner).Target)
+
+	require.Equal(t, "application/json", rules[1].Runner.(valueRunner).Value)
+	require.Equal(t, "mimeType", rules[1].Runner.(valueRunner).Target)
+
+	require.NotNil(t, rules[2].Runner.(expressionRunner).Expression)
+	require.Equal(t, "{{.firstName}} {{.lastName}}", rules[2].Runner.(expressionRunner).ExpressionRaw)
+	require.Equal(t, "fullName", rules[2].Runner.(expressionRunner).Target)
 }
 
 func TestExecuteRules(t *testing.T) {
@@ -183,9 +193,9 @@ func ExamplePipeline_Execute() {
 
 	// CREATE MAPPING RULES
 	rules, err := NewFromMap(
-		mapof.Any{"expression": "{{.firstName}} {{.lastName}}", "target": "fullName"},
-		mapof.Any{"path": "email", "target": "email"},
-		mapof.Any{"value": "person", "target": "type"},
+		mapof.Any{"target": "fullName", "expression": "{{.firstName}} {{.lastName}}"},
+		mapof.Any{"target": "email", "path": "email"},
+		mapof.Any{"target": "type", "value": "person"},
 		mapof.Any{"if": "{{eq \"M\" .gender}}", "then": []mapof.Any{
 			{"target": "comment", "expression": "{{.firstName}} is Male"},
 		}, "else": []mapof.Any{

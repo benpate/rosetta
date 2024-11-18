@@ -2,6 +2,7 @@ package translate
 
 import (
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -30,6 +31,25 @@ func (runner valueRunner) Execute(_ schema.Schema, _ any, targetSchema schema.Sc
 	if err := targetSchema.Set(targteObject, runner.Target, runner.Value); err != nil {
 		return derp.Wrap(err, "rosetta.translate.valueRunner.Set", "Error setting value in target", runner.Target)
 	}
+
+	return nil
+}
+
+/******************************************
+ * Serialization Methods
+ ******************************************/
+
+func (runner valueRunner) MarshalMap() map[string]any {
+	return mapof.Any{
+		"value":  runner.Value,
+		"target": runner.Target,
+	}
+}
+
+func (runner *valueRunner) UnmarshalMap(data mapof.Any) error {
+
+	runner.Value = data.GetAny("value")
+	runner.Target = data.GetString("target")
 
 	return nil
 }
