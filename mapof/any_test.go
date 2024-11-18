@@ -126,3 +126,21 @@ func TestAny_EmptyInt64(t *testing.T) {
 	require.Equal(t, nil, m.GetAny("key"))
 	require.Zero(t, len(m))
 }
+
+func TestSliceOfPlainMap(t *testing.T) {
+
+	data := Any{
+		"value": []Any{
+			{"key": "valueA"},
+			{"key": "valueB"},
+			{"key": "valueC"},
+		},
+	}
+
+	plainMap := data.GetSliceOfPlainMap("value")
+
+	require.Equal(t, 3, len(plainMap))
+	require.Equal(t, "valueA", plainMap[0]["key"])
+	require.Equal(t, "valueB", plainMap[1]["key"])
+	require.Equal(t, "valueC", plainMap[2]["key"])
+}

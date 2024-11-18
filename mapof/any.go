@@ -327,6 +327,25 @@ func (m Any) GetSliceOfMap(name string) []Any {
 	return result
 }
 
+func (m Any) GetSliceOfPlainMap(name string) []map[string]any {
+
+	switch typed := m[name].(type) {
+
+	case []Any:
+		result := make([]map[string]any, len(typed))
+		for index, value := range typed {
+			result[index] = map[string]any(value)
+		}
+		return result
+
+	case []map[string]any:
+		return typed
+
+	default:
+		return convert.SliceOfMap(m[name])
+	}
+}
+
 func (m Any) MapOfAny() map[string]any {
 	return m
 }
