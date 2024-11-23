@@ -71,6 +71,7 @@ func (pipeline Pipeline) Execute(inSchema schema.Schema, inObject any, outSchema
 			return derp.Wrap(err, "rosetta.translate.Pipeline.Execute", "Error executing rule")
 		}
 	}
+
 	return nil
 }
 
