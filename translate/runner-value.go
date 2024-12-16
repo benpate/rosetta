@@ -48,7 +48,7 @@ func (runner valueRunner) MarshalMap() map[string]any {
 
 func (runner *valueRunner) UnmarshalMap(data mapof.Any) error {
 
-	runner.Value = data.GetAny("value")
+	runner.Value = upscale(data.GetAny("value"))
 	runner.Target = data.GetString("target")
 
 	return nil
