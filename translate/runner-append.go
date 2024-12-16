@@ -48,7 +48,7 @@ func (runner appendRunner) MarshalMap() map[string]any {
 
 func (runner *appendRunner) UnmarshalMap(data mapof.Any) error {
 
-	runner.Append = data.GetAny("append")
+	runner.Append = upscale(data.GetAny("append"))
 	runner.Target = data.GetString("target")
 
 	return nil
