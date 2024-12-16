@@ -181,6 +181,20 @@ func (element Array) SetIndex(value any, index int, item any) bool {
 	return false
 }
 
+// Append adds a new item to the end of the array (if the object implements ArraySetter)
+func (element Array) Append(value ArraySetter, item any) error {
+
+	const location = "schema.Array.Append"
+
+	// Try to set the value at the end of the array
+	if success := value.SetIndex(value.Length(), item); !success {
+		return derp.NewInternalError(location, "Unable to set value at end of array", value)
+	}
+
+	// Success
+	return nil
+}
+
 /******************************************
  * Marshal / Unmarshal Methods
  ******************************************/

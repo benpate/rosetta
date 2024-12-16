@@ -14,3 +14,11 @@ func TestAny_Append(t *testing.T) {
 
 	require.Equal(t, Any{1, "hello", true, 42.0, "world", false}, x)
 }
+
+func TestAny_LengthGetter(t *testing.T) {
+
+	x := Any{1, "hello", true}
+
+	require.Equal(t, 3, x.Length())
+	require.Equal(t, 3, (&x).Length())
+}

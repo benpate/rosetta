@@ -160,6 +160,23 @@ func (x *Object[T]) GetPointer(name string) (any, bool) {
 	return nil, false
 }
 
+/******************************************
+ * Setter Interfaces
+ ******************************************/
+
+func (s *Object[T]) SetIndex(index int, value any) bool {
+
+	typed, ok := value.(T)
+
+	if !ok {
+		return false
+	}
+
+	growSlice(s, index)
+	(*s)[index] = typed
+	return true
+}
+
 func (s *Object[T]) SetValue(value any) error {
 
 	if typed, ok := value.(Object[T]); ok {

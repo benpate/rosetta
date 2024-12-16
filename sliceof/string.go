@@ -164,6 +164,12 @@ func (x String) GetStringOK(key string) (string, bool) {
 	return "", false
 }
 
+func (s *String) SetIndex(index int, value any) bool {
+	growSlice(s, index)
+	(*s)[index] = convert.String(value)
+	return true
+}
+
 func (s *String) SetString(key string, value string) bool {
 	if index, ok := sliceIndex(key); ok {
 		growSlice(s, index)

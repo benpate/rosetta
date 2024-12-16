@@ -238,6 +238,12 @@ func (x Any) GetStringOK(key string) (string, bool) {
  * Setter Interfaces
  ******************************************/
 
+func (s *Any) SetIndex(index int, value any) bool {
+	growSlice(s, index)
+	(*s)[index] = value
+	return true
+}
+
 func (x *Any) SetAny(key string, value any) bool {
 
 	if index, ok := sliceIndex(key); ok {

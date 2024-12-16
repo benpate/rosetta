@@ -101,6 +101,19 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 		return nil
 	}
 
+	// Append Runner
+	if append := data.GetAny("append"); append != nil {
+
+		runner := appendRunner{}
+
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling AppendRunner", data)
+		}
+
+		rule.Runner = runner
+		return nil
+	}
+
 	// Value Runner
 	if value := data.GetAny("value"); value != nil {
 
