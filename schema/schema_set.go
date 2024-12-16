@@ -64,15 +64,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	// Different interfaces are required for different types of objects
 	switch typed := subElement.(type) {
 
-	case Any:
-
-		// ObjectSetter interface is required to set values inside of Maps (grr...)
-		if setter, ok := object.(ObjectSetter); ok {
-			return setter.SetObject(element, path, value)
-		}
-		return derp.NewInternalError(location, "To set an 'Any' value, the target Object must be an ObjectSetter", object)
-
-	case Array, Object:
+	case Any, Array, Object:
 
 		// ObjectSetter interface is required for Maps
 		if setter, ok := object.(ObjectSetter); ok {
@@ -85,8 +77,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 				return SetElement(subPointer, typed, tail, value)
 			}
 		}
-
-		return derp.NewInternalError(location, "To set an 'Array' or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", object)
+		return derp.NewInternalError(location, "To set an 'Any', 'Array', or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", object)
 
 	case Boolean:
 		boolValue, _ := convert.BoolOk(value, false)
