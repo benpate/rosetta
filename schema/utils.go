@@ -4,20 +4,6 @@ import (
 	"reflect"
 )
 
-// pointerTo returns the provided value as a pointer to the original.
-// If the provided value is already a pointer, it is returned as-is.
-func pointerTo(value any) any {
-
-	// Some reflect magic to make sure we're working with a pointer
-	if reflect.ValueOf(value).Kind() == reflect.Ptr {
-		return value
-	}
-
-	ptrValue := reflect.New(reflect.TypeOf(value))
-	reflect.Indirect(ptrValue).Set(reflect.ValueOf(value))
-	return ptrValue.Interface()
-}
-
 // indirect returns the value of a pointer, if the provided value is a pointer.
 func indirect(value any) any {
 

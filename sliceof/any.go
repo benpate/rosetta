@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/pointer"
 	"github.com/benpate/rosetta/slice"
 )
 
@@ -210,7 +211,7 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceIndex(key); ok {
 		growSlice(x, index)
-		return &(*x)[index], true
+		return pointer.To((*x)[index]), true
 	}
 
 	switch key {

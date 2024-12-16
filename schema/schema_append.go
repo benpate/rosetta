@@ -2,6 +2,7 @@ package schema
 
 import (
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/pointer"
 )
 
 func (schema Schema) Append(object any, path string, value any) error {
@@ -22,7 +23,7 @@ func (schema Schema) Append(object any, path string, value any) error {
 	}
 
 	// This will only work for ArraySetter objects
-	setter, isSetter := pointerTo(originalValue).(ArraySetter)
+	setter, isSetter := pointer.To(originalValue).(ArraySetter)
 
 	if !isSetter {
 		return derp.NewInternalError(location, "Value must implement ArraySetter interface", setter, isSetter, path)

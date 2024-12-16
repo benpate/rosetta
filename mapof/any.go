@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
+	"github.com/benpate/rosetta/pointer"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -234,17 +235,17 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 		return derp.NewInternalError("mapof.Any.SetObject", "Unknown property", head)
 	}
 
-	var tempValue Any
+	var tempValue any
 
-	// If we already have a mapof.Any, then it's ok to append to it
-	if subValue, ok := (*x)[head].(Any); ok {
+	// If we already have a value in this spot, then use it
+	if subValue, ok := (*x)[head]; ok {
 		tempValue = subValue
 	} else {
 		// Otherwise, initialize a new mapof.Any
 		tempValue = make(Any)
 	}
 
-	if err := schema.SetElement(&tempValue, subElement, tail, value); err != nil {
+	if err := schema.SetElement(pointer.To(tempValue), subElement, tail, value); err != nil {
 		return derp.Wrap(err, "mapof.Any.SetObject", "Error setting value", path)
 	}
 
