@@ -86,6 +86,10 @@ func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalVa
 
 func (element Object) Inherit(parent Element) {
 
+	if element.Properties == nil {
+		element.Properties = make(ElementMap)
+	}
+
 	// Inherit each property from the parent
 	if parentObject, ok := parent.(Object); ok {
 		for propertyName, parentProperty := range parentObject.Properties {
