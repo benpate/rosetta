@@ -117,10 +117,6 @@ func StringOk(value any, defaultValue string) (string, bool) {
 		return buffer.String(), true
 	}
 
-	if baseValue, ok := BaseTypeOK(value); ok {
-		return StringOk(baseValue, defaultValue)
-	}
-
 	return defaultValue, false
 }
 

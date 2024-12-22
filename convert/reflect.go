@@ -78,7 +78,7 @@ func BaseTypeOK(value any) (any, bool) {
 		return result, true
 
 	case reflect.Map:
-		result := make(map[string]any, reflectValue.Len())
+		result := make(map[string]any)
 		for _, key := range reflectValue.MapKeys() {
 			if value, ok := BaseTypeOK(reflectValue.MapIndex(key)); ok {
 				result[key.String()] = value

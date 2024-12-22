@@ -63,5 +63,7 @@ func TestBaseType(t *testing.T) {
 	type testSliceType []string
 
 	testSlice := testSliceType{"a"}
-	require.Equal(t, "a", String(testSlice))
+	baseType, ok := BaseTypeOK(testSlice)
+	require.True(t, ok)
+	require.Equal(t, "a", String(baseType))
 }
