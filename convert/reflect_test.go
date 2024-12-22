@@ -57,3 +57,11 @@ func TestInterface_Invalid(t *testing.T) {
 	v := Interface(reflect.ValueOf(value["missing"]))
 	require.Equal(t, nil, v)
 }
+
+func TestBaseType(t *testing.T) {
+
+	type testSliceType []string
+
+	testSlice := testSliceType{"a"}
+	require.Equal(t, "a", String(testSlice))
+}
