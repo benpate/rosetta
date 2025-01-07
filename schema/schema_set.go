@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"net/url"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
@@ -14,6 +16,31 @@ func (schema Schema) Set(object any, path string, value any) error {
 // at the first error it encounters.  If all values are addedd successfully, then SetAll
 // also uses Validate() to confirm that the object is still correct.
 func (schema Schema) SetAll(object any, values map[string]any) error {
+
+	const location = "schema.Schema.SetAll"
+
+	// Set each value in the schema
+	for path, value := range values {
+
+		// Errors are intentionally ignored here.
+		// Unallowed data does not make it through the schema filter
+		// nolint: errcheck
+		schema.Set(object, path, value)
+	}
+
+	// Validate the whole schema once all the values are set
+	if err := schema.Validate(object); err != nil {
+		return derp.Wrap(err, location, "Validation Error")
+	}
+
+	// Success!!
+	return nil
+}
+
+// SetURLValues iterates over Set to apply all of the values to the object one at a time, stopping
+// at the first error it encounters.  If all values are addedd successfully, then SetURLValues
+// also uses Validate() to confirm that the object is still correct.
+func (schema Schema) SetURLValues(object any, values url.Values) error {
 
 	const location = "schema.Schema.SetAll"
 
