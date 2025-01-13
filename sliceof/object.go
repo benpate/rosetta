@@ -89,6 +89,17 @@ func (x Object[T]) Reverse() Object[T] {
 	return x
 }
 
+// Contains returns TRUE if the "match" function returns TRUE for any element in the slice
+func (x Object[T]) Contains(match func(T) bool) bool {
+	for _, value := range x {
+		if match(value) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Append adds one or more elements to the end of the slice
 func (x *Object[T]) Append(values ...T) {
 	*x = append(*x, values...)
