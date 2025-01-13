@@ -7,7 +7,7 @@ import (
 )
 
 // Token validates a simple token string suitable for use as URL identifiers
-func Token(arg string) StringFormat {
+func Token(_ string) StringFormat {
 
 	token := regexp.MustCompile("(?i)^[A-Z0-9-_]+$")
 
