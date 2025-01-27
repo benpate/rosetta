@@ -2,6 +2,7 @@ package convert
 
 import (
 	"io"
+	"math"
 	"reflect"
 	"strconv"
 )
@@ -60,12 +61,21 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		return int(v), true
 
 	case int64:
+		if v > math.MaxInt {
+			return math.MaxInt, false
+		}
 		return int(v), true
 
 	case float32:
+		if v > math.MaxInt {
+			return math.MaxInt, false
+		}
 		return int(v), hasDecimal(float64(v))
 
 	case float64:
+		if v > math.MaxInt {
+			return math.MaxInt, false
+		}
 		return int(v), hasDecimal(v)
 
 	case string:
