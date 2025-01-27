@@ -75,3 +75,9 @@ func TestTimeString4(t *testing.T) {
 	result := Time("2024-01-10T05:18:54Z")
 	require.Equal(t, time.Date(2024, 1, 10, 5, 18, 54, 0, time.UTC), result)
 }
+
+func TestTimeWithLocale(t *testing.T) {
+	result, ok := TimeWithLocale("2022-09-25T14:50:32.000Z")
+	require.True(t, ok)
+	require.Equal(t, time.Date(2022, 9, 25, 14, 50, 32, 0, time.UTC), result)
+}
