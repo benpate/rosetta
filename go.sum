@@ -2,8 +2,8 @@ github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuP
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/benpate/derp v0.31.1 h1:8mnJo7A/lmHUG37GjE6fDg5kxoI1xZ5bFzszSrOA2LM=
 github.com/benpate/derp v0.31.1/go.mod h1:y+PJWv5VOBOnd1y4CGk/c7xVS0Pwxg9BGQE5r/SGc8w=
-github.com/benpate/exp v0.8.3 h1:rxlXtdLxc+XU5ySoAFEt7YKOjhOE7YRMz15YUePBLJk=
-github.com/benpate/exp v0.8.3/go.mod h1:VWDkZ1uM4HyXJVi+NDA1QvVklsgFE7T9L5lCeZBento=
+github.com/benpate/exp v0.8.4 h1:vDvlYvNy8TgjjfJWhXPtpNrfXK611Q+UbfzFt4KbM24=
+github.com/benpate/exp v0.8.4/go.mod h1:VWDkZ1uM4HyXJVi+NDA1QvVklsgFE7T9L5lCeZBento=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
