@@ -24,6 +24,9 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 	case Timer:
 		return typed.Time(), true
 
+	case ToTimer:
+		return typed.ToTime(), true
+
 	case string:
 
 		if result, ok := TimeWithLocale(typed); ok {

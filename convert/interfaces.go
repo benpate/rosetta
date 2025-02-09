@@ -55,6 +55,13 @@ type Timer interface {
 	Time() time.Time
 }
 
+// ToTimer interface wraps the ToTime() method that returns the time.Time value of the underlying object.
+// This is a cheap hack for instances where we can't use the Timer interface
+type ToTimer interface {
+	// Time returns the time.Time value of the underlying object
+	ToTime() time.Time
+}
+
 // Length interface wraps the Length() method that returns the length of an array or map
 type LengthGetter interface {
 	Length() int
