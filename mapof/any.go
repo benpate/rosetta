@@ -1,6 +1,8 @@
 package mapof
 
 import (
+	"time"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
@@ -107,6 +109,18 @@ func (x Any) GetStringOK(key string) (string, bool) {
 		return convert.StringOk(value, "")
 	}
 	return "", false
+}
+
+func (x Any) GetTime(key string) time.Time {
+	result, _ := x.GetTimeOK(key)
+	return result
+}
+
+func (x Any) GetTimeOK(key string) (time.Time, bool) {
+	if value, ok := x[key]; ok {
+		return convert.TimeOk(value, time.Time{})
+	}
+	return time.Time{}, false
 }
 
 /****************************************
