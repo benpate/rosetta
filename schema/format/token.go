@@ -9,7 +9,7 @@ import (
 // Token validates a simple token string suitable for use as URL identifiers
 func Token(_ string) StringFormat {
 
-	token := regexp.MustCompile("(?i)^[A-Z0-9-_]+$")
+	token := regexp.MustCompile(`(?i)^[\p{L}\p{N}-_]+$`)
 
 	return func(value string) (string, error) {
 

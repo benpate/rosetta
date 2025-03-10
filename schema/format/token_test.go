@@ -28,6 +28,12 @@ func TestTokenFormat(t *testing.T) {
 	}
 
 	{
+		value, err := Token("")("ŤøķĒņš-čÃŅ_ĦÅVę_ŰñíCöÐĚ")
+		require.Nil(t, err)
+		require.Equal(t, value, "ŤøķĒņš-čÃŅ_ĦÅVę_ŰñíCöÐĚ")
+	}
+
+	{
 		value, err := Token("")("T0K3N5-C4N-H4V3-NUMB3RS")
 		require.Nil(t, err)
 		require.Equal(t, value, "T0K3N5-C4N-H4V3-NUMB3RS")
