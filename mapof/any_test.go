@@ -1,6 +1,7 @@
 package mapof
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/benpate/rosetta/schema"
@@ -143,4 +144,26 @@ func TestSliceOfPlainMap(t *testing.T) {
 	require.Equal(t, "valueA", plainMap[0]["key"])
 	require.Equal(t, "valueB", plainMap[1]["key"])
 	require.Equal(t, "valueC", plainMap[2]["key"])
+}
+
+func TestEqual(t *testing.T) {
+
+	a := Any{
+		"a": "value",
+		"b": []string{"one", "two", "three"},
+		"c": Any{
+			"deeply": "valued",
+		},
+	}
+
+	b := Any{
+		"a": "value",
+		"b": []string{"one", "two", "three"},
+		"c": Any{
+			"deeply": "valued",
+		},
+	}
+
+	require.True(t, reflect.DeepEqual(a, b))
+	require.True(t, a.Equal(b))
 }

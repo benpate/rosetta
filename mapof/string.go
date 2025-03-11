@@ -19,7 +19,7 @@ func (x String) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
-func (x String) Equal(value String) bool {
+func (x String) Equal(value map[string]string) bool {
 	// Lengths must be identical
 	if len(x) != len(value) {
 		return false
@@ -33,6 +33,10 @@ func (x String) Equal(value String) bool {
 	}
 
 	return true
+}
+
+func (x String) NotEqual(value map[string]string) bool {
+	return !x.Equal(value)
 }
 
 func (x String) IsEmpty() bool {

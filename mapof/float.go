@@ -16,20 +16,12 @@ func (x Float) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
-func (x Float) Equal(value Float) bool {
-	// Lengths must be identical
-	if len(x) != len(value) {
-		return false
-	}
+func (x Float) Equal(value map[string]float64) bool {
+	return maps.Equal(x, value)
+}
 
-	// Items at each index must be identical
-	for key := range x {
-		if x[key] != value[key] {
-			return false
-		}
-	}
-
-	return true
+func (x Float) NotEqual(value map[string]float64) bool {
+	return maps.NotEqual(x, value)
 }
 
 func (x Float) IsEmpty() bool {

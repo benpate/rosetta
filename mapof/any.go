@@ -1,6 +1,7 @@
 package mapof
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/benpate/derp"
@@ -24,6 +25,14 @@ func NewAny() Any {
 
 func (x Any) Keys() []string {
 	return maps.KeysSorted(x)
+}
+
+func (x Any) Equal(value map[string]any) bool {
+	return reflect.DeepEqual(x, Any(value))
+}
+
+func (x Any) NotEqual(value map[string]any) bool {
+	return !reflect.DeepEqual(x, Any(value))
 }
 
 func (x Any) IsEmpty() bool {
