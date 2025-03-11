@@ -104,6 +104,11 @@ func (x String) Equal(value []string) bool {
 	return slice.Equal(x, value)
 }
 
+// NotEqual returns TRUE if the slice DOES NOT contain exactly the same elements as the "value" slice
+func (x String) NotEqual(value []string) bool {
+	return !slice.Equal(x, value)
+}
+
 // Join concatenates all elements of the slice into a single string, separated by the specified delimiter
 func (x String) Join(delimiter string) string {
 	return strings.Join(x, delimiter)

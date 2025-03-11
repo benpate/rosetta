@@ -17,3 +17,8 @@ func Equal[T comparable](value1 []T, value2 []T) bool {
 
 	return true
 }
+
+// NotEqual returns TRUE if the two slices are NOT identical
+func NotEqual[T comparable](value1 []T, value2 []T) bool {
+	return !Equal(value1, value2)
+}
