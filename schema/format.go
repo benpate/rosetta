@@ -52,4 +52,5 @@ func init() {
 	UseFormat("color", format.Color)
 	UseFormat("token", format.Token)
 	UseFormat("unsafe-any", format.UnsafeAny)
+	UseFormat("username", format.Username)
 }
