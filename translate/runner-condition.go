@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/funcmap"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 )
@@ -20,7 +21,7 @@ type conditionRunner struct {
 // Condition creates a new Rule that executes a condition, and then runs a set of rules based on the result
 func Condition(condition string, thenRules []Rule, elseRules []Rule) Rule {
 
-	conditionTemplate, err := template.New("").Parse(condition)
+	conditionTemplate, err := template.New("").Funcs(funcmap.All()).Parse(condition)
 	derp.Report(err)
 
 	return Rule{

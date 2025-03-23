@@ -5,6 +5,7 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/funcmap"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
@@ -142,7 +143,7 @@ func (runner *forEachRunner) populate(source string, target string, filter strin
 	// Populate Filter
 	runner.Filter = nil
 	if runner.FilterRaw != "" {
-		filterTemplate, err := template.New("").Parse(runner.FilterRaw)
+		filterTemplate, err := template.New("").Funcs(funcmap.All()).Parse(runner.FilterRaw)
 
 		if err != nil {
 			return derp.Wrap(err, "rosetta.translate.forEachRunner.populate", "Error parsing `filter` template", runner.FilterRaw)

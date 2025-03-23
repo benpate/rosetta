@@ -4,6 +4,7 @@ import (
 	"text/template"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/funcmap"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 )
@@ -62,7 +63,7 @@ func (runner *expressionRunner) populate(expression string, target string) error
 	const location = "rosetta.translate.expressionRunner.populate"
 
 	// Parse the template
-	expressionTemplate, err := template.New("").Parse(expression)
+	expressionTemplate, err := template.New("").Funcs(funcmap.All()).Parse(expression)
 
 	if err != nil {
 		return derp.Wrap(err, location, "Error parsing `expression` template", expression)
