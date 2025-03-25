@@ -21,9 +21,9 @@ func TestUsernameFormat(t *testing.T) {
 	yes("username")
 	yes("USERNAMES_CAN_HAVE_UNDERSCORES")
 	yes("usernames_can_have_lowercase_letters")
-	yes("usernames-can-have-dashes")
-	yes("USERNAMES-C4N-H4V3-NUMB3RS")
+	yes("USERNAMES_C4N_H4V3_NUMB3RS")
 
+	no("usernames-cant-have-dashes")
 	no("USERNAMES_CANT_ĦÅVę_ŰñíCöÐĚ")
 	no("USERNAMES CANT HAVE SPACES")
 	no("USERNAMES-CANT-HAVE-A'POSTROPHES")
