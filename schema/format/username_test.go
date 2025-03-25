@@ -12,12 +12,13 @@ func TestUsernameFormat(t *testing.T) {
 		_, err := Username("")(value)
 		require.Nil(t, err)
 	}
+
 	no := func(value string) {
 		_, err := Username("")(value)
 		require.NotNil(t, err)
 	}
 
-	yes("") // Usernames can be empty
+	yes("") // Usernames can be empty but `required` would make them required
 	yes("username")
 	yes("USERNAMES_CAN_HAVE_UNDERSCORES")
 	yes("usernames_can_have_lowercase_letters")
