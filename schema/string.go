@@ -17,6 +17,8 @@ type String struct {
 	MinLength  int      `json:"minLength"`
 	MaxLength  int      `json:"maxLength"`
 	Enum       []string `json:"enum"`
+	MinValue   string   `json:"minValue"`
+	MaxValue   string   `json:"maxValue"`
 	Pattern    string   `json:"pattern"`
 	Format     string   `json:"format"`
 	Required   bool     `json:"required"`
@@ -50,6 +52,20 @@ func (element String) Validate(value any) error {
 	if element.Required {
 		if stringValue == "" {
 			return derp.NewValidationError(" string field is required")
+		}
+	}
+
+	// Validate minimum value
+	if element.MinValue != "" {
+		if stringValue < element.MinValue {
+			return derp.NewValidationError(" minimum string value is " + element.MinValue)
+		}
+	}
+
+	// Validate maximum value
+	if element.MaxValue != "" {
+		if stringValue > element.MaxValue {
+			return derp.NewValidationError(" maximum string value is " + element.MaxValue)
 		}
 	}
 

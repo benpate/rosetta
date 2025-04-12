@@ -89,3 +89,20 @@ func TestStringEnumRequired(t *testing.T) {
 
 	require.NotNil(t, s.Validate(""))
 }
+
+func TestStringMinValue(t *testing.T) {
+	s := String{MinValue: "abc"}
+
+	require.Nil(t, s.Validate("abcd"))
+	require.NotNil(t, s.Validate("ab"))
+	require.NotNil(t, s.Validate("a"))
+	require.NotNil(t, s.Validate(""))
+}
+
+func TestStringMaxValue(t *testing.T) {
+	s := String{MaxValue: "abc"}
+
+	require.Nil(t, s.Validate("ab"))
+	require.Nil(t, s.Validate("a"))
+	require.NotNil(t, s.Validate("abcd"))
+}
