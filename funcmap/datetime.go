@@ -10,6 +10,14 @@ func addDateFuncs(target map[string]interface{}) {
 
 	target["now"] = time.Now
 
+	target["today"] = func() time.Time {
+		return time.Now().Truncate(24 * time.Hour)
+	}
+
+	target["yesterday"] = func() time.Time {
+		return time.Now().Truncate(24*time.Hour).AddDate(0, 0, -1)
+	}
+
 	target["isoDate"] = func(value any) string {
 
 		if valueTime, ok := convert.TimeOk(value, time.Time{}); ok {
@@ -72,6 +80,19 @@ func addDateFuncs(target map[string]interface{}) {
 			return ""
 		}
 		return valueTime.Format("3:04 PM")
+	}
+
+	target["year"] = func(value any) string {
+
+		if value == "" {
+			return ""
+		}
+
+		valueTime := convert.Time(value)
+		if valueTime.IsZero() {
+			return ""
+		}
+		return valueTime.Format("2006")
 	}
 
 }
