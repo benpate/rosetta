@@ -9,7 +9,7 @@ import (
 // Username validates a simple token string suitable for use as URL identifiers
 func Username(_ string) StringFormat {
 
-	token := regexp.MustCompile(`(?i)^[A-z0-9_]*$`)
+	token := regexp.MustCompile(`(?i)^[A-Z0-9_]*$`)
 
 	return func(value string) (string, error) {
 
@@ -17,6 +17,6 @@ func Username(_ string) StringFormat {
 			return value, nil
 		}
 
-		return "", derp.NewInternalError("schema.format.Username", "Value is not a valid Username", value)
+		return "", derp.NewInternalError("schema.format.Username", "Usernames can only contain letters, numbers, and underscores.", value)
 	}
 }
