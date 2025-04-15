@@ -10,7 +10,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.10.0
-	github.com/yuin/goldmark v1.7.8
+	github.com/yuin/goldmark v1.7.9
 )
 
 require (
