@@ -68,21 +68,27 @@ func (schema Schema) Match(value any, expression exp.Expression) bool {
 		fieldValue, err := schema.Get(value, predicate.Field)
 
 		if err != nil {
+			derp.Report(derp.Wrap(err, "schema.schema.Match", "schema value not found", predicate.Field))
 			return false
 		}
 
 		switch predicate.Operator {
+
 		case exp.OperatorEqual:
 			return compare.Equal(fieldValue, predicate.Value)
+
 		case exp.OperatorGreaterThan:
 			return compare.GreaterThan(fieldValue, predicate.Value)
+
 		case exp.OperatorLessThan:
 			return compare.LessThan(fieldValue, predicate.Value)
 
 		case exp.OperatorNotEqual:
 			return !compare.Equal(fieldValue, predicate.Value)
+
 		case exp.OperatorGreaterOrEqual:
 			return !compare.LessThan(fieldValue, predicate.Value)
+
 		case exp.OperatorLessOrEqual:
 			return !compare.GreaterThan(fieldValue, predicate.Value)
 		}
