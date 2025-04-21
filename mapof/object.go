@@ -19,14 +19,17 @@ func NewObject[T any]() Object[T] {
  * Map Manipulations
  ******************************************/
 
+// Returns a SORTED slice of all keys in the map
 func (x Object[T]) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
+// Returns TRUE if the map is empty
 func (x Object[T]) IsEmpty() bool {
 	return len(x) == 0
 }
 
+// Returns TRUE if the map is NOT empty
 func (x Object[T]) NotEmpty() bool {
 	return len(x) > 0
 }
