@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/slice"
 )
 
 // Slice tracks changes to a slice of generic values.  As items are added or removed from the slice,
@@ -46,6 +47,11 @@ func (s Slice[T]) IsChanged() bool {
 	}
 
 	return false
+}
+
+// Unchanged returns the values that have not been added or removed
+func (s Slice[T]) Unchanged() []T {
+	return slice.Difference(s.Values, s.Added)
 }
 
 // Reset resets all of the added/deleted values
