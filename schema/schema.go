@@ -60,15 +60,16 @@ func (schema Schema) Validate(value any) error {
 
 // Match returns TRUE if the provided value (as accessed via this schema) matches
 // the provided expression.  This is useful for server-side data validation.
-func (schema Schema) Match(value any, expression exp.Expression) bool {
+func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 
-	// Evaluate the predicate
-	return expression.Match(func(predicate exp.Predicate) bool {
+	var resultError error
+
+	evaluatePredicate := func(predicate exp.Predicate) bool {
 
 		fieldValue, err := schema.Get(value, predicate.Field)
 
 		if err != nil {
-			derp.Report(derp.Wrap(err, "schema.schema.Match", "schema value not found", predicate.Field))
+			resultError = derp.Wrap(err, "schema.schema.Match", "schema value not found", predicate.Field)
 			return false
 		}
 
@@ -94,7 +95,12 @@ func (schema Schema) Match(value any, expression exp.Expression) bool {
 		}
 
 		return false
-	})
+	}
+
+	// Evaluate the predicate
+	result := expression.Match(evaluatePredicate)
+
+	return result, resultError
 }
 
 func (schema Schema) ValidateRequiredIf(value any) error {

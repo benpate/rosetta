@@ -90,12 +90,14 @@ func (element Array) Validate(object any) error {
 
 func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
+	const location = "schema.Array.ValidateRequiredIf"
+
 	if element.RequiredIf != "" {
 
 		localValue, err := schema.get(globalValue, element, path)
 
 		if err != nil {
-			return derp.Wrap(err, "schema.Any.ValidateRequiredIf", "Error getting value for path", path)
+			return derp.Wrap(err, location, "Error getting value for path", path)
 		}
 
 		length, ok := getLength(localValue)
@@ -105,7 +107,13 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		}
 
 		if length == 0 {
-			if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+			isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
+
+			if err != nil {
+				return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+			}
+
+			if isRequired {
 				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}

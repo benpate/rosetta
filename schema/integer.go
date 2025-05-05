@@ -91,10 +91,20 @@ func (element Integer) Validate(value any) error {
 
 // ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
 func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+
+	const location = "schema.Integer.ValidateRequiredIf"
+
 	if element.RequiredIf != "" {
-		if schema.Match(globalValue, exp.Parse(element.RequiredIf)) {
+
+		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
+
+		if err != nil {
+			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+		}
+
+		if isRequired {
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, "schema.Integer.ValidateRequiredIf", "Error getting value for path", path)
+				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
 				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}

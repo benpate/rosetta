@@ -13,23 +13,44 @@ func TestSchemaMatch(t *testing.T) {
 	value := newTestStructA()
 	schema := New(testStructA_Schema())
 
-	require.True(t, schema.Match(value, exp.Predicate{
+	match, err := schema.Match(value, exp.Predicate{
 		Field:    "active",
 		Operator: exp.OperatorEqual,
 		Value:    true,
-	}))
+	})
 
-	require.True(t, schema.Match(value, exp.Predicate{
+	require.NoError(t, err)
+	require.True(t, match)
+
+	match, err = schema.Match(value, exp.Predicate{
 		Field:    "name",
 		Operator: exp.OperatorEqual,
 		Value:    "John Connor",
-	}))
+	})
+	require.NoError(t, err)
+	require.True(t, match)
 
-	require.True(t, schema.Match(value, exp.Predicate{
+	match, err = schema.Match(value, exp.Predicate{
 		Field:    "name",
 		Operator: exp.OperatorNotEqual,
 		Value:    "Sarah Connor",
-	}))
+	})
+	require.True(t, match)
+	require.NoError(t, err)
+}
+
+func TestSchemaMatchError(t *testing.T) {
+
+	value := newTestStructA()
+	schema := New(testStructA_Schema())
+
+	match, err := schema.Match(value, exp.Predicate{
+		Field:    "missing_property",
+		Operator: exp.OperatorEqual,
+		Value:    "Sarah Connor",
+	})
+	require.Error(t, err)
+	require.False(t, match)
 }
 
 func TestSchemaValidateRequiredIf(t *testing.T) {
