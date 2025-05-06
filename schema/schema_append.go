@@ -12,7 +12,7 @@ func (schema Schema) Append(object any, path string, value any) error {
 	element, exists := schema.GetArrayElement(path)
 
 	if !exists {
-		return derp.NewInternalError(location, "Element must be an ArrayError finding schema element", path)
+		return derp.InternalError(location, "Element must be an ArrayError finding schema element", path)
 	}
 
 	// Get Original Value
@@ -26,7 +26,7 @@ func (schema Schema) Append(object any, path string, value any) error {
 	setter, isSetter := pointer.To(originalValue).(ArraySetter)
 
 	if !isSetter {
-		return derp.NewInternalError(location, "Value must implement ArraySetter interface", setter, isSetter, path)
+		return derp.InternalError(location, "Value must implement ArraySetter interface", setter, isSetter, path)
 	}
 
 	// Append to the array

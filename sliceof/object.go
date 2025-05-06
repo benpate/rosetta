@@ -195,7 +195,7 @@ func (s *Object[T]) SetValue(value any) error {
 		return nil
 	}
 
-	return derp.NewInternalError("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
+	return derp.InternalError("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
 }
 
 func (x *Object[T]) Remove(key string) bool {

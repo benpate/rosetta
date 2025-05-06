@@ -45,7 +45,7 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, globalValue
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}
 	}
@@ -88,7 +88,7 @@ func (element *Any) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "any" {
-		return derp.NewInternalError("schema.String.UnmarshalMap", "Data is not type 'string'", data)
+		return derp.InternalError("schema.String.UnmarshalMap", "Data is not type 'string'", data)
 	}
 
 	element.Required = convert.Bool(data["required"])

@@ -51,36 +51,36 @@ func (element Number) Validate(value any) error {
 	floatValue, ok := toFloat(value)
 
 	if !ok {
-		return derp.NewValidationError(" must be a float")
+		return derp.ValidationError(" must be a float")
 	}
 
 	if element.Required {
 		if floatValue == 0 {
-			return derp.NewValidationError(" float field is required")
+			return derp.ValidationError(" float field is required")
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if floatValue < element.Minimum.Float() {
-			return derp.NewValidationError(" minimum float value is " + convert.String(element.Minimum))
+			return derp.ValidationError(" minimum float value is " + convert.String(element.Minimum))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if floatValue > element.Maximum.Float() {
-			return derp.NewValidationError(" maximum float value is " + convert.String(element.Maximum))
+			return derp.ValidationError(" maximum float value is " + convert.String(element.Maximum))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if math.Remainder(floatValue, element.MultipleOf.Float()) != 0 {
-			return derp.NewValidationError(" float must be a multiple of " + convert.String(element.MultipleOf))
+			return derp.ValidationError(" float must be a multiple of " + convert.String(element.MultipleOf))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, floatValue) {
-			return derp.NewValidationError(" float must contain one of the specified values")
+			return derp.ValidationError(" float must contain one of the specified values")
 		}
 	}
 
@@ -103,7 +103,7 @@ func (element Number) ValidateRequiredIf(schema Schema, path list.List, globalVa
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}
 	}
@@ -181,7 +181,7 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "number" {
-		return derp.NewInternalError("schema.Number.UnmarshalMap", "Data is not type 'number'", data)
+		return derp.InternalError("schema.Number.UnmarshalMap", "Data is not type 'number'", data)
 	}
 
 	element.Default = convert.NullFloat(data["default"])

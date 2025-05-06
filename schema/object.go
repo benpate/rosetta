@@ -164,7 +164,7 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "object" {
-		return derp.NewInternalError("schema.Object.UnmarshalMap", "Data is not type 'object'", data)
+		return derp.InternalError("schema.Object.UnmarshalMap", "Data is not type 'object'", data)
 	}
 
 	// Handle "simple" required as a boolean

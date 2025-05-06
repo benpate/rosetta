@@ -23,6 +23,6 @@ func ObjectID(arg string) StringFormat {
 			return value, nil
 		}
 
-		return "", derp.NewInternalError("schema.format.ObjectID", "Value is not a valid ObjectID", value)
+		return "", derp.InternalError("schema.format.ObjectID", "Value is not a valid ObjectID", value)
 	}
 }

@@ -37,11 +37,11 @@ func (element Boolean) Validate(object any) error {
 	boolValue, ok := object.(bool)
 
 	if !ok {
-		return derp.NewValidationError(" must be a boolean")
+		return derp.ValidationError(" must be a boolean")
 	}
 
 	if element.Required && (!boolValue) {
-		return derp.NewValidationError(" boolean value is required")
+		return derp.ValidationError(" boolean value is required")
 	}
 
 	return nil
@@ -64,7 +64,7 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}
 	}
@@ -125,7 +125,7 @@ func (element Boolean) MarshalMap() map[string]any {
 func (element *Boolean) UnmarshalMap(data map[string]any) error {
 
 	if convert.String(data["type"]) != "boolean" {
-		return derp.NewInternalError("schema.Boolean.UnmarshalMap", "Data is not type 'boolean'", data)
+		return derp.InternalError("schema.Boolean.UnmarshalMap", "Data is not type 'boolean'", data)
 	}
 
 	element.Default = convert.NullBool(data["default"])

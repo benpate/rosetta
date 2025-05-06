@@ -199,7 +199,7 @@ func (x *Any) SetValue(value any) error {
 		return nil
 	}
 
-	return derp.NewInternalError("mapof.Any.SetValue", "Cannot convert value to mapof.Any", value)
+	return derp.InternalError("mapof.Any.SetValue", "Cannot convert value to mapof.Any", value)
 }
 
 // Append adds a new value to the provided key. If a value already exists for this key
@@ -239,7 +239,7 @@ func (x Any) GetPointer(key string) (any, bool) {
 func (x *Any) SetObject(element schema.Element, path list.List, value any) error {
 
 	if path.IsEmpty() {
-		return derp.NewInternalError("mapof.Any.SetObject", "Cannot set values on empty path")
+		return derp.InternalError("mapof.Any.SetObject", "Cannot set values on empty path")
 	}
 
 	x.makeNotNil()
@@ -255,7 +255,7 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.NewInternalError("mapof.Any.SetObject", "Unknown property", head)
+		return derp.InternalError("mapof.Any.SetObject", "Unknown property", head)
 	}
 
 	var tempValue any

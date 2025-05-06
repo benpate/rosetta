@@ -45,7 +45,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case int8:
@@ -74,7 +74,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case int16:
@@ -106,7 +106,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case int32:
@@ -135,7 +135,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case int64:
@@ -164,7 +164,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case uint:
@@ -193,7 +193,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case uint8:
@@ -222,7 +222,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case uint16:
@@ -251,7 +251,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case uint32:
@@ -280,7 +280,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case uint64:
@@ -309,7 +309,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), v2), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case float32:
@@ -353,7 +353,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), float64(v2)), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case float64:
@@ -397,7 +397,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return Float64(float64(v1), float64(v2)), nil
 
 		default:
-			return 0, derp.NewInternalError("compare.Interface", "Incompatible data type", value1, value2)
+			return 0, derp.InternalError("compare.Interface", "Incompatible data type", value1, value2)
 		}
 
 	case string:
@@ -413,5 +413,5 @@ func Interface(value1 any, value2 any) (int, error) {
 		}
 	}
 
-	return 0, derp.NewInternalError("compare.Interface", "Incompatible Types", value1, value2)
+	return 0, derp.InternalError("compare.Interface", "Incompatible Types", value1, value2)
 }

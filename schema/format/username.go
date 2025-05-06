@@ -17,6 +17,6 @@ func Username(_ string) StringFormat {
 			return value, nil
 		}
 
-		return "", derp.NewInternalError("schema.format.Username", "Usernames can only contain letters, numbers, and underscores.", value)
+		return "", derp.InternalError("schema.format.Username", "Usernames can only contain letters, numbers, and underscores.", value)
 	}
 }

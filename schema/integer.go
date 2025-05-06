@@ -53,36 +53,36 @@ func (element Integer) Validate(value any) error {
 	intValue, ok := toInt64(value)
 
 	if !ok {
-		return derp.NewValidationError(" must be an integer")
+		return derp.ValidationError(" must be an integer")
 	}
 
 	if element.Required {
 		if intValue == 0 {
-			return derp.NewValidationError("integer value is required")
+			return derp.ValidationError("integer value is required")
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if intValue < element.Minimum.Int64() {
-			return derp.NewValidationError("minimum integer value is " + convert.String(element.Minimum))
+			return derp.ValidationError("minimum integer value is " + convert.String(element.Minimum))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if intValue > element.Maximum.Int64() {
-			return derp.NewValidationError("maximum integer value is " + convert.String(element.Maximum))
+			return derp.ValidationError("maximum integer value is " + convert.String(element.Maximum))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if (intValue % element.MultipleOf.Int64()) != 0 {
-			return derp.NewValidationError("must be a multiple of " + convert.String(element.MultipleOf))
+			return derp.ValidationError("must be a multiple of " + convert.String(element.MultipleOf))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, intValue) {
-			return derp.NewValidationError("must contain one of the specified values")
+			return derp.ValidationError("must contain one of the specified values")
 		}
 	}
 
@@ -106,7 +106,7 @@ func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalV
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.NewValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}
 	}
@@ -180,7 +180,7 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	var err error
 
 	if convert.String(data["type"]) != "integer" {
-		return derp.NewInternalError("schema.Integer.UnmarshalMap", "Data is not type 'integer'", data)
+		return derp.InternalError("schema.Integer.UnmarshalMap", "Data is not type 'integer'", data)
 	}
 
 	element.Default = convert.NullInt64(data["default"])

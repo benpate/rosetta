@@ -46,7 +46,7 @@ func (object Object[T]) GetPointer(name string) (any, bool) {
 func (object *Object[T]) SetObject(element schema.Element, path list.List, value any) error {
 
 	if path.IsEmpty() {
-		return derp.NewInternalError("mapof.Object.SetObject", "Cannot set values on empty path")
+		return derp.InternalError("mapof.Object.SetObject", "Cannot set values on empty path")
 	}
 
 	object.makeNotNil()
@@ -58,13 +58,13 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 			(*object)[head] = typed
 			return nil
 		}
-		return derp.NewInternalError("mapof.Object.SetObject", "Invalid type", head, value)
+		return derp.InternalError("mapof.Object.SetObject", "Invalid type", head, value)
 	}
 
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.NewInternalError("mapof.Object.SetObject", "Unknown property", head)
+		return derp.InternalError("mapof.Object.SetObject", "Unknown property", head)
 	}
 
 	tempValue := (*object)[head]

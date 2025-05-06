@@ -20,7 +20,7 @@ func Color(arg string) StringFormat {
 
 		// Colors must match the regular expression.
 		if !color.Match([]byte(value)) {
-			return "", derp.New(derp.CodeBadRequestError, "schema.format.Color", "Value is not a valid color", value)
+			return "", derp.BadRequestError("schema.format.Color", "Value is not a valid color", value)
 		}
 
 		return value, nil

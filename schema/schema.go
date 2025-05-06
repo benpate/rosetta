@@ -42,7 +42,7 @@ func (schema Schema) Validate(value any) error {
 
 	// RULE: Schema element cannot be nil
 	if isNil(schema.Element) {
-		return derp.NewInternalError("schema.Schema.Validate", "Schema is nil")
+		return derp.InternalError("schema.Schema.Validate", "Schema is nil")
 	}
 
 	// Validate all elements in the value

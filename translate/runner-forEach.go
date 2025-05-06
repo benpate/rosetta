@@ -39,20 +39,20 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 	sourceElement, ok := sourceSchema.GetArrayElement(runner.SourcePath)
 
 	if !ok {
-		return derp.NewInternalError(location, "Source element must exist in sourceSchema", runner.SourcePath)
+		return derp.InternalError(location, "Source element must exist in sourceSchema", runner.SourcePath)
 	}
 
 	// Get the array value from the sourceValue
 	sourceArray, err := sourceSchema.Get(sourceValue, runner.SourcePath)
 
 	if err != nil {
-		return derp.NewInternalError(location, "Error getting value from source", runner.SourcePath)
+		return derp.InternalError(location, "Error getting value from source", runner.SourcePath)
 	}
 
 	sourceGetter, ok := sourceArray.(schema.KeysGetter)
 
 	if !ok {
-		return derp.NewInternalError(location, "Source value must implement schema.KeysGetter", sourceValue)
+		return derp.InternalError(location, "Source value must implement schema.KeysGetter", sourceValue)
 	}
 
 	// Get the list of keys from the source array.  If none, then exit
@@ -65,7 +65,7 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 	targetElement, ok := targetSchema.GetArrayElement(runner.TargetPath)
 
 	if !ok {
-		return derp.NewInternalError(location, "Target element must exist in targetSchema", runner.TargetPath)
+		return derp.InternalError(location, "Target element must exist in targetSchema", runner.TargetPath)
 	}
 
 	// Create the new schemas for the source/target array items
