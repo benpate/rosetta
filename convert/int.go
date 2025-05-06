@@ -118,7 +118,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 	case reflect.Value:
 		return IntOk(Interface(v), defaultValue)
 
-		// Use standard interfaces, if available
+	// Use standard interfaces, if available
 	case Inter:
 		return v.Int(), true
 
