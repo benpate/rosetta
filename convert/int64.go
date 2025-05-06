@@ -65,15 +65,25 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 		return int64(v), true
 
 	case float32:
-		if v > math.MaxInt {
+		if v > math.MaxInt64 {
 			return math.MaxInt, false
 		}
+
+		if v < math.MinInt64 {
+			return math.MinInt, false
+		}
+
 		return int64(v), hasDecimal(float64(v))
 
 	case float64:
-		if v > math.MaxInt {
+		if v > math.MaxInt64 {
 			return math.MaxInt, false
 		}
+
+		if v < math.MinInt64 {
+			return math.MinInt, false
+		}
+
 		return int64(v), hasDecimal(v)
 
 	case string:

@@ -64,18 +64,33 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		if v > math.MaxInt {
 			return math.MaxInt, false
 		}
+
+		if v < math.MinInt {
+			return math.MinInt, false
+		}
+
 		return int(v), true
 
 	case float32:
 		if v > math.MaxInt {
 			return math.MaxInt, false
 		}
+
+		if v < math.MinInt {
+			return math.MinInt, false
+		}
+
 		return int(v), hasDecimal(float64(v))
 
 	case float64:
 		if v > math.MaxInt {
 			return math.MaxInt, false
 		}
+
+		if v < math.MinInt {
+			return math.MinInt, false
+		}
+
 		return int(v), hasDecimal(v)
 
 	case string:
