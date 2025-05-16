@@ -1,18 +1,16 @@
 package sliceof
 
 import (
-	"math/rand"
 	"strconv"
-	"strings"
 
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/slice"
 )
 
-type String []string
+type Int []int
 
-func NewString() String {
-	return make(String, 0)
+func NewInt() Int {
+	return make(Int, 0)
 }
 
 /****************************************
@@ -20,35 +18,35 @@ func NewString() String {
  ****************************************/
 
 // Length returns the number of elements in the slice
-func (x String) Length() int {
+func (x Int) Length() int {
 	return len(x)
 }
 
 // IsLength returns TRUE if the slice contains exactly "length" elements
-func (x String) IsLength(length int) bool {
+func (x Int) IsLength(length int) bool {
 	return len(x) == length
 }
 
 // IsEmpty returns TRUE if the slice contains no elements
-func (x String) IsEmpty() bool {
+func (x Int) IsEmpty() bool {
 	return len(x) == 0
 }
 
 // NotEmpty returns TRUE if the slice contains at least one element
-func (x String) NotEmpty() bool {
+func (x Int) NotEmpty() bool {
 	return len(x) > 0
 }
 
 // First returns the first element in the slice, or nil if the slice is empty
-func (x String) First() string {
+func (x Int) First() int {
 	if len(x) > 0 {
 		return x[0]
 	}
-	return ""
+	return 0
 }
 
 // FirstN returns the first "n" elements in the slice, or all elements if "n" is greater than the length of the slice
-func (x String) FirstN(n int) String {
+func (x Int) FirstN(n int) Int {
 	if n > len(x) {
 		n = len(x)
 	}
@@ -57,26 +55,26 @@ func (x String) FirstN(n int) String {
 }
 
 // Last returns the last element in the slice, or nil if the slice is empty
-func (x String) Last() string {
+func (x Int) Last() int {
 	if len(x) > 0 {
 		return x[len(x)-1]
 	}
-	return ""
+	return 0
 }
 
 // Find returns the first element in the slice that satisfies the provided function.
-func (x String) Find(fn func(string) bool) (string, bool) {
+func (x Int) Find(fn func(int) bool) (int, bool) {
 	return slice.Find(x, fn)
 }
 
 // At returns a bound-safe element from the slice.  If the index
 // is out of bounds, then `At` returns the zero value for the slice type
-func (x String) At(index int) string {
+func (x Int) At(index int) int {
 	return slice.At(x, index)
 }
 
 // Reverse modifies the slice with the elements in reverse order
-func (x String) Reverse() String {
+func (x Int) Reverse() Int {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
 	}
@@ -85,54 +83,46 @@ func (x String) Reverse() String {
 }
 
 // Contains returns TRUE if the slice contains the specified value
-func (x String) Contains(value string) bool {
+func (x Int) Contains(value int) bool {
 	return slice.Contains(x, value)
 }
 
-func (x String) NotContains(value string) bool {
+func (x Int) NotContains(value int) bool {
 	return !slice.Contains(x, value)
 }
 
 // ContainsAny returns TRUE if the slice contains any of the specified values
-func (x String) ContainsAny(values ...string) bool {
+func (x Int) ContainsAny(values ...int) bool {
 	return slice.ContainsAny(x, values...)
 }
 
 // ContainsAll returns TRUE if the slice contains all of the specified values
-func (x String) ContainsAll(values ...string) bool {
+func (x Int) ContainsAll(values ...int) bool {
 	return slice.ContainsAll(x, values...)
 }
 
 // Equal returns TRUE if the slice contains exactly the same elements as the "value" slice
-func (x String) Equal(value []string) bool {
+func (x Int) Equal(value []int) bool {
 	return slice.Equal(x, value)
 }
 
 // NotEqual returns TRUE if the slice DOES NOT contain exactly the same elements as the "value" slice
-func (x String) NotEqual(value []string) bool {
+func (x Int) NotEqual(value []int) bool {
 	return !slice.Equal(x, value)
 }
 
-// Join concatenates all elements of the slice into a single string, separated by the specified delimiter
-func (x String) Join(delimiter string) string {
-	return strings.Join(x, delimiter)
-}
-
 // Append adds one or more elements to the end of the slice
-func (x *String) Append(values ...string) {
+func (x *Int) Append(values ...int) {
 	*x = append(*x, values...)
 }
 
 // Shuffle randomizes the order of the elements in the slice
-func (x String) Shuffle() String {
-	rand.Shuffle(len(x), func(i, j int) {
-		x[i], x[j] = x[j], x[i]
-	})
-	return x
+func (x Int) Shuffle() Int {
+	return slice.Shuffle(x)
 }
 
-// Keys returns a slice of strings representing the indexes of this slice
-func (x String) Keys() []string {
+// Keys returns a slice of ints representing the indexes of this slice
+func (x Int) Keys() []string {
 	keys := make([]string, len(x))
 
 	for i := range x {
@@ -146,21 +136,21 @@ func (x String) Keys() []string {
  * Getter Interfaces/Setters
  ****************************************/
 
-func (x String) GetAny(key string) any {
-	result, _ := x.GetStringOK(key)
+func (x Int) GetAny(key string) any {
+	result, _ := x.GetIntOK(key)
 	return result
 }
 
-func (x String) GetAnyOK(key string) (any, bool) {
-	return x.GetStringOK(key)
+func (x Int) GetAnyOK(key string) (any, bool) {
+	return x.GetIntOK(key)
 }
 
-func (x String) GetString(key string) string {
-	result, _ := x.GetStringOK(key)
+func (x Int) GetInt(key string) int {
+	result, _ := x.GetIntOK(key)
 	return result
 }
 
-func (x String) GetStringOK(key string) (string, bool) {
+func (x Int) GetIntOK(key string) (int, bool) {
 
 	if index, ok := sliceIndex(key, x.Length()); ok {
 		return x[index], true
@@ -170,16 +160,16 @@ func (x String) GetStringOK(key string) (string, bool) {
 		return x.Last(), true
 	}
 
-	return "", false
+	return 0, false
 }
 
-func (s *String) SetIndex(index int, value any) bool {
+func (s *Int) SetIndex(index int, value any) bool {
 	growSlice(s, index)
-	(*s)[index] = convert.String(value)
+	(*s)[index] = convert.Int(value)
 	return true
 }
 
-func (s *String) SetString(key string, value string) bool {
+func (s *Int) SetInt(key string, value int) bool {
 	if index, ok := sliceIndex(key); ok {
 		growSlice(s, index)
 		(*s)[index] = value
@@ -189,20 +179,20 @@ func (s *String) SetString(key string, value string) bool {
 	switch key {
 
 	case "last":
-		return s.SetString(strconv.Itoa(s.Length()-1), value)
+		return s.SetInt(strconv.Itoa(s.Length()-1), value)
 	case "next":
-		return s.SetString(strconv.Itoa(s.Length()), value)
+		return s.SetInt(strconv.Itoa(s.Length()), value)
 	}
 
 	return false
 }
 
-func (s *String) SetValue(value any) error {
-	*s = convert.SliceOfString(value)
+func (s *Int) SetValue(value any) error {
+	*s = convert.SliceOfInt(value)
 	return nil
 }
 
-func (s *String) Remove(key string) bool {
+func (s *Int) Remove(key string) bool {
 
 	if index, ok := sliceIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
