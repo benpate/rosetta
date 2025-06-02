@@ -53,4 +53,5 @@ func init() {
 	UseFormat("token", format.Token)
 	UseFormat("unsafe-any", format.UnsafeAny)
 	UseFormat("username", format.Username)
+	UseFormat("webfinger", format.WebFinger)
 }
