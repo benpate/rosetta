@@ -1,7 +1,6 @@
 package sliceof
 
 import (
-	"math/rand"
 	"strconv"
 	"strings"
 
@@ -125,10 +124,7 @@ func (x *String) Append(values ...string) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x String) Shuffle() String {
-	rand.Shuffle(len(x), func(i, j int) {
-		x[i], x[j] = x[j], x[i]
-	})
-	return x
+	return slice.Shuffle(x)
 }
 
 // Keys returns a slice of strings representing the indexes of this slice
