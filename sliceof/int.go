@@ -82,6 +82,18 @@ func (x Int) Reverse() Int {
 	return x
 }
 
+// ContainsInterface returns TRUE if the provided generic value is contained in the slice.
+func (x Int) ContainsInterface(value any) bool {
+
+	// Convert the value to an int
+	if value, ok := convert.IntOk(value, 0); ok {
+		return slice.Contains(x, value)
+	}
+
+	// If we can't convert the value to a string, then it is not contained in the slice
+	return false
+}
+
 // Contains returns TRUE if the slice contains the specified value
 func (x Int) Contains(value int) bool {
 	return slice.Contains(x, value)

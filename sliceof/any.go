@@ -84,6 +84,11 @@ func (x Any) Reverse() Any {
 	return x
 }
 
+// ContainsInterface returns TRUE if the provided generic value is contained in the slice.
+func (x Any) ContainsInterface(value any) bool {
+	return slice.Contains(x, value)
+}
+
 // Contains returns TRUE if the slice contains the specified value
 func (x Any) Contains(value any) bool {
 	return slice.Contains(x, value)
