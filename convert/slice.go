@@ -16,7 +16,9 @@ func IsSlice(value any) bool {
 		[]int64,
 		[]float64,
 		[]string,
-		[]map[string]any:
+		[]map[string]any,
+		SliceOfStringer:
+
 		return true
 	}
 

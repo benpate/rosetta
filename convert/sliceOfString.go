@@ -95,6 +95,8 @@ func SliceOfStringOk(value any) ([]string, bool) {
 	case []Stringer:
 		return sliceOfStringOk(typed)
 
+	case SliceOfStringer:
+		return typed.SliceOfString(), true
 	}
 
 	// Use reflection to see if this is even an array/slice
