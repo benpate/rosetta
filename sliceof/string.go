@@ -1,6 +1,7 @@
 package sliceof
 
 import (
+	"iter"
 	"strconv"
 	"strings"
 
@@ -81,6 +82,11 @@ func (x String) Reverse() String {
 	}
 
 	return x
+}
+
+// Range returns an iterator that yields each value in this slice.
+func (x String) Range() iter.Seq2[int, string] {
+	return slice.Range(x)
 }
 
 // ContainsInterface returns TRUE if the provided generic value is contained in the slice.

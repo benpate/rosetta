@@ -1,6 +1,7 @@
 package sliceof
 
 import (
+	"iter"
 	"math/rand"
 	"strconv"
 
@@ -98,6 +99,11 @@ func (x Object[T]) Contains(match func(T) bool) bool {
 	}
 
 	return false
+}
+
+// Range returns an iterator that yields each value in this slice.
+func (x Object[T]) Range() iter.Seq2[int, T] {
+	return slice.Range(x)
 }
 
 // Append adds one or more elements to the end of the slice
