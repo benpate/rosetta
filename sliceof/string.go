@@ -176,7 +176,7 @@ func (x String) GetString(key string) string {
 
 func (x String) GetStringOK(key string) (string, bool) {
 
-	if index, ok := sliceIndex(key, x.Length()); ok {
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
 	}
 
@@ -194,7 +194,7 @@ func (s *String) SetIndex(index int, value any) bool {
 }
 
 func (s *String) SetString(key string, value string) bool {
-	if index, ok := sliceIndex(key); ok {
+	if index, ok := sliceStringIndex(key); ok {
 		growSlice(s, index)
 		(*s)[index] = value
 		return true
@@ -218,8 +218,18 @@ func (s *String) SetValue(value any) error {
 
 func (s *String) Remove(key string) bool {
 
-	if index, ok := sliceIndex(key, s.Length()); ok {
+	if index, ok := sliceStringIndex(key, s.Length()); ok {
 		*s = append((*s)[:index], (*s)[index+1:]...)
+		return true
+	}
+
+	return false
+}
+
+func (x *String) RemoveAt(index int) bool {
+
+	if index, ok := sliceIndex(index, x.Length()); ok {
+		*x = append((*x)[:index], (*x)[index+1:]...)
 		return true
 	}
 

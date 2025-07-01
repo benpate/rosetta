@@ -4,13 +4,7 @@ import (
 	"strconv"
 )
 
-func sliceIndex(key string, maximums ...int) (int, bool) {
-
-	index, err := strconv.Atoi(key)
-
-	if err != nil {
-		return 0, false
-	}
+func sliceIndex(index int, maximums ...int) (int, bool) {
 
 	if index < 0 {
 		return 0, false
@@ -23,6 +17,17 @@ func sliceIndex(key string, maximums ...int) (int, bool) {
 	}
 
 	return index, true
+}
+
+func sliceStringIndex(key string, maximums ...int) (int, bool) {
+
+	index, err := strconv.Atoi(key)
+
+	if err != nil {
+		return 0, false
+	}
+
+	return sliceIndex(index, maximums...)
 }
 
 func growSlice[T any, S ~[]T](value *S, length int) {

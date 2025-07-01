@@ -154,7 +154,7 @@ func (x Any) GetAny(key string) any {
 
 func (x Any) GetAnyOK(key string) (any, bool) {
 
-	if index, ok := sliceIndex(key, x.Length()); ok {
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
 	}
 
@@ -220,7 +220,7 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 }
 
 func (x *Any) GetPointer(key string) (any, bool) {
-	if index, ok := sliceIndex(key); ok {
+	if index, ok := sliceStringIndex(key); ok {
 		growSlice(x, index)
 		return pointer.To((*x)[index]), true
 	}
@@ -258,7 +258,7 @@ func (s *Any) SetIndex(index int, value any) bool {
 
 func (x *Any) SetAny(key string, value any) bool {
 
-	if index, ok := sliceIndex(key); ok {
+	if index, ok := sliceStringIndex(key); ok {
 		growSlice(x, index)
 		(*x)[index] = value
 		return true
@@ -294,7 +294,17 @@ func (x *Any) SetValue(value any) error {
 
 func (x *Any) Remove(key string) bool {
 
-	if index, ok := sliceIndex(key, x.Length()); ok {
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
+		*x = append((*x)[:index], (*x)[index+1:]...)
+		return true
+	}
+
+	return false
+}
+
+func (x *Any) RemoveAt(index int) bool {
+
+	if index, ok := sliceIndex(index, x.Length()); ok {
 		*x = append((*x)[:index], (*x)[index+1:]...)
 		return true
 	}

@@ -140,7 +140,7 @@ func (x Object[T]) GetAny(key string) any {
 }
 
 func (x Object[T]) GetAnyOK(key string) (any, bool) {
-	if index, ok := sliceIndex(key, x.Length()); ok {
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
 	}
 
@@ -158,7 +158,7 @@ func (x Object[T]) GetAnyOK(key string) (any, bool) {
 func (x *Object[T]) GetPointer(name string) (any, bool) {
 
 	// Get a valid index for the slice
-	if index, ok := sliceIndex(name); ok {
+	if index, ok := sliceStringIndex(name); ok {
 		growSlice(x, index)
 
 		// Return result
@@ -206,7 +206,17 @@ func (s *Object[T]) SetValue(value any) error {
 
 func (x *Object[T]) Remove(key string) bool {
 
-	if index, ok := sliceIndex(key, x.Length()); ok {
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
+		*x = append((*x)[:index], (*x)[index+1:]...)
+		return true
+	}
+
+	return false
+}
+
+func (x *Object[T]) RemoveAt(index int) bool {
+
+	if index, ok := sliceIndex(index, x.Length()); ok {
 		*x = append((*x)[:index], (*x)[index+1:]...)
 		return true
 	}
