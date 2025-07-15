@@ -2,6 +2,7 @@ package compare
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/benpate/rosetta/convert"
 )
@@ -17,7 +18,7 @@ func Contains(value1 any, value2 any) bool {
 	case string:
 
 		if value2 := convert.String(value2); value2 != "" {
-			return value1 == value2
+			return strings.Contains(value1, value2)
 		}
 
 	case []string:
