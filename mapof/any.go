@@ -333,6 +333,12 @@ func (m Any) GetSliceOfMap(name string) []Any {
 
 	switch typed := value.(type) {
 
+	case Any:
+		return []Any{typed}
+
+	case *Any:
+		return []Any{*typed}
+
 	case []Any:
 		return typed
 
