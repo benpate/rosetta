@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.1
 
 require (
-	github.com/benpate/derp v0.32.3
+	github.com/benpate/derp v0.32.5
 	github.com/benpate/exp v0.8.5
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.27
