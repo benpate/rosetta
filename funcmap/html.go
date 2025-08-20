@@ -23,8 +23,12 @@ func addHTMLFuncs(target map[string]any) {
 		return url + "?" + extraParams
 	}
 
-	target["queryEscape"] = func(value string) string {
-		return url.QueryEscape(value)
+	target["attr"] = func(value string) template.HTMLAttr {
+		return template.HTMLAttr(value)
+	}
+
+	target["css"] = func(value string) template.CSS {
+		return template.CSS(value)
 	}
 
 	target["highlight"] = func(text string, search string) template.HTML {
@@ -35,12 +39,6 @@ func addHTMLFuncs(target map[string]any) {
 		return template.HTML(result)
 	}
 
-	target["removeLinks"] = func(value string) template.HTML {
-		result := strings.ReplaceAll(value, "<a ", "<span ")
-		result = strings.ReplaceAll(result, "</a", "</span")
-		return template.HTML(result)
-	}
-
 	target["domainOnly"] = func(value string) string {
 		result := strings.TrimPrefix(value, "http://")
 		result = strings.TrimPrefix(result, "https://")
@@ -48,16 +46,38 @@ func addHTMLFuncs(target map[string]any) {
 		return result
 	}
 
-	target["textOnly"] = html.RemoveTags
+	target["hasImage"] = func(value string) bool {
+		if strings.Contains(value, "<img") {
+			return true
+		}
 
-	target["summary"] = html.Summary
+		if strings.Contains(value, "<picture") {
+			return true
+		}
 
-	target["text"] = func(value string) template.HTML {
-		return template.HTML(html.FromText(value))
+		return false
 	}
 
 	target["html"] = func(value string) template.HTML {
 		return template.HTML(value)
+	}
+
+	target["htmlMinimal"] = func(value string) template.HTML {
+		return template.HTML(html.Minimal(value))
+	}
+
+	target["js"] = func(value string) string {
+		return template.JSEscapeString(value)
+	}
+
+	target["json"] = func(value any) string {
+		result, _ := json.Marshal(value)
+		return string(result)
+	}
+
+	target["jsonIndent"] = func(value any) string {
+		result, _ := json.MarshalIndent(value, "", "    ")
+		return string(result)
 	}
 
 	target["markdown"] = func(value any) template.HTML {
@@ -84,42 +104,31 @@ func addHTMLFuncs(target map[string]any) {
 		return template.HTML(buffer.String())
 	}
 
-	target["htmlMinimal"] = func(value string) template.HTML {
-		return template.HTML(html.Minimal(value))
+	target["queryEscape"] = func(value string) string {
+		return url.QueryEscape(value)
 	}
 
-	target["attr"] = func(value string) template.HTMLAttr {
-		return template.HTMLAttr(value)
+	target["removeLinks"] = func(value string) template.HTML {
+		result := strings.ReplaceAll(value, "<a ", "<span ")
+		result = strings.ReplaceAll(result, "</a", "</span")
+		return template.HTML(result)
 	}
 
-	target["css"] = func(value string) template.CSS {
-		return template.CSS(value)
-	}
+	target["summary"] = html.Summary
 
-	target["js"] = func(value string) string {
-		return template.JSEscapeString(value)
-	}
-
-	target["json"] = func(value any) string {
-		result, _ := json.Marshal(value)
-		return string(result)
-	}
-
-	target["jsonIndent"] = func(value any) string {
-		result, _ := json.MarshalIndent(value, "", "    ")
-		return string(result)
-	}
-
-	target["hasImage"] = func(value string) bool {
-		if strings.Contains(value, "<img") {
-			return true
+	target["stripProtocol"] = func(value string) string {
+		if after, found := strings.CutPrefix(value, "http://"); found {
+			return after
 		}
-
-		if strings.Contains(value, "<picture") {
-			return true
+		if after, found := strings.CutPrefix(value, "https://"); found {
+			return after
 		}
-
-		return false
+		return value
 	}
 
+	target["textOnly"] = html.RemoveTags
+
+	target["text"] = func(value string) template.HTML {
+		return template.HTML(html.FromText(value))
+	}
 }
