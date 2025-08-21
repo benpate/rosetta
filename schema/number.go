@@ -138,7 +138,7 @@ func (element Number) Enumerate() []string {
 }
 
 /***********************************
- * MARSHAL / UNMARSHAL METHODS
+ * Marshal / Unmarshal Methods
  ***********************************/
 
 // MarshalMap populates object data into a map[string]any

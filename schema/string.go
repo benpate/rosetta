@@ -143,7 +143,7 @@ func (element String) AllProperties() ElementMap {
 }
 
 /***********************************
- * ENUMERATOR INTERFACE
+ * Enumerator Interface
  ***********************************/
 
 // Enumerate implements the "Enumerator" interface
@@ -152,7 +152,7 @@ func (element String) Enumerate() []string {
 }
 
 /***********************************
- * MARSHAL / UNMARSHAL METHODS
+ * Marshal / Unmarshal Methods
  ***********************************/
 
 // MarshalMap populates object data into a map[string]any
@@ -216,7 +216,7 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 }
 
 /***********************************
- * HELPER METHODS
+ * Helper Methods
  ***********************************/
 
 // formatFunctions parses all of the formatting functions

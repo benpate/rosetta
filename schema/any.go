@@ -69,7 +69,7 @@ func (element Any) AllProperties() ElementMap {
 }
 
 /***********************************
- * MARSHAL / UNMARSHAL METHODS
+ * Marshal / Unmarshal Methods
  ***********************************/
 
 // MarshalMap populates the object data into a map[string]any

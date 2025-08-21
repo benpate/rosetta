@@ -91,7 +91,7 @@ func (element Boolean) AllProperties() ElementMap {
 }
 
 /***********************************
- * MARSHAL / UNMARSHAL METHODS
+ * Marshal / Unmarshal Methods
  ***********************************/
 
 // MarshalJSON implements the json.Marshaler interface

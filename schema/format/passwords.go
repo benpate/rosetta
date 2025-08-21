@@ -33,24 +33,6 @@ func HasNumbers(arg string) StringFormat {
 	}
 }
 
-/*
-func HasSymbols(arg string) StringFormat {
-
-	return func(value string) (string, error) {
-		return value, nil
-	}
-}
-*/
-
-/* TODO
-func HasEntropy(arg string) StringFormat {
-
-	return func(value string) (string, error) {
-		return value, nil
-	}
-}
-*/
-
 func countCharacters(arg string, value string, fn func(byte) bool) (string, error) {
 
 	minCount, err := strconv.Atoi(arg)
