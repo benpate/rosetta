@@ -94,13 +94,13 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		return int32(v), hasDecimal(v)
 
 	case string:
-		result, err := strconv.Atoi(v)
+		result, err := strconv.ParseInt(v, 10, 32)
 
 		if err != nil {
 			return defaultValue, false
 		}
 
-		return int32(result), true
+		return Int32Ok(result, defaultValue)
 
 		// []string is useful for parsing url.Values data
 	case []string:
