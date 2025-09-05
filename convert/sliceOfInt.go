@@ -31,7 +31,7 @@ func SliceOfIntOk(value any) ([]int, bool) {
 		return []int{value}, true
 
 	case int64:
-		return []int{int(value)}, true
+		return []int{Int(value)}, true
 
 	case string:
 		item, ok := IntOk(value, 0)
