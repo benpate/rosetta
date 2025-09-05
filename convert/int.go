@@ -94,13 +94,21 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		return int(v), hasDecimal(v)
 
 	case string:
-		result, err := strconv.Atoi(v)
+		result, err := strconv.ParseInt(v, 10, 64)
 
 		if err != nil {
 			return defaultValue, false
 		}
 
-		return result, true
+		if result < math.MinInt {
+			return math.MinInt, false
+		}
+
+		if result > math.MaxInt {
+			return math.MaxInt, false
+		}
+
+		return int(result), true
 
 		// []string is useful for parsing url.Values data
 	case []string:
