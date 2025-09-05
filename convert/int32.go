@@ -120,7 +120,7 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 
 	// Use standard interfaces, if available
 	case Inter:
-		return int32(v.Int()), true
+		return Int32Ok(v.Int(), defaultValue)
 
 	case Floater:
 		return Int32Ok(v.Float(), defaultValue)
