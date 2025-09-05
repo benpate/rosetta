@@ -123,8 +123,7 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		return int32(v.Int()), true
 
 	case Floater:
-		result := v.Float()
-		return int32(result), hasDecimal(result)
+		return Int32Ok(v.Float(), defaultValue)
 
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)

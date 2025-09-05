@@ -111,11 +111,10 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 
 	// Use standard interfaces, if available
 	case Inter:
-		return int64(v.Int()), true
+		return Int64Ok(v.Int(), defaultValue)
 
 	case Floater:
-		result := v.Float()
-		return int64(result), hasDecimal(result)
+		return Int64Ok(v.Float(), defaultValue)
 
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)

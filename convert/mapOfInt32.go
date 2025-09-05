@@ -43,21 +43,21 @@ func MapOfInt32Ok(value any) (map[string]int32, bool) {
 	case map[string]int64:
 		result := make(map[string]int32, len(typed))
 		for key, value := range typed {
-			result[key] = int32(value)
+			result[key] = Int32(value)
 		}
 		return result, true
 
 	case map[string]any:
 		result := make(map[string]int32, len(typed))
 		for key, value := range typed {
-			result[key] = int32(Int(value))
+			result[key] = Int32(value)
 		}
 		return result, false
 
 	case map[string]string:
 		result := make(map[string]int32, len(typed))
 		for key, value := range typed {
-			result[key] = int32(Int(value))
+			result[key] = Int32(value)
 		}
 		return result, false
 
