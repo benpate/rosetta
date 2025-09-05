@@ -100,15 +100,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 			return defaultValue, false
 		}
 
-		if result < math.MinInt {
-			return math.MinInt, false
-		}
-
-		if result > math.MaxInt {
-			return math.MaxInt, false
-		}
-
-		return int(result), true
+		return IntOk(result, defaultValue)
 
 		// []string is useful for parsing url.Values data
 	case []string:
@@ -132,7 +124,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 
 	case Floater:
 		result := v.Float()
-		return int(result), hasDecimal(result)
+		return Int(result), hasDecimal(result)
 
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)
