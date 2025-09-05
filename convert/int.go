@@ -72,22 +72,22 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		return int(v), true
 
 	case float32:
-		if v > math.MaxInt {
+		if v > float32(math.MaxInt) {
 			return math.MaxInt, false
 		}
 
-		if v < math.MinInt {
+		if v < float32(math.MinInt) {
 			return math.MinInt, false
 		}
 
 		return int(v), hasDecimal(float64(v))
 
 	case float64:
-		if v > math.MaxInt {
+		if v > float64(math.MaxInt) {
 			return math.MaxInt, false
 		}
 
-		if v < math.MinInt {
+		if v < float64(math.MinInt) {
 			return math.MinInt, false
 		}
 
