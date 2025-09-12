@@ -24,8 +24,12 @@ func addMathFuncs(target map[string]any) {
 		return convert.Int64(a) / convert.Int64(b)
 	}
 
+	target["inc"] = func(a any) int {
+		return convert.Int(a) + 1
+	}
+
 	target["min"] = func(values ...any) int {
-		var result int = math.MaxInt
+		var result = math.MaxInt
 		for _, value := range values {
 			if value32 := convert.Int(value); value32 < result {
 				result = value32
@@ -35,7 +39,7 @@ func addMathFuncs(target map[string]any) {
 	}
 
 	target["max"] = func(values ...any) int {
-		var result int = math.MinInt
+		var result = math.MinInt
 		for _, value := range values {
 			if value32 := convert.Int(value); value32 > result {
 				result = value32
