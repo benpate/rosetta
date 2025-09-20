@@ -15,7 +15,7 @@ func SliceOfInt(value any) []int {
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfIntOk(value any) ([]int, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]int, 0), false
 	}

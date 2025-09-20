@@ -15,7 +15,7 @@ func SliceOfAny(value any) []any {
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfAnyOk(value any) ([]any, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]any, 0), false
 	}

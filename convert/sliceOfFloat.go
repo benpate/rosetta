@@ -15,7 +15,7 @@ func SliceOfFloat(value any) []float64 {
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfFloatOk(value any) ([]float64, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]float64, 0), false
 	}

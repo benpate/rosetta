@@ -15,7 +15,7 @@ func SliceOfInt64(value any) []int64 {
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfInt64Ok(value any) ([]int64, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]int64, 0), false
 	}

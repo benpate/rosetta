@@ -13,7 +13,7 @@ func SliceOfMap(value any) []map[string]any {
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfMapOk(value any) ([]map[string]any, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]map[string]any, 0), false
 	}

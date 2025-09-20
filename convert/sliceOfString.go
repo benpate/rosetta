@@ -17,7 +17,7 @@ func SliceOfString(value any) []string {
 // It returns TRUE if the value was converted successfullt, and FALSE otherwise.
 func SliceOfStringOk(value any) ([]string, bool) {
 
-	// Nil check
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return make([]string, 0), false
 	}
