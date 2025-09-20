@@ -9,6 +9,10 @@ import (
 // IsZero returns TRUE if the value is the ZERO VALUE for its datatype or NIL
 func IsZero(value any) bool {
 
+	if value == nil {
+		return true
+	}
+
 	if IsNil(value) {
 		return true
 	}
@@ -55,14 +59,19 @@ func IsZero(value any) bool {
 
 	case Nuller:
 		return v.IsNull()
+
 	case Inter:
 		return IsZero(v.Int())
+
 	case Floater:
 		return IsZero(v.Float())
+
 	case Hexer:
 		return IsZero(convert.Int64(v))
+
 	case Stringer:
 		return IsZero(v.String())
+
 	case io.Reader:
 		return IsZero(convert.String(v))
 	}

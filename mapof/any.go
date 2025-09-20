@@ -331,6 +331,10 @@ func (m Any) GetSliceOfMap(name string) []Any {
 
 	value := m[name]
 
+	if value == nil {
+		return make([]Any, 0)
+	}
+
 	switch typed := value.(type) {
 
 	case Any:

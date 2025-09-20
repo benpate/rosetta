@@ -2,11 +2,13 @@ package schema
 
 import "github.com/benpate/rosetta/schema/format"
 
-var formats map[string]format.Generator
+var formats map[string]format.Generator = make(map[string]format.Generator)
 
 // UseFormat adds a custom FormatFunc function to this library.  Used to register custom validators
 func UseFormat(name string, fn format.Generator) {
-	formats[name] = fn
+	if fn != nil {
+		formats[name] = fn
+	}
 }
 
 func init() {
