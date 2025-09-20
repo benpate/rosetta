@@ -60,7 +60,7 @@ func UnmarshalJSON(data []byte) (Element, error) {
 	}
 
 	if element == nil {
-		return nil, derp.InternalError("schema.UnmarshalJSON", "Element is nil", string(data))
+		return nil, derp.InternalError("schema.UnmarshalJSON", "Unmarshalled element is nil", string(data))
 	}
 
 	return element, nil
@@ -69,49 +69,66 @@ func UnmarshalJSON(data []byte) (Element, error) {
 // UnmarshalMap tries to parse a map[string]any into a schema.Element
 func UnmarshalMap(data any) (Element, error) {
 
+	const location = "schema.UnmarshalMap"
+
+	// NILCHECK: Data cannot be nil
 	if data == nil {
-		return nil, derp.InternalError("schema.UnmarshalMap", "Element is nil")
+		return nil, derp.InternalError(location, "Element is nil")
 	}
 
-	dataMap, ok := data.(map[string]any)
+	// Confirm that the data is a map[string]any
+	dataMap, isMap := data.(map[string]any)
 
-	if !ok {
-		return nil, derp.InternalError("schema.UnmarshalMap", "data is not map[string]any", data)
+	if !isMap {
+		return nil, derp.InternalError(location, "data is not map[string]any", data)
 	}
 
+	// Convert the map value into the correct element.
 	switch Type(convert.String(dataMap["type"])) {
 
 	case TypeArray:
 		result := Array{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeBoolean:
 		result := Boolean{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeInteger:
 		result := Integer{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeNumber:
 		result := Number{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeObject:
 		result := Object{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeString:
 		result := String{}
-		err := result.UnmarshalMap(dataMap)
-		return result, err
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 	}
 
-	// Fall through to failure.  You should be sad.
-	return nil, derp.InternalError("schema.UnmarshalElement", "Unrecognized data type", data)
+	// Fall through to failure.  You should be disappointed.
+	return nil, derp.InternalError(location, "Unrecognized data type", data)
 }
