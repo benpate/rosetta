@@ -60,7 +60,7 @@ func ToText(html string) string {
 // This means that it will remove all tags, but adds regular whitespace in between them.
 func ToSearchText(html string) string {
 	result := html
-	result = strings.Replace(result, "<", " <", -1) // Add space before every HTML tag
+	result = strings.ReplaceAll(result, "<", " <") // Add space before every HTML tag
 	result = RemoveTags(result)
 	result = RemoveSpecialCharacters(result)
 	return result
