@@ -229,11 +229,24 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 
 	var err error
 
+	// RULE: `type` must be "array"
 	if convert.String(data["type"]) != "array" {
 		return derp.InternalError("schema.Array.UnmarshalMap", "Data is not type 'array'", data)
 	}
 
-	element.Items, err = UnmarshalMap(data["items"])
+	// Try to retrieve the array items from the data map
+	items, err := UnmarshalMap(data["items"])
+
+	if err != nil {
+		return derp.Wrap(err, "schema.Array.UnmarshalMap", "Unable to unmarshal 'items'", data["items"])
+	}
+
+	if items == nil {
+		return derp.InternalError("schema.Array.UnmarshalMap", "'items' cannot be nil", data)
+	}
+
+	// Populate the element
+	element.Items = items
 	element.MinLength = convert.Int(data["minLength"])
 	element.MaxLength = convert.Int(data["maxLength"])
 	element.Required = convert.Bool(data["required"])

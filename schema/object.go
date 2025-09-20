@@ -168,12 +168,12 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 	}
 
 	// Handle "simple" required as a boolean
-	if required, ok := data["required"].(bool); ok {
+	if required, isBool := data["required"].(bool); isBool {
 		element.Required = required
 	}
 
 	// Handle property map
-	if properties, ok := data["properties"].(map[string]any); ok {
+	if properties, isMap := data["properties"].(map[string]any); isMap {
 
 		element.Properties = make(map[string]Element, len(properties))
 
@@ -186,7 +186,6 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 				}
 
 				if propertyObject, err := UnmarshalMap(propertyMap); err == nil {
-
 					element.Properties[key] = propertyObject
 				}
 			}
