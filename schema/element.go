@@ -50,13 +50,17 @@ func UnmarshalJSON(data []byte) (Element, error) {
 
 	if err := json.Unmarshal(data, &result); err != nil {
 		derp.Report(err)
-		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Error unmarshalling JSON", string(data))
+		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal JSON", string(data))
 	}
 
 	element, err := UnmarshalMap(result)
 
 	if err != nil {
-		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Error unmarshalling map", string(data))
+		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal map", string(data))
+	}
+
+	if element == nil {
+		return nil, derp.InternalError("schema.UnmarshalJSON", "Element is nil", string(data))
 	}
 
 	return element, nil
@@ -110,5 +114,4 @@ func UnmarshalMap(data any) (Element, error) {
 
 	// Fall through to failure.  You should be sad.
 	return nil, derp.InternalError("schema.UnmarshalElement", "Unrecognized data type", data)
-
 }

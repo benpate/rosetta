@@ -118,8 +118,12 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 			}
 		}
 
-		for index := 0; index < length; index++ {
+		for index := range length {
 			subPath := path.PushTail(strconv.Itoa(index))
+
+			if element.Items == nil {
+				return derp.InternalError(location, "Array items cannot be nil", path)
+			}
 
 			if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
 				return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
