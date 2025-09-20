@@ -71,62 +71,62 @@ func RemoveSpecialCharacters(html string) string {
 
 	result := html
 
-	result = strings.Replace(result, "\u00a0", " ", -1)
+	result = strings.ReplaceAll(result, "\u00a0", " ")
 
-	result = strings.Replace(result, "&#60;", "<", -1)
-	result = strings.Replace(result, "&lt;", "<", -1)
+	result = strings.ReplaceAll(result, "&#60;", "<")
+	result = strings.ReplaceAll(result, "&lt;", "<")
 
-	result = strings.Replace(result, "&#62;", ">", -1)
-	result = strings.Replace(result, "&gt;", ">", -1)
+	result = strings.ReplaceAll(result, "&#62;", ">")
+	result = strings.ReplaceAll(result, "&gt;", ">")
 
-	result = strings.Replace(result, "&#34;", `"`, -1)
-	result = strings.Replace(result, "&quot;", `"`, -1)
+	result = strings.ReplaceAll(result, "&#34;", `"`)
+	result = strings.ReplaceAll(result, "&quot;", `"`)
 
-	result = strings.Replace(result, "&#38;", "&", -1)
-	result = strings.Replace(result, "&amp;", "&", -1)
+	result = strings.ReplaceAll(result, "&#38;", "&")
+	result = strings.ReplaceAll(result, "&amp;", "&")
 
-	result = strings.Replace(result, "&#39;", "'", -1)
-	result = strings.Replace(result, "&apos;", "'", -1)
-	result = strings.Replace(result, "&apos;", "'", -1)
-	result = strings.Replace(result, "&lsquo;", "'", -1)
-	result = strings.Replace(result, "&rsquo;", "'", -1)
+	result = strings.ReplaceAll(result, "&#39;", "'")
+	result = strings.ReplaceAll(result, "&apos;", "'")
+	result = strings.ReplaceAll(result, "&apos;", "'")
+	result = strings.ReplaceAll(result, "&lsquo;", "'")
+	result = strings.ReplaceAll(result, "&rsquo;", "'")
 
-	result = strings.Replace(result, "&#124;", "|", -1)
-	result = strings.Replace(result, "&#145;", "'", -1)
-	result = strings.Replace(result, "&#146;", "'", -1)
-	result = strings.Replace(result, "&#147;", `"`, -1)
-	result = strings.Replace(result, "&#148;", `"`, -1)
-	result = strings.Replace(result, "&ldquo;", `"`, -1)
-	result = strings.Replace(result, "&rdquo;", `"`, -1)
+	result = strings.ReplaceAll(result, "&#124;", "|")
+	result = strings.ReplaceAll(result, "&#145;", "'")
+	result = strings.ReplaceAll(result, "&#146;", "'")
+	result = strings.ReplaceAll(result, "&#147;", `"`)
+	result = strings.ReplaceAll(result, "&#148;", `"`)
+	result = strings.ReplaceAll(result, "&ldquo;", `"`)
+	result = strings.ReplaceAll(result, "&rdquo;", `"`)
 
-	result = strings.Replace(result, "&ndash;", `-`, -1)
-	result = strings.Replace(result, "&mdash;", `-`, -1)
-	result = strings.Replace(result, "&#150;", `-`, -1)
-	result = strings.Replace(result, "&#151;", `-`, -1)
+	result = strings.ReplaceAll(result, "&ndash;", `-`)
+	result = strings.ReplaceAll(result, "&mdash;", `-`)
+	result = strings.ReplaceAll(result, "&#150;", `-`)
+	result = strings.ReplaceAll(result, "&#151;", `-`)
 
-	result = strings.Replace(result, "&#160;", " ", -1)
-	result = strings.Replace(result, "&nbsp;", " ", -1)
+	result = strings.ReplaceAll(result, "&#160;", " ")
+	result = strings.ReplaceAll(result, "&nbsp;", " ")
 
-	result = strings.Replace(result, "&#169;", "(C)", -1)
-	result = strings.Replace(result, "&copy;", "(C)", -1)
+	result = strings.ReplaceAll(result, "&#169;", "(C)")
+	result = strings.ReplaceAll(result, "&copy;", "(C)")
 
-	result = strings.Replace(result, "&#171;", "<<", -1)
-	result = strings.Replace(result, "&laquo;", "<<", -1)
+	result = strings.ReplaceAll(result, "&#171;", "<<")
+	result = strings.ReplaceAll(result, "&laquo;", "<<")
 
-	result = strings.Replace(result, "&#187;", ">>", -1)
-	result = strings.Replace(result, "&raquo;", ">>", -1)
+	result = strings.ReplaceAll(result, "&#187;", ">>")
+	result = strings.ReplaceAll(result, "&raquo;", ">>")
 
-	result = strings.Replace(result, "&#174;", "(R)", -1)
-	result = strings.Replace(result, "&reg;", "(R)", -1)
+	result = strings.ReplaceAll(result, "&#174;", "(R)")
+	result = strings.ReplaceAll(result, "&reg;", "(R)")
 
-	result = strings.Replace(result, "&#8230;", "...", -1)
-	result = strings.Replace(result, "&hellip;", "...", -1)
+	result = strings.ReplaceAll(result, "&#8230;", "...")
+	result = strings.ReplaceAll(result, "&hellip;", "...")
 
-	result = strings.Replace(result, "&#8249;", "<", -1)
-	result = strings.Replace(result, "&lsaquo;", "<", -1)
+	result = strings.ReplaceAll(result, "&#8249;", "<")
+	result = strings.ReplaceAll(result, "&lsaquo;", "<")
 
-	result = strings.Replace(result, "&#8250;", ">", -1)
-	result = strings.Replace(result, "&rsaquo;", "<", -1)
+	result = strings.ReplaceAll(result, "&#8250;", ">")
+	result = strings.ReplaceAll(result, "&rsaquo;", "<")
 
 	return result
 }
