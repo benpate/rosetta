@@ -49,7 +49,6 @@ func UnmarshalJSON(data []byte) (Element, error) {
 	var result map[string]any
 
 	if err := json.Unmarshal(data, &result); err != nil {
-		derp.Report(err)
 		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal JSON", string(data))
 	}
 
