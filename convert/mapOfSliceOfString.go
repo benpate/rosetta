@@ -18,6 +18,11 @@ func MapOfSliceOfString(value any) map[string][]string {
 // possible, then it returns an empty map and FALSE.
 func MapOfSliceOfStringOk(value any) (map[string][]string, bool) {
 
+	// NILCHECK: value cannot be nil
+	if value == nil {
+		return make(map[string][]string), false
+	}
+
 	switch typed := value.(type) {
 
 	case map[string]any:

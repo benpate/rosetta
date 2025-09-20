@@ -16,6 +16,11 @@ func MapOfString(value any) map[string]string {
 // The boolean result value returns TRUE if successful.  FALSE otherwise
 func MapOfStringOk(value any) (map[string]string, bool) {
 
+	// NILCHECK: value cannot be nil
+	if value == nil {
+		return make(map[string]string), false
+	}
+
 	switch typed := value.(type) {
 
 	case map[string]any:

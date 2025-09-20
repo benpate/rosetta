@@ -14,6 +14,11 @@ func MapOfInt32(value any) map[string]int32 {
 // The boolean result value returns TRUE if successful.  FALSE otherwise
 func MapOfInt32Ok(value any) (map[string]int32, bool) {
 
+	// NILCHECK: value cannot be nil
+	if value == nil {
+		return make(map[string]int32), false
+	}
+
 	switch typed := value.(type) {
 
 	case map[string]int:

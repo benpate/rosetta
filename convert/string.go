@@ -36,6 +36,7 @@ func StringDefault(value any, defaultValue string) string {
 // All other values return the default value with Ok=false
 func StringOk(value any, defaultValue string) (string, bool) {
 
+	// NILCHECK: value cannot be nil
 	if value == nil {
 		return defaultValue, false
 	}

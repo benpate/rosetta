@@ -16,6 +16,11 @@ func MapOfAny(value any) map[string]any {
 // The boolean result value returns TRUE if successful.  FALSE otherwise
 func MapOfAnyOk(value any) (map[string]any, bool) {
 
+	// NILCHECK: value cannot be nil
+	if value == nil {
+		return make(map[string]any), false
+	}
+
 	switch typed := value.(type) {
 
 	case map[string]any:
@@ -53,7 +58,6 @@ func MapOfAnyOk(value any) (map[string]any, bool) {
 
 	case MapOfAnyGetter:
 		return typed.MapOfAny(), true
-
 	}
 
 	// Fall through means conversion failed

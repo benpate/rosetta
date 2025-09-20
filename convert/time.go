@@ -16,6 +16,11 @@ func TimeDefault(value any, defaultValue time.Time) time.Time {
 
 func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
+	// NILCHECK: value cannot be nil
+	if value == nil {
+		return defaultValue, false
+	}
+
 	switch typed := value.(type) {
 
 	case time.Time:
