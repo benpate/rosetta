@@ -91,11 +91,10 @@ func (f *Float) UnmarshalJSON(value []byte) error {
 	// Try to convert the value to an integer
 	result, err := strconv.ParseFloat(valueStr, 64)
 
-	if err == nil {
-		f.Set(result)
-		return nil
+	if err != nil {
+		return derp.Wrap(err, "null.Float.UnmarshalJSON", "Invalid float value", valueStr)
 	}
 
-	// Fall through means error
-	return derp.Wrap(err, "null.Float.UnmarshalJSON", "Invalid float value", valueStr)
+	f.Set(result)
+	return nil
 }
