@@ -6,8 +6,10 @@ import "reflect"
 // It works with any, []any, []string, []int, and int values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfInt64(value any) []int64 {
-	result, _ := SliceOfInt64Ok(value)
-	return result
+	if result, _ := SliceOfInt64Ok(value); result != nil {
+		return result
+	}
+	return make([]int64, 0)
 }
 
 // SliceOfInt64Ok converts the value into a slice of int64s.

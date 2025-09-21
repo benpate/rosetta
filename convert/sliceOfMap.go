@@ -4,8 +4,11 @@ package convert
 // It works with []any, []map[string]any.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfMap(value any) []map[string]any {
-	result, _ := SliceOfMapOk(value)
-	return result
+	if result, _ := SliceOfMapOk(value); result != nil {
+		return result
+	}
+
+	return make([]map[string]any, 0)
 }
 
 // SliceOfMapOk converts the value into a slice of map[string]any.

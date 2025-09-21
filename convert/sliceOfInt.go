@@ -6,8 +6,10 @@ import "reflect"
 // It works with any, []any, []string, []int, and int values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfInt(value any) []int {
-	result, _ := SliceOfIntOk(value)
-	return result
+	if result, _ := SliceOfIntOk(value); result != nil {
+		return result
+	}
+	return make([]int, 0)
 }
 
 // SliceOfIntOk converts the value into a slice of ints.

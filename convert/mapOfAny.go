@@ -8,8 +8,10 @@ import (
 
 // MapOfAny attempts to convert the generic value into a map[string]any
 func MapOfAny(value any) map[string]any {
-	result, _ := MapOfAnyOk(value)
-	return result
+	if result, _ := MapOfAnyOk(value); result != nil {
+		return result
+	}
+	return make(map[string]any)
 }
 
 // MapOfAnyOk attempts to convert the generic value into a map[string]any

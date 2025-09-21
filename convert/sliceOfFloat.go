@@ -6,8 +6,10 @@ import "reflect"
 // It works with any, []any, []float64, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfFloat(value any) []float64 {
-	result, _ := SliceOfFloatOk(value)
-	return result
+	if result, _ := SliceOfFloatOk(value); result != nil {
+		return result
+	}
+	return make([]float64, 0)
 }
 
 // SliceOfFloat converts the value into a slice of floats.

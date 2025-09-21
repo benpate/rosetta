@@ -9,8 +9,10 @@ import (
 // MapOfSliceOfString converts the given value to a map[string][]string.
 // If conversion is not possible, then an empty map is returned.
 func MapOfSliceOfString(value any) map[string][]string {
-	result, _ := MapOfSliceOfStringOk(value)
-	return result
+	if result, _ := MapOfSliceOfStringOk(value); result != nil {
+		return result
+	}
+	return make(map[string][]string)
 }
 
 // MapOfSliceOfStringOk converts the given value to a map[string][]string.

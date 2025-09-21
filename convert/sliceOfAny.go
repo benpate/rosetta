@@ -6,8 +6,11 @@ import "reflect"
 // It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfAny(value any) []any {
-	result, _ := SliceOfAnyOk(value)
-	return result
+	if result, _ := SliceOfAnyOk(value); result != nil {
+		return result
+	}
+
+	return make([]any, 0)
 }
 
 // SliceOfAny converts the value into a slice of any.

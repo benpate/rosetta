@@ -8,8 +8,11 @@ import (
 // It works with any, []any, []string, and string values.
 // If the passed value cannot be converted, then an empty slice is returned.
 func SliceOfString(value any) []string {
-	result, _ := SliceOfStringOk(value)
-	return result
+	if result, _ := SliceOfStringOk(value); result != nil {
+		return result
+	}
+
+	return make([]string, 0)
 }
 
 // SliceOfString converts the value into a slice of strings.

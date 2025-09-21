@@ -6,8 +6,11 @@ import (
 
 // MapOfInt attempts to convert the generic value into a map[string]string
 func MapOfInt(value any) map[string]int {
-	result, _ := MapOfIntOk(value)
-	return result
+	if result, _ := MapOfIntOk(value); result != nil {
+		return result
+	}
+
+	return make(map[string]int)
 }
 
 // MapOfIntOk attempts to convert the generic value into a map[string]string

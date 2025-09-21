@@ -8,8 +8,11 @@ import (
 
 // MapOfString attempts to convert the generic value into a map[string]string
 func MapOfString(value any) map[string]string {
-	result, _ := MapOfStringOk(value)
-	return result
+	if result, _ := MapOfStringOk(value); result != nil {
+		return result
+	}
+
+	return make(map[string]string)
 }
 
 // MapOfStringOk attempts to convert the generic value into a map[string]string
