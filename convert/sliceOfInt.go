@@ -9,6 +9,7 @@ func SliceOfInt(value any) []int {
 	if result, _ := SliceOfIntOk(value); result != nil {
 		return result
 	}
+
 	return make([]int, 0)
 }
 

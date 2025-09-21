@@ -9,6 +9,7 @@ func SliceOfFloat(value any) []float64 {
 	if result, _ := SliceOfFloatOk(value); result != nil {
 		return result
 	}
+
 	return make([]float64, 0)
 }
 

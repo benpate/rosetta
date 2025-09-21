@@ -9,6 +9,7 @@ func SliceOfInt64(value any) []int64 {
 	if result, _ := SliceOfInt64Ok(value); result != nil {
 		return result
 	}
+
 	return make([]int64, 0)
 }
 
