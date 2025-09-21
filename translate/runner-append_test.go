@@ -13,9 +13,9 @@ func TestAppend(t *testing.T) {
 
 	// SOURCE DATA
 	sourceValue := sliceof.Object[mapof.Any]{
-		{"name": "Alice", "email": "alice@wonderland.com"},
-		{"name": "John Connor", "email": "john@connor.mil"},
-		{"name": "Sarah Connor", "email": "sarah@sky.net"},
+		mapof.Any{"name": "Alice", "email": "alice@wonderland.com"},
+		mapof.Any{"name": "John Connor", "email": "john@connor.mil"},
+		mapof.Any{"name": "Sarah Connor", "email": "sarah@sky.net"},
 	}
 
 	// TARGET CONFIGURATION
