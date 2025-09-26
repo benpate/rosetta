@@ -49,6 +49,19 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
 	const location = "rosetta.translate.Rule.UnmarshalMap"
 
+	// Append Runner
+	if append := data.GetAny("append"); append != nil {
+
+		runner := appendRunner{}
+
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling AppendRunner", data)
+		}
+
+		rule.Runner = runner
+		return nil
+	}
+
 	// Condition Runner
 	if condition := data.GetString("if"); condition != "" {
 
@@ -56,6 +69,19 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
 		if err := runner.UnmarshalMap(data); err != nil {
 			return derp.Wrap(err, location, "Error unmarshalling ConditionRunner", data)
+		}
+
+		rule.Runner = runner
+		return nil
+	}
+
+	// First Runner
+	if first := data.GetAny("first"); first != nil {
+
+		runner := firstRunner{}
+
+		if err := runner.UnmarshalMap(data); err != nil {
+			return derp.Wrap(err, location, "Error unmarshalling FirstRunner", data)
 		}
 
 		rule.Runner = runner
@@ -95,19 +121,6 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 
 		if err := runner.UnmarshalMap(data); err != nil {
 			return derp.Wrap(err, location, "Error unmarshalling ExpressionRunner", data)
-		}
-
-		rule.Runner = runner
-		return nil
-	}
-
-	// Append Runner
-	if append := data.GetAny("append"); append != nil {
-
-		runner := appendRunner{}
-
-		if err := runner.UnmarshalMap(data); err != nil {
-			return derp.Wrap(err, location, "Error unmarshalling AppendRunner", data)
 		}
 
 		rule.Runner = runner

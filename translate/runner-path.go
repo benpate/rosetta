@@ -5,6 +5,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
+	deepcopy "github.com/tiendc/go-deepcopy"
 )
 
 // pathRunner retrieves a value from the input object, and writes it to the output object
@@ -31,14 +32,28 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
 
 	const location = "rosetta.translate.pathRunner.Execute"
 
-	value, _ := sourceSchema.Get(sourceObject, runner.Path)
+	var duplicateValue any = ""
 
-	value = convert.Element(value)
+	// Get the source value from the source object
+	sourceValue, err := sourceSchema.Get(sourceObject, runner.Path)
 
-	if err := targetSchema.Set(targetObject, runner.Target, value); err != nil {
-		return derp.Wrap(err, location, "Error setting value in target", runner.Target, value)
+	if err == nil {
+
+		// Make a deep copy of the source (to prevent pointer shenanigans)
+		if err := deepcopy.Copy(&duplicateValue, sourceValue); err != nil {
+			return derp.Wrap(err, location, "Unable to deep copy value", runner.Path, sourceValue)
+		}
+
+		// Dereference pointers (if applicable)
+		duplicateValue = convert.Element(duplicateValue)
 	}
 
+	// Set the value in the target object
+	if err := targetSchema.Set(targetObject, runner.Target, duplicateValue); err != nil {
+		return derp.Wrap(err, location, "Unable to set target value", runner.Target, sourceValue)
+	}
+
+	// Success.
 	return nil
 }
 

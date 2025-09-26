@@ -22,7 +22,10 @@ type conditionRunner struct {
 func Condition(condition string, thenRules []Rule, elseRules []Rule) Rule {
 
 	conditionTemplate, err := template.New("").Funcs(funcmap.All()).Parse(condition)
-	derp.Report(err)
+
+	if err != nil {
+		derp.Report(err)
+	}
 
 	return Rule{
 		conditionRunner{

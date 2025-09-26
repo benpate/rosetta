@@ -20,8 +20,10 @@ type expressionRunner struct {
 func Expression(expression string, target string) Rule {
 
 	runner := expressionRunner{}
-	err := runner.populate(expression, target)
-	derp.Report(err)
+
+	if err := runner.populate(expression, target); err != nil {
+		derp.Report(err)
+	}
 
 	return Rule{runner}
 }

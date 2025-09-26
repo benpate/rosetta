@@ -25,8 +25,11 @@ type forEachRunner struct {
 func ForEach(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) Rule {
 
 	runner := forEachRunner{}
-	err := runner.populate(sourcePath, targetPath, filter, rulesMap)
-	derp.Report(err)
+
+	if err := runner.populate(sourcePath, targetPath, filter, rulesMap); err != nil {
+		derp.Report(err)
+	}
+
 	return Rule{runner}
 }
 
