@@ -9,7 +9,7 @@ import (
 
 func TestAny_GroupHeader(t *testing.T) {
 
-	values := testGroupValues()
+	values := testAnyGroupValues()
 
 	groupBy := values.GroupBy("group")
 
@@ -32,7 +32,7 @@ func TestAny_GroupHeader(t *testing.T) {
 
 func TestAny_GroupFooter(t *testing.T) {
 
-	values := testGroupValues()
+	values := testAnyGroupValues()
 
 	groupBy := values.GroupBy("group")
 
