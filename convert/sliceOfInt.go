@@ -1,6 +1,9 @@
 package convert
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 // SliceOfInt converts the value into a slice of ints.
 // It works with any, []any, []string, []int, and int values.
@@ -24,64 +27,64 @@ func SliceOfIntOk(value any) ([]int, bool) {
 	}
 
 	// Known types
-	switch value := value.(type) {
+	switch typed := value.(type) {
 
 	case float64:
 		item, ok := IntOk(value, 0)
 		return []int{item}, ok
 
 	case int:
-		return []int{value}, true
+		return []int{typed}, true
 
 	case int64:
-		return []int{Int(value)}, true
+		return []int{Int(typed)}, true
 
 	case string:
-		item, ok := IntOk(value, 0)
-		return []int{item}, ok
+		split := strings.Split(typed, ",")
+		return sliceOfIntOk(split)
 
 	case reflect.Value:
-		return SliceOfInt(Interface(value)), true
+		return SliceOfInt(Interface(typed)), true
 
 	case Floater:
-		return SliceOfInt(value.Float()), true
+		return SliceOfInt(typed.Float()), true
 
 	case Inter:
-		return SliceOfInt(value.Int()), true
+		return SliceOfInt(typed.Int()), true
 
 	case Int64er:
-		return SliceOfInt(value.Int64()), true
+		return SliceOfInt(typed.Int64()), true
 
 	case Stringer:
-		item, ok := IntOk(value.String(), 0)
+		item, ok := IntOk(typed.String(), 0)
 		return []int{item}, ok
 
 	case []any:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []float64:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []int:
-		return value, true
+		return typed, true
 
 	case []int64:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []string:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []Floater:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []Inter:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []Int64er:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 
 	case []Stringer:
-		return sliceOfIntOk(value)
+		return sliceOfIntOk(typed)
 	}
 
 	// Use reflection to see if this is even an array/slice

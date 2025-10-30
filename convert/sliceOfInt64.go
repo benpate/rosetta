@@ -1,6 +1,9 @@
 package convert
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 // SliceOfInt64 converts the value into a slice of int64s.
 // It works with any, []any, []string, []int, and int values.
@@ -37,8 +40,8 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 		return []int64{typed}, true
 
 	case string:
-		item, ok := Int64Ok(typed, 0)
-		return []int64{item}, ok
+		split := strings.Split(typed, ",")
+		return sliceOfInt64Ok(split)
 
 	case reflect.Value:
 		return SliceOfInt64(Interface(typed)), true

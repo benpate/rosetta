@@ -50,6 +50,15 @@ func TestSliceOfInt_String(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
+func TestSliceOfInt_StringDelimited(t *testing.T) {
+	input := "3,4,5"
+	expected := []int{3, 4, 5}
+
+	actual, ok := SliceOfIntOk(input)
+	require.True(t, ok)
+	require.Equal(t, expected, actual)
+}
+
 func TestSliceOfInt_ReflectValue(t *testing.T) {
 	input := ReflectValue(42)
 	expected := []int{42}

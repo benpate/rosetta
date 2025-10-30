@@ -50,6 +50,15 @@ func TestSliceOfFloat_String(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
+func TestSliceOfFloat_StringDelimited(t *testing.T) {
+
+	input := "1.0,2.0,3.0,4.0"
+	expected := []float64{1.0, 2.0, 3.0, 4.0}
+	actual, ok := SliceOfFloatOk(input)
+	require.True(t, ok)
+	require.Equal(t, expected, actual)
+}
+
 func TestSliceOfFloat_ReflectValue(t *testing.T) {
 	input := ReflectValue(42)
 	expected := []float64{42}

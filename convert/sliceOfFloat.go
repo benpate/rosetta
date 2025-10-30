@@ -1,6 +1,9 @@
 package convert
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 // SliceOfFloat converts the value into a slice of floats.
 // It works with any, []any, []float64, and float64 values.
@@ -36,8 +39,8 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 		return []float64{float64(typed)}, true
 
 	case string:
-		item, ok := FloatOk(typed, 0.0)
-		return []float64{item}, ok
+		split := strings.Split(typed, ",")
+		return sliceOfFloatOk(split)
 
 	case reflect.Value:
 		return SliceOfFloat(Interface(typed)), true

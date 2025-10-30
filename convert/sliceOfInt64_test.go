@@ -50,6 +50,15 @@ func TestSliceOfInt64_String(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
+func TestSliceOfInt64_StringDelimited(t *testing.T) {
+	input := "3,4,5,6"
+	expected := []int64{3, 4, 5, 6}
+
+	actual, ok := SliceOfInt64Ok(input)
+	require.True(t, ok)
+	require.Equal(t, expected, actual)
+}
+
 func TestSliceOfInt64_ReflectValue(t *testing.T) {
 	input := ReflectValue(42)
 	expected := []int64{42}
