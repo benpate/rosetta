@@ -29,6 +29,13 @@ func (x Object[T]) IsLength(length int) bool {
 	return len(x) == length
 }
 
+// IsZero returns TRUE if the slice contains no elements.
+// This is an alias for IsEmpty, and implements the `Zeroer`
+// interface used by many packages (including go/json)
+func (x Object[T]) IsZero() bool {
+	return len(x) == 0
+}
+
 // IsEmpty returns TRUE if the slice contains no elements
 func (x Object[T]) IsEmpty() bool {
 	return len(x) == 0
