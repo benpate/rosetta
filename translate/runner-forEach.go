@@ -160,7 +160,7 @@ func (runner *forEachRunner) populate(source string, target string, filter strin
 	pipeline, err := NewFromMap(rules...)
 
 	if err != nil {
-		return derp.Wrap(err, "rosetta.translate.forEachRunner.populate", "Error creating Pipeline", rules)
+		return derp.Wrap(err, "rosetta.translate.forEachRunner.populate", "Unable to create Pipeline", rules)
 	}
 
 	// Populate remaining fields

@@ -98,14 +98,14 @@ func (runner *conditionRunner) populate(condition string, thenRules []map[string
 	thenPipeline, err := NewFromMap(thenRules...)
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error creating `then` rules", thenRules)
+		return derp.Wrap(err, location, "Unable to create `then` rules", thenRules)
 	}
 
 	// Parse Else Rules
 	elsePipeline, err := NewFromMap(elseRules...)
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error creating `else` rules", elseRules)
+		return derp.Wrap(err, location, "Unable to create `else` rules", elseRules)
 	}
 
 	// Apply values

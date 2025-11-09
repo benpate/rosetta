@@ -43,7 +43,7 @@ func NewSliceOfPipelines(slices [][]map[string]any) ([]Pipeline, error) {
 		pipeline, err := NewFromMap(item...)
 
 		if err != nil {
-			return result, derp.Wrap(err, location, "Error creating metadata pipeline", item)
+			return result, derp.Wrap(err, location, "Unable to create metadata pipeline", item)
 		}
 
 		result[index] = pipeline
