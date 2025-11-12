@@ -1,5 +1,9 @@
 package convert
 
+import (
+	"reflect"
+)
+
 // SliceOfMap converts the value into a slice of map[string]any.
 // It works with []any, []map[string]any.
 // If the passed value cannot be converted, then an empty slice is returned.
@@ -52,6 +56,22 @@ func SliceOfMapOk(value any) ([]map[string]any, bool) {
 		for index, v := range typed {
 			result[index] = v.MapOfAny()
 		}
+		return result, true
+	}
+
+	// Use reflection to see if this is even an array/slice
+	valueOf := reflect.ValueOf(value)
+
+	switch valueOf.Kind() {
+	case reflect.Pointer:
+		return SliceOfMapOk(valueOf.Elem().Interface())
+
+	case reflect.Array, reflect.Slice:
+		result := make([]map[string]any, valueOf.Len())
+		for index := 0; index < valueOf.Len(); index++ {
+			result[index] = MapOfAny(valueOf.Index(index))
+		}
+
 		return result, true
 	}
 

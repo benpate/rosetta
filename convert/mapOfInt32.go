@@ -76,6 +76,21 @@ func MapOfInt32Ok(value any) (map[string]int32, bool) {
 		return MapOfInt32Ok(typed.MapOfAny())
 	}
 
+	// Last chance, try reflection
+	v := reflect.ValueOf(value)
+	if v.Type().Kind() == reflect.Map {
+
+		result := make(map[string]int32)
+
+		for _, reflectKey := range v.MapKeys() {
+			key := String(reflectKey)
+			value := Int32(v.MapIndex(reflectKey).Interface())
+			result[key] = value
+		}
+
+		return result, true
+	}
+
 	// Fall through means conversion failed
 	return make(map[string]int32), false
 }

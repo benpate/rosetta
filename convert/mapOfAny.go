@@ -62,6 +62,19 @@ func MapOfAnyOk(value any) (map[string]any, bool) {
 		return typed.MapOfAny(), true
 	}
 
+	// Last chance, try reflection
+	v := reflect.ValueOf(value)
+	if v.Type().Kind() == reflect.Map {
+
+		result := make(map[string]any)
+		for _, reflectKey := range v.MapKeys() {
+			key := String(reflectKey)
+			result[key] = v.MapIndex(reflectKey).Interface()
+		}
+
+		return result, true
+	}
+
 	// Fall through means conversion failed
 	return make(map[string]any), false
 }
