@@ -1,8 +1,9 @@
-package schema
+package tests
 
 import (
 	"testing"
 
+	"github.com/benpate/rosetta/schema"
 	"github.com/benpate/rosetta/sliceof"
 	"github.com/stretchr/testify/require"
 )
@@ -10,8 +11,7 @@ import (
 func TestAppend_String(t *testing.T) {
 
 	testArray := sliceof.String{"one", "two", "three"}
-	testElement := testArrayA_Schema()
-	testSchema := New(testElement)
+	testSchema := schema.New(schema.Array{Items: schema.String{}, MaxLength: 5})
 
 	err := testSchema.Append(&testArray, "", "four")
 	require.Nil(t, err)
@@ -26,8 +26,7 @@ func TestAppend_String(t *testing.T) {
 func TestAppend_Object(t *testing.T) {
 
 	testArray := sliceof.Object[string]{"one", "two", "three"}
-	testElement := testArrayA_Schema()
-	testSchema := New(testElement)
+	testSchema := schema.New(schema.Array{Items: schema.String{}, MaxLength: 5})
 
 	err := testSchema.Append(&testArray, "", "four")
 
