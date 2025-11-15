@@ -16,6 +16,7 @@ func init() {
 	formats = make(map[string]format.Generator)
 
 	// Calendar
+	UseFormat("iso8601", format.ISO8601)
 	UseFormat("date", format.Date)
 	UseFormat("dateTime", format.DateTime)
 	UseFormat("time", format.Time)
