@@ -39,3 +39,11 @@ func TestStringConversion(t *testing.T) {
 	var value []string = NewString()
 	t.Log(value)
 }
+
+func TestString_NewConstructor(t *testing.T) {
+	slice := NewString("zero", "one", "two")
+	require.Equal(t, 3, slice.Length())
+	require.Equal(t, "zero", slice[0])
+	require.Equal(t, "one", slice[1])
+	require.Equal(t, "two", slice[2])
+}

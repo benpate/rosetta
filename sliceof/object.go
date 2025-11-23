@@ -11,8 +11,8 @@ import (
 
 type Object[T any] []T
 
-func NewObject[T any]() Object[T] {
-	return make(Object[T], 0)
+func NewObject[T any](values ...T) Object[T] {
+	return values
 }
 
 /******************************************

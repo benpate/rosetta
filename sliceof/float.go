@@ -10,8 +10,8 @@ import (
 
 type Float []float64
 
-func NewFloat() Float {
-	return make(Float, 0)
+func NewFloat(values ...float64) Float {
+	return values
 }
 
 /****************************************

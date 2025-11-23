@@ -13,8 +13,8 @@ import (
 
 type MapOfAny []mapof.Any
 
-func NewMapOfAny() MapOfAny {
-	return make(MapOfAny, 0)
+func NewMapOfAny(values ...mapof.Any) MapOfAny {
+	return values
 }
 
 /******************************************

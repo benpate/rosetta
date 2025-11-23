@@ -10,8 +10,8 @@ import (
 
 type Int []int
 
-func NewInt() Int {
-	return make(Int, 0)
+func NewInt(values ...int) Int {
+	return values
 }
 
 /****************************************

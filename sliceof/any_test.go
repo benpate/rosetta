@@ -22,3 +22,12 @@ func TestAny_LengthGetter(t *testing.T) {
 	require.Equal(t, 3, x.Length())
 	require.Equal(t, 3, (&x).Length())
 }
+
+func TestAny_NewConstructor(t *testing.T) {
+	slice := NewAny("zero", "one", "two", 3)
+	require.Equal(t, 4, slice.Length())
+	require.Equal(t, "zero", slice[0])
+	require.Equal(t, "one", slice[1])
+	require.Equal(t, "two", slice[2])
+	require.Equal(t, 3, slice[3])
+}

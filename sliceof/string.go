@@ -11,8 +11,8 @@ import (
 
 type String []string
 
-func NewString() String {
-	return make(String, 0)
+func NewString(values ...string) String {
+	return values
 }
 
 /****************************************

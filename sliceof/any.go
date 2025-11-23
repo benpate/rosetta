@@ -12,8 +12,8 @@ import (
 
 type Any []any
 
-func NewAny() Any {
-	return make(Any, 0)
+func NewAny(values ...any) Any {
+	return values
 }
 
 /****************************************

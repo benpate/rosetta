@@ -44,3 +44,11 @@ func TestObjectReverseEven(t *testing.T) {
 	require.Equal(t, 2, x[8])
 	require.Equal(t, 1, x[9])
 }
+
+func TestObject_NewConstructor(t *testing.T) {
+	slice := NewObject[string]("zero", "one", "two")
+	require.Equal(t, 3, slice.Length())
+	require.Equal(t, "zero", slice[0])
+	require.Equal(t, "one", slice[1])
+	require.Equal(t, "two", slice[2])
+}

@@ -13,8 +13,8 @@ import (
 
 type MapOfString []mapof.String
 
-func NewMapOfString() MapOfString {
-	return make(MapOfString, 0)
+func NewMapOfString(values ...mapof.String) MapOfString {
+	return values
 }
 
 /******************************************
