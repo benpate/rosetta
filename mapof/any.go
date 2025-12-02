@@ -314,6 +314,11 @@ func (m Any) GetSliceOfFloat(name string) []float64 {
 
 // GetMap returns a named option as a mapof.Any
 func (m Any) GetMap(name string) Any {
+	return m.GetMapOfAny(name)
+}
+
+// GetMapOfAny returns a named option as a mapof.Any
+func (m Any) GetMapOfAny(name string) Any {
 
 	if value, ok := m[name].(Any); ok {
 		return value
@@ -324,6 +329,20 @@ func (m Any) GetMap(name string) Any {
 	}
 
 	return NewAny()
+}
+
+// GetMapOfString returns a named option as a mapof.String
+func (m Any) GetMapOfString(name string) String {
+
+	if value, ok := m[name].(String); ok {
+		return value
+	}
+
+	if value, ok := m[name].(map[string]string); ok {
+		return String(value)
+	}
+
+	return NewString()
 }
 
 // GetSliceOfMap returns a named option as a slice of mapof.Any objects.
