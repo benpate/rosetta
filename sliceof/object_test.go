@@ -6,7 +6,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestObjectReverseOdd(t *testing.T) {
+func TestObject_NewConstructor(t *testing.T) {
+	slice := NewObject[string]("zero", "one", "two")
+	require.Equal(t, 3, slice.Length())
+	require.Equal(t, "zero", slice[0])
+	require.Equal(t, "one", slice[1])
+	require.Equal(t, "two", slice[2])
+}
+
+func TestObject_EmptyConstructor(t *testing.T) {
+
+	result := NewObject[int]()
+	require.NotNil(t, result)
+	require.Zero(t, result.Length())
+}
+
+func TestObject_ReverseOdd(t *testing.T) {
 
 	x := Object[int]{1, 2, 3, 4, 5, 6, 7, 8, 9}
 	require.True(t, x.IsLength(9))
@@ -25,7 +40,7 @@ func TestObjectReverseOdd(t *testing.T) {
 	require.Equal(t, 1, x[8])
 }
 
-func TestObjectReverseEven(t *testing.T) {
+func TestObject_ReverseEven(t *testing.T) {
 
 	x := Object[int]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	require.True(t, x.IsLength(10))
@@ -43,12 +58,4 @@ func TestObjectReverseEven(t *testing.T) {
 	require.Equal(t, 3, x[7])
 	require.Equal(t, 2, x[8])
 	require.Equal(t, 1, x[9])
-}
-
-func TestObject_NewConstructor(t *testing.T) {
-	slice := NewObject[string]("zero", "one", "two")
-	require.Equal(t, 3, slice.Length())
-	require.Equal(t, "zero", slice[0])
-	require.Equal(t, "one", slice[1])
-	require.Equal(t, "two", slice[2])
 }

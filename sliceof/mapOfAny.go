@@ -14,7 +14,12 @@ import (
 type MapOfAny []mapof.Any
 
 func NewMapOfAny(values ...mapof.Any) MapOfAny {
-	return values
+
+	if len(values) == 0 {
+		return make(MapOfAny, 0)
+	}
+
+	return MapOfAny(values)
 }
 
 /******************************************

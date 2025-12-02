@@ -12,6 +12,9 @@ import (
 type String []string
 
 func NewString(values ...string) String {
+	if len(values) == 0 {
+		return make(String, 0)
+	}
 	return values
 }
 

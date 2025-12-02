@@ -12,6 +12,11 @@ import (
 type Object[T any] []T
 
 func NewObject[T any](values ...T) Object[T] {
+
+	if len(values) == 0 {
+		return make(Object[T], 0)
+	}
+
 	return values
 }
 

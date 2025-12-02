@@ -11,6 +11,11 @@ import (
 type Float []float64
 
 func NewFloat(values ...float64) Float {
+
+	if len(values) == 0 {
+		return make(Float, 0)
+	}
+
 	return values
 }
 

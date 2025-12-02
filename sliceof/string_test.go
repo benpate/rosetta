@@ -6,9 +6,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestString_EmptyConstructor(t *testing.T) {
+
+	result := NewString()
+	require.NotNil(t, result)
+	require.Zero(t, result.Length())
+}
+
 func TestString(t *testing.T) {
 
 	s := NewString()
+	require.NotNil(t, s)
 	require.Zero(t, s.Length())
 	require.True(t, s.SetString("0", "one"))
 	require.True(t, s.SetString("1", "two"))

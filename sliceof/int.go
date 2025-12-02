@@ -11,6 +11,11 @@ import (
 type Int []int
 
 func NewInt(values ...int) Int {
+
+	if len(values) == 0 {
+		return make(Int, 0)
+	}
+
 	return values
 }
 

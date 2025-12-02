@@ -6,6 +6,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestAny_EmptyConstructor(t *testing.T) {
+
+	result := NewAny()
+	require.NotNil(t, result)
+	require.Zero(t, result.Length())
+}
+
 func TestAny_Append(t *testing.T) {
 
 	x := Any{1, "hello", true}

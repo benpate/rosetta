@@ -13,6 +13,11 @@ import (
 type Any []any
 
 func NewAny(values ...any) Any {
+
+	if len(values) == 0 {
+		return make(Any, 0)
+	}
+
 	return values
 }
 

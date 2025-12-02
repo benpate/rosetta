@@ -14,6 +14,11 @@ import (
 type MapOfString []mapof.String
 
 func NewMapOfString(values ...mapof.String) MapOfString {
+
+	if len(values) == 0 {
+		return make(MapOfString, 0)
+	}
+
 	return values
 }
 
