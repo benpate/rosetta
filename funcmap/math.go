@@ -55,4 +55,8 @@ func addMathFuncs(target map[string]any) {
 	target["int64"] = func(value any) int64 {
 		return convert.Int64(value)
 	}
+
+	target["float"] = func(value any) float64 {
+		return convert.Float(value)
+	}
 }
