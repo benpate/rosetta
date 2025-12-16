@@ -83,6 +83,11 @@ func (x Object[T]) Find(fn func(T) bool) (T, bool) {
 	return slice.Find(x, fn)
 }
 
+// Filter returns all elements in the slice that satisfies the provided function.
+func (x Object[T]) Filter(fn func(T) bool) Object[T] {
+	return slice.Filter(x, fn)
+}
+
 // At returns a bound-safe element from the slice.  If the index
 // is out of bounds, then `At` returns the zero value for the slice type
 func (x Object[T]) At(index int) T {

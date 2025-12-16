@@ -84,6 +84,11 @@ func (x MapOfAny) Find(fn func(mapof.Any) bool) (mapof.Any, bool) {
 	return slice.Find(x, fn)
 }
 
+// Filter returns all elements in the slice that satisfies the provided function.
+func (x MapOfAny) Filter(fn func(mapof.Any) bool) MapOfAny {
+	return slice.Filter(x, fn)
+}
+
 // At returns a bound-safe element from the slice.  If the index
 // is out of bounds, then `At` returns the zero value for the slice type
 func (x MapOfAny) At(index int) mapof.Any {
