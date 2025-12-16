@@ -23,9 +23,7 @@ func IsSlice(value any) bool {
 	}
 
 	// Otherwise, use reflection to see what's inside there...
-	valueOf := reflect.ValueOf(value)
-
-	switch valueOf.Kind() {
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
 	// Dereference pointers (if necessary)
 	case reflect.Pointer:
@@ -64,11 +62,11 @@ func SliceLength(value any) int {
 	}
 
 	// Reflection for unknown types
-	valueOf := reflect.ValueOf(value)
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	switch valueOf.Kind() {
 	case reflect.Pointer:
 		return SliceLength(valueOf.Elem().Interface())
+
 	case reflect.Array, reflect.Slice:
 		return valueOf.Len()
 	}

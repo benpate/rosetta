@@ -131,9 +131,7 @@ func TestObject_Validate(t *testing.T) {
 	object := newTestStructA()
 	schema := New(testStructA_Schema())
 
-	{
-		err := schema.Validate(&object)
-		spew.Config.DisableMethods = true
-		require.Nil(t, err)
-	}
+	err := schema.Validate(&object)
+	spew.Config.DisableMethods = true
+	require.Nil(t, err)
 }

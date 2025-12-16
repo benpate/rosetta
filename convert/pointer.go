@@ -10,9 +10,7 @@ func Pointer[T any](original T) *T {
 // Element defreferences a pointer, if necessary, and returns the underlying value
 func Element(original any) any {
 
-	valueOf := reflect.ValueOf(original)
-
-	if valueOf.Kind() == reflect.Ptr {
+	if valueOf := reflect.ValueOf(original); valueOf.Kind() == reflect.Ptr {
 		return valueOf.Elem().Interface()
 	}
 

@@ -77,14 +77,13 @@ func MapOfIntOk(value any) (map[string]int, bool) {
 	}
 
 	// Last chance, try reflection
-	v := reflect.ValueOf(value)
-	if v.Type().Kind() == reflect.Map {
+	if valueOf := reflect.ValueOf(value); valueOf.Type().Kind() == reflect.Map {
 
 		result := make(map[string]int)
 
-		for _, reflectKey := range v.MapKeys() {
+		for _, reflectKey := range valueOf.MapKeys() {
 			key := String(reflectKey)
-			value := Int(v.MapIndex(reflectKey).Interface())
+			value := Int(valueOf.MapIndex(reflectKey).Interface())
 			result[key] = value
 		}
 

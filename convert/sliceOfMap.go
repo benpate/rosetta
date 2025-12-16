@@ -60,9 +60,8 @@ func SliceOfMapOk(value any) ([]map[string]any, bool) {
 	}
 
 	// Use reflection to see if this is even an array/slice
-	valueOf := reflect.ValueOf(value)
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	switch valueOf.Kind() {
 	case reflect.Pointer:
 		return SliceOfMapOk(valueOf.Elem().Interface())
 

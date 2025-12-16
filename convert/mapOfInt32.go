@@ -77,14 +77,13 @@ func MapOfInt32Ok(value any) (map[string]int32, bool) {
 	}
 
 	// Last chance, try reflection
-	v := reflect.ValueOf(value)
-	if v.Type().Kind() == reflect.Map {
+	if valueOf := reflect.ValueOf(value); valueOf.Type().Kind() == reflect.Map {
 
 		result := make(map[string]int32)
 
-		for _, reflectKey := range v.MapKeys() {
+		for _, reflectKey := range valueOf.MapKeys() {
 			key := String(reflectKey)
-			value := Int32(v.MapIndex(reflectKey).Interface())
+			value := Int32(valueOf.MapIndex(reflectKey).Interface())
 			result[key] = value
 		}
 

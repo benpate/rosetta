@@ -87,9 +87,8 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 	}
 
 	// Use reflection to see if this is even an array/slice
-	valueOf := reflect.ValueOf(value)
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	switch valueOf.Kind() {
 	case reflect.Pointer:
 		return SliceOfFloatOk(valueOf.Elem().Interface())
 

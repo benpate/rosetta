@@ -60,8 +60,7 @@ func MapOfStringOk(value any) (map[string]string, bool) {
 	}
 
 	// Last chance, try reflection
-	valueOf := reflect.ValueOf(value)
-	if valueOf.Kind() == reflect.Map {
+	if valueOf := reflect.ValueOf(value); valueOf.Kind() == reflect.Map {
 		result := make(map[string]string)
 		for _, reflectKey := range valueOf.MapKeys() {
 			key := String(reflectKey)

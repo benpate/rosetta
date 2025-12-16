@@ -127,8 +127,8 @@ func ExampleNew() {
 func ExampleNewFromJSON() {
 
 	// Import JSON from external source
-	rulesJSON := `[
-		{"expression": "{{.firstName}} {{.lastName}}", "target": "fullName"},
+	rulesJSON := `[` + // nolint:scopeguard
+		`{"expression": "{{.firstName}} {{.lastName}}", "target": "fullName"},
 		{"path": "email", "target": "email"},
 		{"value": "person", "target": "type"},
 		{"if": "{{eq \"M\" .gender}}", "then": [

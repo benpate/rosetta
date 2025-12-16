@@ -29,10 +29,11 @@ func addStringFuncs(target map[string]any) {
 	}
 
 	target["pluralize"] = func(count any, single string, plural string) string {
-		countInt := convert.Int(count)
-		if countInt == 1 {
+
+		if countInt := convert.Int(count); countInt == 1 {
 			return single
 		}
+
 		return plural
 	}
 

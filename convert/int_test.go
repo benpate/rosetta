@@ -101,27 +101,22 @@ func TestStringToInt(t *testing.T) {
 }
 
 func TestStringArrayInt(t *testing.T) {
-
 	s := []string{"100", "200", "300"}
 
-	{
-		result, natural := IntOk(s, -1)
+	result, natural := IntOk(s, -1)
 
-		require.False(t, natural)
-		require.Equal(t, result, int(100))
-	}
+	require.False(t, natural)
+	require.Equal(t, result, int(100))
 }
 
 func TestStringerToInt(t *testing.T) {
 
 	s := getTestStringer()
 
-	{
-		result, natural := IntOk(s, -1)
+	result, natural := IntOk(s, -1)
 
-		require.False(t, natural)
-		require.Equal(t, result, int(-1))
-	}
+	require.False(t, natural)
+	require.Equal(t, result, int(-1))
 }
 
 func TestInvalidToInt(t *testing.T) {

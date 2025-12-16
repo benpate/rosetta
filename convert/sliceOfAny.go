@@ -94,9 +94,8 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 	}
 
 	// Use reflection to see if this is even aa array/slice
-	valueOf := reflect.ValueOf(value)
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	switch valueOf.Kind() {
 	case reflect.Pointer:
 		return SliceOfAny(valueOf.Elem().Interface()), true
 

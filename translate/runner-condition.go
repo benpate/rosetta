@@ -42,11 +42,9 @@ func (runner conditionRunner) Execute(sourceSchema schema.Schema, sourceValue an
 
 	const location = "rosetta.translate.conditionRunner.Execute"
 
-	condition := executeTemplate(runner.Condition, sourceValue)
+	// If the condition is true, execute the THEN rules
+	if condition := executeTemplate(runner.Condition, sourceValue); convert.Bool(condition) {
 
-	if convert.Bool(condition) {
-
-		// If the condition is true, then execute the rules
 		if err := runner.ThenRules.Execute(sourceSchema, sourceValue, targetSchema, targetValue); err != nil {
 			return derp.Wrap(err, location, "Error executing rules")
 		}
@@ -54,7 +52,7 @@ func (runner conditionRunner) Execute(sourceSchema schema.Schema, sourceValue an
 		return nil
 	}
 
-	// If the condition is true, then execute the rules
+	// Otherwise, execute the ELSE rules
 	if err := runner.ElseRules.Execute(sourceSchema, sourceValue, targetSchema, targetValue); err != nil {
 		return derp.Wrap(err, location, "Error executing rules")
 	}

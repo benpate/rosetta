@@ -15,9 +15,7 @@ func IsMap(value any) bool {
 	}
 
 	// Otherwise, use reflection to see what's inside there...
-	valueOf := reflect.ValueOf(value)
-
-	switch valueOf.Kind() {
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
 	// Dereference pointers (if necessary)
 	case reflect.Pointer:

@@ -17,9 +17,8 @@ func TestAt(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := At(test.slice, test.index)
 
-		if result != test.result {
+		if result := At(test.slice, test.index); result != test.result {
 			t.Errorf("Expected At(%v, %v) to be %v, but got %v", test.slice, test.index, test.result, result)
 		}
 	}

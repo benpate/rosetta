@@ -29,24 +29,24 @@ func ReflectType(value any) reflect.Type {
 func Interface(value any) any {
 
 	// Safe handling of reflection values
-	if v, ok := value.(reflect.Value); ok {
+	if valueOf, ok := value.(reflect.Value); ok {
 
-		if v.Kind() == reflect.Invalid {
+		if valueOf.Kind() == reflect.Invalid {
 			return nil
 		}
 
-		return v.Interface()
+		return valueOf.Interface()
 	}
 
 	// Otherwise, just return the value
 	return value
 }
 
+// BaseTypeOK attempts to convert a value into a base type (bool, int, float, string, slice, map).
+// The boolean result value returns TRUE if successful.  FALSE otherwise
 func BaseTypeOK(value any) (any, bool) {
 
-	reflectValue := ReflectValue(value)
-
-	switch reflectValue.Kind() {
+	switch reflectValue := ReflectValue(value); reflectValue.Kind() {
 
 	case reflect.Bool:
 		return reflectValue.Bool(), true
@@ -89,7 +89,8 @@ func BaseTypeOK(value any) (any, bool) {
 
 		return result, true
 
-	default:
-		return nil, false
 	}
+
+	// Fall through is failure
+	return nil, false
 }

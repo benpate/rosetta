@@ -24,7 +24,7 @@ func Slice[T any](iterator Iterator, constructor func() T) []T {
 
 	result := make([]T, 0, iterator.Count())
 
-	value := constructor()
+	value := constructor() // nolint:scopeguard
 
 	for iterator.Next(&value) {
 		result = append(result, value)
@@ -45,7 +45,7 @@ func Channel[T any](iterator Iterator, constructor func() T) chan T {
 
 		defer close(result)
 
-		value := constructor()
+		value := constructor() // nolint:scopeguard
 
 		for iterator.Next(&value) {
 			result <- value
@@ -64,8 +64,10 @@ func ChannelWithCancel[T any](iterator Iterator, constructor func() T, cancel <-
 	result := make(chan T, 1) // Length of 1 to prevent blocking on the first item.
 
 	go func() {
+
 		defer close(result)
-		value := constructor()
+
+		value := constructor() // nolint:scopeguard
 
 		for iterator.Next(&value) {
 			select {

@@ -63,13 +63,12 @@ func MapOfAnyOk(value any) (map[string]any, bool) {
 	}
 
 	// Last chance, try reflection
-	v := reflect.ValueOf(value)
-	if v.Type().Kind() == reflect.Map {
+	if valueOf := reflect.ValueOf(value); valueOf.Type().Kind() == reflect.Map {
 
 		result := make(map[string]any)
-		for _, reflectKey := range v.MapKeys() {
+		for _, reflectKey := range valueOf.MapKeys() {
 			key := String(reflectKey)
-			result[key] = v.MapIndex(reflectKey).Interface()
+			result[key] = valueOf.MapIndex(reflectKey).Interface()
 		}
 
 		return result, true

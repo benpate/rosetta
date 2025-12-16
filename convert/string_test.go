@@ -92,12 +92,10 @@ func TestStringerToString(t *testing.T) {
 
 	s := getTestStringer()
 
-	{
-		result, natural := StringOk(s, "")
+	result, natural := StringOk(s, "")
 
-		assert.True(t, natural)
-		assert.Equal(t, result, "hello")
-	}
+	assert.True(t, natural)
+	assert.Equal(t, result, "hello")
 }
 
 func TestInvalidToString(t *testing.T) {

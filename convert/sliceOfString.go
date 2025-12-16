@@ -103,9 +103,7 @@ func SliceOfStringOk(value any) ([]string, bool) {
 	}
 
 	// Use reflection to see if this is even an array/slice
-	valueOf := reflect.ValueOf(value)
-
-	switch valueOf.Kind() {
+	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 	case reflect.Pointer:
 		return SliceOfStringOk(valueOf.Elem().Interface())
 
