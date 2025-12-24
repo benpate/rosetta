@@ -6,7 +6,8 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-func TestAllProperties(t *testing.T) {
+// TestAllProperties tests the AllProperties function
+func TestAllProperties(_ *testing.T) {
 
 	s := Schema{
 		Element: Object{

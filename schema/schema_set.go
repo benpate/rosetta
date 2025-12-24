@@ -8,6 +8,7 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
+// Set sets the value at the specified path within the object according to this schema
 func (schema Schema) Set(object any, path string, value any) error {
 	return SetElement(object, schema.Element, list.ByDot(path), value)
 }
@@ -62,6 +63,7 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 	return nil
 }
 
+// SetElement sets the value at the specified path within the object according to the provided schema
 func SetElement(object any, element Element, path list.List, value any) error {
 
 	const location = "schema.SetElement"

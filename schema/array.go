@@ -22,20 +22,23 @@ type Array struct {
  * Container Interface
  ******************************************/
 
+// GetProperty returns the property with the specified name
 func (element Array) GetProperty(name string) (Element, error) {
+
+	const location = "schema.Array.GetProperty"
 
 	index, err := strconv.Atoi(name)
 
 	if err != nil {
-		return nil, derp.Wrap(err, "schema.Array.GetProperty", "Invalid array index", name)
+		return nil, derp.Wrap(err, location, "Invalid array index", name)
 	}
 
 	if index < 0 {
-		return nil, derp.BadRequestError("schema.Array.GetProperty", "Array index must not be negative", name)
+		return nil, derp.BadRequestError(location, "Array index must not be negative", name)
 	}
 
 	if index > element.MaxLength {
-		return nil, derp.BadRequestError("schema.Array.GetProperty", "Array index must not be greater than the maximum", name, element.MaxLength)
+		return nil, derp.BadRequestError(location, "Array index must not be greater than the maximum", name, element.MaxLength)
 	}
 
 	return element.Items, nil
@@ -45,17 +48,21 @@ func (element Array) GetProperty(name string) (Element, error) {
  * Element Interface
  ******************************************/
 
+// DefaultValue implements the Element interface
+// It returns the default value for this element type
 func (element Array) DefaultValue() any {
 	// TODO: We can make a better default than this.
 	return []any{}
 }
 
-// IsRequired returns TRUE if this element is a required field
+// IsRequired implements the Element interface
+// It returns TRUE if this element is a required field
 func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-// Validate validates a value against this schema
+// Validate implements the Element interface
+// It validates a value against this schema
 func (element Array) Validate(object any) error {
 
 	length, isLengthGetter := getLength(object)
@@ -88,6 +95,8 @@ func (element Array) Validate(object any) error {
 	return nil
 }
 
+// ValidateRequiredIf implements the Element interface
+// It returns an error if the conditional expression is true but the value is empty
 func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
 	const location = "schema.Array.ValidateRequiredIf"
@@ -134,6 +143,8 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	return nil
 }
 
+// GetElement implements the Element interface
+// It returns the element at the specified path
 func (element Array) GetElement(name string) (Element, bool) {
 
 	if name == "" {
@@ -158,11 +169,14 @@ func (element Array) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
-func (element Array) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It is a no-op for Array elements
+func (element Array) Inherit(_ Element) {
 	// Do nothing
 }
 
-// AllProperties returns a map of all properties for this element
+// AllProperties implements the Element interface
+// It returns a map of all properties for this element
 func (element Array) AllProperties() ElementMap {
 	return ElementMap{
 		"": element,

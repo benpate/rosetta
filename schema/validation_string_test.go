@@ -11,15 +11,18 @@ type testStringGetter struct {
 	value string
 }
 
-func (t testStringGetter) GetStringOK(name string) (string, bool) {
+// GetStringOK gets a string value
+func (t testStringGetter) GetStringOK(_ string) (string, bool) {
 	return t.value, true
 }
 
-func (t *testStringGetter) SetString(name string, value string) bool {
+// SetString sets a string value
+func (t *testStringGetter) SetString(_ string, value string) bool {
 	t.value = value
 	return true
 }
 
+// TestStringGetter tests getting/setting string values
 func TestStringGetter(t *testing.T) {
 
 	schema := New(Object{
@@ -72,7 +75,7 @@ type testStringPointer struct {
 	value string
 }
 
-func (test *testStringPointer) GetPointer(name string) (any, bool) {
+func (test *testStringPointer) GetPointer(_ string) (any, bool) {
 	return &test.value, true
 }
 

@@ -12,15 +12,18 @@ type testIntGetter struct {
 	value int
 }
 
-func (t testIntGetter) GetIntOK(name string) (int, bool) {
+// GetIntOK gets an int value
+func (t testIntGetter) GetIntOK(_ string) (int, bool) {
 	return t.value, true
 }
 
-func (t *testIntGetter) SetInt(name string, value int) bool {
+// SetInt sets an int value
+func (t *testIntGetter) SetInt(_ string, value int) bool {
 	t.value = value
 	return true
 }
 
+// TestIntGetter tests getting/setting bool values
 func TestIntGetter(t *testing.T) {
 
 	schema := New(Object{
@@ -45,7 +48,7 @@ type testIntPointer struct {
 	value int
 }
 
-func (test *testIntPointer) GetPointer(name string) (any, bool) {
+func (test *testIntPointer) GetPointer(_ string) (any, bool) {
 	return &test.value, true
 }
 

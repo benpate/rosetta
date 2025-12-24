@@ -13,7 +13,7 @@ func SliceOfAny(value any) []any {
 	return make([]any, 0)
 }
 
-// SliceOfAny converts the value into a slice of any.
+// SliceOfAnyOk converts the value into a slice of any.
 // It works with any, []any, []string, []int, []float64, string, int, and float64 values.
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfAnyOk(value any) ([]any, bool) {

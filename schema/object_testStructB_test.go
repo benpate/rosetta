@@ -16,7 +16,7 @@ func newTestStructB() testStructB {
 	}
 }
 
-func testStructB_Schema() Element {
+func testStructBSchema() Element {
 	return Object{
 		Properties: map[string]Element{
 			"name":      String{},

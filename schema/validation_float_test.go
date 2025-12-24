@@ -12,11 +12,11 @@ type testFloatGetter struct {
 	value float64
 }
 
-func (t testFloatGetter) GetFloatOK(name string) (float64, bool) {
+func (t testFloatGetter) GetFloatOK(_ string) (float64, bool) {
 	return t.value, true
 }
 
-func (t *testFloatGetter) SetFloat(name string, value float64) bool {
+func (t *testFloatGetter) SetFloat(_ string, value float64) bool {
 	t.value = value
 	return true
 }
@@ -45,10 +45,12 @@ type testFloatPointer struct {
 	value float64
 }
 
-func (test *testFloatPointer) GetPointer(name string) (any, bool) {
+// GetPointer gets a pointer to the float value
+func (test *testFloatPointer) GetPointer(_ string) (any, bool) {
 	return &test.value, true
 }
 
+// TestFloatPointer tests getting/setting float values via a pointer
 func TestFloatPointer(t *testing.T) {
 
 	schema := New(Object{

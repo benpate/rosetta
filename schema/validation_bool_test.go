@@ -11,11 +11,11 @@ type testBoolGetter struct {
 	value bool
 }
 
-func (t testBoolGetter) GetBoolOK(name string) (bool, bool) {
+func (t testBoolGetter) GetBoolOK(_ string) (bool, bool) {
 	return t.value, true
 }
 
-func (t *testBoolGetter) SetBool(name string, value bool) bool {
+func (t *testBoolGetter) SetBool(_ string, value bool) bool {
 	t.value = value
 	return true
 }
@@ -46,7 +46,7 @@ type testBoolPointer struct {
 	value bool
 }
 
-func (test *testBoolPointer) GetPointer(name string) (any, bool) {
+func (test *testBoolPointer) GetPointer(_ string) (any, bool) {
 	return &test.value, true
 }
 

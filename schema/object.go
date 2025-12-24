@@ -18,6 +18,7 @@ type Object struct {
  * Container Interface
  ***********************************/
 
+// GetElement returns the element at the specified path within the object
 func (element Object) GetElement(name string) (Element, bool) {
 
 	if name == "" {
@@ -41,7 +42,8 @@ func (element Object) GetElement(name string) (Element, bool) {
  * Element Interface
  ***********************************/
 
-// DefaultValue returns the default value for this element type.  In a special case for objects,
+// DefaultValue implements the Element interface
+// It returns the default value for this element type.  In a special case for objects,
 // which can be represented as both Go structs and maps, this returns a map[string]any that has been
 // populated with any known default keys.
 func (element Object) DefaultValue() any {
@@ -54,12 +56,14 @@ func (element Object) DefaultValue() any {
 	return result
 }
 
-// IsRequired returns TRUE if this element is a required field
+// IsRequired implements the Element interface
+// returns TRUE if this element is a required field
 func (element Object) IsRequired() bool {
 	return element.Required
 }
 
-// Validate validates a value against this schema
+// Validate implements the Element interface
+// It validates a value against this schema
 func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
@@ -71,7 +75,8 @@ func (element Object) Validate(object any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+// ValidateRequiredIf implements the Element interface
+// It returns an error if the conditional expression is true but the value is empty
 func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
 	for name, subElement := range element.Properties {
@@ -84,6 +89,8 @@ func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	return nil
 }
 
+// Inherit implements the Element interface
+// It inherits properties from the parent element
 func (element Object) Inherit(parent Element) {
 
 	if element.Properties == nil {
@@ -103,7 +110,8 @@ func (element Object) Inherit(parent Element) {
 	}
 }
 
-// AllProperties returns a flat slice of all properties in this element
+// AllProperties implements the Element interface
+// It returns a flat slice of all properties in this element
 // (in this case, it returns all properties of this object)
 func (element Object) AllProperties() ElementMap {
 

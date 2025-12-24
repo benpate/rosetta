@@ -12,11 +12,11 @@ type testInt64Getter struct {
 	value int64
 }
 
-func (t testInt64Getter) GetInt64OK(name string) (int64, bool) {
+func (t testInt64Getter) GetInt64OK(_ string) (int64, bool) {
 	return t.value, true
 }
 
-func (t *testInt64Getter) SetInt64(name string, value int64) bool {
+func (t *testInt64Getter) SetInt64(_ string, value int64) bool {
 	t.value = value
 	return true
 }
@@ -45,7 +45,7 @@ type testInt64Pointer struct {
 	value int64
 }
 
-func (test *testInt64Pointer) GetPointer(name string) (any, bool) {
+func (test *testInt64Pointer) GetPointer(_ string) (any, bool) {
 	return &test.value, true
 }
 

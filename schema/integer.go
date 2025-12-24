@@ -25,7 +25,8 @@ type Integer struct {
  * Element Interface
  ******************************************/
 
-// DefaultValue returns the default value for this element type
+// DefaultValue implements the Element interface
+// It returns the default value for this element type
 func (element Integer) DefaultValue() any {
 
 	switch element.BitSize {
@@ -42,12 +43,14 @@ func (element Integer) DefaultValue() any {
 	}
 }
 
-// IsRequired returns TRUE if this element is a required field
+// IsRequired implements the Element interface
+// It returns TRUE if this element is a required field
 func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-// Validate validates a value using this schema
+// Validate implements the Element interface
+// It validates a value using this schema
 func (element Integer) Validate(value any) error {
 
 	intValue, ok := toInt64(value)
@@ -89,7 +92,8 @@ func (element Integer) Validate(value any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+// ValidateRequiredIf implements the Element interface
+// It returns an error if the conditional expression is true but the value is empty
 func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
 	const location = "schema.Integer.ValidateRequiredIf"
@@ -113,6 +117,8 @@ func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalV
 	return nil
 }
 
+// GetElement implements the Element interface
+// It returns the element at the specified path
 func (element Integer) GetElement(name string) (Element, bool) {
 	if name == "" {
 		return element, true
@@ -120,7 +126,9 @@ func (element Integer) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
-func (element Integer) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It inherits properties from the parent element
+func (element Integer) Inherit(_ Element) {
 	// Do nothing
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/benpate/rosetta/pointer"
 )
 
+// Append appends a value to the array at the specified path within the object according to this schema
 func (schema Schema) Append(object any, path string, value any) error {
 
 	const location = "schema.Schema.Append"

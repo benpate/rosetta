@@ -25,6 +25,7 @@ func New(element Element) Schema {
 	}
 }
 
+// Wildcard returns a Schema that accepts any data type
 func Wildcard() Schema {
 	return Schema{
 		Element: Any{},
@@ -103,6 +104,8 @@ func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 	return result, resultError
 }
 
+// ValidateRequiredIf implements the Element interface
+// It returns an error if the conditional expression is true but the value is empty
 func (schema Schema) ValidateRequiredIf(value any) error {
 	return schema.Element.ValidateRequiredIf(schema, list.ByDot(""), value)
 }

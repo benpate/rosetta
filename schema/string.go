@@ -123,6 +123,8 @@ func (element String) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	return nil
 }
 
+// GetElement implements the Element interface
+// It returns the element at the specified path
 func (element String) GetElement(name string) (Element, bool) {
 
 	if name == "" {
@@ -131,7 +133,9 @@ func (element String) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
-func (element String) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It is a no-op for String elements
+func (element String) Inherit(_ Element) {
 	// Do nothing
 }
 

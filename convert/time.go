@@ -4,16 +4,25 @@ import (
 	"time"
 )
 
+// Time converts the value into a time.Time.
+// It works with time.Time, Timer, ToTimer, string, int, and int64 values.
+// If the passed value cannot be converted, then the zero time is returned.
 func Time(value any) time.Time {
 	result, _ := TimeOk(value, time.Time{})
 	return result
 }
 
+// TimeDefault converts the value into a time.Time.
+// It works with time.Time, Timer, ToTimer, string, int, and int64 values.
+// If the passed value cannot be converted, then the defaultValue is returned.
 func TimeDefault(value any, defaultValue time.Time) time.Time {
 	result, _ := TimeOk(value, defaultValue)
 	return result
 }
 
+// TimeOk converts the value into a time.Time.
+// It works with time.Time, Timer, ToTimer, string, int, and int64 values.
+// It returns TRUE if the conversion was successful, and FALSE otherwise.
 func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
 	// NILCHECK: value cannot be nil

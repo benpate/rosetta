@@ -8,12 +8,13 @@ import (
 	"github.com/benpate/rosetta/list"
 )
 
+// Any represents a schema that accepts any data type
 type Any struct {
 	Required   bool
 	RequiredIf string
 }
 
-// Default returns the default value for this element
+// DefaultValue returns the default value for this element
 func (element Any) DefaultValue() any {
 	return nil
 }
@@ -24,7 +25,7 @@ func (element Any) IsRequired() bool {
 }
 
 // Validate validates the provided value
-func (element Any) Validate(value any) error {
+func (element Any) Validate(_ any) error {
 	return nil
 }
 
@@ -53,15 +54,20 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, globalValue
 	return nil
 }
 
-func (element Any) GetElement(name string) (Element, bool) {
+// GetElement implements the Element interface
+// It returns the element at the specified path
+func (element Any) GetElement(_ string) (Element, bool) {
 	return element, true
 }
 
-func (element Any) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It is a no-op for Any elements
+func (element Any) Inherit(_ Element) {
 	// Do nothing
 }
 
-// AllProperties returns a map of all properties for this element
+// AllProperties implements the Element interface
+// It returns a map of all properties for this element
 func (element Any) AllProperties() ElementMap {
 	return ElementMap{
 		"": element,

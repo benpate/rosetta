@@ -121,6 +121,9 @@ func StringOk(value any, defaultValue string) (string, bool) {
 	return defaultValue, false
 }
 
+// JoinString converts the value into a string.
+// If the value is a slice ([]string or []any), then the values are joined with the specified delimiter.
+// If the value is not a slice, then it is converted to a string using the String() function.
 func JoinString(value any, delimiter string) string {
 
 	if delimiter != "" {

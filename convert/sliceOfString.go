@@ -15,7 +15,7 @@ func SliceOfString(value any) []string {
 	return make([]string, 0)
 }
 
-// SliceOfString converts the value into a slice of strings.
+// SliceOfStringOk converts the value into a slice of strings.
 // It works with any, []any, []string, and string values.
 // It returns TRUE if the value was converted successfullt, and FALSE otherwise.
 func SliceOfStringOk(value any) ([]string, bool) {

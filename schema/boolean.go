@@ -22,16 +22,19 @@ type Boolean struct {
  * Element Interface
  ***********************************/
 
+// DefaultValue is a part of the Element interface
 func (element Boolean) DefaultValue() any {
 	return element.Default.Bool()
 }
 
-// IsRequired returns TRUE if this element is a required field
+// IsRequired is a part of the Element interface
+// it returns TRUE if this element is a required field
 func (element Boolean) IsRequired() bool {
 	return element.Required
 }
 
-// Validate validates a generic value using this schema
+// Validate is a part of the Element interface
+// It validates a generic value using this schema
 func (element Boolean) Validate(object any) error {
 
 	boolValue, ok := object.(bool)
@@ -47,7 +50,8 @@ func (element Boolean) Validate(object any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
+// ValidateRequiredIf is a part of the Element interface
+// It returns an error if the conditional expression is true but the value is empty
 func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
 	const location = "schema.Boolean.ValidateRequiredIf"
@@ -71,6 +75,8 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 	return nil
 }
 
+// GetElement implements the Element interface
+// It returns the element at the specified path
 func (element Boolean) GetElement(name string) (Element, bool) {
 
 	if name == "" {
@@ -79,7 +85,9 @@ func (element Boolean) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
-func (element Boolean) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It is a no-op for Boolean elements
+func (element Boolean) Inherit(_ Element) {
 	// Do nothing
 }
 

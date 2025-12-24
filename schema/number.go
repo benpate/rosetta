@@ -110,6 +110,8 @@ func (element Number) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	return nil
 }
 
+// GetElement implements the Element interface
+// It returns the element at the specified path
 func (element Number) GetElement(name string) (Element, bool) {
 	if name == "" {
 		return element, true
@@ -117,7 +119,9 @@ func (element Number) GetElement(name string) (Element, bool) {
 	return nil, false
 }
 
-func (element Number) Inherit(parent Element) {
+// Inherit implements the Element interface
+// It is a no-op for Number elements
+func (element Number) Inherit(_ Element) {
 	// Do nothing
 }
 

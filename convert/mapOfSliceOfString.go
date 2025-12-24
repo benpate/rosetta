@@ -72,7 +72,7 @@ func URLValues(value any) url.Values {
 	return url.Values(MapOfSliceOfString(value))
 }
 
-// URLValues converts a data structure into a url.Values object,
+// URLValuesOk converts a data structure into a url.Values object,
 // which is a specialized instance of a map[string][]string.
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func URLValuesOk(value any) (url.Values, bool) {
@@ -86,7 +86,7 @@ func HTTPHeader(value any) http.Header {
 	return http.Header(MapOfSliceOfString(value))
 }
 
-// HTTPHeader converts a data structure into a http.Header object,
+// HTTPHeaderOk converts a data structure into a http.Header object,
 // which is a specialized instance of a map[string][]string.
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func HTTPHeaderOk(value any) (http.Header, bool) {
