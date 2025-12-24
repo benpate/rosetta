@@ -1,3 +1,4 @@
+// Package schema provides tools for defining, validating, and manipulating JSON-Schema-like structures in Go.
 package schema
 
 import (

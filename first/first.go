@@ -1,3 +1,4 @@
+// Package first provides utility functions to return the first non-empty value from a list of values
 package first
 
 // String returns the first non-empty value in the argument list

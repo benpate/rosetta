@@ -170,20 +170,24 @@ func (x String) Keys() []string {
  * Getter Interfaces/Setters
  ****************************************/
 
+// GetAny returns the value at the specified key as an "any" type
 func (x String) GetAny(key string) any {
 	result, _ := x.GetStringOK(key)
 	return result
 }
 
+// GetAnyOK returns the value at the specified key as an "any" type, along with a boolean indicating success
 func (x String) GetAnyOK(key string) (any, bool) {
 	return x.GetStringOK(key)
 }
 
+// GetString returns the string value at the specified key
 func (x String) GetString(key string) string {
 	result, _ := x.GetStringOK(key)
 	return result
 }
 
+// GetStringOK returns the string value at the specified key, along with a boolean indicating success
 func (x String) GetStringOK(key string) (string, bool) {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -197,12 +201,14 @@ func (x String) GetStringOK(key string) (string, bool) {
 	return "", false
 }
 
+// SetIndex sets the value at the specified index
 func (s *String) SetIndex(index int, value any) bool {
 	growSlice(s, index)
 	(*s)[index] = convert.String(value)
 	return true
 }
 
+// SetString sets the string value at the specified key
 func (s *String) SetString(key string, value string) bool {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(s, index)
@@ -221,11 +227,13 @@ func (s *String) SetString(key string, value string) bool {
 	return false
 }
 
+// SetValue sets the value of this slice to the provided value
 func (s *String) SetValue(value any) error {
 	*s = convert.SliceOfString(value)
 	return nil
 }
 
+// Remove removes the element with the specified key
 func (s *String) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, s.Length()); ok {
@@ -236,6 +244,7 @@ func (s *String) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt removes the element at the specified index
 func (x *String) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

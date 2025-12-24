@@ -2,11 +2,13 @@ package schema
 
 import "github.com/benpate/rosetta/list"
 
+// Remove removes a value from the object at the specified path
 func (schema Schema) Remove(object any, path string) bool {
 
 	return schema.remove(object, list.ByDot(path))
 }
 
+// remove is the recursive implementation of the Remove function
 func (schema Schema) remove(object any, path list.List) bool {
 
 	head, tail := path.Split()

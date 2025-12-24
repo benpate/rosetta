@@ -288,27 +288,33 @@ func (x *Any) SetBool(key string, value bool) bool {
 	return x.SetAny(key, value)
 }
 
+// SetInt sets a property with an int value
 func (x *Any) SetInt(key string, value int) bool {
 	return x.SetAny(key, value)
 }
 
+// SetInt64 sets a property with an int64 value
 func (x *Any) SetInt64(key string, value int64) bool {
 	return x.SetAny(key, value)
 }
 
+// SetFloat sets a property with a float64 value
 func (x *Any) SetFloat(key string, value float64) bool {
 	return x.SetAny(key, value)
 }
 
+// SetString sets a property with an string value
 func (x *Any) SetString(key string, value string) bool {
 	return x.SetAny(key, value)
 }
 
+// SetValue sets the entire value of this slice to the provided value
 func (x *Any) SetValue(value any) error {
 	*x = convert.SliceOfAny(value)
 	return nil
 }
 
+// Remove removes the element with the specified key
 func (x *Any) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -319,6 +325,7 @@ func (x *Any) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt removes the element at the specified index
 func (x *Any) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

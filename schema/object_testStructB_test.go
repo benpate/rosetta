@@ -1,5 +1,6 @@
 package schema
 
+// testStructB is a test struct used for schema testing
 type testStructB struct {
 	Name      string
 	Age       int
@@ -7,6 +8,7 @@ type testStructB struct {
 	Array     testArrayB
 }
 
+// newTestStructB returns an instance of testStructB with default values
 func newTestStructB() testStructB {
 	return testStructB{
 		Name:      "John Connor",
@@ -16,6 +18,7 @@ func newTestStructB() testStructB {
 	}
 }
 
+// testStructB_Schema returns the schema definition for this struct
 func testStructB_Schema() Element {
 	return Object{
 		Properties: map[string]Element{

@@ -56,7 +56,7 @@ func Channel[T any](iterator Iterator, constructor func() T) chan T {
 	return result
 }
 
-// Channel converts an Iterator into a channel of items.
+// ChannelWithCancel converts an Iterator into a channel of items.
 // You must include a constructor function that generates fully initialized values of the type you want to return.
 // Deprecated: freeing up this namespace to use for new Go 1.23 range functions
 func ChannelWithCancel[T any](iterator Iterator, constructor func() T, cancel <-chan bool) chan T {
