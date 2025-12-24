@@ -10,7 +10,7 @@ func newTestArrayB() testArrayB {
 	}
 }
 
-func testArrayBSchema() Element {
+func testArrayB_Schema() Element {
 	return Array{
 		Items:     testStructA_Schema(),
 		MaxLength: 5,
