@@ -85,6 +85,7 @@ func validate_integer(element Integer, object any, name string) error {
 
 // validate_number specifically validates int32 sub-elements
 func validate_int32(element Integer, object any, name string) error {
+
 	if getter, ok := object.(IntGetter); ok {
 		if value, ok := getter.GetIntOK(name); ok {
 			return element.Validate(value)
