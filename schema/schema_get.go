@@ -8,10 +8,10 @@ import (
 // Get retrieves a generic value from the object.  If the object is nil,
 // Get still tries to return a default value if provided by the schema
 func (schema Schema) Get(object any, path string) (any, error) {
-	return schema.get(object, schema.Element, list.ByDot(path))
+	return schema.getFromList(object, schema.Element, list.ByDot(path))
 }
 
-func (schema Schema) get(object any, element Element, path list.List) (any, error) {
+func (schema Schema) getFromList(object any, element Element, path list.List) (any, error) {
 
 	const location = "schema.Schema.get"
 
@@ -46,7 +46,7 @@ func (schema Schema) get(object any, element Element, path list.List) (any, erro
 			return nil, derp.InternalError(location, "Unable to get object", head, object)
 		}
 
-		return schema.get(subObject, typed, tail)
+		return schema.getFromList(subObject, typed, tail)
 
 	case Boolean:
 

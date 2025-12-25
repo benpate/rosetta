@@ -52,7 +52,8 @@ func (x Any) NotEmpty() bool {
 	return len(x) > 0
 }
 
-// First returns the first element in the slice, or nil if the slice is empty
+// First returns the first element in the slice,
+// or nil if the slice is empty
 func (x Any) First() any {
 	if len(x) > 0 {
 		return x[0]
@@ -60,7 +61,8 @@ func (x Any) First() any {
 	return nil
 }
 
-// FirstN returns the first "n" elements in the slice, or all elements if "n" is greater than the length of the slice
+// FirstN returns the first "n" elements in the slice,
+// or all elements if "n" is greater than the length of the slice
 func (x Any) FirstN(n int) Any {
 	if n > len(x) {
 		n = len(x)
@@ -69,7 +71,8 @@ func (x Any) FirstN(n int) Any {
 	return x[:n]
 }
 
-// Last returns the last element in the slice, or nil if the slice is empty
+// Last returns the last element in the slice,
+// or nil if the slice is empty
 func (x Any) Last() any {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -117,17 +120,20 @@ func (x Any) Contains(value any) bool {
 	return slice.Contains(x, value)
 }
 
-// ContainsAny returns TRUE if the slice contains any of the specified values
+// ContainsAny returns TRUE if the slice contains
+// any of the specified values
 func (x Any) ContainsAny(values ...any) bool {
 	return slice.ContainsAny(x, values...)
 }
 
-// ContainsAll returns TRUE if the slice contains all of the specified values
+// ContainsAll returns TRUE if the slice contains
+// all of the specified values
 func (x Any) ContainsAll(values ...any) bool {
 	return slice.ContainsAll(x, values...)
 }
 
-// Equal returns TRUE if the slice contains exactly the same elements as the specified value
+// Equal returns TRUE if the slice contains
+// exactly the same elements as the specified value
 func (x Any) Equal(value []any) bool {
 	return slice.Equal(x, value)
 }
@@ -242,9 +248,7 @@ func (x *Any) GetPointer(key string) (any, bool) {
 		return pointer.To((*x)[index]), true
 	}
 
-	switch key {
-
-	case "last":
+	if key == "last" {
 		return x.GetPointer(strconv.Itoa(x.Length() - 1))
 	}
 
@@ -267,9 +271,9 @@ func (x Any) GetStringOK(key string) (string, bool) {
  * Setter Interfaces
  ******************************************/
 
-func (s *Any) SetIndex(index int, value any) bool {
-	growSlice(s, index)
-	(*s)[index] = value
+func (x *Any) SetIndex(index int, value any) bool {
+	growSlice(x, index)
+	(*x)[index] = value
 	return true
 }
 

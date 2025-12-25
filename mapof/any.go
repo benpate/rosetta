@@ -65,7 +65,7 @@ func (x Any) GetBool(key string) bool {
 	return result
 }
 
-func (x Any) GetBoolOK(key string) (bool, bool) {
+func (x Any) GetBoolOK(key string) (value bool, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.BoolOk(value, false)
 	}
@@ -77,7 +77,7 @@ func (x Any) GetFloat(key string) float64 {
 	return result
 }
 
-func (x Any) GetFloatOK(key string) (float64, bool) {
+func (x Any) GetFloatOK(key string) (value float64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.FloatOk(value, 0)
 	}
@@ -89,7 +89,7 @@ func (x Any) GetInt(key string) int {
 	return result
 }
 
-func (x Any) GetIntOK(key string) (int, bool) {
+func (x Any) GetIntOK(key string) (value int, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.IntOk(value, 0)
 	}
@@ -101,7 +101,7 @@ func (x Any) GetInt64(key string) int64 {
 	return result
 }
 
-func (x Any) GetInt64OK(key string) (int64, bool) {
+func (x Any) GetInt64OK(key string) (value int64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.Int64Ok(value, 0)
 	}
@@ -113,7 +113,7 @@ func (x Any) GetString(key string) string {
 	return result
 }
 
-func (x Any) GetStringOK(key string) (string, bool) {
+func (x Any) GetStringOK(key string) (value string, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.StringOk(value, "")
 	}
@@ -125,7 +125,7 @@ func (x Any) GetTime(key string) time.Time {
 	return result
 }
 
-func (x Any) GetTimeOK(key string) (time.Time, bool) {
+func (x Any) GetTimeOK(key string) (value time.Time, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.TimeOk(value, time.Time{})
 	}
@@ -238,8 +238,10 @@ func (x Any) GetPointer(key string) (any, bool) {
 
 func (x *Any) SetObject(element schema.Element, path list.List, value any) error {
 
+	const location = "mapof.Any.SetObject"
+
 	if path.IsEmpty() {
-		return derp.InternalError("mapof.Any.SetObject", "Cannot set values on empty path")
+		return derp.InternalError(location, "Cannot set values on empty path")
 	}
 
 	x.makeNotNil()
@@ -255,7 +257,7 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.InternalError("mapof.Any.SetObject", "Unknown property", head)
+		return derp.InternalError(location, "Invalid property", head)
 	}
 
 	var tempValue any
@@ -269,7 +271,7 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 	}
 
 	if err := schema.SetElement(pointer.To(tempValue), subElement, tail, value); err != nil {
-		return derp.Wrap(err, "mapof.Any.SetObject", "Error setting value", path)
+		return derp.Wrap(err, location, "Unable to set value", path)
 	}
 
 	// Reapply the updated value to the map
@@ -292,32 +294,32 @@ func (m Any) IsZeroValue(name string) bool {
 	return compare.IsZero(m[name])
 }
 
-// GetSliceofAny returns a named option as a slice of any values
+// GetSliceofAny returns a named property as a slice of any values
 func (m Any) GetSliceOfAny(name string) []any {
 	return convert.SliceOfAny(m[name])
 }
 
-// GetSliceOfString returns a named option as a slice of strings
+// GetSliceOfString returns a named property as a slice of strings
 func (m Any) GetSliceOfString(name string) []string {
 	return convert.SliceOfString(m[name])
 }
 
-// GetSliceOfInt returns a named option as a slice of int values
+// GetSliceOfInt returns a named property as a slice of int values
 func (m Any) GetSliceOfInt(name string) []int {
 	return convert.SliceOfInt(m[name])
 }
 
-// GetSliceOfFloat returns a named option as a slice of float64 values
+// GetSliceOfFloat returns a named property as a slice of float64 values
 func (m Any) GetSliceOfFloat(name string) []float64 {
 	return convert.SliceOfFloat(m[name])
 }
 
-// GetMap returns a named option as a mapof.Any
+// GetMap returns a named property as a mapof.Any
 func (m Any) GetMap(name string) Any {
 	return m.GetMapOfAny(name)
 }
 
-// GetMapOfAny returns a named option as a mapof.Any
+// GetMapOfAny returns a named property as a mapof.Any
 func (m Any) GetMapOfAny(name string) Any {
 
 	if value, ok := m[name].(Any); ok {
@@ -331,7 +333,7 @@ func (m Any) GetMapOfAny(name string) Any {
 	return NewAny()
 }
 
-// GetMapOfString returns a named option as a mapof.String
+// GetMapOfString returns a named property as a mapof.String
 func (m Any) GetMapOfString(name string) String {
 
 	if value, ok := m[name].(String); ok {
@@ -345,7 +347,7 @@ func (m Any) GetMapOfString(name string) String {
 	return NewString()
 }
 
-// GetSliceOfMap returns a named option as a slice of mapof.Any objects.
+// GetSliceOfMap returns a named property as a slice of mapof.Any objects.
 func (m Any) GetSliceOfMap(name string) []Any {
 
 	value := m[name]
@@ -380,6 +382,7 @@ func (m Any) GetSliceOfMap(name string) []Any {
 	return result
 }
 
+// GetSliceOfPlainMap returns a named property as a slice of plain map[string]any objects.
 func (m Any) GetSliceOfPlainMap(name string) []map[string]any {
 
 	switch typed := m[name].(type) {
@@ -399,10 +402,14 @@ func (m Any) GetSliceOfPlainMap(name string) []map[string]any {
 	}
 }
 
+// MapOfAny implements the MapOfAny interface.
+// It returns this value as a map[string]any
 func (m Any) MapOfAny() map[string]any {
 	return m
 }
 
+// MapOfString implements the MapOfString interface.
+// It returns this value as a map[string]string
 func (m Any) MapOfString() map[string]string {
 	return convert.MapOfString(m.MapOfAny())
 }

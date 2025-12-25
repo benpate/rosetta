@@ -66,44 +66,45 @@ func SliceOfStringOk(value any) ([]string, bool) {
 		return []string{typed.String()}, true
 
 	case []any:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []bool:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []float64:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []int:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []int64:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []string:
 		return typed, true
 
 	case []Floater:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []Inter:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []Int64er:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []Hexer:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case []Stringer:
-		return sliceOfStringOk(typed)
+		return makeSliceOfString(typed)
 
 	case SliceOfStringer:
 		return typed.SliceOfString(), true
 	}
 
-	// Use reflection to see if this is even an array/slice
+	// Otherwise, use reflection to see if this is even an array/slice
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
+
 	case reflect.Pointer:
 		return SliceOfStringOk(valueOf.Elem().Interface())
 
@@ -123,8 +124,8 @@ func SliceOfStringOk(value any) ([]string, bool) {
 	return make([]string, 0), false
 }
 
-// sliceOfStringOk is a generic helper to convert known slices into a slice of strings.
-func sliceOfStringOk[T any](value []T) ([]string, bool) {
+// makeSliceOfString is a generic helper to convert known slices into a slice of strings.
+func makeSliceOfString[T any](value []T) ([]string, bool) {
 	result := make([]string, len(value))
 	allOk := true
 	for index, item := range value {

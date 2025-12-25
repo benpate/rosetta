@@ -59,34 +59,26 @@ func (element Integer) Validate(value any) error {
 		return derp.ValidationError(" must be an integer")
 	}
 
-	if element.Required {
-		if intValue == 0 {
-			return derp.ValidationError("integer value is required")
-		}
+	if element.Required && (intValue == 0) {
+		return derp.ValidationError("integer value is required")
 	}
 
-	if element.Minimum.IsPresent() {
-		if intValue < element.Minimum.Int64() {
-			return derp.ValidationError("minimum integer value is " + convert.String(element.Minimum))
-		}
+	if element.Minimum.IsPresent() && (intValue < element.Minimum.Int64()) {
+		return derp.ValidationError("minimum integer value is " + convert.String(element.Minimum))
+
 	}
 
-	if element.Maximum.IsPresent() {
-		if intValue > element.Maximum.Int64() {
-			return derp.ValidationError("maximum integer value is " + convert.String(element.Maximum))
-		}
+	if element.Maximum.IsPresent() && (intValue > element.Maximum.Int64()) {
+		return derp.ValidationError("maximum integer value is " + convert.String(element.Maximum))
+
 	}
 
-	if element.MultipleOf.IsPresent() {
-		if (intValue % element.MultipleOf.Int64()) != 0 {
-			return derp.ValidationError("must be a multiple of " + convert.String(element.MultipleOf))
-		}
+	if element.MultipleOf.IsPresent() && (intValue%element.MultipleOf.Int64() != 0) {
+		return derp.ValidationError("must be a multiple of " + convert.String(element.MultipleOf))
 	}
 
-	if len(element.Enum) > 0 {
-		if !compare.Contains(element.Enum, intValue) {
-			return derp.ValidationError("must contain one of the specified values")
-		}
+	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, intValue) {
+		return derp.ValidationError("must contain one of the specified values")
 	}
 
 	return nil
@@ -98,22 +90,28 @@ func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalV
 
 	const location = "schema.Integer.ValidateRequiredIf"
 
-	if element.RequiredIf != "" {
-
-		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
-		}
-
-		if isRequired {
-			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, location, "Error getting value for path", path)
-			} else if compare.IsZero(localValue) {
-				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
-			}
-		}
+	// If there's no required-if condition, then skip this step
+	if element.RequiredIf == "" {
+		return nil
 	}
+
+	// Evaluate the condition
+	isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+	}
+
+	if !isRequired {
+		return nil
+	}
+
+	if localValue, err := schema.Get(globalValue, path.String()); err != nil {
+		return derp.Wrap(err, location, "Error getting value for path", path)
+	} else if compare.IsZero(localValue) {
+		return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+	}
+
 	return nil
 }
 

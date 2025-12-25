@@ -202,42 +202,42 @@ func (x String) GetStringOK(key string) (string, bool) {
 }
 
 // SetIndex sets the value at the specified index
-func (s *String) SetIndex(index int, value any) bool {
-	growSlice(s, index)
-	(*s)[index] = convert.String(value)
+func (x *String) SetIndex(index int, value any) bool {
+	growSlice(x, index)
+	(*x)[index] = convert.String(value)
 	return true
 }
 
 // SetString sets the string value at the specified key
-func (s *String) SetString(key string, value string) bool {
+func (x *String) SetString(key string, value string) bool {
 	if index, ok := sliceStringIndex(key); ok {
-		growSlice(s, index)
-		(*s)[index] = value
+		growSlice(x, index)
+		(*x)[index] = value
 		return true
 	}
 
 	switch key {
 
 	case "last":
-		return s.SetString(strconv.Itoa(s.Length()-1), value)
+		return x.SetString(strconv.Itoa(x.Length()-1), value)
 	case "next":
-		return s.SetString(strconv.Itoa(s.Length()), value)
+		return x.SetString(strconv.Itoa(x.Length()), value)
 	}
 
 	return false
 }
 
 // SetValue sets the value of this slice to the provided value
-func (s *String) SetValue(value any) error {
-	*s = convert.SliceOfString(value)
+func (x *String) SetValue(value any) error {
+	*x = convert.SliceOfString(value)
 	return nil
 }
 
 // Remove removes the element with the specified key
-func (s *String) Remove(key string) bool {
+func (x *String) Remove(key string) bool {
 
-	if index, ok := sliceStringIndex(key, s.Length()); ok {
-		*s = append((*s)[:index], (*s)[index+1:]...)
+	if index, ok := sliceStringIndex(key, x.Length()); ok {
+		*x = append((*x)[:index], (*x)[index+1:]...)
 		return true
 	}
 

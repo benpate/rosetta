@@ -171,20 +171,26 @@ func (x Float) Keys() []string {
  * Getter Floaterfaces/Setters
  ****************************************/
 
+// GetAny returns the rquested property as an any type
 func (x Float) GetAny(key string) any {
 	result, _ := x.GetFloatOK(key)
 	return result
 }
 
+// GetAnyOK returns the requested property as an any type
+// and a boolean TRUE/FALSE value indicating whether the value was found
 func (x Float) GetAnyOK(key string) (any, bool) {
 	return x.GetFloatOK(key)
 }
 
+// GetFloat returns the requested property as a float64 type
 func (x Float) GetFloat(key string) float64 {
 	result, _ := x.GetFloatOK(key)
 	return result
 }
 
+// GetFloatOK returns the requested property as a float64 type
+// and a boolean TRUE/FALSE value indicating whether the value was found
 func (x Float) GetFloatOK(key string) (float64, bool) {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -198,12 +204,14 @@ func (x Float) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
+// SetIndex sets the value at the specified index, growing the slice if necessary
 func (s *Float) SetIndex(index int, value any) bool {
 	growSlice(s, index)
 	(*s)[index] = convert.Float(value)
 	return true
 }
 
+// SetFloat sets the value at the specified key, growing the slice if necessary
 func (s *Float) SetFloat(key string, value float64) bool {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(s, index)
@@ -222,11 +230,13 @@ func (s *Float) SetFloat(key string, value float64) bool {
 	return false
 }
 
+// SetValue sets the value at the specified index, growing the slice if necessary
 func (s *Float) SetValue(value any) error {
 	*s = convert.SliceOfFloat(value)
 	return nil
 }
 
+// Remove deletes the element at the specified key
 func (s *Float) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, s.Length()); ok {
@@ -237,6 +247,7 @@ func (s *Float) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt deletes the element at the specified index
 func (x *Float) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

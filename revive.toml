@@ -1,0 +1,14 @@
+enableAllRules = true
+
+[rule.var-naming]
+arguments = [[], [], [{ skipInitialismNameChecks = true }]]
+
+
+[rule.empty-lines]
+disabled = true
+
+[rule.comment-spacings]
+arguments = ["/***"]
+
+[rule.add-constant]
+arguments = [{allowStrs = "\"\"", allowInts = "0,1"}]

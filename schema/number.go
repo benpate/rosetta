@@ -182,10 +182,12 @@ func (element Number) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Number) UnmarshalMap(data map[string]any) error {
 
+	const location = "schema.Number.UnmarshalMap"
+
 	var err error
 
 	if convert.String(data["type"]) != "number" {
-		return derp.InternalError("schema.Number.UnmarshalMap", "Data is not type 'number'", data)
+		return derp.InternalError(location, "Data must be type 'number'", data)
 	}
 
 	element.Default = convert.NullFloat(data["default"])

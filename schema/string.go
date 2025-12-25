@@ -105,21 +105,28 @@ func (element String) ValidateRequiredIf(schema Schema, path list.List, globalVa
 
 	const location = "schema.String.ValidateRequiredIf"
 
-	if element.RequiredIf != "" {
-		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
-		}
-
-		if isRequired {
-			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, location, "Error getting value for path", path)
-			} else if compare.IsZero(localValue) {
-				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
-			}
-		}
+	// If there is no `required-if` condition, then skip this step
+	if element.RequiredIf == "" {
+		return nil
 	}
+
+	// Check to see if this field is required
+	isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+	}
+
+	if !isRequired {
+		return nil
+	}
+
+	if localValue, err := schema.Get(globalValue, path.String()); err != nil {
+		return derp.Wrap(err, location, "Error getting value for path", path)
+	} else if compare.IsZero(localValue) {
+		return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+	}
+
 	return nil
 }
 

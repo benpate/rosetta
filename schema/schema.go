@@ -42,19 +42,21 @@ func Wildcard() Schema {
 // (and cannot be coerced into being valid) then it returns an error.
 func (schema Schema) Validate(value any) error {
 
+	const location = "schema.Schema.Validate"
+
 	// RULE: Schema element cannot be nil
 	if isNil(schema.Element) {
-		return derp.InternalError("schema.Schema.Validate", "Schema is nil")
+		return derp.InternalError(location, "Schema must not be nil")
 	}
 
 	// Validate all elements in the value
 	if err := schema.Element.Validate(value); err != nil {
-		return derp.Wrap(err, "schema.Schema.Validate", "Error validating value", value)
+		return derp.Wrap(err, location, "Value is not valid for this schema", value)
 	}
 
 	// Handle special cases for "required-if" fields
 	if err := schema.ValidateRequiredIf(value); err != nil {
-		return derp.Wrap(err, "schema.Schema.Validate", "Error validating required-if fields", value)
+		return derp.Wrap(err, location, "Unable to validate `required-if` fields", value)
 	}
 
 	return nil

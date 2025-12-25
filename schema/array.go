@@ -65,10 +65,12 @@ func (element Array) IsRequired() bool {
 // It validates a value against this schema
 func (element Array) Validate(object any) error {
 
+	const location = "schema.Array.Validate"
+
 	length, isLengthGetter := getLength(object)
 
 	if !isLengthGetter {
-		return derp.InternalError("schema.Array.Validate", "Array must implement LengthGetter interface")
+		return derp.InternalError(location, "Array must implement LengthGetter interface")
 	}
 
 	// Check minimum/maximum lengths
@@ -84,14 +86,16 @@ func (element Array) Validate(object any) error {
 		return derp.ValidationError(" maximum array length is " + convert.String(element.MaxLength))
 	}
 
+	// Validate each item in the array
 	for index := 0; index < length; index = index + 1 {
 		indexString := strconv.Itoa(index)
 
 		if err := validate(element.Items, object, indexString); err != nil {
-			return derp.Wrap(err, "schema.Array.Validate", "Error Validating object at index", index)
+			return derp.Wrap(err, location, "Unable to validate object at index", index)
 		}
 	}
 
+	// Valid
 	return nil
 }
 
@@ -101,42 +105,50 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 
 	const location = "schema.Array.ValidateRequiredIf"
 
-	if element.RequiredIf != "" {
+	// If there is no `required-if` condition, then skip this step
+	if element.RequiredIf == "" {
+		return nil
+	}
 
-		localValue, err := schema.get(globalValue, element, path)
+	// Get the value at this path
+	localValue, err := schema.getFromList(globalValue, element, path)
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error getting value for path", path)
+	}
+
+	// Get the length of the value
+	length, isLengthGetter := getLength(localValue)
+
+	if !isLengthGetter {
+		return derp.ValidationError("Array must implement LengthGetter interface")
+	}
+
+	// If the array is empty, then check for required" conditions
+	if length == 0 {
+		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 		if err != nil {
-			return derp.Wrap(err, location, "Error getting value for path", path)
+			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
 		}
 
-		length, ok := getLength(localValue)
-
-		if !ok {
-			return derp.ValidationError("Array must implement LengthGetter interface")
+		if isRequired {
+			return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 		}
 
-		if length == 0 {
-			isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
+		return nil
+	}
 
-			if err != nil {
-				return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
-			}
+	// Otherwise, validate each item in the array
+	for index := range length {
+		subPath := path.PushTail(strconv.Itoa(index))
 
-			if isRequired {
-				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
-			}
+		if element.Items == nil {
+			return derp.InternalError(location, "Array items cannot be nil", path)
 		}
 
-		for index := range length {
-			subPath := path.PushTail(strconv.Itoa(index))
-
-			if element.Items == nil {
-				return derp.InternalError(location, "Array items cannot be nil", path)
-			}
-
-			if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-				return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
-			}
+		if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
+			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
 		}
 	}
 
@@ -241,22 +253,24 @@ func (element Array) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Array) UnmarshalMap(data map[string]any) error {
 
+	const location = "schema.Array.UnmarshalMap"
+
 	var err error
 
 	// RULE: `type` must be "array"
 	if convert.String(data["type"]) != "array" {
-		return derp.InternalError("schema.Array.UnmarshalMap", "Data is not type 'array'", data)
+		return derp.InternalError(location, "Data must be type 'array'", data)
 	}
 
 	// Try to retrieve the array items from the data map
 	items, err := UnmarshalMap(data["items"])
 
 	if err != nil {
-		return derp.Wrap(err, "schema.Array.UnmarshalMap", "Unable to unmarshal 'items'", data["items"])
+		return derp.Wrap(err, location, "Unable to unmarshal 'items'", data["items"])
 	}
 
 	if items == nil {
-		return derp.InternalError("schema.Array.UnmarshalMap", "'items' cannot be nil", data)
+		return derp.InternalError(location, "'items' must not be nil", data)
 	}
 
 	// Populate the element
