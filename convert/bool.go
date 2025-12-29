@@ -21,15 +21,18 @@ func BoolDefault(value any, defaultValue bool) bool {
 	return result
 }
 
-// BoolOk converts an arbitrary value (passed in the first parameter) into a boolean, somehow, no matter what.
-// The first result is the final converted value, or the default value (passed in the second parameter)
+// BoolOk converts an arbitrary value (passed in the first parameter) into a boolean, somehow,
+// no matter what. The first result is the final converted value, or the default value
+// (passed in the second parameter)
 // The second result is TRUE if the value was naturally a bool, and FALSE otherwise
 //
 // Conversion Rules:
 // Nils return default value and Ok=false
 // Bools are passed through with Ok=true
-// Ints and Floats all convert to FALSE if they are zero, and TRUE if they are non-zero.  In these cases, Ok=false
-// String values of "true" and "false" convert normall, and Ok=true.  All other strings return the default value, with Ok=false
+// Ints and Floats all convert to FALSE if they are zero, and TRUE if they are non-zero.
+// In these cases, Ok=false
+// String values of "true" and "false" convert normall, and Ok=true.
+// All other strings return the default value, with Ok=false
 // Known interfaces (Booler, Inter, Floater, Stringer) are handled like their corresponding types
 // All other values return the default value with Ok=false
 func BoolOk(value any, defaultValue bool) (bool, bool) {

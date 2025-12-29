@@ -68,7 +68,7 @@ func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
 		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Error validating property", name)
+			return derp.Wrap(err, "schema.Object.Validate", "Unable to validate property", name)
 		}
 	}
 
@@ -79,10 +79,12 @@ func (element Object) Validate(object any) error {
 // It returns an error if the conditional expression is true but the value is empty
 func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
+	const location = "schema.Object.ValidateRequiredIf"
+
 	for name, subElement := range element.Properties {
 		subPath := path.PushTail(name)
 		if err := subElement.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, "schema.Object.ValidateRequiredIf", "Error validating property", subPath.String())
+			return derp.Wrap(err, location, "Unable to validate property", subPath.String())
 		}
 	}
 
@@ -169,8 +171,10 @@ func (element Object) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Object) UnmarshalMap(data map[string]any) error {
 
+	const location = "schema.Object.UnmarshalMap"
+
 	if convert.String(data["type"]) != "object" {
-		return derp.InternalError("schema.Object.UnmarshalMap", "Data is not type 'object'", data)
+		return derp.InternalError(location, "Data must be a type 'object'", data)
 	}
 
 	// Handle "simple" required as a boolean

@@ -3,6 +3,8 @@ enableAllRules = true
 [rule.var-naming]
 arguments = [[], [], [{ skipInitialismNameChecks = true }]]
 
+[rule.line-length-limit]
+arguments = [100]
 
 [rule.empty-lines]
 disabled = true

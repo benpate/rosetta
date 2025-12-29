@@ -40,7 +40,7 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 
 	case string:
 		split := strings.Split(typed, ",")
-		return sliceOfFloatOk(split)
+		return makeSliceOfFloatOk(split)
 
 	case reflect.Value:
 		return SliceOfFloat(Interface(typed)), true
@@ -59,31 +59,31 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 		return []float64{item}, ok
 
 	case []any:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []float64:
 		return typed, true
 
 	case []int:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []int64:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []string:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []Floater:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []Inter:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []Int64er:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 
 	case []Stringer:
-		return sliceOfFloatOk(typed)
+		return makeSliceOfFloatOk(typed)
 	}
 
 	// Use reflection to see if this is even an array/slice
@@ -107,8 +107,8 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 	return make([]float64, 0), false
 }
 
-// sliceOfFloatOk converts a slice of any type into a slice of float64s.
-func sliceOfFloatOk[T any](value []T) ([]float64, bool) {
+// makeSliceOfFloatOk converts a slice of any type into a slice of float64s.
+func makeSliceOfFloatOk[T any](value []T) ([]float64, bool) {
 	result := make([]float64, len(value))
 	allOk := true
 	for index, v := range value {

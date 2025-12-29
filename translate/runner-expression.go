@@ -34,7 +34,7 @@ func (runner expressionRunner) Execute(_ schema.Schema, sourceValue any, targetS
 	value := executeTemplate(runner.Expression, sourceValue)
 
 	if err := targetSchema.Set(targetValue, runner.Target, value); err != nil {
-		return derp.Wrap(err, "rosetta.translate.expressionRunner.Set", "Error setting value in target", runner.Target)
+		return derp.Wrap(err, "rosetta.translate.expressionRunner.Set", "Unable to set value in target", runner.Target)
 	}
 
 	return nil

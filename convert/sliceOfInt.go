@@ -41,7 +41,7 @@ func SliceOfIntOk(value any) ([]int, bool) {
 
 	case string:
 		split := strings.Split(typed, ",")
-		return sliceOfIntOk(split)
+		return makeSliceOfIntOk(split)
 
 	case reflect.Value:
 		return SliceOfInt(Interface(typed)), true
@@ -60,31 +60,31 @@ func SliceOfIntOk(value any) ([]int, bool) {
 		return []int{item}, ok
 
 	case []any:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []float64:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []int:
 		return typed, true
 
 	case []int64:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []string:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []Floater:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []Inter:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []Int64er:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 
 	case []Stringer:
-		return sliceOfIntOk(typed)
+		return makeSliceOfIntOk(typed)
 	}
 
 	// Use reflection to see if this is even an array/slice
@@ -97,7 +97,7 @@ func SliceOfIntOk(value any) ([]int, bool) {
 		length := valueOf.Len()
 		result := make([]int, length)
 		allOk := true
-		for index := 0; index < length; index++ {
+		for index := range length {
 			item, ok := IntOk(valueOf.Index(index), 0)
 			result[index] = item
 			allOk = allOk && ok
@@ -108,8 +108,8 @@ func SliceOfIntOk(value any) ([]int, bool) {
 	return make([]int, 0), false
 }
 
-// sliceOfIntOk converts a slice of any type into a slice of ints.
-func sliceOfIntOk[T any](value []T) ([]int, bool) {
+// makeSliceOfIntOk converts a slice of any type into a slice of ints.
+func makeSliceOfIntOk[T any](value []T) ([]int, bool) {
 	result := make([]int, len(value))
 	allOk := true
 	for index, v := range value {

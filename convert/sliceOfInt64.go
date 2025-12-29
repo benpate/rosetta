@@ -17,7 +17,8 @@ func SliceOfInt64(value any) []int64 {
 }
 
 // SliceOfInt64Ok converts the value into a slice of int64s.
-// It works with float64, int, int64, string, and []any, []float64, []int, []int64, and []string values.
+// It works with float64, int, int64, string, and
+// []any, []float64, []int, []int64, and []string values.
 // It returns TRUE if the conversion was successful, and FALSE otherwise.
 func SliceOfInt64Ok(value any) ([]int64, bool) {
 
@@ -41,7 +42,7 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 
 	case string:
 		split := strings.Split(typed, ",")
-		return sliceOfInt64Ok(split)
+		return makeSliceOfInt64Ok(split)
 
 	case reflect.Value:
 		return SliceOfInt64(Interface(typed)), true
@@ -60,31 +61,31 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 		return []int64{item}, ok
 
 	case []any:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []float64:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []int:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []int64:
 		return typed, true
 
 	case []string:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []Floater:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []Inter:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []Int64er:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 
 	case []Stringer:
-		return sliceOfInt64Ok(typed)
+		return makeSliceOfInt64Ok(typed)
 	}
 
 	// Use reflection to see if this is even an array/slice
@@ -108,8 +109,8 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 	return make([]int64, 0), false
 }
 
-// sliceOfInt64Ok converts a slice of any type into a slice of int64s.
-func sliceOfInt64Ok[T any](value []T) ([]int64, bool) {
+// makeSliceOfInt64Ok converts a slice of any type into a slice of int64s.
+func makeSliceOfInt64Ok[T any](value []T) ([]int64, bool) {
 	result := make([]int64, len(value))
 	allOk := true
 	for index, v := range value {

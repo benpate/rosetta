@@ -70,7 +70,7 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 	tempValue := (*object)[head]
 
 	if err := schema.SetElement(&tempValue, subElement, tail, value); err != nil {
-		return derp.Wrap(err, "mapof.Object.SetObject", "Error setting value", path)
+		return derp.Wrap(err, "mapof.Object.SetObject", "Unable to set value", path)
 	}
 
 	// Reapply the updated value to the map

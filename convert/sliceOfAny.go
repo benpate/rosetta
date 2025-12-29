@@ -63,34 +63,34 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 		return typed, true
 
 	case []bool:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []int:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []int64:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []float64:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []string:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []Floater:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []Hexer:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []Inter:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []Int64er:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 
 	case []Stringer:
-		return sliceOfAnyOk(typed)
+		return makeSliceOfAnyOk(typed)
 	}
 
 	// Use reflection to see if this is even aa array/slice
@@ -112,8 +112,8 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 	return make([]any, 0), false
 }
 
-// sliceOfAnyOk converts a slice of any type into a slice of int64s.
-func sliceOfAnyOk[T any](value []T) ([]any, bool) {
+// makeSliceOfAnyOk converts a slice of any type into a slice of int64s.
+func makeSliceOfAnyOk[T any](value []T) ([]any, bool) {
 	result := make([]any, len(value))
 	for index, v := range value {
 		result[index] = v

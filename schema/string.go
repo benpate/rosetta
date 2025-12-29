@@ -91,8 +91,8 @@ func (element String) Validate(value any) error {
 	}
 
 	// Validate against all formatting functions
-	for _, format := range element.formatFunctions() {
-		if _, err := format(stringValue); err != nil {
+	for _, formatFunc := range element.formatFunctions() {
+		if _, err := formatFunc(stringValue); err != nil {
 			return err
 		}
 	}
@@ -142,7 +142,7 @@ func (element String) GetElement(name string) (Element, bool) {
 
 // Inherit implements the Element interface
 // It is a no-op for String elements
-func (element String) Inherit(_ Element) {
+func (_ String) Inherit(_ Element) {
 	// Do nothing
 }
 
@@ -208,10 +208,12 @@ func (element String) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *String) UnmarshalMap(data map[string]any) error {
 
+	const location = "schema.String.UnmarshalMap"
+
 	var err error
 
 	if convert.String(data["type"]) != "string" {
-		return derp.InternalError("schema.String.UnmarshalMap", "Data is not type 'string'", data)
+		return derp.InternalError(location, "Data is not type 'string'", data)
 	}
 
 	element.Default = convert.String(data["default"])

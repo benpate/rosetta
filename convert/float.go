@@ -21,14 +21,18 @@ func FloatDefault(value any, defaultValue float64) float64 {
 	return result
 }
 
-// FloatOk converts an arbitrary value (passed in the first parameter) into a float64, no matter what.
-// The first result is the final converted value, or the default value (passed in the second parameter)
-// The second result is TRUE if the value was naturally a floating point number, and FALSE otherwise
+// FloatOk converts an arbitrary value (passed in the first parameter) into a float64,
+// no matter what. The first result is the final converted value, or the default value
+// (passed in the second parameter)
+// The second result is TRUE if the value was naturally a floating point number, and
+// FALSE otherwise
 //
 // Conversion Rules:
 // Nils and Bools return default value and Ok=false
 // Ints and Floats are converted into float64, with Ok=true
-// String values are attempted to parse as a float64.  If unsuccessful, default value is returned.  For all strings, Ok=false
+// String values are attempted to parse as a float64.
+// If unsuccessful, default value is returned.
+// For all strings, Ok=false
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
 func FloatOk(value any, defaultValue float64) (float64, bool) {

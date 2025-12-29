@@ -51,7 +51,7 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 		// Errors are intentionally ignored here.
 		// Unallowed data does not make it through the schema filter
 		// nolint: errcheck
-		schema.Set(object, path, value)
+		_ = schema.Set(object, path, value)
 	}
 
 	// Validate the whole schema once all the values are set
@@ -74,7 +74,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	if path.IsEmpty() {
 		if setter, ok := object.(ValueSetter); ok {
 			if err := setter.SetValue(value); err != nil {
-				return derp.Wrap(err, location, "Error setting value", object, value)
+				return derp.Wrap(err, location, "Unable to set value", object, value)
 			}
 			return nil
 		}
@@ -200,9 +200,15 @@ func SetElement(object any, element Element, path list.List, value any) error {
 					return nil
 				}
 			}
+
 		}
 
-		return derp.InternalError(location, "To set a 'String' value, the target Object must be a StringSetter or PointerGetter", path, object)
+		return derp.InternalError(
+			location,
+			"To set a 'String' value, the target Object must be a StringSetter or PointerGetter",
+			path,
+			object,
+		)
 	}
 
 	return derp.InternalError(location, "Unsupported element type", path, subElement, object)

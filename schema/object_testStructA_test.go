@@ -34,28 +34,28 @@ func testStructA_Schema() Element {
  * Getter Interfaces
  ******************************************/
 
-func (t testStructA) GetBoolOK(path string) (bool, bool) {
+func (t testStructA) GetBoolOK(path string) (value bool, ok bool) {
 	if path == "active" {
 		return t.Active, true
 	}
 	return false, false
 }
 
-func (t testStructA) GetFloatOK(path string) (float64, bool) {
+func (t testStructA) GetFloatOK(path string) (value float64, ok bool) {
 	if path == "latitude" {
 		return t.Latitude, true
 	}
 	return 0, false
 }
 
-func (t *testStructA) GetPointer(path string) (any, bool) {
+func (t *testStructA) GetPointer(path string) (value any, ok bool) {
 	if path == "array" {
 		return &t.Array, true
 	}
 	return nil, false
 }
 
-func (t testStructA) GetStringOK(path string) (string, bool) {
+func (t testStructA) GetStringOK(path string) (value string, ok bool) {
 	switch path {
 	case "name":
 		return t.Name, true

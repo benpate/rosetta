@@ -68,7 +68,10 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
 				return derp.Wrap(err, location, "Error getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.ValidationError(
+					"field: " + path.String() +
+						" is required based on condition: " + element.RequiredIf,
+				)
 			}
 		}
 	}
@@ -87,7 +90,7 @@ func (element Boolean) GetElement(name string) (Element, bool) {
 
 // Inherit implements the Element interface
 // It is a no-op for Boolean elements
-func (element Boolean) Inherit(_ Element) {
+func (_ Boolean) Inherit(_ Element) {
 	// Do nothing
 }
 

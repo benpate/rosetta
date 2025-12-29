@@ -3,7 +3,8 @@ package schema
 // Type enumerates all of the data types that can make up a schema
 type Type string
 
-// String implements the ubiquitous "Stringer" interface, so that these types can be represented as strings, if necessary
+// String implements the ubiquitous "Stringer" interface,
+// so that these types can be represented as strings, if necessary
 func (schemaType Type) String() string {
 	return string(schemaType)
 }
