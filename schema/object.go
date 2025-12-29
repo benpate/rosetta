@@ -169,8 +169,6 @@ func (element Object) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Object) UnmarshalMap(data map[string]any) error {
 
-	var err error
-
 	if convert.String(data["type"]) != "object" {
 		return derp.InternalError("schema.Object.UnmarshalMap", "Data is not type 'object'", data)
 	}
@@ -207,5 +205,5 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		}
 	}
 
-	return err
+	return nil
 }
