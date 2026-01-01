@@ -3,7 +3,6 @@ package convert
 import (
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,7 +33,7 @@ func TestCustomTypes_SliceOfMap(t *testing.T) {
 	result := SliceOfMap(value)
 
 	require.Equal(t, 3, len(result))
-	spew.Dump(result)
+	t.Log(result)
 }
 
 func TestCustomTypes_MapOfAny(t *testing.T) {
@@ -47,7 +46,7 @@ func TestCustomTypes_MapOfAny(t *testing.T) {
 
 	result := MapOfAny(value)
 	require.Equal(t, 3, len(value))
-	spew.Dump(result)
+	t.Log(result)
 }
 
 func TestCustomTypes_MapOfString(t *testing.T) {
@@ -60,7 +59,7 @@ func TestCustomTypes_MapOfString(t *testing.T) {
 
 	result := MapOfString(value)
 	require.Equal(t, 3, len(value))
-	spew.Dump(result)
+	t.Log(result)
 }
 
 func TestCustomTypes_MapOfInt(t *testing.T) {
@@ -73,7 +72,7 @@ func TestCustomTypes_MapOfInt(t *testing.T) {
 
 	result := MapOfInt(value)
 	require.Equal(t, 3, len(value))
-	spew.Dump(result)
+	t.Log(result)
 }
 
 func TestCustomTypes_MapOfInt32(t *testing.T) {
@@ -86,5 +85,5 @@ func TestCustomTypes_MapOfInt32(t *testing.T) {
 
 	result := MapOfInt32(value)
 	require.Equal(t, 3, len(value))
-	spew.Dump(result)
+	t.Log(result)
 }

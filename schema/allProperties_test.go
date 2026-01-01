@@ -2,12 +2,10 @@ package schema
 
 import (
 	"testing"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // TestAllProperties tests the AllProperties function
-func TestAllProperties(_ *testing.T) {
+func TestAllProperties(t *testing.T) {
 
 	s := Schema{
 		Element: Object{
@@ -29,5 +27,5 @@ func TestAllProperties(_ *testing.T) {
 
 	result := s.AllProperties()
 
-	spew.Dump(result)
+	t.Log(result)
 }

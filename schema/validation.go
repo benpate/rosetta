@@ -32,7 +32,7 @@ func validate(element Element, object any, name string) error {
 		return validate_string(typed, object, name)
 
 	default:
-		return derp.InternalError("schema.validate", "Unable to validate unknown type", element, object, name)
+		return derp.Internal("schema.validate", "Unable to validate unknown type", element, object, name)
 	}
 }
 
@@ -46,7 +46,7 @@ func validate_array(element Array, object any, name string) error {
 	}
 
 	// Fall through means that we don't have a PointerGetter.  That's bad...
-	return derp.InternalError("schema.validate_array", "To validate this property, the Object must be a 'PointerGetter'", object, name)
+	return derp.Internal("schema.validate_array", "To validate this property, the Object must be a 'PointerGetter'", object, name)
 }
 
 // validate_boolean specifically validates Boolean sub-elements
@@ -67,7 +67,7 @@ func validate_boolean(element Boolean, object any, name string) error {
 	}
 
 	if element.Required {
-		return derp.ValidationError("schema.validate_boolean", "Required boolean property is missing", element, object, name)
+		return derp.Validation("schema.validate_boolean", "Required boolean property is missing", element, object, name)
 	}
 
 	return nil
@@ -101,7 +101,7 @@ func validate_int32(element Integer, object any, name string) error {
 	}
 
 	if element.Required {
-		return derp.ValidationError("schema.validate_int32", "Required int32 property is missing", element, object, name)
+		return derp.Validation("schema.validate_int32", "Required int32 property is missing", element, object, name)
 	}
 
 	return nil
@@ -124,7 +124,7 @@ func validate_int64(element Integer, object any, name string) error {
 	}
 
 	if element.Required {
-		return derp.ValidationError("schema.validate_int64", "Required int64 property is missing", element, object, name)
+		return derp.Validation("schema.validate_int64", "Required int64 property is missing", element, object, name)
 	}
 
 	return nil
@@ -148,7 +148,7 @@ func validate_number(element Number, object any, name string) error {
 	}
 
 	if element.Required {
-		return derp.ValidationError("schema.validate_number", "Required number property is missing", element, object, name)
+		return derp.Validation("schema.validate_number", "Required number property is missing", element, object, name)
 	}
 
 	return nil
@@ -163,7 +163,7 @@ func validate_object(element Object, object any, name string) error {
 		}
 	}
 
-	return derp.InternalError("schema.validate_object", "To validate this property, the Object must be a 'PointerGetter'", object, name)
+	return derp.Internal("schema.validate_object", "To validate this property, the Object must be a 'PointerGetter'", object, name)
 }
 
 // validate_string specifically validates String sub-elements
@@ -183,7 +183,7 @@ func validate_string(element String, object any, name string) error {
 	}
 
 	if element.Required {
-		return derp.ValidationError("schema.validate_string", "Required string property is missing", element, object, name)
+		return derp.Validation("schema.validate_string", "Required string property is missing", element, object, name)
 	}
 
 	return nil

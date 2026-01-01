@@ -141,5 +141,5 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 	}
 
 	// Unrecognized Ruleset
-	return derp.InternalError(location, "No valid runner found in rule", data)
+	return derp.Internal(location, "No valid runner found in rule", data)
 }

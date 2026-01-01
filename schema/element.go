@@ -59,7 +59,7 @@ func UnmarshalJSON(data []byte) (Element, error) {
 	}
 
 	if element == nil {
-		return nil, derp.InternalError("schema.UnmarshalJSON", "Unmarshalled element is nil", string(data))
+		return nil, derp.Internal("schema.UnmarshalJSON", "Unmarshalled element is nil", string(data))
 	}
 
 	return element, nil
@@ -72,14 +72,14 @@ func UnmarshalMap(data any) (Element, error) {
 
 	// NILCHECK: Data cannot be nil
 	if data == nil {
-		return nil, derp.InternalError(location, "Element is nil")
+		return nil, derp.Internal(location, "Element is nil")
 	}
 
 	// Confirm that the data is a map[string]any
 	dataMap, isMap := data.(map[string]any)
 
 	if !isMap {
-		return nil, derp.InternalError(location, "data is not map[string]any", data)
+		return nil, derp.Internal(location, "data is not map[string]any", data)
 	}
 
 	// Convert the map value into the correct element.
@@ -129,5 +129,5 @@ func UnmarshalMap(data any) (Element, error) {
 	}
 
 	// Fall through to failure.  You should be disappointed.
-	return nil, derp.InternalError(location, "Unrecognized data type", data)
+	return nil, derp.Internal(location, "Unrecognized data type", data)
 }

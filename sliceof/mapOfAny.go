@@ -215,7 +215,7 @@ func (s *MapOfAny) SetValue(value any) error {
 		return nil
 	}
 
-	return derp.InternalError("sliceof.Map.SetValue", "Unable to convert value to Map", value)
+	return derp.Internal("sliceof.Map.SetValue", "Unable to convert value to Map", value)
 }
 
 func (x *MapOfAny) Remove(key string) bool {

@@ -20,7 +20,7 @@ func WebFinger(arg string) StringFormat {
 		}
 
 		if !strings.HasPrefix(value, "@") {
-			return "", derp.BadRequestError(location, "Invalid WebFinger Handle", value, "WebFinger handles must start with '@'")
+			return "", derp.BadRequest(location, "Invalid WebFinger Handle", value, "WebFinger handles must start with '@'")
 		}
 
 		value = strings.TrimPrefix(value, "@")

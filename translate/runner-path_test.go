@@ -3,7 +3,6 @@ package translate
 import (
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	deepcopy "github.com/tiendc/go-deepcopy"
 )
 
@@ -24,7 +23,7 @@ func TestDeepCopy_Map(t *testing.T) {
 		t.Errorf("Error during deepcopy: %v", err)
 	}
 
-	spew.Dump(source, target)
+	t.Log(source, target)
 }
 
 func TestDeepCopy_Struct(t *testing.T) {
@@ -43,5 +42,5 @@ func TestDeepCopy_Struct(t *testing.T) {
 		t.Errorf("Error during deepcopy: %v", err)
 	}
 
-	spew.Dump(source, target)
+	t.Log(source, target)
 }

@@ -78,7 +78,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			}
 			return nil
 		}
-		return derp.InternalError(location, "Cannot set values on empty path", object, element, path, value)
+		return derp.Internal(location, "Cannot set values on empty path", object, element, path, value)
 	}
 
 	// Otherwise, we're setting a sub-element within the object:
@@ -87,7 +87,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
-		return derp.InternalError(location, "Property does not exist in schema", head, path)
+		return derp.Internal(location, "Property does not exist in schema", head, path)
 	}
 
 	// Different interfaces are required for different types of objects
@@ -106,7 +106,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 				return SetElement(subPointer, typed, tail, value)
 			}
 		}
-		return derp.InternalError(location, "To set an 'Any', 'Array', or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", path, object)
+		return derp.Internal(location, "To set an 'Any', 'Array', or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", path, object)
 
 	case Boolean:
 		boolValue, _ := convert.BoolOk(value, false)
@@ -125,7 +125,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			}
 		}
 
-		return derp.InternalError(location, "To set a 'Boolean' value, the target Object must be a BoolSetter or PointerGetter", path, object)
+		return derp.Internal(location, "To set a 'Boolean' value, the target Object must be a BoolSetter or PointerGetter", path, object)
 
 	case Integer:
 		if typed.BitSize == 64 {
@@ -145,7 +145,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 				}
 			}
 
-			return derp.InternalError(location, "To set a 64-bit 'Integer' value, the target Object must be an Int64Setter or PointerGetter", path, object)
+			return derp.Internal(location, "To set a 64-bit 'Integer' value, the target Object must be an Int64Setter or PointerGetter", path, object)
 		}
 
 		intValue, _ := convert.IntOk(value, 0)
@@ -164,7 +164,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			}
 		}
 
-		return derp.InternalError(location, "To set an 'Integer' value, the target Object must be an IntSetter or PointerGetter", path, object)
+		return derp.Internal(location, "To set an 'Integer' value, the target Object must be an IntSetter or PointerGetter", path, object)
 
 	case Number:
 		floatValue, _ := convert.FloatOk(value, 0)
@@ -183,7 +183,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 			}
 		}
 
-		return derp.InternalError(location, "To set a 'Number' value, the target Object must be a FloatSetter or PointerGetter", path, object)
+		return derp.Internal(location, "To set a 'Number' value, the target Object must be a FloatSetter or PointerGetter", path, object)
 
 	case String:
 		stringValue, _ := convert.StringOk(value, "")
@@ -203,7 +203,7 @@ func SetElement(object any, element Element, path list.List, value any) error {
 
 		}
 
-		return derp.InternalError(
+		return derp.Internal(
 			location,
 			"To set a 'String' value, the target Object must be a StringSetter or PointerGetter",
 			path,
@@ -211,5 +211,5 @@ func SetElement(object any, element Element, path list.List, value any) error {
 		)
 	}
 
-	return derp.InternalError(location, "Unsupported element type", path, subElement, object)
+	return derp.Internal(location, "Unsupported element type", path, subElement, object)
 }

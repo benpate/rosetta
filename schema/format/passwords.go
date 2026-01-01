@@ -51,7 +51,7 @@ func countCharacters(arg string, value string, fn func(byte) bool) (string, erro
 	}
 
 	if minCount > count {
-		return "", derp.ValidationError("value does not meet criteria")
+		return "", derp.Validation("value does not meet criteria")
 	}
 
 	return value, nil

@@ -23,6 +23,6 @@ func Token(_ string) StringFormat {
 			return value, nil
 		}
 
-		return "", derp.InternalError("schema.format.Token", "Value is not a valid Token", value)
+		return "", derp.Internal("schema.format.Token", "Value is not a valid Token", value)
 	}
 }

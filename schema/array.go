@@ -34,11 +34,11 @@ func (element Array) GetProperty(name string) (Element, error) {
 	}
 
 	if index < 0 {
-		return nil, derp.BadRequestError(location, "Array index must not be negative", name)
+		return nil, derp.BadRequest(location, "Array index must not be negative", name)
 	}
 
 	if index > element.MaxLength {
-		return nil, derp.BadRequestError(location, "Array index must not be greater than the maximum", name, element.MaxLength)
+		return nil, derp.BadRequest(location, "Array index must not be greater than the maximum", name, element.MaxLength)
 	}
 
 	return element.Items, nil
@@ -69,20 +69,20 @@ func (element Array) Validate(object any) error {
 	length, isLengthGetter := getLength(object)
 
 	if !isLengthGetter {
-		return derp.InternalError(location, "Array must implement LengthGetter interface")
+		return derp.Internal(location, "Array must implement LengthGetter interface")
 	}
 
 	// Check minimum/maximum lengths
 	if element.Required && length == 0 {
-		return derp.ValidationError(" array value is required")
+		return derp.Validation(" array value is required")
 	}
 
 	if (element.MinLength > 0) && (length < element.MinLength) {
-		return derp.ValidationError(" minimum array length is " + convert.String(element.MinLength))
+		return derp.Validation(" minimum array length is " + convert.String(element.MinLength))
 	}
 
 	if (element.MaxLength > 0) && (length > element.MaxLength) {
-		return derp.ValidationError(" maximum array length is " + convert.String(element.MaxLength))
+		return derp.Validation(" maximum array length is " + convert.String(element.MaxLength))
 	}
 
 	// Validate each item in the array
@@ -120,7 +120,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	length, isLengthGetter := getLength(localValue)
 
 	if !isLengthGetter {
-		return derp.ValidationError("Array must implement LengthGetter interface")
+		return derp.Validation("Array must implement LengthGetter interface")
 	}
 
 	// If the array is empty, then check for required" conditions
@@ -132,7 +132,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		}
 
 		if isRequired {
-			return derp.ValidationError("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 		}
 
 		return nil
@@ -143,7 +143,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		subPath := path.PushTail(strconv.Itoa(index))
 
 		if element.Items == nil {
-			return derp.InternalError(location, "Array items cannot be nil", path)
+			return derp.Internal(location, "Array items cannot be nil", path)
 		}
 
 		if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
@@ -225,7 +225,7 @@ func (_ Array) Append(value ArraySetter, item any) error {
 
 	// Try to set the value at the end of the array
 	if success := value.SetIndex(value.Length(), item); !success {
-		return derp.InternalError(location, "Unable to set value at end of array", value)
+		return derp.Internal(location, "Unable to set value at end of array", value)
 	}
 
 	// Success
@@ -258,7 +258,7 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 
 	// RULE: `type` must be "array"
 	if convert.String(data["type"]) != "array" {
-		return derp.InternalError(location, "Data must be type 'array'", data)
+		return derp.Internal(location, "Data must be type 'array'", data)
 	}
 
 	// Try to retrieve the array items from the data map
@@ -269,7 +269,7 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 	}
 
 	if items == nil {
-		return derp.InternalError(location, "'items' must not be nil", data)
+		return derp.Internal(location, "'items' must not be nil", data)
 	}
 
 	// Populate the element
