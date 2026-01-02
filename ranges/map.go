@@ -7,8 +7,7 @@ func Map[T any, U any](iterator iter.Seq[T], transform func(T) U) iter.Seq[U] {
 
 	return func(yield func(U) bool) {
 		for item := range iterator {
-			mappedItem := transform(item)
-			if !yield(mappedItem) {
+			if mappedItem := transform(item); !yield(mappedItem) {
 				return
 			}
 		}
