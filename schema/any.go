@@ -30,27 +30,40 @@ func (element Any) Validate(_ any) error {
 }
 
 // ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
-func (element Any) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) error {
 
 	const location = "schema.Any.ValidateRequiredIf"
 
-	if element.RequiredIf != "" {
-
-		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
-
-		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
-		}
-
-		if isRequired {
-			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, location, "Error getting value for path", path)
-			} else if compare.IsZero(localValue) {
-				return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
-			}
-		}
+	// If RequiredIf is not set, then exit
+	if element.RequiredIf == "" {
+		return nil
 	}
 
+	// Evaluate the RequiredIf expression
+	isRequired, err := schema.Match(value, exp.Parse(element.RequiredIf))
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+	}
+
+	// If the expression did not evaluat to TRUE, then exit
+	if !isRequired {
+		return nil
+	}
+
+	// Find the propertyValue in the global object
+	propertyValue, err := schema.Get(value, path.String())
+
+	if err != nil {
+		return derp.Wrap(err, location, "Error getting value for path", path)
+	}
+
+	// The value is required, but missing, so.. error.
+	if compare.IsZero(propertyValue) {
+		return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+	}
+
+	// The value is required, but present, so.. success.
 	return nil
 }
 

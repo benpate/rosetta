@@ -46,20 +46,22 @@ type WritableElement interface {
 // UnmarshalJSON tries to parse a []byte into a schema.Element
 func UnmarshalJSON(data []byte) (Element, error) {
 
+	const location = "schema.UnmarshalJSON"
+
 	var result map[string]any
 
 	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal JSON", string(data))
+		return nil, derp.Wrap(err, location, "Unable to unmarshal JSON", string(data))
 	}
 
 	element, err := UnmarshalMap(result)
 
 	if err != nil {
-		return nil, derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal map", string(data))
+		return nil, derp.Wrap(err, location, "Unable to unmarshal map", string(data))
 	}
 
 	if element == nil {
-		return nil, derp.Internal("schema.UnmarshalJSON", "Unmarshalled element is nil", string(data))
+		return nil, derp.Internal(location, "Unmarshalled element is nil", string(data))
 	}
 
 	return element, nil
