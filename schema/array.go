@@ -50,7 +50,7 @@ func (element Array) GetProperty(name string) (Element, error) {
 
 // DefaultValue implements the Element interface
 // It returns the default value for this element type
-func (_ Array) DefaultValue() any {
+func (Array) DefaultValue() any {
 	return []any{}
 }
 
@@ -199,17 +199,17 @@ func (element Array) AllProperties() ElementMap {
  ******************************************/
 
 // GetLength returns the length of the array value (if the object implements ArrayGetter)
-func (_ Array) GetLength(value any) (int, bool) {
+func (Array) GetLength(value any) (int, bool) {
 	return getLength(value)
 }
 
 // GetIndex returns the value at a specific index in the array (if the object implements ArrayGetter)
-func (_ Array) GetIndex(value any, index int) (any, bool) {
+func (Array) GetIndex(value any, index int) (any, bool) {
 	return getIndex(value, index)
 }
 
 // SetIndex sets the value at a specific index in the array (if the object implements ArraySetter)
-func (_ Array) SetIndex(value any, index int, item any) bool {
+func (Array) SetIndex(value any, index int, item any) bool {
 
 	if setter, ok := value.(ArraySetter); ok {
 		return setter.SetIndex(index, item)
@@ -219,7 +219,7 @@ func (_ Array) SetIndex(value any, index int, item any) bool {
 }
 
 // Append adds a new item to the end of the array (if the object implements ArraySetter)
-func (_ Array) Append(value ArraySetter, item any) error {
+func (element Array) Append(value ArraySetter, item any) error {
 
 	const location = "schema.Array.Append"
 

@@ -142,7 +142,7 @@ func (element String) GetElement(name string) (Element, bool) {
 
 // Inherit implements the Element interface
 // It is a no-op for String elements
-func (_ String) Inherit(_ Element) {
+func (String) Inherit(_ Element) {
 	// Do nothing
 }
 
