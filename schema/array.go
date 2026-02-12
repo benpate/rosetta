@@ -182,7 +182,7 @@ func (element Array) GetElement(name string) (Element, bool) {
 
 // Inherit implements the Element interface
 // It is a no-op for Array elements
-func (_ Array) Inherit(_ Element) {
+func (Array) Inherit(_ Element) {
 	// Do nothing
 }
 

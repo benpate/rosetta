@@ -90,7 +90,7 @@ func (element Boolean) GetElement(name string) (Element, bool) {
 
 // Inherit implements the Element interface
 // It is a no-op for Boolean elements
-func (_ Boolean) Inherit(_ Element) {
+func (Boolean) Inherit(_ Element) {
 	// Do nothing
 }
 
