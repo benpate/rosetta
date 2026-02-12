@@ -23,16 +23,18 @@ func IntDefault(value any, defaultValue int) int {
 	return result
 }
 
-// IntOk converts an arbitrary value (passed in the first parameter) into an int, no matter what.
-// The first result is the final converted value, or the default value (passed in the second parameter)
-// The second result is TRUE if the value was naturally an integer, and FALSE otherwise
+// IntOk converts an arbitrary value (passed in the first parameter) into an int,
+// no matter what. The first result is the final converted value, or the default
+// value (passed in the second parameter). The second result is TRUE if the value
+// was naturally an integer, and FALSE otherwise
 //
 // Conversion Rules:
 // Nils and Bools return default value and Ok=false
 // Ints are returned directly with Ok=true
 // Floats are truncated into ints.  If there is no decimal value then Ok=true
-// String values are attempted to parse as a int.  If unsuccessful, default value is returned.  For all strings, Ok=false
-// Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
+// String values are attempted to parse as a int.
+// If unsuccessful, default value is returned.  For all strings, Ok=false
+// Known interfaces (Inter, Floater, Stringer) are handled like their types.
 // All other values return the default value with Ok=false
 func IntOk(value any, defaultValue int) (int, bool) {
 
