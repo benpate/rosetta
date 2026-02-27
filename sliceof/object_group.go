@@ -21,7 +21,7 @@ func (grouper ObjectGrouper[T]) IsHeader(index int) bool {
 		return true
 	}
 
-	if index >= grouper.slice.Length()-1 {
+	if index >= grouper.slice.Length() {
 		return false
 	}
 

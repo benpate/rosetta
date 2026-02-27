@@ -24,7 +24,7 @@ func TestMapOfAny_GroupHeader(t *testing.T) {
 	require.True(t, groupBy.IsHeader(8))
 	require.False(t, groupBy.IsHeader(9))
 	require.True(t, groupBy.IsHeader(10))
-	require.False(t, groupBy.IsHeader(11))
+	require.True(t, groupBy.IsHeader(11))
 	require.False(t, groupBy.IsHeader(12))
 	require.False(t, groupBy.IsHeader(100))
 }
@@ -46,7 +46,7 @@ func TestMapOfAny_GroupFooter(t *testing.T) {
 	require.True(t, groupBy.IsFooter(7))
 	require.False(t, groupBy.IsFooter(8))
 	require.True(t, groupBy.IsFooter(9))
-	require.False(t, groupBy.IsFooter(10))
+	require.True(t, groupBy.IsFooter(10))
 	require.True(t, groupBy.IsFooter(11))
 	require.True(t, groupBy.IsFooter(12))
 	require.True(t, groupBy.IsFooter(100))
@@ -133,11 +133,11 @@ func test_mapOfAny_GroupValues() MapOfAny {
 			"group":       "User Payments",
 		},
 		{
-			"value":       "STRIPE-CONNECT",
-			"label":       "Stripe Connect",
-			"icon":        "stripe",
+			"value":       "BLUESKY",
+			"label":       "Bluesky",
+			"icon":        "bluesky",
 			"description": "Users sign in via OAuth. Requires additional setup from admins.",
-			"group":       "User Payments",
+			"group":       "Network",
 		},
 	}
 }

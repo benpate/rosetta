@@ -25,7 +25,7 @@ func TestObject_GroupHeader(t *testing.T) {
 	require.True(t, groupBy.IsHeader(8))
 	require.False(t, groupBy.IsHeader(9))
 	require.True(t, groupBy.IsHeader(10))
-	require.False(t, groupBy.IsHeader(11))
+	require.True(t, groupBy.IsHeader(11))
 	require.False(t, groupBy.IsHeader(12))
 	require.False(t, groupBy.IsHeader(100))
 }
@@ -47,7 +47,7 @@ func TestObject_GroupFooter(t *testing.T) {
 	require.True(t, groupBy.IsFooter(7))
 	require.False(t, groupBy.IsFooter(8))
 	require.True(t, groupBy.IsFooter(9))
-	require.False(t, groupBy.IsFooter(10))
+	require.True(t, groupBy.IsFooter(10))
 	require.True(t, groupBy.IsFooter(11))
 	require.True(t, groupBy.IsFooter(12))
 	require.True(t, groupBy.IsFooter(100))
@@ -127,11 +127,11 @@ func testGroupValues() Object[mapof.String] {
 			"group":       "Geo-Search",
 		},
 		{
-			"value":       "STRIPE",
-			"label":       "Stripe Payments",
-			"icon":        "stripe",
-			"description": "Users copy/paste API keys from their own Stripe Dashboard.",
-			"group":       "User Payments",
+			"value":       "BLUESKY",
+			"label":       "Bluesky",
+			"icon":        "bluesky",
+			"description": "Users copy/paste API keys from their own Bluesky Dashboard.",
+			"group":       "Network",
 		},
 		{
 			"value":       "STRIPE-CONNECT",

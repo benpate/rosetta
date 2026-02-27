@@ -45,7 +45,7 @@ func TestString(t *testing.T) {
 
 func TestStringConversion(t *testing.T) {
 	var value []string = NewString()
-	t.Log(value)
+	require.Zero(t, len(value))
 }
 
 func TestString_NewConstructor(t *testing.T) {
