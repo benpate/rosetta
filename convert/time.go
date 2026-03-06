@@ -52,13 +52,13 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
 	case int64:
 
-		// Assume Seconds
-		if typed < 10000000000 {
-			return time.Unix(typed, 0).In(time.UTC), true
+		// Assume Seconds until 2065
+		if typed > 3000000000 {
+			return TimeOk(typed/1000, defaultValue)
 		}
 
 		// Assume Miliseconds
-		return time.UnixMilli(typed).In(time.UTC), true
+		return time.Unix(typed, 0).In(time.UTC), true
 	}
 
 	return defaultValue, false
