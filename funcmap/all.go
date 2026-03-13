@@ -7,6 +7,7 @@ func All() map[string]any {
 	result := make(map[string]any)
 
 	addArraysFuncs(result)
+	addCompareFuncs(result)
 	addCurrencyFuncs(result)
 	addDateFuncs(result)
 	addHTMLFuncs(result)
