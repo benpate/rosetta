@@ -12,6 +12,11 @@ func NewInt64() Int64 {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Int64) Length() int {
+	return len(x)
+}
+
 func (x Int64) Keys() []string {
 	return maps.KeysSorted(x)
 }

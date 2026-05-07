@@ -23,6 +23,11 @@ func NewAny() Any {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Any) Length() int {
+	return len(x)
+}
+
 func (x Any) Keys() []string {
 	return maps.KeysSorted(x)
 }

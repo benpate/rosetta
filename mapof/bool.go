@@ -12,6 +12,11 @@ func NewBool() Bool {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Bool) Length() int {
+	return len(x)
+}
+
 func (x Bool) Keys() []string {
 	return maps.KeysSorted(x)
 }

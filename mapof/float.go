@@ -12,6 +12,11 @@ func NewFloat() Float {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Float) Length() int {
+	return len(x)
+}
+
 func (x Float) Keys() []string {
 	return maps.KeysSorted(x)
 }

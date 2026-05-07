@@ -12,6 +12,11 @@ func NewInt() Int {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Int) Length() int {
+	return len(x)
+}
+
 func (x Int) Keys() []string {
 	return maps.KeysSorted(x)
 }

@@ -19,6 +19,11 @@ func NewObject[T any]() Object[T] {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Object[T]) Length() int {
+	return len(x)
+}
+
 // Returns a SORTED slice of all keys in the map
 func (x Object[T]) Keys() []string {
 	return maps.KeysSorted(x)

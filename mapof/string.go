@@ -15,6 +15,11 @@ func NewString() String {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x String) Length() int {
+	return len(x)
+}
+
 func (x String) Keys() []string {
 	return maps.KeysSorted(x)
 }
