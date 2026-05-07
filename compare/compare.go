@@ -9,6 +9,7 @@ func WithOperator(value1 any, operator string, value2 any) (bool, error) {
 
 	// These operations are performed outside of the "Interface" comparison
 	switch operator {
+
 	case OperatorBeginsWith:
 		return BeginsWith(value1, value2), nil
 
