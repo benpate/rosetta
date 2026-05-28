@@ -64,9 +64,15 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 }
 
 // SetElement sets the value at the specified path within the object according to the provided schema
-func SetElement(object any, element Element, path list.List, value any) error {
+func SetElement(object any, element Element, path list.List, value any) (err error) {
 
 	const location = "schema.SetElement"
+
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = derp.Internal(location, "Panic while setting value", path, value, recovered)
+		}
+	}()
 
 	// In rare cases, we may need to set an entire element in one call.
 	// If the path is empty, then we're setting the entire element, which
