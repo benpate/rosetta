@@ -126,7 +126,7 @@ func RemoveSpecialCharacters(html string) string {
 	result = strings.ReplaceAll(result, "&lsaquo;", "<")
 
 	result = strings.ReplaceAll(result, "&#8250;", ">")
-	result = strings.ReplaceAll(result, "&rsaquo;", "<")
+	result = strings.ReplaceAll(result, "&rsaquo;", ">")
 
 	return result
 }
