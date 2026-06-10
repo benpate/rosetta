@@ -71,12 +71,20 @@ func addHTMLFuncs(target map[string]any) {
 	}
 
 	target["json"] = func(value any) string {
-		result, _ := json.Marshal(value)
+		result, err := json.Marshal(value)
+
+		if err != nil {
+			derp.Report(derp.WrapIF(err, "tools.templates.functions.json", "Error marshaling JSON"))
+		}
+
 		return string(result)
 	}
 
 	target["jsonIndent"] = func(value any) string {
-		result, _ := json.MarshalIndent(value, "", "    ")
+		result, err := json.MarshalIndent(value, "", "    ")
+		if err != nil {
+			derp.Report(derp.WrapIF(err, "tools.templates.functions.jsonIndent", "Error marshaling JSON with indentation"))
+		}
 		return string(result)
 	}
 
