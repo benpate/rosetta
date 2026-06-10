@@ -18,7 +18,7 @@ func Token(_ string) StringFormat {
 			return value, nil
 		}
 
-		// Non-empty IDs must be 24 hexadecimal characters
+		// Non-empty IDs must look like a token (characters, numbers, dashes, and underscores)
 		if token.MatchString(value) {
 			return value, nil
 		}
