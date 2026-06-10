@@ -27,12 +27,7 @@ func Contains(value1 any, value2 any) bool {
 	case []int:
 
 		if value2, ok := convert.IntOk(value2, 0); ok {
-
-			for index := range value1 {
-				if value1[index] == value2 {
-					return true
-				}
-			}
+			return slices.Contains(value1, value2)
 		}
 
 	case []int64:
