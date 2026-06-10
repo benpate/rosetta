@@ -16,10 +16,7 @@ func Contains(value1 any, value2 any) bool {
 		return value1.ContainsInterface(value2)
 
 	case string:
-
-		if value2 := convert.String(value2); value2 != "" {
-			return strings.Contains(value1, value2)
-		}
+		return strings.Contains(value1, convert.String(value2))
 
 	case []string:
 
