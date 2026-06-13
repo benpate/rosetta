@@ -25,7 +25,9 @@ func TestForEach(t *testing.T) {
 				"fullName":     schema.String{},
 				"emailAddress": schema.String{Format: "email"},
 				"type":         schema.String{},
-				"comment":      schema.String{},
+				// "comment" contains "Name <email>"; opt out of the default
+				// no-html format so the angle-bracketed text is preserved.
+				"comment": schema.String{Format: "unsafe-any"},
 			},
 		},
 	})
