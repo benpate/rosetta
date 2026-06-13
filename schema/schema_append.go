@@ -35,9 +35,10 @@ func (schema Schema) Append(object any, path string, value any) error {
 		return derp.Wrap(err, location, "Appending value", path)
 	}
 
-	// Set the value back into the object
-	finalValue := indirect(setter)
-	if err := schema.Set(object, path, finalValue); err != nil {
+	// Write the grown array back into the object. We pass the pointer (setter)
+	// rather than a dereferenced value so that Set's validation can treat it as
+	// an ArrayGetterSetter; convert dereferences the pointer when persisting.
+	if err := schema.Set(object, path, setter); err != nil {
 		return derp.Wrap(err, location, "Re-populating value", path)
 	}
 

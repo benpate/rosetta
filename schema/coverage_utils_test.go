@@ -9,15 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIndirect_Pointer(t *testing.T) {
-	value := "hello"
-	require.Equal(t, "hello", indirect(&value))
-}
-
-func TestIndirect_NotPointer(t *testing.T) {
-	require.Equal(t, "hello", indirect("hello"))
-}
-
 func TestGetLength(t *testing.T) {
 	length, ok := getLength(testArrayA{"one", "two"})
 	require.True(t, ok)

@@ -218,8 +218,14 @@ func (x Object[T]) GetIndex(index int) (any, bool) {
 
 func (s *Object[T]) SetValue(value any) error {
 
-	if typed, ok := value.(Object[T]); ok {
+	switch typed := value.(type) {
+
+	case Object[T]:
 		*s = typed
+		return nil
+
+	case *Object[T]:
+		*s = *typed
 		return nil
 	}
 
