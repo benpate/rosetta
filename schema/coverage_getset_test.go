@@ -42,6 +42,32 @@ func TestSchema_SetURLValues(t *testing.T) {
 	require.Equal(t, "Kyle Reese", value.Name)
 }
 
+// TestSchema_SetURLValues_AllScalarTypes confirms that string, number, and
+// boolean fields can all be set from url.Values (which delivers every value as
+// a single-element []string). This exercises the convert single-element unwrap.
+func TestSchema_SetURLValues_AllScalarTypes(t *testing.T) {
+	schema := New(Object{
+		Properties: map[string]Element{
+			"name":     String{},
+			"latitude": Number{BitSize: 64},
+			"active":   Boolean{},
+		},
+	})
+	value := newTestStructA()
+	value.Active = false
+
+	err := schema.SetURLValues(&value, url.Values{
+		"name":     []string{"Kyle Reese"},
+		"latitude": []string{"99.5"},
+		"active":   []string{"true"},
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, "Kyle Reese", value.Name)
+	require.Equal(t, 99.5, value.Latitude)
+	require.True(t, value.Active)
+}
+
 // TestSchema_SetURLValues_CoercesAndWritesBack confirms that values which the
 // schema coerces during validation (truncation, clamping) are written back to
 // the object, not just the raw input.
@@ -62,6 +88,44 @@ func TestSchema_SetURLValues_CoercesAndWritesBack(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "abcde", value.Name)  // truncated to MaxLength
 	require.Equal(t, 10.0, value.Latitude) // clamped to Maximum
+}
+
+// TestSchema_SetURLValues_Error confirms that SetURLValues now surfaces errors
+// (an unknown path) rather than silently ignoring them.
+func TestSchema_SetURLValues_Error(t *testing.T) {
+	schema := New(testStructA_Schema())
+	value := newTestStructA()
+
+	require.Error(t, schema.SetURLValues(&value, url.Values{"missing": []string{"x"}}))
+}
+
+// TestSchema_SetAll_RequiredIf confirms that SetAll enforces required-if
+// constraints after applying all values.
+func TestSchema_SetAll_RequiredIf(t *testing.T) {
+	schema := New(testStructA_Schema())
+	value := newTestStructA()
+
+	// "optional" is required when name is "Aethelflad"; leaving it empty must fail.
+	require.Error(t, schema.SetAll(&value, map[string]any{"name": "Aethelflad"}))
+
+	// Providing "optional" satisfies the condition.
+	value = newTestStructA()
+	require.NoError(t, schema.SetAll(&value, map[string]any{"name": "Aethelflad", "optional": "present"}))
+}
+
+// TestSchema_SetURLValues_RequiredIf confirms that SetURLValues enforces
+// required-if constraints after applying all values.
+func TestSchema_SetURLValues_RequiredIf(t *testing.T) {
+	schema := New(testStructA_Schema())
+	value := newTestStructA()
+
+	require.Error(t, schema.SetURLValues(&value, url.Values{"name": []string{"Aethelflad"}}))
+
+	value = newTestStructA()
+	require.NoError(t, schema.SetURLValues(&value, url.Values{
+		"name":     []string{"Aethelflad"},
+		"optional": []string{"present"},
+	}))
 }
 
 // boolPointerObject exposes a single boolean property via the PointerGetter

@@ -120,7 +120,7 @@ func SetProperty(element Element, object any, path string, value any) (err error
 	switch typed := subElement.(type) {
 
 	case Any, Array, Object:
-		return setProperty_Object(typed, object, path, head, tail, value)
+		return setProperty_Object(element, typed, object, path, head, tail, value)
 
 	case Boolean:
 		return setProperty_Boolean(object, path, value)
@@ -143,19 +143,23 @@ func SetProperty(element Element, object any, path string, value any) (err error
 }
 
 // setProperty_Object sets a value in the object using either the ObjectSetter or PointerGetter interface.
-func setProperty_Object(element Element, object any, path string, head string, tail string, value any) error {
+// parentElement describes the object being set (its properties are the object's keys); childElement is
+// the schema for the first path segment (head).
+func setProperty_Object(parentElement Element, childElement Element, object any, path string, head string, tail string, value any) error {
 
 	const location = "schema.setProperty_Object"
 
-	// ObjectSetter interface is required for Maps
+	// ObjectSetter interface is required for Maps. The map's own schema is the
+	// parent element, and SetObject descends the full path itself.
 	if setter, ok := object.(ObjectSetter); ok {
-		return setter.SetObject(element, list.ByDot(path), value)
+		return setter.SetObject(parentElement, list.ByDot(path), value)
 	}
 
-	// PointerGetter works for Structs, Slices, and Arrays
+	// PointerGetter works for Structs, Slices, and Arrays. We have already
+	// descended to "head", so continue with the child element and the tail.
 	if getter, ok := object.(PointerGetter); ok {
 		if subPointer, ok := getter.GetPointer(head); ok {
-			return SetProperty(element, subPointer, tail, value)
+			return SetProperty(childElement, subPointer, tail, value)
 		}
 	}
 
