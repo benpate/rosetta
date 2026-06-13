@@ -19,13 +19,13 @@ func TestAppend(t *testing.T) {
 	}
 
 	// TARGET CONFIGURATION
+	// The Items schema matches the keys actually present in the data, since
+	// strict validation now checks every item in the array on Append.
 	targetSchema := schema.New(schema.Array{
 		Items: schema.Object{
 			Properties: schema.ElementMap{
-				"fullName":     schema.String{},
-				"emailAddress": schema.String{Format: "email"},
-				"type":         schema.String{},
-				"comment":      schema.String{},
+				"name":  schema.String{},
+				"email": schema.String{Format: "email"},
 			},
 		},
 	})
