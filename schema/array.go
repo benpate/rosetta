@@ -19,32 +19,6 @@ type Array struct {
 }
 
 /******************************************
- * Container Interface
- ******************************************/
-
-// GetProperty returns the property with the specified name
-func (element Array) GetProperty(name string) (Element, error) {
-
-	const location = "schema.Array.GetProperty"
-
-	index, err := strconv.Atoi(name)
-
-	if err != nil {
-		return nil, derp.Wrap(err, location, "Invalid array index", name)
-	}
-
-	if index < 0 {
-		return nil, derp.BadRequest(location, "Array index must not be negative", name)
-	}
-
-	if index > element.MaxLength {
-		return nil, derp.BadRequest(location, "Array index must not be greater than the maximum", name, element.MaxLength)
-	}
-
-	return element.Items, nil
-}
-
-/******************************************
  * Element Interface
  ******************************************/
 

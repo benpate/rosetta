@@ -6,29 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestArray_GetProperty(t *testing.T) {
-	element := Array{Items: String{}, MaxLength: 5}
-
-	found, err := element.GetProperty("2")
-	require.NoError(t, err)
-	require.Equal(t, String{}, found)
-}
-
-func TestArray_GetProperty_NotAnIndex(t *testing.T) {
-	_, err := Array{Items: String{}}.GetProperty("notanumber")
-	require.Error(t, err)
-}
-
-func TestArray_GetProperty_Negative(t *testing.T) {
-	_, err := Array{Items: String{}}.GetProperty("-1")
-	require.Error(t, err)
-}
-
-func TestArray_GetProperty_AboveMaximum(t *testing.T) {
-	_, err := Array{Items: String{}, MaxLength: 3}.GetProperty("99")
-	require.Error(t, err)
-}
-
 func TestArray_Validate_Required(t *testing.T) {
 	// A required array must contain at least one item
 	schema := New(Array{Items: String{}, Required: true})
