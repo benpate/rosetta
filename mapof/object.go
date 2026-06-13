@@ -74,7 +74,7 @@ func (object *Object[T]) SetObject(element schema.Element, path list.List, value
 
 	tempValue := (*object)[head]
 
-	if err := schema.SetElement(&tempValue, subElement, tail, value); err != nil {
+	if err := schema.SetProperty(subElement, &tempValue, tail.String(), value); err != nil {
 		return derp.Wrap(err, "mapof.Object.SetObject", "Unable to set value", path)
 	}
 

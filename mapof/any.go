@@ -9,7 +9,6 @@ import (
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
-	"github.com/benpate/rosetta/pointer"
 	"github.com/benpate/rosetta/schema"
 )
 
@@ -275,7 +274,7 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 		tempValue = make(Any)
 	}
 
-	if err := schema.SetElement(pointer.To(tempValue), subElement, tail, value); err != nil {
+	if err := schema.SetProperty(subElement, &tempValue, tail.String(), value); err != nil {
 		return derp.Wrap(err, location, "Unable to set value", path)
 	}
 
