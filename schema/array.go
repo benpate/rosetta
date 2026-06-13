@@ -88,7 +88,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	localValue, err := getPropertyRecursive(element, globalValue, path.String())
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error getting value for path", path)
+		return derp.Wrap(err, location, "Getting value for path", path)
 	}
 
 	// Get the length of the value
@@ -103,11 +103,11 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+			return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 		}
 
 		if isRequired {
-			return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 		}
 
 		return nil
@@ -122,7 +122,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		}
 
 		if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
+			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Validating object at index", index)
 		}
 	}
 
@@ -200,7 +200,7 @@ func (element Array) Append(value ArraySetter, item any) error {
 
 	// Try to set the value at the end of the array
 	if success := value.SetIndex(value.Length(), item); !success {
-		return derp.Internal(location, "Unable to set value at end of array", value)
+		return derp.Internal(location, "Setting value at end of array", value)
 	}
 
 	// Success
@@ -240,7 +240,7 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 	items, err := UnmarshalMap(data["items"])
 
 	if err != nil {
-		return derp.Wrap(err, location, "Unable to unmarshal 'items'", data["items"])
+		return derp.Wrap(err, location, "Unmarshalling 'items'", data["items"])
 	}
 
 	if items == nil {

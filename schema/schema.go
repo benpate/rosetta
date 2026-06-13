@@ -240,7 +240,7 @@ func (schema *Schema) UnmarshalJSON(data []byte) error {
 	}
 
 	if err := schema.UnmarshalMap(unmarshalled); err != nil {
-		return derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal from Map", unmarshalled)
+		return derp.Wrap(err, "schema.UnmarshalJSON", "Unmarshalling from map", unmarshalled)
 	}
 
 	return nil
@@ -255,7 +255,7 @@ func (schema *Schema) UnmarshalMap(data map[string]any) error {
 	element, err := UnmarshalMap(data)
 
 	if err != nil {
-		return derp.Wrap(err, "schema.Schema.UnmarshalMap", "Error unmarshalling element")
+		return derp.Wrap(err, "schema.Schema.UnmarshalMap", "Unmarshalling element")
 	}
 
 	schema.Element = element

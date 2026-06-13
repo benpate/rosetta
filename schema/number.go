@@ -51,36 +51,36 @@ func (element Number) Validate(value any) error {
 	floatValue, ok := toFloat(value)
 
 	if !ok {
-		return derp.Validation(" must be a float")
+		return derp.Validation("Must be a number")
 	}
 
 	if element.Required {
 		if floatValue == 0 {
-			return derp.Validation(" float field is required")
+			return derp.Validation("Value is required")
 		}
 	}
 
 	if element.Minimum.IsPresent() {
 		if floatValue < element.Minimum.Float() {
-			return derp.Validation(" minimum float value is " + convert.String(element.Minimum))
+			return derp.Validation("Minimum number value is " + convert.String(element.Minimum))
 		}
 	}
 
 	if element.Maximum.IsPresent() {
 		if floatValue > element.Maximum.Float() {
-			return derp.Validation(" maximum float value is " + convert.String(element.Maximum))
+			return derp.Validation("Maximum number value is " + convert.String(element.Maximum))
 		}
 	}
 
 	if element.MultipleOf.IsPresent() {
 		if math.Remainder(floatValue, element.MultipleOf.Float()) != 0 {
-			return derp.Validation(" float must be a multiple of " + convert.String(element.MultipleOf))
+			return derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
 		}
 	}
 
 	if len(element.Enum) > 0 {
 		if !compare.Contains(element.Enum, floatValue) {
-			return derp.Validation(" float must contain one of the specified values")
+			return derp.Validation("Must be one of the specified values")
 		}
 	}
 
@@ -96,14 +96,14 @@ func (element Number) ValidateRequiredIf(schema Schema, path list.List, globalVa
 		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+			return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 		}
 
 		if isRequired {
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, location, "Error getting value for path", path)
+				return derp.Wrap(err, location, "Getting value for path", path)
 			} else if compare.IsZero(localValue) {
-				return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+				return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 			}
 		}
 	}

@@ -26,7 +26,7 @@ func Validate(schema Schema, value any) (any, bool, error) {
 
 	// Handle special cases for "required-if" fields
 	if err := schema.ValidateRequiredIf(value); err != nil {
-		return value, false, derp.Wrap(err, location, "Unable to validate `required-if` fields", value)
+		return value, false, derp.Wrap(err, location, "Validating `required-if` fields", value)
 	}
 
 	return value, updated, nil

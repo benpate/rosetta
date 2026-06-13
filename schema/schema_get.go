@@ -89,7 +89,7 @@ func getProperty(element Element, object any, name string) (any, error) {
 	}
 
 	// You suck.
-	return nil, derp.Internal(location, "Unable to get property", name, object)
+	return nil, derp.Internal(location, "Getting property", name, object)
 }
 
 // getProperty_PointerOnly retrieves a value from the object using only the PointerGetter interface.

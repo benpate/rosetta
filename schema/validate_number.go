@@ -10,7 +10,7 @@ func validate_Number(element Number, value float64) (float64, bool, error) {
 
 	// RULE: Required value cannot be zero
 	if element.Required && (value == 0) {
-		return value, false, derp.Validation(" float field is required")
+		return value, false, derp.Validation("Value is required")
 	}
 
 	// RULE: Rewrite value if it is below the minimum
@@ -25,12 +25,12 @@ func validate_Number(element Number, value float64) (float64, bool, error) {
 
 	// RULE: Value must be a multiple of the specified value
 	if element.MultipleOf.IsPresent() && notMultipleOfFloat(value, element.MultipleOf.Float()) {
-		return value, false, derp.Validation(" float must be a multiple of " + convert.String(element.MultipleOf))
+		return value, false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
 	}
 
 	// RULE: Value must be one of the specified values
 	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, value) {
-		return value, false, derp.Validation(" float must contain one of the specified values")
+		return value, false, derp.Validation("Must be one of the specified values")
 	}
 
 	// Return the value converted back to the target type

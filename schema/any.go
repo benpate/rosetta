@@ -43,7 +43,7 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) 
 	isRequired, err := schema.Match(value, exp.Parse(element.RequiredIf))
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+		return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 	}
 
 	// If the expression did not evaluat to TRUE, then exit
@@ -55,12 +55,12 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) 
 	propertyValue, err := schema.Get(value, path.String())
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error getting value for path", path)
+		return derp.Wrap(err, location, "Getting value for path", path)
 	}
 
 	// The value is required, but missing, so.. error.
 	if compare.IsZero(propertyValue) {
-		return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+		return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 	}
 
 	// The value is required, but present, so.. success.

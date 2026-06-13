@@ -33,7 +33,7 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (
 
 	// RULE: Required value cannot be zero
 	if element.Required && (value == 0) {
-		return 0, false, derp.Validation("Value must be an integer")
+		return 0, false, derp.Validation("Value is required")
 	}
 
 	// RULE: Rewrite value if it is below the minimum
@@ -53,7 +53,7 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (
 
 	// RULE: Value must be one of the specified values
 	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, value) {
-		return value, false, derp.Validation("Must contain one of the specified values")
+		return value, false, derp.Validation("Must be one of the specified values")
 	}
 
 	// Return the value converted back to the target type

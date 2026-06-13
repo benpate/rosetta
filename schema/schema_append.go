@@ -13,14 +13,14 @@ func (schema Schema) Append(object any, path string, value any) error {
 	element, exists := schema.GetArrayElement(path)
 
 	if !exists {
-		return derp.Internal(location, "Element must be an ArrayError finding schema element", path)
+		return derp.Internal(location, "Schema element is not an array", path)
 	}
 
 	// Get Original Value
 	originalValue, err := schema.Get(object, path)
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error getting value", path)
+		return derp.Wrap(err, location, "Getting value", path)
 	}
 
 	// This will only work for ArraySetter objects
@@ -32,13 +32,13 @@ func (schema Schema) Append(object any, path string, value any) error {
 
 	// Append to the array
 	if err := element.Append(setter, value); err != nil {
-		return derp.Wrap(err, location, "Error appending value", path)
+		return derp.Wrap(err, location, "Appending value", path)
 	}
 
 	// Set the value back into the object
 	finalValue := indirect(setter)
 	if err := schema.Set(object, path, finalValue); err != nil {
-		return derp.Wrap(err, location, "Error re-populating value", path)
+		return derp.Wrap(err, location, "Re-populating value", path)
 	}
 
 	return nil

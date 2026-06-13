@@ -69,7 +69,7 @@ func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
 		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Unable to validate property", name)
+			return derp.Wrap(err, "schema.Object.Validate", "Validating property", name)
 		}
 	}
 
@@ -85,7 +85,7 @@ func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	for name, subElement := range element.Properties {
 		subPath := path.PushTail(name)
 		if err := subElement.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, location, "Unable to validate property", subPath.String())
+			return derp.Wrap(err, location, "Validating property", subPath.String())
 		}
 	}
 

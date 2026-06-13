@@ -32,7 +32,7 @@ func validate_Array[T any](element Array, value T) (T, bool, error) {
 		indexValue, isValid := getterSetter.GetIndex(index)
 
 		if !isValid {
-			return value, false, derp.Internal(location, "Unable to get value at index", index)
+			return value, false, derp.Internal(location, "Getting value at index", index)
 		}
 
 		// Validate the value using the schema's "Items" definition

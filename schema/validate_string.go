@@ -43,7 +43,7 @@ func validate_String(element String, value string) (string, bool, error) {
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (value != "") && (compare.NotContains(element.Enum, value)) {
-			return value, false, derp.Validation("Value must match one of...", value, element.Enum)
+			return value, false, derp.Validation("Must be one of the specified values", value, element.Enum)
 		}
 	}
 

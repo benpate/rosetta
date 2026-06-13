@@ -51,13 +51,13 @@ func UnmarshalJSON(data []byte) (Element, error) {
 	var result map[string]any
 
 	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, derp.Wrap(err, location, "Unable to unmarshal JSON", string(data))
+		return nil, derp.Wrap(err, location, "Unmarshalling JSON", string(data))
 	}
 
 	element, err := UnmarshalMap(result)
 
 	if err != nil {
-		return nil, derp.Wrap(err, location, "Unable to unmarshal map", string(data))
+		return nil, derp.Wrap(err, location, "Unmarshalling map", string(data))
 	}
 
 	if element == nil {
@@ -81,7 +81,7 @@ func UnmarshalMap(data any) (Element, error) {
 	dataMap, isMap := data.(map[string]any)
 
 	if !isMap {
-		return nil, derp.Internal(location, "data is not map[string]any", data)
+		return nil, derp.Internal(location, "Data is not a map[string]any", data)
 	}
 
 	// Convert the map value into the correct element.
