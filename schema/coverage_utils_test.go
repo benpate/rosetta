@@ -40,14 +40,30 @@ func TestGetIndex_NotArrayGetter(t *testing.T) {
 	require.False(t, ok)
 }
 
-func TestIsMultipleOf(t *testing.T) {
-	require.True(t, isMultipleOf(10, 5))
-	require.False(t, isMultipleOf(10, 3))
+func TestIsMultipleOfInteger(t *testing.T) {
+	require.True(t, isMultipleOfInteger(10, 5))
+	require.False(t, isMultipleOfInteger(10, 3))
+
+	// A zero divisor is treated as "no constraint" and must not panic.
+	require.True(t, isMultipleOfInteger(10, 0))
+
+	// Large int64 values must not be corrupted by a detour through float64.
+	// 2^53 + 1 cannot be represented exactly as a float64.
+	const big = int64(9_007_199_254_740_993) // 2^53 + 1
+	require.True(t, isMultipleOfInteger(big, 1))
+	require.False(t, isMultipleOfInteger(big, 2))
+
+	// Unsigned integers are supported too.
+	require.True(t, isMultipleOfInteger(uint64(12), uint64(4)))
+	require.False(t, isMultipleOfInteger(uint64(12), uint64(5)))
 }
 
-func TestNotMultipleOf(t *testing.T) {
-	require.False(t, notMultipleOf(10, 5))
-	require.True(t, notMultipleOf(10, 3))
+func TestIsMultipleOfFloat(t *testing.T) {
+	require.True(t, isMultipleOfFloat(10.0, 2.5))
+	require.False(t, isMultipleOfFloat(10.0, 3.0))
+
+	// A zero divisor is treated as "no constraint".
+	require.True(t, isMultipleOfFloat(10.0, 0.0))
 }
 
 func TestType_String(t *testing.T) {

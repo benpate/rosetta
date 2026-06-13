@@ -47,7 +47,7 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (
 	}
 
 	// RULE: Value must be a multiple of the specified value
-	if element.MultipleOf.IsPresent() && notMultipleOf(value, T(element.MultipleOf.Int64())) {
+	if element.MultipleOf.IsPresent() && notMultipleOfInteger(value, T(element.MultipleOf.Int64())) {
 		return value, false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
 	}
 

@@ -24,7 +24,7 @@ func validate_Number(element Number, value float64) (float64, bool, error) {
 	}
 
 	// RULE: Value must be a multiple of the specified value
-	if element.MultipleOf.IsPresent() && !isMultipleOf(value, element.MultipleOf.Float()) {
+	if element.MultipleOf.IsPresent() && notMultipleOfFloat(value, element.MultipleOf.Float()) {
 		return value, false, derp.Validation(" float must be a multiple of " + convert.String(element.MultipleOf))
 	}
 

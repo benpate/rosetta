@@ -38,10 +38,32 @@ func getIndex(object any, index int) (any, bool) {
 	return nil, false
 }
 
-func isMultipleOf[T constraints.Float | constraints.Integer](value, multipleOf T) bool {
-	return math.Remainder(float64(value), float64(multipleOf)) == 0
+// isMultipleOfInteger reports whether value is an exact integer multiple of
+// multipleOf, using integer modulo so that large values are not corrupted by a
+// detour through float64. A multipleOf of zero is treated as "no constraint"
+// (and also avoids a divide-by-zero panic).
+func isMultipleOfInteger[T constraints.Integer](value, multipleOf T) bool {
+	if multipleOf == 0 {
+		return true
+	}
+	return value%multipleOf == 0
 }
 
-func notMultipleOf[T constraints.Float | constraints.Integer](value, multipleOf T) bool {
-	return !isMultipleOf(value, multipleOf)
+// notMultipleOfInteger returns TRUE when the value is not an exact integer multiple of multipleOf.
+func notMultipleOfInteger[T constraints.Integer](value, multipleOf T) bool {
+	return !isMultipleOfInteger(value, multipleOf)
+}
+
+// isMultipleOfFloat reports whether value is an exact multiple of multipleOf.
+// A multipleOf of zero is treated as "no constraint".
+func isMultipleOfFloat[T constraints.Float](value, multipleOf T) bool {
+	if multipleOf == 0 {
+		return true
+	}
+	return math.Mod(float64(value), float64(multipleOf)) == 0
+}
+
+// notMultipleOfFloat returns TRUE when the value is not an exact multiple of multipleOf.
+func notMultipleOfFloat[T constraints.Float](value, multipleOf T) bool {
+	return !isMultipleOfFloat(value, multipleOf)
 }

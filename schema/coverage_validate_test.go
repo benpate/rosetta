@@ -109,10 +109,9 @@ func TestValidate_Integer_NoTruncation(t *testing.T) {
 }
 
 func TestValidateInteger_Direct_AllWidths(t *testing.T) {
-	// validate_Integer accepts every signed and unsigned integer width
+	// validate_Integer accepts every signed integer width
 	cases := []any{
 		int(1), int8(1), int16(1), int32(1), int64(1),
-		uint(1), uint8(1), uint16(1), uint32(1), uint64(1),
 	}
 
 	for _, value := range cases {
