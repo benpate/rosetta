@@ -1,3 +1,4 @@
+// Package translate provides a rule-based pipeline for transforming data structures
 package translate
 
 import (

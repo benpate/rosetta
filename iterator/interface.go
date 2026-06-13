@@ -1,3 +1,4 @@
+// Package iterator defines a legacy interface for iterating over collections of items
 package iterator
 
 // Iterator interface allows callers to iterator over a large number of items in an array/slice

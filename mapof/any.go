@@ -1,3 +1,4 @@
+// Package mapof provides generic string-keyed map types with typed values and helper methods
 package mapof
 
 import (

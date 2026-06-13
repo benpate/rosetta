@@ -1,3 +1,4 @@
+// Package sliceof provides generic slice types with helper methods
 package sliceof
 
 import (

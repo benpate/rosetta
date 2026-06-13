@@ -1,3 +1,4 @@
+// Package list provides functions for parsing and manipulating delimited strings as lists
 package list
 
 // IsEmpty returns TRUE if the list is empty.
