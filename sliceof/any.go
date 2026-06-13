@@ -145,7 +145,7 @@ func (x *Any) Append(values ...any) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x Any) Shuffle() Any {
-	rand.Shuffle(len(x), func(i, j int) {
+	rand.Shuffle(len(x), func(i, j int) { // NOSONAR: does not need to be cyptographically secure.
 		x[i], x[j] = x[j], x[i]
 	})
 	return x
