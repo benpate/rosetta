@@ -227,7 +227,9 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.MinValue = convert.String(data["minValue"])
 	element.MaxValue = convert.String(data["maxValue"])
 	element.Format = convert.String(data["format"])
-	element.Enum = convert.SliceOfString(data["enum"])
+	if raw, ok := data["enum"]; ok {
+		element.Enum = convert.SliceOfString(raw)
+	}
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 

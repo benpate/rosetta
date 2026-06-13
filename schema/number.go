@@ -201,7 +201,9 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	element.Maximum = convert.NullFloat(data["maximum"])
 	element.MultipleOf = convert.NullFloat(data["multipleOf"])
 	element.BitSize = convert.Int(data["bitSize"])
-	element.Enum = convert.SliceOfFloat(data["enum"])
+	if raw, ok := data["enum"]; ok {
+		element.Enum = convert.SliceOfFloat(raw)
+	}
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 

@@ -204,7 +204,9 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	element.Maximum = convert.NullInt64(data["maximum"])
 	element.MultipleOf = convert.NullInt64(data["multipleOf"])
 	element.BitSize = convert.Int(data["bitSize"])
-	element.Enum = convert.SliceOfInt(data["enum"])
+	if raw, ok := data["enum"]; ok {
+		element.Enum = convert.SliceOfInt(raw)
+	}
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 

@@ -98,7 +98,7 @@ func TestRoundTrip_Any(t *testing.T) {
 func TestRoundTrip_Array(t *testing.T) {
 
 	original := Array{
-		Items:      String{MaxLength: 10, Enum: []string{"a", "b"}},
+		Items:      String{MaxLength: 10},
 		MinLength:  1,
 		MaxLength:  5,
 		Required:   true,
@@ -111,22 +111,30 @@ func TestRoundTrip_Array(t *testing.T) {
 // TestRoundTrip_Object confirms that every Object field (including nested
 // properties, wildcard, and required-if) survives a round trip.
 //
-// Note: enums are set explicitly on nested elements because a missing enum
-// round-trips to an empty (rather than nil) slice, and the object's own
-// Required is left false because Object.UnmarshalMap intentionally propagates
-// a true Required down to child properties. Both are pre-existing behaviors
-// unrelated to field preservation.
+// Note: the object's own Required is left false because Object.UnmarshalMap
+// intentionally propagates a true Required down to child properties -- a
+// pre-existing behavior unrelated to field preservation.
 func TestRoundTrip_Object(t *testing.T) {
 
 	original := Object{
 		Properties: ElementMap{
-			"name": String{MaxLength: 50, Enum: []string{"a", "b"}, Required: true},
-			"age":  Integer{Minimum: null.NewInt64(0), BitSize: 32, Enum: []int{1, 2}},
+			"name": String{MaxLength: 50, Required: true},
+			"age":  Integer{Minimum: null.NewInt64(0), BitSize: 32},
 		},
-		Wildcard:   String{MaxLength: 100, Enum: []string{"x"}},
+		Wildcard:   String{MaxLength: 100},
 		Required:   false,
 		RequiredIf: "other == true",
 	}
 
 	require.Equal(t, original, roundTrip(t, original))
+}
+
+// TestRoundTrip_NilEnum confirms that an element with no enum round-trips back
+// to a nil (not empty) slice, preserving exact identity.
+func TestRoundTrip_NilEnum(t *testing.T) {
+
+	result := roundTrip(t, String{MaxLength: 10})
+
+	require.Equal(t, String{MaxLength: 10}, result)
+	require.Nil(t, result.(String).Enum)
 }
