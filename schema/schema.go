@@ -275,8 +275,10 @@ func isNil(i any) bool {
 		return true
 	}
 
+	// Only call IsNil() for kinds that are actually nillable; calling it on a
+	// non-nillable kind (e.g. Array, Struct) panics.
 	switch reflect.TypeOf(i).Kind() {
-	case reflect.Ptr, reflect.Array, reflect.Slice, reflect.Chan, reflect.Map:
+	case reflect.Ptr, reflect.Slice, reflect.Chan, reflect.Map, reflect.Func:
 		return reflect.ValueOf(i).IsNil()
 	}
 	return false

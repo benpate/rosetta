@@ -6,6 +6,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// isNil ----------------------------------------------------------------------
+
+func TestIsNil(t *testing.T) {
+	var nilPtr *String
+	var nilMap map[string]int
+	var nilSlice []int
+
+	// Nillable kinds report their nil-ness correctly.
+	require.True(t, isNil(nil))
+	require.True(t, isNil(nilPtr))
+	require.True(t, isNil(nilMap))
+	require.True(t, isNil(nilSlice))
+
+	// Non-nil values of every relevant kind report false...
+	require.False(t, isNil(&String{}))
+	require.False(t, isNil(map[string]int{}))
+	require.False(t, isNil([]int{}))
+	require.False(t, isNil("a string"))
+	require.False(t, isNil(42))
+
+	// ...including non-nillable kinds (Array, Struct), which previously
+	// panicked when passed to reflect.Value.IsNil().
+	require.NotPanics(t, func() { require.False(t, isNil([3]int{})) })
+	require.NotPanics(t, func() { require.False(t, isNil(String{})) })
+}
+
 // validate_String branches via the dispatcher --------------------------------
 
 func TestValidateString_Required(t *testing.T) {
