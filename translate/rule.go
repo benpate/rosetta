@@ -21,8 +21,8 @@ func (rule *Rule) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(rule.Runner)
 }
-// MarshalMap returns the rule's underlying Runner as a map[string]any.
 
+// MarshalMap returns the rule's underlying Runner as a map[string]any.
 func (rule *Rule) MarshalMap() map[string]any {
 
 	if rule.Runner == nil {
