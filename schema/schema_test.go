@@ -62,7 +62,7 @@ func TestSchemaValidateRequiredIf(t *testing.T) {
 
 	{
 		newValue, changed, err := Validate(schema, &value)
-		require.Equal(t, value, newValue)
+		require.Equal(t, &value, newValue)
 		require.False(t, changed)
 		require.NoError(t, err)
 	}
@@ -70,7 +70,7 @@ func TestSchemaValidateRequiredIf(t *testing.T) {
 	{
 		value.Name = "Aethelflad"
 		newValue, changed, err := Validate(schema, &value)
-		require.Equal(t, value, newValue)
+		require.Equal(t, &value, newValue)
 		require.False(t, changed)
 		require.Error(t, err)
 	}

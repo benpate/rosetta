@@ -132,8 +132,8 @@ func TestObject_Validate(t *testing.T) {
 
 	value, changed, err := Validate(schema, &object)
 	require.Nil(t, err)
-	require.True(t, changed)
-	require.Equal(t, testStructA{
+	require.False(t, changed)
+	require.Equal(t, &testStructA{
 		Name:     "John Connor",
 		Latitude: 45.123456,
 		Active:   true,

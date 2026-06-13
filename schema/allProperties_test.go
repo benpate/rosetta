@@ -2,6 +2,8 @@ package schema
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TestAllProperties tests the AllProperties function
@@ -25,7 +27,17 @@ func TestAllProperties(t *testing.T) {
 		},
 	}
 
-	result := s.AllProperties()
+	expected := ElementMap{
+		"name":        String{},
+		"age":         Integer{BitSize: 32},
+		"published":   Integer{BitSize: 64},
+		"other":       Array{Items: String{}},
+		"more.first":  String{},
+		"more.second": Integer{BitSize: 32},
+		"more.third":  Integer{BitSize: 64},
+	}
 
-	t.Log(result)
+	actual := s.AllProperties()
+
+	require.Equal(t, expected, actual)
 }

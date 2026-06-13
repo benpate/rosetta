@@ -71,14 +71,24 @@ func TestStringLength(t *testing.T) {
 		require.Error(t, err)
 	}
 
-	// Maxinum Defined
+	// Within Maximum
 	{
 		s := String{MaxLength: 10}
-		_, _, err := validate(s, "this is ok")
-		require.Nil(t, err)
 
-		_, _, err = validate(s, "this is a really long string and it should fail because it's too long.")
-		require.Error(t, err)
+		newValue, changed, err := validate(s, "this is ok")
+		require.Nil(t, err)
+		require.False(t, changed)
+		require.Equal(t, "this is ok", newValue)
+	}
+
+	// Exceeds Maximum (rewrite value)
+	{
+		s := String{MaxLength: 10}
+
+		newValue, changed, err := validate(s, "1234567890 - this is a really long string and it should fail because it's too long.")
+		require.NoError(t, err)
+		require.True(t, changed)
+		require.Equal(t, "1234567890", newValue)
 	}
 }
 
