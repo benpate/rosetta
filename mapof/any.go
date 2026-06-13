@@ -264,22 +264,23 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 		return derp.Internal(location, "Invalid property", head)
 	}
 
-	var tempValue any
+	// Get or create the child map. We use a concrete Any (not a bare `any`) so
+	// that the recursive SetProperty call receives a *Any, which implements the
+	// setter interfaces; a *any (pointer to interface) would implement none.
+	var subMap Any
 
-	// If we already have a value in this spot, then use it
-	if subValue, ok := (*x)[head]; ok {
-		tempValue = subValue
+	if existing, ok := (*x)[head].(Any); ok {
+		subMap = existing
 	} else {
-		// Otherwise, initialize a new mapof.Any
-		tempValue = make(Any)
+		subMap = make(Any)
 	}
 
-	if err := schema.SetProperty(subElement, &tempValue, tail.String(), value); err != nil {
-		return derp.Wrap(err, location, "Unable to set value", path)
+	if err := schema.SetProperty(subElement, &subMap, tail.String(), value); err != nil {
+		return derp.Wrap(err, location, "Setting value", path)
 	}
 
-	// Reapply the updated value to the map
-	(*x)[head] = tempValue
+	// Reapply the (mutated) child map back into this map.
+	(*x)[head] = subMap
 
 	return nil
 }
