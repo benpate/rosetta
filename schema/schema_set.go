@@ -33,8 +33,8 @@ func (schema Schema) Set(object any, path string, value any) error {
 }
 
 // SetAll iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are addedd successfully, then SetAll
-// also uses Validate() to confirm that the object is still correct.
+// at the first error it encounters.  If all values are added successfully, then SetAll
+// also runs ValidateRequiredIf() to confirm that the object is still correct.
 func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	const location = "schema.Schema.SetAll"
@@ -48,7 +48,7 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 		}
 	}
 
-	// Validate the whole schema once all the values are set
+	// Confirm required-if constraints once all values are set
 	if err := schema.ValidateRequiredIf(object); err != nil {
 		return derp.Wrap(err, location, "Validating values", object)
 	}
@@ -58,8 +58,8 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 }
 
 // SetURLValues iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are addedd successfully, then SetURLValues
-// also uses Validate() to confirm that the object is still correct.
+// at the first error it encounters.  If all values are added successfully, then SetURLValues
+// also runs ValidateRequiredIf() to confirm that the object is still correct.
 func (schema Schema) SetURLValues(object any, values url.Values) error {
 
 	const location = "schema.Schema.SetURLValues"
@@ -73,7 +73,7 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 		}
 	}
 
-	// Validate the whote schema once all the values are set
+	// Confirm required-if constraints once all values are set
 	if err := schema.ValidateRequiredIf(object); err != nil {
 		return derp.Wrap(err, location, "Validating values", object)
 	}
