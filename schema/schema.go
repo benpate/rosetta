@@ -82,6 +82,25 @@ func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 	return result, resultError
 }
 
+func (schema Schema) Validate(value any) (bool, error) {
+
+	const location = "schema.Schema.Validate"
+
+	// Validate the top-level item, reporting changes if necessary
+	_, changed, err := Validate(schema, value)
+
+	if err != nil {
+		return false, derp.Wrap(err, location, "Validation error")
+	}
+
+	// Validate required-if conditions.
+	if err := schema.ValidateRequiredIf(value); err != nil {
+		return false, derp.Wrap(err, location, "RequiredIf validation error")
+	}
+
+	return changed, nil
+}
+
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
 func (schema Schema) ValidateRequiredIf(value any) error {
