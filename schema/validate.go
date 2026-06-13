@@ -55,23 +55,16 @@ func validate(element Element, value any) (any, bool, error) {
 	case Integer:
 
 		if coercedValue, ok := convert.Int64Ok(value, 0); ok {
-			switch typedElement.BitSize {
 
-			case 8:
-				return validate_Integer(typedElement, int8(coercedValue))
+			// Narrow to the declared bit size, rejecting values that would
+			// overflow that width instead of silently wrapping them.
+			narrowedValue, err := narrowIntegerBitSize(typedElement.BitSize, coercedValue)
 
-			case 16:
-				return validate_Integer(typedElement, int16(coercedValue))
-
-			case 32:
-				return validate_Integer(typedElement, int32(coercedValue))
-
-			case 64:
-				return validate_Integer(typedElement, int64(coercedValue))
-
-			default:
-				return validate_Integer(typedElement, int(coercedValue))
+			if err != nil {
+				return value, false, err
 			}
+
+			return validate_Integer(typedElement, narrowedValue)
 		}
 
 		return 0, false, derp.Validation("Value must be an integer")

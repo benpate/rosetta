@@ -204,3 +204,39 @@ func TestValidate_Array_LengthRules(t *testing.T) {
 	_, _, err := Validate(schema, &testArrayA{"one"})
 	require.Error(t, err)
 }
+
+func TestValidate_Integer_BitSizeOverflow(t *testing.T) {
+
+	// A value outside the declared bit size must be rejected, not silently wrapped.
+	// Before the fix, int8(300) wrapped to 44 and slipped past validation.
+	cases := []struct {
+		bitSize int
+		value   int
+	}{
+		{8, 300},            // > MaxInt8 (127)
+		{8, -200},           // < MinInt8 (-128)
+		{16, 70000},         // > MaxInt16 (32767)
+		{32, 5_000_000_000}, // > MaxInt32
+	}
+
+	for _, c := range cases {
+		_, _, err := validate(Integer{BitSize: c.bitSize}, c.value)
+		require.Error(t, err, "bitSize=%d value=%d should be rejected", c.bitSize, c.value)
+	}
+}
+
+func TestValidate_Integer_BitSizeInRange(t *testing.T) {
+
+	// Values that fit the declared width pass through with the correct typed result.
+	value, _, err := validate(Integer{BitSize: 8}, 100)
+	require.NoError(t, err)
+	require.Equal(t, int8(100), value)
+
+	value, _, err = validate(Integer{BitSize: 16}, 30000)
+	require.NoError(t, err)
+	require.Equal(t, int16(30000), value)
+
+	value, _, err = validate(Integer{BitSize: 32}, 2_000_000_000)
+	require.NoError(t, err)
+	require.Equal(t, int32(2_000_000_000), value)
+}
