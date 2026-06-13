@@ -45,3 +45,7 @@ func Contains(value1 any, value2 any) bool {
 
 	return false
 }
+
+func NotContains(value1 any, value2 any) bool {
+	return !Contains(value1, value2)
+}

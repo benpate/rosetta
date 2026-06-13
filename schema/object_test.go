@@ -3,7 +3,6 @@ package schema
 import (
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -131,7 +130,13 @@ func TestObject_Validate(t *testing.T) {
 	object := newTestStructA()
 	schema := New(testStructA_Schema())
 
-	err := schema.Validate(&object)
-	spew.Config.DisableMethods = true
+	value, changed, err := Validate(schema, &object)
 	require.Nil(t, err)
+	require.True(t, changed)
+	require.Equal(t, testStructA{
+		Name:     "John Connor",
+		Latitude: 45.123456,
+		Active:   true,
+		Array:    testArrayA{"one", "two", "three"},
+	}, value)
 }

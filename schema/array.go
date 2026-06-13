@@ -60,6 +60,7 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
+/*
 // Validate implements the Element interface
 // It validates a value against this schema
 func (element Array) Validate(object any) error {
@@ -96,7 +97,7 @@ func (element Array) Validate(object any) error {
 
 	// Valid
 	return nil
-}
+} */
 
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
@@ -110,7 +111,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	}
 
 	// Get the value at this path
-	localValue, err := schema.getFromList(globalValue, element, path)
+	localValue, err := getPropertyRecursive(element, globalValue, path.String())
 
 	if err != nil {
 		return derp.Wrap(err, location, "Error getting value for path", path)

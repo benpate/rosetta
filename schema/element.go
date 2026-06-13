@@ -18,7 +18,7 @@ type Element interface {
 	IsRequired() bool
 
 	// Validate validates the provided value
-	Validate(value any) error
+	// Validate(value any) error
 
 	// ValidateRequiredIf handles conditional validation of a required field
 	ValidateRequiredIf(schema Schema, path list.List, globalValue any) error

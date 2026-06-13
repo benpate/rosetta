@@ -24,10 +24,29 @@ func (t testArrayB) Length() int {
 	return len(t)
 }
 
+func (t testArrayB) GetIndex(index int) (any, bool) {
+	if index >= 0 && index < len(t) {
+		return t[index], true
+	}
+
+	return nil, false
+}
+
+func (t *testArrayB) SetIndex(index int, value any) bool {
+	if index >= 0 && index < len(*t) {
+		if typedValue, ok := value.(testStructA); ok {
+			(*t)[index] = typedValue
+			return true
+		}
+	}
+
+	return false
+}
+
 func (t testArrayB) GetPointer(path string) (any, bool) {
 	if index, ok := Index(path, len(t)); ok {
 		return t[index], true
 	}
 
-	return "", false
+	return nil, false
 }

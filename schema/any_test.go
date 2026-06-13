@@ -18,7 +18,11 @@ func TestAny(t *testing.T) {
 	}
 
 	// Validate the data
-	require.Nil(t, schema.Validate(data))
+	value, changed, err := Validate(schema, data)
+
+	require.Nil(t, err)
+	require.False(t, changed)
+	require.Equal(t, data, value)
 
 	require.Equal(t, "bar", data["foo"])
 	require.Equal(t, 123, data["baz"])

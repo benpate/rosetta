@@ -62,6 +62,7 @@ func (element Object) IsRequired() bool {
 	return element.Required
 }
 
+/*
 // Validate implements the Element interface
 // It validates a value against this schema
 func (element Object) Validate(object any) error {
@@ -73,7 +74,7 @@ func (element Object) Validate(object any) error {
 	}
 
 	return nil
-}
+}*/
 
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty

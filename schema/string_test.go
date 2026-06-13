@@ -20,7 +20,7 @@ func TestStringUnmarshalSimple(t *testing.T) {
 
 func TestStringUnmarshalComplete(t *testing.T) {
 
-	value := []byte(`{"type":"string", "format":"date", "pattern":"abc123", "minLength":10, "maxLength":100, "required":true}`)
+	value := []byte(`{"type":"string", "format":"date", "minLength":10, "maxLength":100, "required":true}`)
 
 	st, err := UnmarshalJSON(value)
 
@@ -31,5 +31,4 @@ func TestStringUnmarshalComplete(t *testing.T) {
 	require.Equal(t, str.MaxLength, 100)
 	require.Equal(t, str.Required, true)
 	require.Equal(t, str.Format, "date")
-	require.Equal(t, str.Pattern, "abc123")
 }

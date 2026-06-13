@@ -32,13 +32,14 @@ func TestBoolGetter(t *testing.T) {
 
 	value, err := schema.Get(&getter, "value")
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, false, value)
 
-	require.Nil(t, schema.Set(&getter, "value", true))
+	require.NoError(t, schema.Set(&getter, "value", true))
 	require.Equal(t, true, getter.value)
 
-	require.Nil(t, schema.Validate(&getter))
+	_, _, err = Validate(schema, &getter)
+	require.NoError(t, err)
 }
 
 // testBoolPointer tests getting/setting bool values via a pointer
@@ -62,11 +63,12 @@ func TestBoolPointer(t *testing.T) {
 
 	value, err := schema.Get(&getter, "value")
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, false, value)
 
-	require.Nil(t, schema.Set(&getter, "value", true))
+	require.NoError(t, schema.Set(&getter, "value", true))
 	require.Equal(t, true, getter.value)
 
-	require.Nil(t, schema.Validate(&getter))
+	_, _, err = Validate(schema, &getter)
+	require.NoError(t, err)
 }

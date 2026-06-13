@@ -61,13 +61,17 @@ func TestSchemaValidateRequiredIf(t *testing.T) {
 	schema := New(testStructA_Schema())
 
 	{
-		err := schema.Validate(&value)
+		newValue, changed, err := Validate(schema, &value)
+		require.Equal(t, value, newValue)
+		require.False(t, changed)
 		require.NoError(t, err)
 	}
 
 	{
 		value.Name = "Aethelflad"
-		err := schema.Validate(&value)
+		newValue, changed, err := Validate(schema, &value)
+		require.Equal(t, value, newValue)
+		require.False(t, changed)
 		require.Error(t, err)
 	}
 }

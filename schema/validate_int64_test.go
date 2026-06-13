@@ -33,10 +33,10 @@ func TestInt64Getter(t *testing.T) {
 
 	value, err := schema.Get(&getter, "value")
 
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, int64(0), value)
 
-	require.Nil(t, schema.Set(&getter, "value", 12345678))
+	require.NoError(t, schema.Set(&getter, "value", 12345678))
 	require.Equal(t, int64(12345678), getter.value)
 }
 
@@ -60,17 +60,20 @@ func TestInt64Pointer(t *testing.T) {
 	var getter testInt64Pointer
 
 	// Validate correct value
-	require.Nil(t, schema.Set(&getter, "value", 123456))
+	require.NoError(t, schema.Set(&getter, "value", 123456))
 	require.Equal(t, int64(123456), getter.value)
-	require.Nil(t, schema.Validate(&getter))
+	_, _, err := Validate(schema, &getter)
+	require.NoError(t, err)
 
-	// Validate incorrect value (to small)
-	require.Nil(t, schema.Set(&getter, "value", int64(1)))
-	require.Equal(t, int64(1), getter.value)
-	require.Error(t, schema.Validate(&getter))
+	// Value below the minimum is clamped to the minimum (does not fail)
+	require.NoError(t, schema.Set(&getter, "value", int64(1)))
+	require.Equal(t, int64(100), getter.value)
+	_, _, err = Validate(schema, &getter)
+	require.NoError(t, err)
 
-	// Validate incorrect value (too large)
-	require.Nil(t, schema.Set(&getter, "value", int64(1000000000)))
-	require.Equal(t, int64(1000000000), getter.value)
-	require.Error(t, schema.Validate(&getter))
+	// Value above the maximum is clamped to the maximum (does not fail)
+	require.NoError(t, schema.Set(&getter, "value", int64(1000000000)))
+	require.Equal(t, int64(1000000), getter.value)
+	_, _, err = Validate(schema, &getter)
+	require.NoError(t, err)
 }

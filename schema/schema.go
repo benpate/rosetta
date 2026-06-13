@@ -37,31 +37,6 @@ func Wildcard() Schema {
  * Validation Methods
  ******************************************/
 
-// Validate checks a particular value against this schema, updating values when
-// possible so that they pass validation.  If the provided value is not valid
-// (and cannot be coerced into being valid) then it returns an error.
-func (schema Schema) Validate(value any) error {
-
-	const location = "schema.Schema.Validate"
-
-	// RULE: Schema element cannot be nil
-	if isNil(schema.Element) {
-		return derp.Internal(location, "Schema must not be nil")
-	}
-
-	// Validate all elements in the value
-	if err := schema.Element.Validate(value); err != nil {
-		return derp.Wrap(err, location, "Value is not valid for this schema", value)
-	}
-
-	// Handle special cases for "required-if" fields
-	if err := schema.ValidateRequiredIf(value); err != nil {
-		return derp.Wrap(err, location, "Unable to validate `required-if` fields", value)
-	}
-
-	return nil
-}
-
 // Match returns TRUE if the provided value (as accessed via this schema) matches
 // the provided expression.  This is useful for server-side data validation.
 func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {

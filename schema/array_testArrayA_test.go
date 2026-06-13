@@ -26,6 +26,25 @@ func (t testArrayA) Length() int {
 	return len(t)
 }
 
+func (t testArrayA) GetIndex(index int) (any, bool) {
+	if index >= 0 && index < len(t) {
+		return t[index], true
+	}
+
+	return nil, false
+}
+
+func (t *testArrayA) SetIndex(index int, value any) bool {
+	if index >= 0 && index < len(*t) {
+		if typedValue, ok := value.(string); ok {
+			(*t)[index] = typedValue
+			return true
+		}
+	}
+
+	return false
+}
+
 // GetPointer implements the Getter interface
 func (t testArrayA) GetStringOK(path string) (string, bool) {
 	if index, ok := Index(path, len(t)); ok {

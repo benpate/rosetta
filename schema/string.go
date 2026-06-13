@@ -19,7 +19,6 @@ type String struct {
 	Enum       []string `json:"enum"`
 	MinValue   string   `json:"minValue"`
 	MaxValue   string   `json:"maxValue"`
-	Pattern    string   `json:"pattern"`
 	Format     string   `json:"format"`
 	Required   bool     `json:"required"`
 	RequiredIf string   `json:"required-if"`
@@ -92,7 +91,10 @@ func (element String) Validate(value any) error {
 
 	// Validate against all formatting functions
 	for _, formatFunc := range element.formatFunctions() {
-		if _, err := formatFunc(stringValue); err != nil {
+		var err error
+		stringValue, err = formatFunc(stringValue)
+
+		if err != nil {
 			return err
 		}
 	}
@@ -186,10 +188,6 @@ func (element String) MarshalMap() map[string]any {
 		result["maxLength"] = element.MaxLength
 	}
 
-	if element.Pattern != "" {
-		result["pattern"] = element.Pattern
-	}
-
 	if element.Format != "" {
 		result["format"] = element.Format
 	}
@@ -219,7 +217,6 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.Default = convert.String(data["default"])
 	element.MinLength = convert.Int(data["minLength"])
 	element.MaxLength = convert.Int(data["maxLength"])
-	element.Pattern = convert.String(data["pattern"])
 	element.Format = convert.String(data["format"])
 	element.Enum = convert.SliceOfString(data["enum"])
 	element.Required = convert.Bool(data["required"])

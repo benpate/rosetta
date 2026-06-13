@@ -39,8 +39,19 @@ func TestStringEnumUnmarshal(t *testing.T) {
 
 	require.Nil(t, err)
 
-	require.Nil(t, s.Validate("John"))
-	require.Nil(t, s.Validate("Sarah"))
-	require.Nil(t, s.Validate("Kyle"))
-	require.NotNil(t, s.Validate("Anyone Else"))
+	_, changed, err := validate(s, "John")
+	require.False(t, changed)
+	require.Nil(t, err)
+
+	_, changed, err = validate(s, "Sarah")
+	require.False(t, changed)
+	require.Nil(t, err)
+
+	_, changed, err = validate(s, "Kyle")
+	require.False(t, changed)
+	require.Nil(t, err)
+
+	_, changed, err = validate(s, "Anyone Else")
+	require.False(t, changed)
+	require.Error(t, err)
 }

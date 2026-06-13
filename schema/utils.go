@@ -1,7 +1,10 @@
 package schema
 
 import (
+	"math"
 	"reflect"
+
+	"golang.org/x/exp/constraints"
 )
 
 // indirect returns the value of a pointer, if the provided value is a pointer.
@@ -33,4 +36,12 @@ func getIndex(object any, index int) (any, bool) {
 	}
 
 	return nil, false
+}
+
+func isMultipleOf[T constraints.Float | constraints.Integer](value, multipleOf T) bool {
+	return math.Remainder(float64(value), float64(multipleOf)) == 0
+}
+
+func notMultipleOf[T constraints.Float | constraints.Integer](value, multipleOf T) bool {
+	return !isMultipleOf(value, multipleOf)
 }
