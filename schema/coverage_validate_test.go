@@ -63,10 +63,49 @@ func TestValidateBoolean_Direct_NotBoolean(t *testing.T) {
 }
 
 func TestValidate_Integer_Clamps(t *testing.T) {
+	// With no BitSize, the validated result is a plain int.
 	value, changed, err := validate(Integer{Minimum: null.NewInt64(100)}, 5)
 	require.NoError(t, err)
 	require.True(t, changed)
 	require.Equal(t, 100, value)
+}
+
+func TestValidate_Integer_BitSizeTypes(t *testing.T) {
+	// validate types the result to match the element's BitSize.
+	cases := []struct {
+		bitSize  int
+		expected any
+	}{
+		{0, int(1)},
+		{8, int8(1)},
+		{16, int16(1)},
+		{32, int32(1)},
+		{64, int64(1)},
+	}
+
+	for _, test := range cases {
+		value, _, err := validate(Integer{BitSize: test.bitSize}, 1)
+		require.NoError(t, err, test.bitSize)
+		require.Equal(t, test.expected, value, test.bitSize)
+	}
+}
+
+func TestValidate_Integer_NoTruncation(t *testing.T) {
+	// A value larger than MaxInt32 must pass through validation without being
+	// truncated. BitSize:64 pins the result to int64 on every platform
+	// (regression for coercing through a 32-bit `int`).
+	const big = int64(5_000_000_000) // > math.MaxInt32
+
+	value, changed, err := validate(Integer{BitSize: 64, Maximum: null.NewInt64(10_000_000_000)}, big)
+	require.NoError(t, err)
+	require.False(t, changed)
+	require.Equal(t, big, value)
+
+	// Clamping to a 64-bit maximum must also preserve full width.
+	value, changed, err = validate(Integer{BitSize: 64, Maximum: null.NewInt64(big)}, int64(9_000_000_000))
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, big, value)
 }
 
 func TestValidateInteger_Direct_AllWidths(t *testing.T) {

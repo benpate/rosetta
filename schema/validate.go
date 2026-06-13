@@ -53,7 +53,24 @@ func validate(element Element, value any) (any, bool, error) {
 		return false, false, derp.Validation("Value must be a boolean")
 
 	case Integer:
-		return validate_Integer(typedElement, convert.Int(value))
+
+		switch typedElement.BitSize {
+
+		case 8:
+			return validate_Integer(typedElement, int8(convert.Int(value)))
+
+		case 16:
+			return validate_Integer(typedElement, int16(convert.Int(value)))
+
+		case 32:
+			return validate_Integer(typedElement, convert.Int32(value))
+
+		case 64:
+			return validate_Integer(typedElement, convert.Int64(value))
+
+		default:
+			return validate_Integer(typedElement, convert.Int(value))
+		}
 
 	case Number:
 		if coercedValue, ok := convert.FloatOk(value, 0); ok {
