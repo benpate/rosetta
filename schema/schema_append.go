@@ -13,7 +13,7 @@ func (schema Schema) Append(object any, path string, value any) error {
 	element, exists := schema.GetArrayElement(path)
 
 	if !exists {
-		return derp.Internal(location, "Schema element is not an array", path)
+		return derp.Internal(location, "Schema element must be an array", path)
 	}
 
 	// Get Original Value
