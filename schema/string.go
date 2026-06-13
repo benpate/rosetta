@@ -251,7 +251,7 @@ func (element String) formatFunctions() []format.StringFormat {
 
 		name, value := list.Equal(arg).Split()
 
-		if formatFunction, ok := formats[name]; ok {
+		if formatFunction, ok := lookupFormat(name); ok {
 			result = append(result, formatFunction(value.String()))
 		}
 	}
@@ -259,7 +259,9 @@ func (element String) formatFunctions() []format.StringFormat {
 	// If there are no valid formats defined, then default to
 	// no-html, which strictly removes all HTML tags from the value.
 	if len(result) == 0 {
-		result = []format.StringFormat{formats["no-html"]("")}
+		if noHTML, ok := lookupFormat("no-html"); ok {
+			result = []format.StringFormat{noHTML("")}
+		}
 	}
 
 	return result

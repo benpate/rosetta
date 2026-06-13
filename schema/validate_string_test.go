@@ -151,7 +151,9 @@ func TestStringValidator_Multibyte(t *testing.T) {
 
 	// Register a passthrough format so this test exercises the rune-aware
 	// length/truncation logic in isolation, rather than the default `no-html`
-	// sanitizer.
+	// sanitizer. Reset the freeze latch first, since earlier tests may have
+	// frozen the registry by reading from it.
+	formatsFrozen.Store(false)
 	UseFormat("test-passthrough", func(_ string) format.StringFormat {
 		return func(value string) (string, error) { return value, nil }
 	})
