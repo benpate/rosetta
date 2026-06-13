@@ -183,6 +183,8 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		element.Required = required
 	}
 
+	element.RequiredIF = convert.String(data["required-if"])
+
 	// Handle property map
 	if properties, isMap := data["properties"].(map[string]any); isMap {
 

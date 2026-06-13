@@ -87,6 +87,13 @@ func UnmarshalMap(data any) (Element, error) {
 	// Convert the map value into the correct element.
 	switch Type(convert.String(dataMap["type"])) {
 
+	case TypeAny:
+		result := Any{}
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
+
 	case TypeArray:
 		result := Array{}
 		if err := result.UnmarshalMap(dataMap); err != nil {

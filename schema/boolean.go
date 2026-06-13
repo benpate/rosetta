@@ -141,6 +141,7 @@ func (element *Boolean) UnmarshalMap(data map[string]any) error {
 
 	element.Default = convert.NullBool(data["default"])
 	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	return nil
 }

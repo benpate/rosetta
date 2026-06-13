@@ -173,8 +173,20 @@ func (element Integer) MarshalMap() map[string]any {
 		result["multipleOf"] = element.MultipleOf.Int64()
 	}
 
+	if element.BitSize != 0 {
+		result["bitSize"] = element.BitSize
+	}
+
 	if len(element.Enum) > 0 {
 		result["enum"] = element.Enum
+	}
+
+	if element.Required {
+		result["required"] = true
+	}
+
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
 	}
 
 	return result
@@ -182,8 +194,6 @@ func (element Integer) MarshalMap() map[string]any {
 
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Integer) UnmarshalMap(data map[string]any) error {
-
-	var err error
 
 	if convert.String(data["type"]) != "integer" {
 		return derp.Internal("schema.Integer.UnmarshalMap", "Data is not type 'integer'", data)
@@ -193,10 +203,12 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	element.Minimum = convert.NullInt64(data["minimum"])
 	element.Maximum = convert.NullInt64(data["maximum"])
 	element.MultipleOf = convert.NullInt64(data["multipleOf"])
-	element.Required = convert.Bool(data["required"])
+	element.BitSize = convert.Int(data["bitSize"])
 	element.Enum = convert.SliceOfInt(data["enum"])
+	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }
 
 func toInt64(value any) (int64, bool) {

@@ -189,6 +189,14 @@ func (element String) MarshalMap() map[string]any {
 		result["maxLength"] = element.MaxLength
 	}
 
+	if element.MinValue != "" {
+		result["minValue"] = element.MinValue
+	}
+
+	if element.MaxValue != "" {
+		result["maxValue"] = element.MaxValue
+	}
+
 	if element.Format != "" {
 		result["format"] = element.Format
 	}
@@ -209,8 +217,6 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 
 	const location = "schema.String.UnmarshalMap"
 
-	var err error
-
 	if convert.String(data["type"]) != "string" {
 		return derp.Internal(location, "Data is not type 'string'", data)
 	}
@@ -218,12 +224,14 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.Default = convert.String(data["default"])
 	element.MinLength = convert.Int(data["minLength"])
 	element.MaxLength = convert.Int(data["maxLength"])
+	element.MinValue = convert.String(data["minValue"])
+	element.MaxValue = convert.String(data["maxValue"])
 	element.Format = convert.String(data["format"])
 	element.Enum = convert.SliceOfString(data["enum"])
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }
 
 /***********************************

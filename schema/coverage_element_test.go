@@ -7,9 +7,8 @@ import (
 )
 
 func TestUnmarshalMap_AllTypes(t *testing.T) {
-	// NOTE: "any" is intentionally omitted — UnmarshalMap does not dispatch it
-	// (see TestUnmarshalMap_AnyIsUnsupported below)
 	cases := map[string]any{
+		"any":     Any{},
 		"array":   Array{},
 		"boolean": Boolean{},
 		"integer": Integer{},
@@ -32,10 +31,11 @@ func TestUnmarshalMap_AllTypes(t *testing.T) {
 	}
 }
 
-func TestUnmarshalMap_AnyIsUnsupported(t *testing.T) {
-	// UnmarshalMap has no case for "any", so it reports an unrecognized type
-	_, err := UnmarshalMap(map[string]any{"type": "any"})
-	require.Error(t, err)
+func TestUnmarshalMap_Any(t *testing.T) {
+	// UnmarshalMap dispatches the "any" type to an Any element
+	element, err := UnmarshalMap(map[string]any{"type": "any"})
+	require.NoError(t, err)
+	require.IsType(t, Any{}, element)
 }
 
 func TestUnmarshalMap_Nil(t *testing.T) {

@@ -164,6 +164,14 @@ func (element Number) MarshalMap() map[string]any {
 		result["maximum"] = element.Maximum.Float()
 	}
 
+	if element.MultipleOf.IsPresent() {
+		result["multipleOf"] = element.MultipleOf.Float()
+	}
+
+	if element.BitSize != 0 {
+		result["bitSize"] = element.BitSize
+	}
+
 	if len(element.Enum) > 0 {
 		result["enum"] = element.Enum
 	}
@@ -184,8 +192,6 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 
 	const location = "schema.Number.UnmarshalMap"
 
-	var err error
-
 	if convert.String(data["type"]) != "number" {
 		return derp.Internal(location, "Data must be type 'number'", data)
 	}
@@ -193,11 +199,13 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	element.Default = convert.NullFloat(data["default"])
 	element.Minimum = convert.NullFloat(data["minimum"])
 	element.Maximum = convert.NullFloat(data["maximum"])
+	element.MultipleOf = convert.NullFloat(data["multipleOf"])
+	element.BitSize = convert.Int(data["bitSize"])
 	element.Enum = convert.SliceOfFloat(data["enum"])
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }
 
 func toFloat(value any) (float64, bool) {

@@ -104,13 +104,12 @@ func (element Any) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Any) UnmarshalMap(data map[string]any) error {
 
-	var err error
-
 	if convert.String(data["type"]) != "any" {
-		return derp.Internal("schema.String.UnmarshalMap", "Data is not type 'string'", data)
+		return derp.Internal("schema.Any.UnmarshalMap", "Data is not type 'any'", data)
 	}
 
 	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }
