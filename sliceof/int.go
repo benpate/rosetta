@@ -204,6 +204,11 @@ func (s *Int) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x Int) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
 func (s *Int) SetInt(key string, value int) bool {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(s, index)

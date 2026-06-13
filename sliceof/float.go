@@ -211,6 +211,11 @@ func (s *Float) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x Float) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
 // SetFloat sets the value at the specified key, growing the slice if necessary
 func (s *Float) SetFloat(key string, value float64) bool {
 	if index, ok := sliceStringIndex(key); ok {

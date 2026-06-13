@@ -211,6 +211,11 @@ func (s *Object[T]) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x Object[T]) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
 func (s *Object[T]) SetValue(value any) error {
 
 	if typed, ok := value.(Object[T]); ok {

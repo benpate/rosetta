@@ -208,6 +208,11 @@ func (s *MapOfAny) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x MapOfAny) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
 func (s *MapOfAny) SetValue(value any) error {
 
 	if typed, ok := value.(MapOfAny); ok {

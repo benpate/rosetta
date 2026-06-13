@@ -208,6 +208,11 @@ func (x *String) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x String) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
 // SetString sets the string value at the specified key
 func (x *String) SetString(key string, value string) bool {
 	if index, ok := sliceStringIndex(key); ok {
