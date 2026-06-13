@@ -23,17 +23,6 @@ func validate_Integer(element Integer, value any) (any, bool, error) {
 		return validate_Integer_Generic(element, typedValue)
 	case int64:
 		return validate_Integer_Generic(element, typedValue)
-
-	case uint:
-		return validate_Integer_Generic(element, typedValue)
-	case uint8:
-		return validate_Integer_Generic(element, typedValue)
-	case uint16:
-		return validate_Integer_Generic(element, typedValue)
-	case uint32:
-		return validate_Integer_Generic(element, typedValue)
-	case uint64:
-		return validate_Integer_Generic(element, typedValue)
 	}
 
 	return nil, false, derp.Internal(location, "Value must be an integer", value)
