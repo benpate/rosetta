@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/benpate/rosetta/null"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,6 +40,28 @@ func TestSchema_SetURLValues(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, "Kyle Reese", value.Name)
+}
+
+// TestSchema_SetURLValues_CoercesAndWritesBack confirms that values which the
+// schema coerces during validation (truncation, clamping) are written back to
+// the object, not just the raw input.
+func TestSchema_SetURLValues_CoercesAndWritesBack(t *testing.T) {
+	schema := New(Object{
+		Properties: map[string]Element{
+			"name":     String{MaxLength: 5},
+			"latitude": Number{BitSize: 64, Maximum: null.NewFloat(10)},
+		},
+	})
+	value := newTestStructA()
+
+	err := schema.SetURLValues(&value, url.Values{
+		"name":     []string{"abcdefghij"},
+		"latitude": []string{"99.5"},
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, "abcde", value.Name)  // truncated to MaxLength
+	require.Equal(t, 10.0, value.Latitude) // clamped to Maximum
 }
 
 // boolPointerObject exposes a single boolean property via the PointerGetter
