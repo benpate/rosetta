@@ -49,10 +49,8 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 	}
 
 	// Validate the whole schema once all the values are set
-	// TODO: Validate Required-If here...
-	_, _, err := Validate(schema, object)
-	if err != nil {
-		return derp.Wrap(err, location, "Validating values")
+	if err := schema.ValidateRequiredIf(object); err != nil {
+		return derp.Wrap(err, location, "Validating values", object)
 	}
 
 	// Success!!
@@ -69,17 +67,15 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 	// Set each value in the schema
 	for path, value := range values {
 
-		// Errors are intentionally ignored here.
-		// Unallowed data does not make it through the schema filter
-		// nolint: errcheck
-		_ = schema.Set(object, path, value)
+		// Try to set the value in the object
+		if err := schema.Set(object, path, value); err != nil {
+			return derp.Wrap(err, location, "Setting value", path, value)
+		}
 	}
 
-	// Validate the whole schema once all the values are set
-	// TODO: Changes are not yet applied here
-	_, _, err := Validate(schema, object)
-	if err != nil {
-		return derp.Wrap(err, location, "Validating values")
+	// Validate the whote schema once all the values are set
+	if err := schema.ValidateRequiredIf(object); err != nil {
+		return derp.Wrap(err, location, "Validating values", object)
 	}
 
 	// Success!!
