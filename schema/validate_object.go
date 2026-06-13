@@ -34,7 +34,7 @@ func validate_Object(element Object, value any) (any, bool, error) {
 		// If changed, then set the new value in the object
 		if itemChanged {
 
-			if err := setProperty(element, value, key, changedValue); err != nil {
+			if err := SetProperty(element, value, key, changedValue); err != nil {
 				return nil, false, derp.Wrap(err, location, "Setting property")
 			}
 

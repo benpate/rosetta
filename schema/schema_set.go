@@ -29,7 +29,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// set the property value in the object
-	return setProperty(schema.Element, object, path, value)
+	return SetProperty(schema.Element, object, path, value)
 }
 
 // SetAll iterates over Set to apply all of the values to the object one at a time, stopping
@@ -86,8 +86,8 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 	return nil
 }
 
-// setProperty sets the value at the specified path within the object according to the provided schema
-func setProperty(element Element, object any, path string, value any) (err error) {
+// SetProperty sets the value at the specified path within the object according to the provided schema
+func SetProperty(element Element, object any, path string, value any) (err error) {
 
 	const location = "schema.setProperty"
 
@@ -159,7 +159,7 @@ func setProperty_Object(element Element, object any, path string, head string, t
 	// PointerGetter works for Structs, Slices, and Arrays
 	if getter, ok := object.(PointerGetter); ok {
 		if subPointer, ok := getter.GetPointer(head); ok {
-			return setProperty(element, subPointer, tail, value)
+			return SetProperty(element, subPointer, tail, value)
 		}
 	}
 
