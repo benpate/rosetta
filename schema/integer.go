@@ -16,7 +16,7 @@ type Integer struct {
 	Maximum    null.Int64 `json:"maximum"`
 	MultipleOf null.Int64 `json:"multipleOf"`
 	BitSize    int        `json:"bitSize"`
-	Enum       []int      `json:"emum"`
+	Enum       []int      `json:"enum"`
 	Required   bool       `json:"required"`
 	RequiredIf string     `json:"required-if"`
 }
