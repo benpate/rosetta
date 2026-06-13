@@ -46,6 +46,7 @@ func Contains(value1 any, value2 any) bool {
 	return false
 }
 
+// NotContains returns TRUE if value1 does not contain value2.  It is the inverse of Contains.
 func NotContains(value1 any, value2 any) bool {
 	return !Contains(value1, value2)
 }

@@ -82,6 +82,7 @@ func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 	return result, resultError
 }
 
+// Validate checks the provided value against this schema, returning whether it was changed and any validation error.
 func (schema Schema) Validate(value any) (bool, error) {
 
 	const location = "schema.Schema.Validate"
