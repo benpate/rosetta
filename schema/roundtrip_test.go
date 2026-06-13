@@ -125,7 +125,7 @@ func TestRoundTrip_Object(t *testing.T) {
 		},
 		Wildcard:   String{MaxLength: 100, Enum: []string{"x"}},
 		Required:   false,
-		RequiredIF: "other == true",
+		RequiredIf: "other == true",
 	}
 
 	require.Equal(t, original, roundTrip(t, original))

@@ -98,7 +98,7 @@ func TestObject_MarshalMap(t *testing.T) {
 		Properties: ElementMap{"name": String{}},
 		Wildcard:   String{},
 		Required:   true,
-		RequiredIF: "a is b",
+		RequiredIf: "a is b",
 	}
 
 	result := element.MarshalMap()

@@ -11,7 +11,7 @@ type Object struct {
 	Properties ElementMap `json:"properties"`
 	Wildcard   Element    `json:"wildcard"`
 	Required   bool       `json:"required"`
-	RequiredIF string     `json:"required-if"`
+	RequiredIf string     `json:"required-if"`
 }
 
 /***********************************
@@ -162,8 +162,8 @@ func (element Object) MarshalMap() map[string]any {
 		result["required"] = true
 	}
 
-	if element.RequiredIF != "" {
-		result["required-if"] = element.RequiredIF
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
 	}
 
 	return result
@@ -183,7 +183,7 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		element.Required = required
 	}
 
-	element.RequiredIF = convert.String(data["required-if"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	// Handle property map
 	if properties, isMap := data["properties"].(map[string]any); isMap {
