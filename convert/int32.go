@@ -107,11 +107,17 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return Int32Ok(v[0], defaultValue)
+		}
 		return Int32Default(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return Int32Ok(v[0], defaultValue)
 		}
 		return Int32Default(v[0], defaultValue), false
 

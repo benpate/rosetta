@@ -98,11 +98,17 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return Int64Ok(v[0], defaultValue)
+		}
 		return Int64Default(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return Int64Ok(v[0], defaultValue)
 		}
 		return Int64Default(v[0], defaultValue), false
 

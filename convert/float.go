@@ -84,11 +84,17 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return FloatOk(v[0], defaultValue)
+		}
 		return FloatDefault(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return FloatOk(v[0], defaultValue)
 		}
 		return FloatDefault(v[0], defaultValue), false
 

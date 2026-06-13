@@ -83,11 +83,17 @@ func BoolOk(value any, defaultValue bool) (bool, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return BoolOk(v[0], defaultValue)
+		}
 		return BoolDefault(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return BoolOk(v[0], defaultValue)
 		}
 		return BoolDefault(v[0], defaultValue), false
 

@@ -109,11 +109,17 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return IntOk(v[0], defaultValue)
+		}
 		return IntDefault(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return IntOk(v[0], defaultValue)
 		}
 		return IntDefault(v[0], defaultValue), false
 
