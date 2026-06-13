@@ -5,7 +5,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-// validate_Array checks that the provided value meets the requirements of the schema element.
+// validate_Array checks that the provided value meets the requirements of the schema element, and updates the value if necessary.
 func validate_Array[T any](element Array, value T) (T, bool, error) {
 
 	const location = "schema.validate_Array"

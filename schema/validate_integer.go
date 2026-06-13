@@ -7,6 +7,7 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
+// validate_Integer checks that the provided value meets the requirements of the Integer schema element, and updates the value if necessary.
 func validate_Integer(element Integer, value any) (any, bool, error) {
 
 	const location = "schema.validate_Integer"
@@ -28,7 +29,7 @@ func validate_Integer(element Integer, value any) (any, bool, error) {
 	return nil, false, derp.Internal(location, "Value must be an integer", value)
 }
 
-// validate_Integer checks that the provided value meets the requirements of the schema element.
+// validate_Integer_Generic checks that the provided value meets the requirements of the schema element.
 func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (T, bool, error) {
 
 	// RULE: Required value cannot be zero

@@ -5,7 +5,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-// validate_Boolean checks that the provided value meets the requirements of the schema element.
+// validate_Boolean checks that the provided value meets the requirements of the schema element, and updates the value if necessary.
 func validate_Boolean[T any](element Boolean, value T) (T, bool, error) {
 
 	// Make a boolean version of this value to compare schema rules

@@ -8,6 +8,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
+// validate_String checks that the provided value meets the requirements of the String schema element, and updates the value if necessary.
 func validate_String(element String, value string) (string, bool, error) {
 
 	changed := false

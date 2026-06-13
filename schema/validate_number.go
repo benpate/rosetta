@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
+// validate_Number checks that the provided value meets the requirements of the Number schema element, and updates the value if necessary.
 func validate_Number(element Number, value float64) (float64, bool, error) {
 
 	// RULE: Required value cannot be zero
