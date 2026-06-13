@@ -155,10 +155,6 @@ func RemoveTags(html string) string {
 	end := 0    // The index of the previous end tag character `>`
 
 	for i, c := range html {
-		// If this is the last character and we are not in an HTML tag, save it.
-		if (i+1) == len(html) && end >= start {
-			builder.WriteString(html[end:])
-		}
 
 		// Keep going if the character is not `<` or `>`
 		if c != htmlTagStart && c != htmlTagEnd {
@@ -180,6 +176,14 @@ func RemoveTags(html string) string {
 		// else c == htmlTagEnd
 		in = false
 		end = i + 1
+	}
+
+	// Flush any text following the last closed tag. Using a byte index from
+	// `range` to detect the final character mis-fires on multi-byte runes, so
+	// we write the trailing run after the loop instead. Skip it if we ended
+	// inside an unterminated tag.
+	if !in {
+		builder.WriteString(html[end:])
 	}
 
 	return builder.String()

@@ -2,7 +2,9 @@ package schema
 
 import (
 	"testing"
+	"unicode/utf8"
 
+	"github.com/benpate/rosetta/schema/format"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
@@ -140,6 +142,40 @@ func TestStringValidator(t *testing.T) {
 	_, _, err = Validate(schema, &getter)
 	require.NoError(t, err)
 
+}
+
+// TestStringValidator_Multibyte confirms that length limits are measured in
+// runes (not bytes) and that truncation lands on a rune boundary, never
+// splitting a multi-byte character into invalid UTF-8.
+func TestStringValidator_Multibyte(t *testing.T) {
+
+	// Register a passthrough format so this test exercises the rune-aware
+	// length/truncation logic in isolation, rather than the default `no-html`
+	// sanitizer.
+	UseFormat("test-passthrough", func(_ string) format.StringFormat {
+		return func(value string) (string, error) { return value, nil }
+	})
+
+	schema := New(Object{
+		Properties: ElementMap{
+			"value": String{MinLength: 3, MaxLength: 5, Format: "test-passthrough"},
+		},
+	})
+
+	var getter testStringGetter
+
+	// Five 3-byte runes (15 bytes) is exactly MaxLength=5 runes, so it must pass unchanged.
+	require.NoError(t, schema.Set(&getter, "value", "日本語です"))
+	require.Equal(t, "日本語です", getter.value)
+
+	// Seven runes must truncate to the first five runes (not the first five bytes),
+	// and the result must remain valid UTF-8.
+	require.NoError(t, schema.Set(&getter, "value", "日本語ですよね"))
+	require.Equal(t, "日本語です", getter.value)
+	require.True(t, utf8.ValidString(getter.value))
+
+	// Two runes is below MinLength=3 (even though it is 6 bytes), so it must fail.
+	require.Error(t, schema.Set(&getter, "value", "日本"))
 }
 
 // testStringPointer tests getting/setting bool values via a pointer

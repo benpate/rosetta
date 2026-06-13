@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"unicode/utf8"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
@@ -25,14 +27,16 @@ func validate_String(element String, value string) (string, bool, error) {
 		return value, false, derp.Validation("Maximum value is " + element.MaxValue)
 	}
 
-	// Validate minimum length
-	if (element.MinLength > 0) && (len(value) < element.MinLength) {
+	// Validate minimum length (measured in runes, not bytes)
+	if (element.MinLength > 0) && (utf8.RuneCountInString(value) < element.MinLength) {
 		return value, false, derp.Validation("Minimum length is " + convert.String(element.MinLength))
 	}
 
-	// Validate maximum length (ACTUALLY TRUNCATES THE STRING TO THE MAXIMUM LENGTH)
-	if (element.MaxLength > 0) && (len(value) > element.MaxLength) {
-		value = value[:element.MaxLength]
+	// Validate maximum length (ACTUALLY TRUNCATES THE STRING TO THE MAXIMUM LENGTH).
+	// Length is measured in runes, and truncation happens on a rune boundary so that
+	// multi-byte characters are never split into invalid UTF-8.
+	if (element.MaxLength > 0) && (utf8.RuneCountInString(value) > element.MaxLength) {
+		value = string([]rune(value)[:element.MaxLength])
 		changed = true
 	}
 

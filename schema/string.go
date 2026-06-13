@@ -2,6 +2,7 @@ package schema
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/exp"
@@ -68,16 +69,16 @@ func (element String) Validate(value any) error {
 		}
 	}
 
-	// Validate minimum length
+	// Validate minimum length (measured in runes, not bytes)
 	if element.MinLength > 0 {
-		if len(stringValue) < element.MinLength {
+		if utf8.RuneCountInString(stringValue) < element.MinLength {
 			return derp.Validation(" minimum string length is " + convert.String(element.MinLength))
 		}
 	}
 
-	// Validate maximum length
+	// Validate maximum length (measured in runes, not bytes)
 	if element.MaxLength > 0 {
-		if len(stringValue) > element.MaxLength {
+		if utf8.RuneCountInString(stringValue) > element.MaxLength {
 			return derp.Validation(" maximum string length is " + convert.String(element.MaxLength))
 		}
 	}
