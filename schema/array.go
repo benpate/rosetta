@@ -34,45 +34,6 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-/*
-// Validate implements the Element interface
-// It validates a value against this schema
-func (element Array) Validate(object any) error {
-
-	const location = "schema.Array.Validate"
-
-	length, isLengthGetter := getLength(object)
-
-	if !isLengthGetter {
-		return derp.Internal(location, "Array must implement LengthGetter interface")
-	}
-
-	// Check minimum/maximum lengths
-	if element.Required && length == 0 {
-		return derp.Validation(" array value is required")
-	}
-
-	if (element.MinLength > 0) && (length < element.MinLength) {
-		return derp.Validation(" minimum array length is " + convert.String(element.MinLength))
-	}
-
-	if (element.MaxLength > 0) && (length > element.MaxLength) {
-		return derp.Validation(" maximum array length is " + convert.String(element.MaxLength))
-	}
-
-	// Validate each item in the array
-	for index := 0; index < length; index = index + 1 {
-		indexString := strconv.Itoa(index)
-
-		if err := validate(element.Items, object, indexString); err != nil {
-			return derp.Wrap(err, location, "Unable to validate object at index", index)
-		}
-	}
-
-	// Valid
-	return nil
-} */
-
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
 func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
