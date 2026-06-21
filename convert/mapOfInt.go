@@ -49,9 +49,10 @@ func MapOfIntOk(value any) (map[string]int, bool) {
 		return result, true
 
 	case map[string]int64:
+		// int64 -> int narrows on 32-bit platforms; route through Int so large values clamp instead of truncating.
 		result := make(map[string]int, len(typed))
 		for key, value := range typed {
-			result[key] = int(value)
+			result[key] = Int(value)
 		}
 		return result, true
 

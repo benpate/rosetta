@@ -25,9 +25,10 @@ func MapOfInt32Ok(value any) (map[string]int32, bool) {
 	switch typed := value.(type) {
 
 	case map[string]int:
+		// int is 64-bit on most platforms; route through Int32 so large values clamp instead of truncating.
 		result := make(map[string]int32, len(typed))
 		for key, value := range typed {
-			result[key] = int32(value)
+			result[key] = Int32(value)
 		}
 		return result, true
 
