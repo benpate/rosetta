@@ -17,11 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
       with:
         fetch-depth: 0
    
     - name: Nil panic checks
-      uses: qbaware/nilaway-action@v0
+      uses: qbaware/nilaway-action@18bae1177e15ef2cc9583baa872c43c50ad84d9e # v0.0.14
       with:
         package-to-scan: ./...
