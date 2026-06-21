@@ -1,3 +1,5 @@
+// Package html provides helpers for converting between HTML and plain text,
+// sanitizing HTML, and extracting summaries from HTML documents.
 package html
 
 import (

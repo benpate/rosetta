@@ -187,7 +187,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return UInt64(uint64(v1), uint64(v2)), nil
 
 		case uint64:
-			return UInt64(uint64(v1), v2), nil // TODO: LOW: range checking?
+			return UInt64(uint64(v1), v2), nil
 
 		case float32:
 			return Float32(float32(v1), v2), nil
@@ -216,7 +216,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return UInt64(uint64(v1), uint64(v2)), nil
 
 		case uint64:
-			return UInt64(uint64(v1), v2), nil // TODO: LOW: range checking?
+			return UInt64(uint64(v1), v2), nil
 
 		case float32:
 			return Float32(float32(v1), v2), nil
@@ -245,7 +245,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return UInt64(uint64(v1), uint64(v2)), nil
 
 		case uint64:
-			return UInt64(uint64(v1), v2), nil // TODO: LOW: range checking?
+			return UInt64(uint64(v1), v2), nil
 
 		case float32:
 			return Float32(float32(v1), v2), nil
@@ -274,7 +274,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return UInt64(uint64(v1), uint64(v2)), nil
 
 		case uint64:
-			return UInt64(uint64(v1), v2), nil // TODO: LOW: range checking?
+			return UInt64(uint64(v1), v2), nil
 
 		case float32:
 			return Float32(float32(v1), v2), nil
@@ -303,7 +303,7 @@ func Interface(value1 any, value2 any) (int, error) {
 			return UInt64(uint64(v1), uint64(v2)), nil
 
 		case uint64:
-			return UInt64(uint64(v1), v2), nil // TODO: LOW: range checking?
+			return UInt64(uint64(v1), v2), nil
 
 		case float32:
 			return Float32(float32(v1), v2), nil
