@@ -8,8 +8,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// Int is a slice of int values with typed accessors and schema-traversal support.
 type Int []int
 
+// NewInt returns an Int slice containing the provided values (or an empty slice if none are given).
 func NewInt(values ...int) Int {
 
 	if len(values) == 0 {
@@ -122,6 +124,7 @@ func (x Int) Contains(value int) bool {
 	return slice.Contains(x, value)
 }
 
+// NotContains returns TRUE if the slice does not contain the provided value.
 func (x Int) NotContains(value int) bool {
 	return !slice.Contains(x, value)
 }
@@ -171,20 +174,24 @@ func (x Int) Keys() []string {
  * Getter Interfaces/Setters
  ****************************************/
 
+// GetAny returns the value for the key index, or nil if absent.
 func (x Int) GetAny(key string) any {
 	result, _ := x.GetIntOK(key)
 	return result
 }
 
+// GetAnyOK returns the value for the key index and TRUE if present.
 func (x Int) GetAnyOK(key string) (any, bool) {
 	return x.GetIntOK(key)
 }
 
+// GetInt returns the value for the key index coerced to int, or 0 if absent.
 func (x Int) GetInt(key string) int {
 	result, _ := x.GetIntOK(key)
 	return result
 }
 
+// GetIntOK returns the value for the key index coerced to int, with TRUE if present.
 func (x Int) GetIntOK(key string) (int, bool) {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -198,6 +205,7 @@ func (x Int) GetIntOK(key string) (int, bool) {
 	return 0, false
 }
 
+// SetIndex stores the value at the index, growing the slice to fit if necessary.
 func (s *Int) SetIndex(index int, value any) bool {
 	growSlice(s, index)
 	(*s)[index] = convert.Int(value)
@@ -209,6 +217,7 @@ func (x Int) GetIndex(index int) (any, bool) {
 	return slice.AtOK(x, index)
 }
 
+// SetInt stores an int value at the key index.
 func (s *Int) SetInt(key string, value int) bool {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(s, index)
@@ -227,11 +236,13 @@ func (s *Int) SetInt(key string, value int) bool {
 	return false
 }
 
+// SetValue replaces the entire slice with the provided value, if it can be converted.
 func (s *Int) SetValue(value any) error {
 	*s = convert.SliceOfInt(value)
 	return nil
 }
 
+// Remove deletes the element identified by the key index.
 func (s *Int) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, s.Length()); ok {
@@ -242,6 +253,7 @@ func (s *Int) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt deletes the element at the given index.
 func (x *Int) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

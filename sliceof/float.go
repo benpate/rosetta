@@ -8,8 +8,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// Float is a slice of float64 values with typed accessors and schema-traversal support.
 type Float []float64
 
+// NewFloat returns a Float slice containing the provided values (or an empty slice if none are given).
 func NewFloat(values ...float64) Float {
 
 	if len(values) == 0 {
@@ -122,6 +124,7 @@ func (x Float) Contains(value float64) bool {
 	return slice.Contains(x, value)
 }
 
+// NotContains returns TRUE if the slice does not contain the provided value.
 func (x Float) NotContains(value float64) bool {
 	return !slice.Contains(x, value)
 }

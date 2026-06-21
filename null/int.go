@@ -6,13 +6,13 @@ import (
 	"github.com/benpate/derp"
 )
 
-// Int provides a nullable bool
+// Int provides a nullable int
 type Int struct {
 	value   int
 	present bool
 }
 
-// NewInt returns a fully populated, nullable bool
+// NewInt returns a fully populated, nullable int
 func NewInt(value int) Int {
 	return Int{
 		value:   value,

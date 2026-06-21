@@ -1,10 +1,12 @@
 package sliceof
 
+// MapOfAnyGrouper reports group boundaries within a MapOfAny slice, grouped by a named field.
 type MapOfAnyGrouper struct {
 	slice MapOfAny
 	field string
 }
 
+// GroupBy returns a grouper that detects boundaries in this slice using the named field.
 func (x MapOfAny) GroupBy(field string) MapOfAnyGrouper {
 	return MapOfAnyGrouper{
 		slice: x,
@@ -12,6 +14,7 @@ func (x MapOfAny) GroupBy(field string) MapOfAnyGrouper {
 	}
 }
 
+// IsHeader returns TRUE if the element at index begins a new group.
 func (grouper MapOfAnyGrouper) IsHeader(index int) bool {
 
 	if index <= 0 {
@@ -28,6 +31,7 @@ func (grouper MapOfAnyGrouper) IsHeader(index int) bool {
 	return previous != current
 }
 
+// IsFooter returns TRUE if the element at index ends a group.
 func (grouper MapOfAnyGrouper) IsFooter(index int) bool {
 
 	if index <= 0 {

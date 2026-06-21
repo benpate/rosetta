@@ -1,5 +1,6 @@
 package slice
 
+// RemoveAt returns the slice with the element at index removed; an out-of-range index is a no-op.
 func RemoveAt[T comparable](slice []T, index int) []T {
 
 	// Bounds check

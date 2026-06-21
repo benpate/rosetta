@@ -11,8 +11,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// MapOfString is a slice of mapof.String objects with typed accessors and schema-traversal support.
 type MapOfString []mapof.String
 
+// NewMapOfString returns a MapOfString slice containing the provided values (or an empty slice if none are given).
 func NewMapOfString(values ...mapof.String) MapOfString {
 
 	if len(values) == 0 {
@@ -95,6 +97,7 @@ func (x MapOfString) At(index int) mapof.String {
 	return slice.At(x, index)
 }
 
+// AtOK returns the element at the index and TRUE, or the zero value and FALSE if out of range.
 func (x MapOfString) AtOK(index int) (mapof.String, bool) {
 	return slice.AtOK(x, index)
 }
@@ -152,11 +155,13 @@ func (x MapOfString) Keys() []string {
  * Getter Interfaces
  ******************************************/
 
+// GetAny returns the value for the key index, or nil if absent.
 func (x MapOfString) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
 	return result
 }
 
+// GetAnyOK returns the value for the key index and TRUE if present.
 func (x MapOfString) GetAnyOK(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
@@ -173,6 +178,7 @@ func (x MapOfString) GetAnyOK(key string) (any, bool) {
 	return nil, false
 }
 
+// GetPointer returns a pointer to the element at the key index, growing the slice as needed (implements schema PointerGetter).
 func (x *MapOfString) GetPointer(name string) (any, bool) {
 
 	// Get a valid index for the slice
@@ -199,6 +205,7 @@ func (x *MapOfString) GetPointer(name string) (any, bool) {
  * Setter Interfaces
  ******************************************/
 
+// SetIndex stores the value at the index, growing the slice to fit if necessary.
 func (s *MapOfString) SetIndex(index int, value any) bool {
 
 	mapValue := convert.MapOfString(value)
@@ -213,6 +220,7 @@ func (x MapOfString) GetIndex(index int) (any, bool) {
 	return slice.AtOK(x, index)
 }
 
+// SetValue replaces the entire slice with the provided value, if it can be converted.
 func (s *MapOfString) SetValue(value any) error {
 
 	if typed, ok := value.(MapOfString); ok {
@@ -223,6 +231,7 @@ func (s *MapOfString) SetValue(value any) error {
 	return derp.Internal("sliceof.Map.SetValue", "Unable to convert value to Map", value)
 }
 
+// Remove deletes the element identified by the key index.
 func (x *MapOfString) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -233,6 +242,7 @@ func (x *MapOfString) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt deletes the element at the given index.
 func (x *MapOfString) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

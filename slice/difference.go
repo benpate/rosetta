@@ -1,5 +1,6 @@
 package slice
 
+// Difference returns a new slice of the elements in a that are not present in b.
 func Difference[T comparable](a []T, b []T) []T {
 
 	// Create a slice to store the difference

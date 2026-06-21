@@ -11,8 +11,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// Any is a slice of arbitrary values with typed, coercing accessors and schema-traversal support.
 type Any []any
 
+// NewAny returns an Any slice containing the provided values (or an empty slice if none are given).
 func NewAny(values ...any) Any {
 
 	if len(values) == 0 {
@@ -167,15 +169,18 @@ func (x Any) Keys() []string {
  * Getter Interfaces
  ******************************************/
 
+// GetIndex returns the value at the index and TRUE, or (nil, false) if out of range.
 func (x Any) GetIndex(index int) (any, bool) {
 	return slice.AtOK(x, index)
 }
 
+// GetAny returns the value for the key, or nil if absent. The key is a numeric index or "last"/"next".
 func (x Any) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
 	return result
 }
 
+// GetAnyOK returns the value for the key and TRUE if present. The key is a numeric index or "last"/"next".
 func (x Any) GetAnyOK(key string) (any, bool) {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -194,11 +199,13 @@ func (x Any) GetAnyOK(key string) (any, bool) {
 	return nil, false
 }
 
+// GetBool returns the value for the key coerced to bool, or FALSE if absent or not coercible.
 func (x Any) GetBool(key string) bool {
 	result, _ := x.GetBoolOK(key)
 	return result
 }
 
+// GetBoolOK returns the value for the key coerced to bool, with TRUE if it was present and coercible.
 func (x Any) GetBoolOK(key string) (bool, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		return convert.BoolOk(value, false)
@@ -206,11 +213,13 @@ func (x Any) GetBoolOK(key string) (bool, bool) {
 	return false, false
 }
 
+// GetInt returns the value for the key coerced to int, or 0 if absent or not coercible.
 func (x Any) GetInt(key string) int {
 	result, _ := x.GetIntOK(key)
 	return result
 }
 
+// GetIntOK returns the value for the key coerced to int, with TRUE if it was present and coercible.
 func (x Any) GetIntOK(key string) (int, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		return convert.IntOk(value, 0)
@@ -219,11 +228,13 @@ func (x Any) GetIntOK(key string) (int, bool) {
 	return 0, false
 }
 
+// GetInt64 returns the value for the key coerced to int64, or 0 if absent or not coercible.
 func (x Any) GetInt64(key string) int64 {
 	result, _ := x.GetInt64OK(key)
 	return result
 }
 
+// GetInt64OK returns the value for the key coerced to int64, with TRUE if it was present and coercible.
 func (x Any) GetInt64OK(key string) (int64, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		return convert.Int64Ok(value, 0)
@@ -231,11 +242,13 @@ func (x Any) GetInt64OK(key string) (int64, bool) {
 	return 0, false
 }
 
+// GetFloat returns the value for the key coerced to float64, or 0 if absent or not coercible.
 func (x Any) GetFloat(key string) float64 {
 	result, _ := x.GetFloatOK(key)
 	return result
 }
 
+// GetFloatOK returns the value for the key coerced to float64, with TRUE if it was present and coercible.
 func (x Any) GetFloatOK(key string) (float64, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		return convert.FloatOk(value, 0)
@@ -243,6 +256,7 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
+// GetPointer returns a pointer to the element at the key index, growing the slice as needed (implements schema PointerGetter).
 func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(x, index)
@@ -256,11 +270,13 @@ func (x *Any) GetPointer(key string) (any, bool) {
 	return nil, false
 }
 
+// GetString returns the value for the key coerced to string, or "" if absent or not coercible.
 func (x Any) GetString(key string) string {
 	result, _ := x.GetStringOK(key)
 	return result
 }
 
+// GetStringOK returns the value for the key coerced to string, with TRUE if it was present and coercible.
 func (x Any) GetStringOK(key string) (string, bool) {
 	if value, ok := x.GetAnyOK(key); ok {
 		return convert.StringOk(value, "")
@@ -272,12 +288,14 @@ func (x Any) GetStringOK(key string) (string, bool) {
  * Setter Interfaces
  ******************************************/
 
+// SetIndex stores the value at the index, growing the slice to fit if necessary.
 func (x *Any) SetIndex(index int, value any) bool {
 	growSlice(x, index)
 	(*x)[index] = value
 	return true
 }
 
+// SetAny stores the value at the key index (growing the slice to fit), returning FALSE for a non-index key.
 func (x *Any) SetAny(key string, value any) bool {
 
 	if index, ok := sliceStringIndex(key); ok {
@@ -289,6 +307,7 @@ func (x *Any) SetAny(key string, value any) bool {
 	return false
 }
 
+// SetBool stores a bool value at the key index.
 func (x *Any) SetBool(key string, value bool) bool {
 	return x.SetAny(key, value)
 }
