@@ -198,6 +198,9 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 					propertyMap["required"] = true
 				}
 
+				// Errors are intentionally tolerated: a property using an unsupported construct
+				// (e.g. a "$ref" reference this package does not resolve) is skipped so the rest of
+				// the schema still loads, rather than failing the whole document.
 				if propertyObject, err := UnmarshalMap(propertyMap); err == nil {
 					element.Properties[key] = propertyObject
 				}
@@ -205,7 +208,8 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		}
 	}
 
-	// Handle other "wildcard" properties
+	// Handle other "wildcard" properties. As with properties above, an unsupported wildcard schema
+	// is skipped rather than failing the whole document.
 	if wildcard, ok := data["wildcard"].(map[string]any); ok {
 		if wildcardObject, err := UnmarshalMap(wildcard); err == nil {
 			element.Wildcard = wildcardObject
