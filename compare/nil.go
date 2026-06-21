@@ -12,7 +12,7 @@ func IsNil(value any) bool {
 	}
 
 	switch reflect.TypeOf(value).Kind() {
-	case reflect.Ptr, reflect.Array, reflect.Slice, reflect.Chan, reflect.Map:
+	case reflect.Pointer, reflect.Array, reflect.Slice, reflect.Chan, reflect.Map:
 		return reflect.ValueOf(value).IsNil()
 	}
 

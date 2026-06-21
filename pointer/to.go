@@ -6,13 +6,10 @@ import "reflect"
 // If the provided value is already a pointer, it is returned as-is.
 func To(value any) any {
 
-	// Some reflect magic to make sure we're working with a pointer
+	// Pointers and interfaces already carry a reference, so return them as-is.
 	switch reflect.ValueOf(value).Kind() {
 
-	case reflect.Ptr:
-		return value
-
-	case reflect.Interface:
+	case reflect.Pointer, reflect.Interface:
 		return value
 	}
 
