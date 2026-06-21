@@ -124,6 +124,7 @@ func FuzzHTMLDecoders(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, html string) {
 
+		// Call every decoder on the raw (possibly invalid) input to confirm none panic.
 		outputs := map[string]string{
 			"ToText":                  ToText(html),
 			"ToSearchText":            ToSearchText(html),
@@ -132,16 +133,18 @@ func FuzzHTMLDecoders(f *testing.F) {
 			"Minimal":                 Minimal(html),
 		}
 
-		// Valid input must not be corrupted into invalid UTF-8 (invalid input may pass through).
-		if utf8.ValidString(html) {
-			for name, output := range outputs {
-				if !utf8.ValidString(output) {
-					t.Fatalf("%s(%q) = %q corrupted valid UTF-8", name, html, output)
-				}
-			}
-		}
-
 		// IsHTML is a predicate; just confirm it never panics on arbitrary input.
 		_ = IsHTML(html)
+
+		// Valid input must not be corrupted into invalid UTF-8 (invalid input may pass through).
+		if !utf8.ValidString(html) {
+			return
+		}
+
+		for name, output := range outputs {
+			if !utf8.ValidString(output) {
+				t.Fatalf("%s(%q) = %q corrupted valid UTF-8", name, html, output)
+			}
+		}
 	})
 }

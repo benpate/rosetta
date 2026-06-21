@@ -147,8 +147,7 @@ func TestInt_NoSilentTruncation(t *testing.T) {
 	}
 
 	for _, in := range inputs {
-		result, ok := Int32Ok(in, -999)
-		if ok {
+		if result, ok := Int32Ok(in, -999); ok {
 			// Natural conversion must round-trip exactly.
 			require.Equal(t, in, int64(result), "Int32Ok(%d) reported ok but changed the value", in)
 		} else {

@@ -52,28 +52,21 @@ func FuzzIntNarrowing(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value int64) {
 
 		// int32: Ok exactly when the value is within int32 range, and the result round-trips.
-		result32, ok32 := Int32Ok(value, -1)
-		inRange32 := value >= math.MinInt32 && value <= math.MaxInt32
-		if ok32 != inRange32 {
-			t.Fatalf("Int32Ok(%d): ok=%v but inRange=%v", value, ok32, inRange32)
-		}
-		if ok32 && int64(result32) != value {
+		if result32, ok32 := Int32Ok(value, -1); ok32 != (value >= math.MinInt32 && value <= math.MaxInt32) {
+			t.Fatalf("Int32Ok(%d): ok=%v but in-range=%v", value, ok32, value >= math.MinInt32 && value <= math.MaxInt32)
+		} else if ok32 && int64(result32) != value {
 			t.Fatalf("Int32Ok(%d) reported ok but returned %d", value, result32)
 		}
 
 		// int64: every int64 fits, so it is always natural and exact.
-		result64, ok64 := Int64Ok(value, -1)
-		if !ok64 || result64 != value {
+		if result64, ok64 := Int64Ok(value, -1); !ok64 || result64 != value {
 			t.Fatalf("Int64Ok(%d) = (%d, %v); want (%d, true)", value, result64, ok64, value)
 		}
 
 		// int: identical to int64 on 64-bit; on 32-bit, Ok only within int range.
-		resultInt, okInt := IntOk(value, -1)
-		inRangeInt := value >= math.MinInt && value <= math.MaxInt
-		if okInt != inRangeInt {
-			t.Fatalf("IntOk(%d): ok=%v but inRange=%v", value, okInt, inRangeInt)
-		}
-		if okInt && int64(resultInt) != value {
+		if resultInt, okInt := IntOk(value, -1); okInt != (value >= math.MinInt && value <= math.MaxInt) {
+			t.Fatalf("IntOk(%d): ok=%v but in-range=%v", value, okInt, value >= math.MinInt && value <= math.MaxInt)
+		} else if okInt && int64(resultInt) != value {
 			t.Fatalf("IntOk(%d) reported ok but returned %d", value, resultInt)
 		}
 	})
@@ -102,14 +95,12 @@ func FuzzFloatNarrowing(f *testing.F) {
 		}
 
 		// int32: Ok only when the (truncated) value is representable in int32.
-		result32, ok32 := Int32Ok(value, -1)
-		if ok32 && (float64(result32) > value || value >= float64(1<<31) || value < -float64(1<<31)) {
+		if result32, ok32 := Int32Ok(value, -1); ok32 && (float64(result32) > value || value >= float64(1<<31) || value < -float64(1<<31)) {
 			t.Fatalf("Int32Ok(%v) reported ok with out-of-range result %d", value, result32)
 		}
 
 		// int64: an out-of-range float must report Ok=false rather than a wrapped value.
-		result64, ok64 := Int64Ok(value, -1)
-		if ok64 && (value >= float64(1<<63) || value < -float64(1<<63)) {
+		if result64, ok64 := Int64Ok(value, -1); ok64 && (value >= float64(1<<63) || value < -float64(1<<63)) {
 			t.Fatalf("Int64Ok(%v) reported ok=true for an out-of-range float (result %d)", value, result64)
 		}
 	})
