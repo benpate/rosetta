@@ -88,7 +88,7 @@ func getProperty(element Element, object any, name string) (any, error) {
 		return getProperty_String(object, name)
 	}
 
-	// You suck.
+	// Fall-through: the element is not one of the known schema types.
 	return nil, derp.Internal(location, "Getting property", name, object)
 }
 
