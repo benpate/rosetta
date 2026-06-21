@@ -7,94 +7,154 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// These tests verify that narrowing integer conversions never silently truncate:
-// a value outside the target range must clamp to the boundary AND return Ok=false.
+// These tests verify that narrowing integer conversions never silently truncate: a value outside
+// the target range must clamp to the boundary AND report Ok=false. In-range values report Ok=true.
+
+// floatInter / floatFloater exercise the Inter and Floater interface paths with custom types.
+type testInter int64
+
+func (i testInter) Int() int { return int(i) }
+
+type testFloater float64
+
+func (f testFloater) Float() float64 { return float64(f) }
 
 func TestInt32Ok_Overflow(t *testing.T) {
 
-	// int64 above/below int32 range
-	{
-		result, ok := Int32Ok(int64(math.MaxInt32)+1, -1)
-		require.False(t, ok)
-		require.Equal(t, int32(math.MaxInt32), result)
-	}
-	{
-		result, ok := Int32Ok(int64(math.MinInt32)-1, -1)
-		require.False(t, ok)
-		require.Equal(t, int32(math.MinInt32), result)
+	cases := []struct {
+		name   string
+		input  any
+		expect int32
+		ok     bool
+	}{
+		// In-range stays natural
+		{"int in range", int(123), 123, true},
+		{"int64 in range", int64(-123), -123, true},
+		{"int8 max", int8(math.MaxInt8), math.MaxInt8, true},
+		{"int16 min", int16(math.MinInt16), math.MinInt16, true},
+		{"int32 max", int32(math.MaxInt32), math.MaxInt32, true},
+		{"int32 min", int32(math.MinInt32), math.MinInt32, true},
+
+		// int (64-bit) past int32 range — the originally-unguarded path
+		{"int above max", int(math.MaxInt32) + 1, math.MaxInt32, false},
+		{"int below min", int(math.MinInt32) - 1, math.MinInt32, false},
+
+		// int64 past int32 range
+		{"int64 above max", int64(math.MaxInt32) + 1, math.MaxInt32, false},
+		{"int64 below min", int64(math.MinInt32) - 1, math.MinInt32, false},
+		{"int64 far above", int64(math.MaxInt64), math.MaxInt32, false},
+		{"int64 far below", int64(math.MinInt64), math.MinInt32, false},
+
+		// float64 / float32 at the exact 2^31 boundary that the naive guard let slip through
+		{"float64 == 2^31", float64(1 << 31), math.MaxInt32, false},
+		{"float64 below -2^31", -float64(1<<31) - 1, math.MinInt32, false},
+		{"float32 == 2^31", float32(1 << 31), math.MaxInt32, false},
+		{"float64 in range", float64(1000), 1000, true},
+
+		// string overflow returns default + false
+		{"string overflow", "99999999999999999", int32(-1), false},
+		{"string in range", "1000", 1000, true},
+
+		// interface paths
+		{"Inter above max", testInter(int64(math.MaxInt32) + 1), math.MaxInt32, false},
+		{"Floater 2^31", testFloater(float64(1 << 31)), math.MaxInt32, false},
 	}
 
-	// int above int32 range (64-bit platforms) — the previously-unguarded path
-	{
-		result, ok := Int32Ok(int(math.MaxInt32)+1, -1)
-		require.False(t, ok)
-		require.Equal(t, int32(math.MaxInt32), result)
-	}
-
-	// In-range int is still natural
-	{
-		result, ok := Int32Ok(int(123), -1)
-		require.True(t, ok)
-		require.Equal(t, int32(123), result)
-	}
-
-	// float64 at exactly 2^31 (the boundary float32(MaxInt32) rounds up to) must NOT slip through
-	{
-		result, ok := Int32Ok(float64(1<<31), -1)
-		require.False(t, ok)
-		require.Equal(t, int32(math.MaxInt32), result)
-	}
-	// float32 at exactly 2^31 likewise
-	{
-		result, ok := Int32Ok(float32(1<<31), -1)
-		require.False(t, ok)
-		require.Equal(t, int32(math.MaxInt32), result)
+	for _, c := range cases {
+		result, ok := Int32Ok(c.input, -1)
+		require.Equal(t, c.ok, ok, c.name)
+		require.Equal(t, c.expect, result, c.name)
 	}
 }
 
 func TestInt64Ok_Overflow(t *testing.T) {
 
-	// float64 at exactly 2^63 (which math.MaxInt64 rounds up to) must NOT overflow through the guard
-	{
-		result, ok := Int64Ok(float64(1<<63), -1)
-		require.False(t, ok)
-		require.Equal(t, int64(math.MaxInt64), result)
-	}
-	// float64 below int64 range
-	{
-		result, ok := Int64Ok(-float64(1<<63)*2, -1)
-		require.False(t, ok)
-		require.Equal(t, int64(math.MinInt64), result)
-	}
-	// float32 at 2^63 likewise
-	{
-		result, ok := Int64Ok(float32(1<<63), -1)
-		require.False(t, ok)
-		require.Equal(t, int64(math.MaxInt64), result)
+	cases := []struct {
+		name   string
+		input  any
+		expect int64
+		ok     bool
+	}{
+		// Every signed/widening source is in range for int64
+		{"int", int(math.MaxInt32), math.MaxInt32, true},
+		{"int64 max", int64(math.MaxInt64), math.MaxInt64, true},
+		{"int64 min", int64(math.MinInt64), math.MinInt64, true},
+
+		// float64 at exactly 2^63 (which math.MaxInt64 rounds up to) must NOT overflow through
+		{"float64 == 2^63", float64(1 << 63), math.MaxInt64, false},
+		{"float64 below -2^63", -float64(1<<63) * 2, math.MinInt64, false},
+		{"float32 == 2^63", float32(1 << 63), math.MaxInt64, false},
+		{"float64 in range", float64(1000), 1000, true},
+
+		// string overflow
+		{"string overflow", "99999999999999999999999999", int64(-1), false},
+		{"string in range", "1234567890123", 1234567890123, true},
+
+		// interface paths
+		{"Floater 2^63", testFloater(float64(1 << 63)), math.MaxInt64, false},
 	}
 
-	// In-range float is still natural
-	{
-		result, ok := Int64Ok(float64(1000), -1)
-		require.True(t, ok)
-		require.Equal(t, int64(1000), result)
+	for _, c := range cases {
+		result, ok := Int64Ok(c.input, -1)
+		require.Equal(t, c.ok, ok, c.name)
+		require.Equal(t, c.expect, result, c.name)
 	}
 }
 
 func TestIntOk_Overflow(t *testing.T) {
 
-	// On 64-bit platforms, float64 at 2^63 must not overflow through the guard.
-	// (On 32-bit, math.MaxInt is smaller and this value is still out of range — either way Ok=false.)
-	{
-		result, ok := IntOk(float64(1<<63), -1)
-		require.False(t, ok)
-		require.Equal(t, math.MaxInt, result)
+	cases := []struct {
+		name   string
+		input  any
+		expect int
+		ok     bool
+	}{
+		{"int", int(123), 123, true},
+		{"int64 in range", int64(123), 123, true},
+
+		// On 64-bit, float64 at 2^63 must not overflow through the guard.
+		{"float64 == 2^63", float64(1 << 63), math.MaxInt, false},
+		{"float64 below -2^63", -float64(1<<63) * 2, math.MinInt, false},
+		{"float64 in range", float64(1000), 1000, true},
+
+		// Floater interface previously reported ok=true for out-of-range values
+		{"Floater 2^63", testFloater(float64(1 << 63)), math.MaxInt, false},
+		{"Floater in range", testFloater(42.0), 42, true},
+
+		// string overflow
+		{"string overflow", "99999999999999999999999999", int(-1), false},
 	}
 
-	// In-range float is still natural
-	{
-		result, ok := IntOk(float64(1000), -1)
-		require.True(t, ok)
-		require.Equal(t, 1000, result)
+	for _, c := range cases {
+		result, ok := IntOk(c.input, -1)
+		require.Equal(t, c.ok, ok, c.name)
+		require.Equal(t, c.expect, result, c.name)
+	}
+}
+
+// TestInt_NoSilentTruncation is a focused invariant check: for any int64 input, converting to a
+// narrower type must either preserve the exact value (ok=true) or report ok=false. It must never
+// return a different in-range value with ok=true.
+func TestInt_NoSilentTruncation(t *testing.T) {
+
+	inputs := []int64{
+		0, 1, -1,
+		math.MaxInt8, math.MinInt8,
+		math.MaxInt16, math.MinInt16,
+		math.MaxInt32, math.MinInt32,
+		int64(math.MaxInt32) + 1, int64(math.MinInt32) - 1,
+		math.MaxInt64, math.MinInt64,
+	}
+
+	for _, in := range inputs {
+		result, ok := Int32Ok(in, -999)
+		if ok {
+			// Natural conversion must round-trip exactly.
+			require.Equal(t, in, int64(result), "Int32Ok(%d) reported ok but changed the value", in)
+		} else {
+			// Rejected values must be exactly the values that don't fit in int32.
+			require.True(t, in > math.MaxInt32 || in < math.MinInt32,
+				"Int32Ok(%d) reported NOT-ok for an in-range value", in)
+		}
 	}
 }
