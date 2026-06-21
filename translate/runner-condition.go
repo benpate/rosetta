@@ -23,6 +23,8 @@ func Condition(condition string, thenRules []Rule, elseRules []Rule) Rule {
 
 	conditionTemplate, err := template.New("").Funcs(funcmap.All()).Parse(condition)
 
+	// This constructor cannot return an error, so a malformed condition is reported and the
+	// template left nil; executeTemplate guards against the nil so Execute simply takes the ELSE branch.
 	if err != nil {
 		derp.Report(err)
 	}
