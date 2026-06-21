@@ -26,12 +26,14 @@ jobs:
       with:
         go-version: '1.26'
 
+    # Pin nilaway to an explicit version (it publishes only pseudo-versions,
+    # no semver tags) so the installed tool is predictable, not @latest.
     - name: Install NilAway
-      run: go install go.uber.org/nilaway/cmd/nilaway@latest
+      run: go install go.uber.org/nilaway/cmd/nilaway@v0.0.0-20260617211854-01ab7e30fbe0
 
-    # RULE: -exclude-test-files suppresses false positives where the only nil flow
-    # originates in a test calling a *map setter on a zero-value (nil) map variable.
-    # Those setters allocate via makeNotNil() before any write, so the production
-    # code is provably nil-safe (covered by the -race tests). See mapof/README.md.
+    # -exclude-test-files scopes analysis to production code; nil flows that
+    # exist only in test fixtures (a setter called on a zero-value map variable)
+    # are out of scope. The map setters allocate via makeNotNil() before any
+    # write and are covered by the -race tests. See mapof/README.md.
     - name: Nil panic checks
       run: nilaway -exclude-test-files=true ./...
