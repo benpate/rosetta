@@ -1,5 +1,6 @@
 package slice
 
+// Map returns a new slice containing the result of applying delta to each element of source.
 func Map[T1 any, T2 any](source []T1, delta func(T1) T2) []T2 {
 
 	result := make([]T2, len(source))

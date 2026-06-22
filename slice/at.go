@@ -1,3 +1,4 @@
+// Package slice provides generic utility functions for working with slices
 package slice
 
 // At returns a bounds-safe value from a slice.  If the index is out of

@@ -40,7 +40,6 @@ func TestStringUnmarshalComplete1(t *testing.T) {
 	assert.Equal(t, str.MaxLength, 100)
 	assert.Equal(t, str.Required, true)
 	assert.Equal(t, str.Format, "date")
-	assert.Equal(t, str.Pattern, "abc123")
 }
 
 func TestStringFormatLowercase1(t *testing.T) {
@@ -53,9 +52,14 @@ func TestStringFormatLowercase1(t *testing.T) {
 		return
 	}
 
-	require.NotNil(t, s.Validate("NOT-ENOUGH-LOWERCASE"))
-	require.NotNil(t, s.Validate("NOT-ENOUGH-LOWERCASE-a"))
-	require.Nil(t, s.Validate("ENOUGH-LOWERCASE-ab"))
+	_, _, err = validate(s, "NOT-ENOUGH-LOWERCASE")
+	require.NotNil(t, err)
+
+	_, _, err = validate(s, "NOT-ENOUGH-LOWERCASE-a")
+	require.NotNil(t, err)
+
+	_, _, err = validate(s, "ENOUGH-LOWERCASE-ab")
+	require.Nil(t, err)
 }
 
 func TestStringFormatUppercase1(t *testing.T) {
@@ -68,7 +72,12 @@ func TestStringFormatUppercase1(t *testing.T) {
 		return
 	}
 
-	require.NotNil(t, s.Validate("not-enough-uppercase"))
-	require.NotNil(t, s.Validate("not-enough-uppercase-A"))
-	require.Nil(t, s.Validate("enough-uppercase-AB"))
+	_, _, err = validate(s, "not-enough-uppercase")
+	require.NotNil(t, err)
+
+	_, _, err = validate(s, "not-enough-uppercase-A")
+	require.NotNil(t, err)
+
+	_, _, err = validate(s, "enough-uppercase-AB")
+	require.Nil(t, err)
 }

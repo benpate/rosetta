@@ -11,7 +11,7 @@ type Object struct {
 	Properties ElementMap `json:"properties"`
 	Wildcard   Element    `json:"wildcard"`
 	Required   bool       `json:"required"`
-	RequiredIF string     `json:"required-if"`
+	RequiredIf string     `json:"required-if"`
 }
 
 /***********************************
@@ -62,18 +62,19 @@ func (element Object) IsRequired() bool {
 	return element.Required
 }
 
+/*
 // Validate implements the Element interface
 // It validates a value against this schema
 func (element Object) Validate(object any) error {
 
 	for name, subElement := range element.Properties {
 		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Unable to validate property", name)
+			return derp.Wrap(err, "schema.Object.Validate", "Validating property", name)
 		}
 	}
 
 	return nil
-}
+}*/
 
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
@@ -84,7 +85,7 @@ func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	for name, subElement := range element.Properties {
 		subPath := path.PushTail(name)
 		if err := subElement.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, location, "Unable to validate property", subPath.String())
+			return derp.Wrap(err, location, "Validating property", subPath.String())
 		}
 	}
 
@@ -161,8 +162,8 @@ func (element Object) MarshalMap() map[string]any {
 		result["required"] = true
 	}
 
-	if element.RequiredIF != "" {
-		result["required-if"] = element.RequiredIF
+	if element.RequiredIf != "" {
+		result["required-if"] = element.RequiredIf
 	}
 
 	return result
@@ -182,6 +183,8 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		element.Required = required
 	}
 
+	element.RequiredIf = convert.String(data["required-if"])
+
 	// Handle property map
 	if properties, isMap := data["properties"].(map[string]any); isMap {
 
@@ -195,6 +198,9 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 					propertyMap["required"] = true
 				}
 
+				// Errors are intentionally tolerated: a property using an unsupported construct
+				// (e.g. a "$ref" reference this package does not resolve) is skipped so the rest of
+				// the schema still loads, rather than failing the whole document.
 				if propertyObject, err := UnmarshalMap(propertyMap); err == nil {
 					element.Properties[key] = propertyObject
 				}
@@ -202,7 +208,8 @@ func (element *Object) UnmarshalMap(data map[string]any) error {
 		}
 	}
 
-	// Handle other "wildcard" properties
+	// Handle other "wildcard" properties. As with properties above, an unsupported wildcard schema
+	// is skipped rather than failing the whole document.
 	if wildcard, ok := data["wildcard"].(map[string]any); ok {
 		if wildcardObject, err := UnmarshalMap(wildcard); err == nil {
 			element.Wildcard = wildcardObject

@@ -7,6 +7,22 @@ import (
 	"strconv"
 )
 
+// Float boundaries for safe int conversion. float(math.MaxInt) rounds up to the next power of two,
+// so we compare against the exact 2^(N-1) boundary instead: any float >= that or < its negation is
+// out of int range. The boundary depends on the platform int width (32- or 64-bit).
+var (
+	maxIntAsFloat = boundaryIf(math.MaxInt == math.MaxInt32, maxInt32AsFloat, maxInt64AsFloat)
+	minIntAsFloat = boundaryIf(math.MaxInt == math.MaxInt32, minInt32AsFloat, minInt64AsFloat)
+)
+
+// boundaryIf selects between two float boundaries based on the platform int width.
+func boundaryIf(is32 bool, on32, on64 float64) float64 {
+	if is32 {
+		return on32
+	}
+	return on64
+}
+
 // Int forces a conversion from an arbitrary value into an int.
 // If the value cannot be converted, then the zero value for the type (0) is used.
 func Int(value any) int {
@@ -74,22 +90,24 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		return int(v), true
 
 	case float32:
-		if v > float32(math.MaxInt) {
+		// float(math.MaxInt) rounds UP to the next power of two, so a plain `> MaxInt` lets that
+		// boundary value slip through and overflow. Compare against the exact 2^(N-1) boundary with >=.
+		if float64(v) >= maxIntAsFloat {
 			return math.MaxInt, false
 		}
 
-		if v < float32(math.MinInt) {
+		if float64(v) < minIntAsFloat {
 			return math.MinInt, false
 		}
 
 		return int(v), hasDecimal(float64(v))
 
 	case float64:
-		if v > float64(math.MaxInt) {
+		if v >= maxIntAsFloat {
 			return math.MaxInt, false
 		}
 
-		if v < float64(math.MinInt) {
+		if v < minIntAsFloat {
 			return math.MinInt, false
 		}
 
@@ -109,11 +127,17 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return IntOk(v[0], defaultValue)
+		}
 		return IntDefault(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return IntOk(v[0], defaultValue)
 		}
 		return IntDefault(v[0], defaultValue), false
 
@@ -125,8 +149,8 @@ func IntOk(value any, defaultValue int) (int, bool) {
 		return v.Int(), true
 
 	case Floater:
-		result := v.Float()
-		return Int(result), hasDecimal(result)
+		// Delegate to the float64 case so out-of-range values are clamped and reported as Ok=false.
+		return IntOk(v.Float(), defaultValue)
 
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)

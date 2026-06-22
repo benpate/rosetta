@@ -1,3 +1,4 @@
+// Package mapof provides generic string-keyed map types with typed values and helper methods
 package mapof
 
 import (
@@ -9,12 +10,13 @@ import (
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
-	"github.com/benpate/rosetta/pointer"
 	"github.com/benpate/rosetta/schema"
 )
 
+// Any is a map of string keys to arbitrary values with typed, coercing accessors.
 type Any map[string]any
 
+// NewAny returns a new, initialized Any map.
 func NewAny() Any {
 	return make(Any)
 }
@@ -23,22 +25,32 @@ func NewAny() Any {
  * Map Manipulations
  ******************************************/
 
+// Length returns the number of elements in the map
+func (x Any) Length() int {
+	return len(x)
+}
+
+// Keys returns the map's keys in sorted order.
 func (x Any) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
+// Equal returns TRUE if this map deeply equals the provided map.
 func (x Any) Equal(value map[string]any) bool {
 	return reflect.DeepEqual(x, Any(value))
 }
 
+// NotEqual returns TRUE if this map does not deeply equal the provided map.
 func (x Any) NotEqual(value map[string]any) bool {
 	return !reflect.DeepEqual(x, Any(value))
 }
 
+// IsEmpty returns TRUE if the map contains no elements.
 func (x Any) IsEmpty() bool {
 	return len(x) == 0
 }
 
+// NotEmpty returns TRUE if the map contains one or more elements.
 func (x Any) NotEmpty() bool {
 	return len(x) > 0
 }
@@ -47,11 +59,13 @@ func (x Any) NotEmpty() bool {
  * Getter Interfaces
  ******************************************/
 
+// GetAny returns the raw value for the key, or nil if the key is not present.
 func (x Any) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
 	return result
 }
 
+// GetAnyOK returns the raw value for the key and TRUE if it is present, or (nil, false) if not.
 func (x Any) GetAnyOK(key string) (any, bool) {
 	if value, ok := x[key]; ok {
 		return value, true
@@ -60,11 +74,13 @@ func (x Any) GetAnyOK(key string) (any, bool) {
 
 }
 
+// GetBool returns the value for the key coerced to bool, or FALSE if absent or not coercible.
 func (x Any) GetBool(key string) bool {
 	result, _ := x.GetBoolOK(key)
 	return result
 }
 
+// GetBoolOK returns the value for the key coerced to bool, with TRUE if it was present and coercible.
 func (x Any) GetBoolOK(key string) (value bool, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.BoolOk(value, false)
@@ -72,11 +88,13 @@ func (x Any) GetBoolOK(key string) (value bool, ok bool) {
 	return false, false
 }
 
+// GetFloat returns the value for the key coerced to float64, or 0 if absent or not coercible.
 func (x Any) GetFloat(key string) float64 {
 	result, _ := x.GetFloatOK(key)
 	return result
 }
 
+// GetFloatOK returns the value for the key coerced to float64, with TRUE if it was present and coercible.
 func (x Any) GetFloatOK(key string) (value float64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.FloatOk(value, 0)
@@ -84,11 +102,13 @@ func (x Any) GetFloatOK(key string) (value float64, ok bool) {
 	return 0, false
 }
 
+// GetInt returns the value for the key coerced to int, or 0 if absent or not coercible.
 func (x Any) GetInt(key string) int {
 	result, _ := x.GetIntOK(key)
 	return result
 }
 
+// GetIntOK returns the value for the key coerced to int, with TRUE if it was present and coercible.
 func (x Any) GetIntOK(key string) (value int, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.IntOk(value, 0)
@@ -96,11 +116,13 @@ func (x Any) GetIntOK(key string) (value int, ok bool) {
 	return 0, false
 }
 
+// GetInt64 returns the value for the key coerced to int64, or 0 if absent or not coercible.
 func (x Any) GetInt64(key string) int64 {
 	result, _ := x.GetInt64OK(key)
 	return result
 }
 
+// GetInt64OK returns the value for the key coerced to int64, with TRUE if it was present and coercible.
 func (x Any) GetInt64OK(key string) (value int64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.Int64Ok(value, 0)
@@ -108,11 +130,13 @@ func (x Any) GetInt64OK(key string) (value int64, ok bool) {
 	return 0, false
 }
 
+// GetString returns the value for the key coerced to string, or "" if absent or not coercible.
 func (x Any) GetString(key string) string {
 	result, _ := x.GetStringOK(key)
 	return result
 }
 
+// GetStringOK returns the value for the key coerced to string, with TRUE if it was present and coercible.
 func (x Any) GetStringOK(key string) (value string, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.StringOk(value, "")
@@ -120,11 +144,13 @@ func (x Any) GetStringOK(key string) (value string, ok bool) {
 	return "", false
 }
 
+// GetTime returns the value for the key coerced to time.Time, or the zero time if absent or not coercible.
 func (x Any) GetTime(key string) time.Time {
 	result, _ := x.GetTimeOK(key)
 	return result
 }
 
+// GetTimeOK returns the value for the key coerced to time.Time, with TRUE if it was present and coercible.
 func (x Any) GetTimeOK(key string) (value time.Time, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.TimeOk(value, time.Time{})
@@ -136,6 +162,7 @@ func (x Any) GetTimeOK(key string) (value time.Time, ok bool) {
  * Setter Interfaces
  ****************************************/
 
+// SetAny stores a non-zero value at the key (deleting the key when the value is zero to keep the map sparse).
 func (x *Any) SetAny(key string, value any) bool {
 	x.makeNotNil()
 	if compare.IsZero(value) {
@@ -146,12 +173,14 @@ func (x *Any) SetAny(key string, value any) bool {
 	return true
 }
 
+// SetBool stores a bool value at the key.
 func (x *Any) SetBool(key string, value bool) bool {
 	x.makeNotNil()
 	(*x)[key] = value
 	return true
 }
 
+// SetFloat stores a non-zero float64 at the key (deleting the key when the value is zero).
 func (x *Any) SetFloat(key string, value float64) bool {
 	x.makeNotNil()
 	if value == 0 {
@@ -162,6 +191,7 @@ func (x *Any) SetFloat(key string, value float64) bool {
 	return true
 }
 
+// SetInt stores a non-zero int at the key (deleting the key when the value is zero).
 func (x *Any) SetInt(key string, value int) bool {
 	x.makeNotNil()
 	if value == 0 {
@@ -172,6 +202,7 @@ func (x *Any) SetInt(key string, value int) bool {
 	return true
 }
 
+// SetInt64 stores a non-zero int64 at the key (deleting the key when the value is zero).
 func (x *Any) SetInt64(key string, value int64) bool {
 	x.makeNotNil()
 	if value == 0 {
@@ -182,6 +213,7 @@ func (x *Any) SetInt64(key string, value int64) bool {
 	return true
 }
 
+// SetString stores a non-empty string at the key (deleting the key when the value is empty).
 func (x *Any) SetString(key string, value string) bool {
 	x.makeNotNil()
 	if value == "" {
@@ -192,6 +224,7 @@ func (x *Any) SetString(key string, value string) bool {
 	return true
 }
 
+// SetValue replaces the entire map with the provided value, if it can be converted to a mapof.Any.
 func (x *Any) SetValue(value any) error {
 
 	if mapOfAny, ok := MapOfAny(value); ok {
@@ -221,6 +254,7 @@ func (x *Any) Append(key string, value any) {
 	(*x)[key] = []any{value}
 }
 
+// makeNotNil allocates the backing map if the receiver currently points to a nil map.
 func (x *Any) makeNotNil() {
 	if *x == nil {
 		*x = make(Any)
@@ -231,11 +265,13 @@ func (x *Any) makeNotNil() {
  * Tree Traversal
  ****************************************/
 
+// GetPointer returns the raw value for the key (implements the schema PointerGetter interface).
 func (x Any) GetPointer(key string) (any, bool) {
 	result, ok := x[key]
 	return result, ok
 }
 
+// SetObject descends the path (creating child maps as needed) and sets the value (implements the schema ObjectSetter interface).
 func (x *Any) SetObject(element schema.Element, path list.List, value any) error {
 
 	const location = "mapof.Any.SetObject"
@@ -260,26 +296,28 @@ func (x *Any) SetObject(element schema.Element, path list.List, value any) error
 		return derp.Internal(location, "Invalid property", head)
 	}
 
-	var tempValue any
+	// Get or create the child map. We use a concrete Any (not a bare `any`) so
+	// that the recursive SetProperty call receives a *Any, which implements the
+	// setter interfaces; a *any (pointer to interface) would implement none.
+	var subMap Any
 
-	// If we already have a value in this spot, then use it
-	if subValue, ok := (*x)[head]; ok {
-		tempValue = subValue
+	if existing, ok := (*x)[head].(Any); ok {
+		subMap = existing
 	} else {
-		// Otherwise, initialize a new mapof.Any
-		tempValue = make(Any)
+		subMap = make(Any)
 	}
 
-	if err := schema.SetElement(pointer.To(tempValue), subElement, tail, value); err != nil {
-		return derp.Wrap(err, location, "Unable to set value", path)
+	if err := schema.SetProperty(subElement, &subMap, tail.String(), value); err != nil {
+		return derp.Wrap(err, location, "Setting value", path)
 	}
 
-	// Reapply the updated value to the map
-	(*x)[head] = tempValue
+	// Reapply the (mutated) child map back into this map.
+	(*x)[head] = subMap
 
 	return nil
 }
 
+// Remove deletes the key from the map.
 func (x *Any) Remove(key string) bool {
 	x.makeNotNil()
 	delete(*x, key)
@@ -290,6 +328,7 @@ func (x *Any) Remove(key string) bool {
  * Other Getter Interfaces
  ******************************************/
 
+// IsZeroValue returns TRUE if the named property is absent or holds a zero value.
 func (m Any) IsZeroValue(name string) bool {
 	return compare.IsZero(m[name])
 }

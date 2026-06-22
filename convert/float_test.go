@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO: LOW: Thes tests still dont account for overflow errors.
-
 func TestNilToFloat(t *testing.T) {
 
 	result, natural := FloatOk(nil, float64(-1))

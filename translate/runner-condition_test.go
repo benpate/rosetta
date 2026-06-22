@@ -48,6 +48,24 @@ func TestUnmarshalCondition_If(t *testing.T) {
 	require.Equal(t, 42, result.GetInt("age"))
 }
 
+func TestCondition_MalformedTemplate(t *testing.T) {
+
+	// A malformed condition leaves the Runner's template nil; executing it must not panic.
+	rule := Condition(
+		"{{ this is not valid", // unterminated/invalid template
+		[]Rule{{conditionRunner{}}},
+		nil,
+	)
+
+	testData := mapof.Any{"value": 42}
+	result := mapof.Any{}
+
+	// Execute takes the ELSE branch (here empty), leaving the result untouched and returning no error.
+	err := Pipeline{rule}.Execute(schema.Wildcard(), testData, schema.Wildcard(), &result)
+	require.Nil(t, err)
+	require.Equal(t, 0, len(result))
+}
+
 func TestUnmarshalCondition_Else(t *testing.T) {
 
 	testJSON := `[

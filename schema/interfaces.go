@@ -98,6 +98,9 @@ type LengthGetter interface {
 // ArrayGetter allows an object to get a value at a specific index in an array
 type ArrayGetter interface {
 
+	// Length returns the length of the array
+	Length() int
+
 	// GetIndex gets the value at the specified index
 	GetIndex(int) (any, bool)
 }
@@ -174,6 +177,12 @@ type ArraySetter interface {
 
 	// Length returns the length of the array
 	Length() int
+}
+
+// ArrayGetterSetter combines the ArrayGetter and ArraySetter interfaces, for objects that can both get and set array values.
+type ArrayGetterSetter interface {
+	ArrayGetter
+	ArraySetter
 }
 
 /******************************************

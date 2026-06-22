@@ -7,6 +7,14 @@ import (
 	"strconv"
 )
 
+// Float boundaries for safe int32 conversion. float32(math.MaxInt32) rounds up to 2^31, so we
+// compare against the exact 2^31 power-of-two boundary instead: any float >= 2^31 or < -2^31 is
+// out of int32 range. Both boundaries are exactly representable in float32 and float64.
+const (
+	maxInt32AsFloat = float64(1 << 31)  // 2^31, the first float above math.MaxInt32
+	minInt32AsFloat = -float64(1 << 31) // -2^31, exactly math.MinInt32
+)
+
 // Int32 forces a conversion from an arbitrary value into an int.
 // If the value cannot be converted, then the zero value for the type (0) is used.
 func Int32(value any) int32 {
@@ -49,6 +57,13 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		return 0, true
 
 	case int:
+		// int is 64-bit on most platforms, so it must be range-checked before narrowing to int32.
+		if int64(v) > math.MaxInt32 {
+			return math.MaxInt32, false
+		}
+		if int64(v) < math.MinInt32 {
+			return math.MinInt32, false
+		}
 		return int32(v), true
 
 	case int8:
@@ -72,22 +87,24 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		return int32(v), true
 
 	case float32:
-		if v > float32(math.MaxInt32) {
+		// float32(math.MaxInt32) rounds UP to 2^31, so a plain `> MaxInt32` lets 2^31 slip through
+		// and overflow. Compare against the exact 2^31 boundary with >= instead.
+		if float64(v) >= maxInt32AsFloat {
 			return math.MaxInt32, false
 		}
 
-		if v < float32(math.MinInt32) {
+		if float64(v) < minInt32AsFloat {
 			return math.MinInt32, false
 		}
 
 		return int32(v), hasDecimal(float64(v))
 
 	case float64:
-		if v > float64(math.MaxInt32) {
+		if v >= maxInt32AsFloat {
 			return math.MaxInt32, false
 		}
 
-		if v < float64(math.MinInt32) {
+		if v < minInt32AsFloat {
 			return math.MinInt32, false
 		}
 
@@ -107,11 +124,17 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return Int32Ok(v[0], defaultValue)
+		}
 		return Int32Default(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return Int32Ok(v[0], defaultValue)
 		}
 		return Int32Default(v[0], defaultValue), false
 

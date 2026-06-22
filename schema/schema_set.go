@@ -2,6 +2,7 @@ package schema
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
@@ -10,12 +11,30 @@ import (
 
 // Set sets the value at the specified path within the object according to this schema
 func (schema Schema) Set(object any, path string, value any) error {
-	return SetElement(object, schema.Element, list.ByDot(path), value)
+
+	const location = "schema.Schema.Set"
+
+	// Find the element for this path
+	element, ok := schema.GetElement(path)
+
+	if !ok {
+		return derp.BadRequest(location, "Invalid path", path)
+	}
+
+	// Validate the value (and update if necessary) against the schema rules for this element
+	value, _, err := validate(element, value)
+
+	if err != nil {
+		return derp.Wrap(err, location, "Value is not valid for this schema", path, value)
+	}
+
+	// set the property value in the object
+	return SetProperty(schema.Element, object, path, value)
 }
 
 // SetAll iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are addedd successfully, then SetAll
-// also uses Validate() to confirm that the object is still correct.
+// at the first error it encounters.  If all values are added successfully, then SetAll
+// also runs ValidateRequiredIf() to confirm that the object is still correct.
 func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	const location = "schema.Schema.SetAll"
@@ -23,15 +42,15 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 	// Set each value in the schema
 	for path, value := range values {
 
-		// Errors are intentionally ignored here.
-		// Unallowed data does not make it through the schema filter
-		// nolint: errcheck
-		schema.Set(object, path, value)
+		// Try to set the value in the object.
+		if err := schema.Set(object, path, value); err != nil {
+			return derp.Wrap(err, location, "Setting value", path, value)
+		}
 	}
 
-	// Validate the whole schema once all the values are set
-	if err := schema.Validate(object); err != nil {
-		return derp.Wrap(err, location, "Validation Error")
+	// Confirm required-if constraints once all values are set
+	if err := schema.ValidateRequiredIf(object); err != nil {
+		return derp.Wrap(err, location, "Validating values", object)
 	}
 
 	// Success!!
@@ -39,177 +58,254 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 }
 
 // SetURLValues iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are addedd successfully, then SetURLValues
-// also uses Validate() to confirm that the object is still correct.
+// at the first error it encounters.  If all values are added successfully, then SetURLValues
+// also runs ValidateRequiredIf() to confirm that the object is still correct.
 func (schema Schema) SetURLValues(object any, values url.Values) error {
 
-	const location = "schema.Schema.SetAll"
+	const location = "schema.Schema.SetURLValues"
 
 	// Set each value in the schema
 	for path, value := range values {
 
-		// Errors are intentionally ignored here.
-		// Unallowed data does not make it through the schema filter
-		// nolint: errcheck
-		_ = schema.Set(object, path, value)
+		// Try to set the value in the object
+		if err := schema.Set(object, path, value); err != nil {
+			return derp.Wrap(err, location, "Setting value", path, value)
+		}
 	}
 
-	// Validate the whole schema once all the values are set
-	if err := schema.Validate(object); err != nil {
-		return derp.Wrap(err, location, "Validation Error")
+	// Confirm required-if constraints once all values are set
+	if err := schema.ValidateRequiredIf(object); err != nil {
+		return derp.Wrap(err, location, "Validating values", object)
 	}
 
 	// Success!!
 	return nil
 }
 
-// SetElement sets the value at the specified path within the object according to the provided schema
-func SetElement(object any, element Element, path list.List, value any) error {
+// SetProperty sets the value at the specified path within the object according to the provided schema
+func SetProperty(element Element, object any, path string, value any) (err error) {
 
-	const location = "schema.SetElement"
+	const location = "schema.setProperty"
+
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = derp.Internal(location, "Panic while setting value", path, value, recovered)
+		}
+	}()
 
 	// In rare cases, we may need to set an entire element in one call.
 	// If the path is empty, then we're setting the entire element, which
 	// must implement the "ValueSetter" interface
-	if path.IsEmpty() {
+	if path == "" {
 		if setter, ok := object.(ValueSetter); ok {
 			if err := setter.SetValue(value); err != nil {
-				return derp.Wrap(err, location, "Unable to set value", object, value)
+				return derp.Wrap(err, location, "Setting value", object, value)
 			}
 			return nil
 		}
 		return derp.Internal(location, "Cannot set values on empty path", object, element, path, value)
 	}
 
-	// Otherwise, we're setting a sub-element within the object:
+	// Split the path into head and tail
+	head, tail, _ := strings.Cut(path, ".")
 
-	head, tail := path.Split()
+	// FInd the property definition for the first path segment
 	subElement, ok := element.GetElement(head)
 
 	if !ok {
 		return derp.Internal(location, "Property does not exist in schema", head, path)
 	}
 
-	// Different interfaces are required for different types of objects
+	// Use the element type to find the correct property setter
 	switch typed := subElement.(type) {
 
 	case Any, Array, Object:
-
-		// ObjectSetter interface is required for Maps
-		if setter, ok := object.(ObjectSetter); ok {
-			return setter.SetObject(element, path, value)
-		}
-
-		// PointerGetter works for Structs, Slices, and Arrays
-		if getter, ok := object.(PointerGetter); ok {
-			if subPointer, ok := getter.GetPointer(head); ok {
-				return SetElement(subPointer, typed, tail, value)
-			}
-		}
-		return derp.Internal(location, "To set an 'Any', 'Array', or 'Object' value, the target Object must be an ObjectSetter or PointerGetter", path, object)
+		return setProperty_Object(element, typed, object, path, head, tail, value)
 
 	case Boolean:
-		boolValue, _ := convert.BoolOk(value, false)
-		if setter, ok := object.(BoolSetter); ok {
-			if setter.SetBool(head, boolValue) {
-				return nil
-			}
-		}
-
-		if getter, ok := object.(PointerGetter); ok {
-			if pointer, ok := getter.GetPointer(head); ok {
-				if value, ok := pointer.(*bool); ok {
-					*value = boolValue
-					return nil
-				}
-			}
-		}
-
-		return derp.Internal(location, "To set a 'Boolean' value, the target Object must be a BoolSetter or PointerGetter", path, object)
+		return setProperty_Boolean(object, path, value)
 
 	case Integer:
 		if typed.BitSize == 64 {
-			int64Value, _ := convert.Int64Ok(value, 0)
-			if setter, ok := object.(Int64Setter); ok {
-				if setter.SetInt64(head, int64Value) {
-					return nil
-				}
-			}
-
-			if getter, ok := object.(PointerGetter); ok {
-				if pointer, ok := getter.GetPointer(head); ok {
-					if value, ok := pointer.(*int64); ok {
-						*value = int64Value
-						return nil
-					}
-				}
-			}
-
-			return derp.Internal(location, "To set a 64-bit 'Integer' value, the target Object must be an Int64Setter or PointerGetter", path, object)
+			return setProperty_Integer64(object, path, value)
 		}
 
-		intValue, _ := convert.IntOk(value, 0)
-		if setter, ok := object.(IntSetter); ok {
-			if setter.SetInt(head, intValue) {
-				return nil
-			}
-		}
-
-		if getter, ok := object.(PointerGetter); ok {
-			if pointer, ok := getter.GetPointer(head); ok {
-				if value, ok := pointer.(*int); ok {
-					*value = intValue
-					return nil
-				}
-			}
-		}
-
-		return derp.Internal(location, "To set an 'Integer' value, the target Object must be an IntSetter or PointerGetter", path, object)
+		return setProperty_Integer32(object, path, value)
 
 	case Number:
-		floatValue, _ := convert.FloatOk(value, 0)
-		if setter, ok := object.(FloatSetter); ok {
-			if setter.SetFloat(head, floatValue) {
-				return nil
-			}
-		}
-
-		if getter, ok := object.(PointerGetter); ok {
-			if pointer, ok := getter.GetPointer(head); ok {
-				if value, ok := pointer.(*float64); ok {
-					*value = floatValue
-					return nil
-				}
-			}
-		}
-
-		return derp.Internal(location, "To set a 'Number' value, the target Object must be a FloatSetter or PointerGetter", path, object)
+		return setProperty_Number(object, path, value)
 
 	case String:
-		stringValue, _ := convert.StringOk(value, "")
-		if setter, ok := object.(StringSetter); ok {
-			if setter.SetString(head, stringValue) {
-				return nil
-			}
-		}
-
-		if getter, ok := object.(PointerGetter); ok {
-			if pointer, ok := getter.GetPointer(head); ok {
-				if value, ok := pointer.(*string); ok {
-					*value = stringValue
-					return nil
-				}
-			}
-
-		}
-
-		return derp.Internal(
-			location,
-			"To set a 'String' value, the target Object must be a StringSetter or PointerGetter",
-			path,
-			object,
-		)
+		return setProperty_String(object, path, value)
 	}
 
 	return derp.Internal(location, "Unsupported element type", path, subElement, object)
+}
+
+// setProperty_Object sets a value in the object using either the ObjectSetter or PointerGetter interface.
+// parentElement describes the object being set (its properties are the object's keys); childElement is
+// the schema for the first path segment (head).
+func setProperty_Object(parentElement Element, childElement Element, object any, path string, head string, tail string, value any) error {
+
+	const location = "schema.setProperty_Object"
+
+	// ObjectSetter interface is required for Maps. The map's own schema is the
+	// parent element, and SetObject descends the full path itself.
+	if setter, ok := object.(ObjectSetter); ok {
+		return setter.SetObject(parentElement, list.ByDot(path), value)
+	}
+
+	// PointerGetter works for Structs, Slices, and Arrays. We have already
+	// descended to "head", so continue with the child element and the tail.
+	if getter, ok := object.(PointerGetter); ok {
+		if subPointer, ok := getter.GetPointer(head); ok {
+			return SetProperty(childElement, subPointer, tail, value)
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be an ObjectSetter or PointerGetter", path, object)
+}
+
+// setProperty_Boolean sets a boolean value in the object.
+func setProperty_Boolean(object any, path string, value any) error {
+
+	const location = "schema.setProperty_Boolean"
+
+	// Convert the value to a bool
+	boolValue := convert.Bool(value)
+
+	// Try to set the value using the BoolSetter interface
+	if setter, ok := object.(BoolSetter); ok {
+		if setter.SetBool(path, boolValue) {
+			return nil
+		}
+	}
+
+	// Try to set the value using the PointerGetter interface
+	if getter, ok := object.(PointerGetter); ok {
+		if pointer, ok := getter.GetPointer(path); ok {
+			if value, ok := pointer.(*bool); ok {
+				*value = boolValue
+				return nil
+			}
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be a BoolSetter or PointerGetter", path, object)
+}
+
+// setProperty_Integer32 sets a 32-bit integer value in the object.
+func setProperty_Integer32(object any, path string, value any) error {
+
+	const location = "schema.setProperty_Integer32"
+
+	// Convert the value to an int
+	intValue := convert.Int(value)
+
+	// Try to set the value using the IntSetter interface
+	if setter, ok := object.(IntSetter); ok {
+		if setter.SetInt(path, intValue) {
+			return nil
+		}
+	}
+
+	// Try to set the value using the PointerGetter interface
+	if getter, ok := object.(PointerGetter); ok {
+		if pointer, ok := getter.GetPointer(path); ok {
+			if value, ok := pointer.(*int); ok {
+				*value = intValue
+				return nil
+			}
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be an IntSetter or PointerGetter", path, object)
+}
+
+// setProperty_Integer64 sets a 64-bit integer value in the object.
+func setProperty_Integer64(object any, path string, value any) error {
+
+	const location = "schema.setProperty_Integer64"
+
+	// Convert the value to an int64
+	int64Value := convert.Int64(value)
+
+	// Try to set the value using the Int64Setter interface
+	if setter, ok := object.(Int64Setter); ok {
+		if setter.SetInt64(path, int64Value) {
+			return nil
+		}
+	}
+
+	// Try to set the value using the PointerGetter interface
+	if getter, ok := object.(PointerGetter); ok {
+		if pointer, ok := getter.GetPointer(path); ok {
+			if value, ok := pointer.(*int64); ok {
+				*value = int64Value
+				return nil
+			}
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be an Int64Setter or PointerGetter", path, object)
+}
+
+func setProperty_Number(object any, path string, value any) error {
+
+	const location = "schema.setProperty_Number"
+
+	// Convert the value to a float
+	floatValue := convert.Float(value)
+
+	// Try to set the value using the NumberSetter interface
+	if setter, ok := object.(FloatSetter); ok {
+		if setter.SetFloat(path, floatValue) {
+			return nil
+		}
+	}
+
+	// Try to set the value using the PointerGetter interface
+	if getter, ok := object.(PointerGetter); ok {
+		if pointer, ok := getter.GetPointer(path); ok {
+			if value, ok := pointer.(*float64); ok {
+				*value = floatValue
+				return nil
+			}
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be a FloatSetter or PointerGetter", path, object)
+}
+
+func setProperty_String(object any, path string, value any) error {
+
+	const location = "schema.setProperty_String"
+
+	// Convert the value to a string
+	stringValue := convert.String(value)
+
+	// Try to set the value using the StringSetter interface
+	if setter, ok := object.(StringSetter); ok {
+		if setter.SetString(path, stringValue) {
+			return nil
+		}
+	}
+
+	// Try to set the value using the PointerGetter interface
+	if getter, ok := object.(PointerGetter); ok {
+		if pointer, ok := getter.GetPointer(path); ok {
+			if value, ok := pointer.(*string); ok {
+				*value = stringValue
+				return nil
+			}
+		}
+	}
+
+	// Cannot set the value
+	return derp.Internal(location, "Target Object must be a StringSetter or PointerGetter", path, object)
 }

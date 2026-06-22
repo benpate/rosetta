@@ -11,6 +11,7 @@ func TestContains(t *testing.T) {
 	require.True(t, Contains([]string{"a", "b", "c"}, "b"))
 	require.True(t, Contains([]string{"a", "b", "c"}, "c"))
 	require.False(t, Contains([]string{"a", "b", "c"}, "d"))
+	require.False(t, Contains([]string{"a", "b"}, ""))
 }
 
 func TestContainsAny(t *testing.T) {
@@ -36,6 +37,7 @@ func TestContainsAll(t *testing.T) {
 	require.True(t, ContainsAll([]string{"a", "b", "c"}, "b", "a"))
 	require.True(t, ContainsAll([]string{"a", "b", "c"}, "c", "b"))
 
+	require.False(t, ContainsAll([]string{}, "a"))
 	require.False(t, ContainsAll([]string{"a", "b", "c"}, "a", "b", "c", "d"))
 	require.False(t, ContainsAll([]string{"a", "b", "c"}, "b", "c", "d"))
 	require.False(t, ContainsAll([]string{"a", "b", "c"}, "1", "2"))

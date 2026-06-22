@@ -9,8 +9,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// Object is a slice of values of a single type T, with typed accessors and schema-traversal support.
 type Object[T any] []T
 
+// NewObject returns an Object slice containing the provided values (or an empty slice if none are given).
 func NewObject[T any](values ...T) Object[T] {
 
 	if len(values) == 0 {
@@ -94,6 +96,7 @@ func (x Object[T]) At(index int) T {
 	return slice.At(x, index)
 }
 
+// AtOK returns the element at the index and TRUE, or the zero value and FALSE if out of range.
 func (x Object[T]) AtOK(index int) (T, bool) {
 	return slice.AtOK(x, index)
 }
@@ -130,7 +133,7 @@ func (x *Object[T]) Append(values ...T) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x Object[T]) Shuffle() Object[T] {
-	rand.Shuffle(len(x), func(i, j int) {
+	rand.Shuffle(len(x), func(i, j int) { // NOSONAR: does not need to be cyptographically secure.
 		x[i], x[j] = x[j], x[i]
 	})
 	return x
@@ -151,11 +154,13 @@ func (x Object[T]) Keys() []string {
  * Getter Interfaces
  ******************************************/
 
+// GetAny returns the value for the key index, or nil if absent.
 func (x Object[T]) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
 	return result
 }
 
+// GetAnyOK returns the value for the key index and TRUE if present.
 func (x Object[T]) GetAnyOK(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
@@ -172,6 +177,7 @@ func (x Object[T]) GetAnyOK(key string) (any, bool) {
 	return nil, false
 }
 
+// GetPointer returns a pointer to the element at the key index, growing the slice as needed (implements schema PointerGetter).
 func (x *Object[T]) GetPointer(name string) (any, bool) {
 
 	// Get a valid index for the slice
@@ -198,6 +204,7 @@ func (x *Object[T]) GetPointer(name string) (any, bool) {
  * Setter Interfaces
  ******************************************/
 
+// SetIndex stores the value at the index, growing the slice to fit if necessary.
 func (s *Object[T]) SetIndex(index int, value any) bool {
 
 	typed, ok := value.(T)
@@ -211,16 +218,29 @@ func (s *Object[T]) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x Object[T]) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
+// SetValue replaces the entire slice with the provided value, if it can be converted.
 func (s *Object[T]) SetValue(value any) error {
 
-	if typed, ok := value.(Object[T]); ok {
+	switch typed := value.(type) {
+
+	case Object[T]:
 		*s = typed
+		return nil
+
+	case *Object[T]:
+		*s = *typed
 		return nil
 	}
 
 	return derp.Internal("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
 }
 
+// Remove deletes the element identified by the key index.
 func (x *Object[T]) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -231,6 +251,7 @@ func (x *Object[T]) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt deletes the element at the given index.
 func (x *Object[T]) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

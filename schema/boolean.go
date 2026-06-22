@@ -40,11 +40,11 @@ func (element Boolean) Validate(object any) error {
 	boolValue, ok := object.(bool)
 
 	if !ok {
-		return derp.Validation(" must be a boolean")
+		return derp.Validation("Must be a boolean")
 	}
 
 	if element.Required && (!boolValue) {
-		return derp.Validation(" boolean value is required")
+		return derp.Validation("Value is required")
 	}
 
 	return nil
@@ -61,15 +61,15 @@ func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalV
 		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+			return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 		}
 
 		if isRequired {
 			if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-				return derp.Wrap(err, location, "Error getting value for path", path)
+				return derp.Wrap(err, location, "Getting value for path", path)
 			} else if compare.IsZero(localValue) {
 				return derp.Validation(
-					"field: " + path.String() +
+					"Field: " + path.String() +
 						" is required based on condition: " + element.RequiredIf,
 				)
 			}
@@ -141,6 +141,7 @@ func (element *Boolean) UnmarshalMap(data map[string]any) error {
 
 	element.Default = convert.NullBool(data["default"])
 	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
 	return nil
 }

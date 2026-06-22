@@ -1,5 +1,6 @@
 package compare
 
+// Maps returns TRUE if the two maps contain exactly the same keys and values.
 func Maps[T comparable](a, b map[string]T) bool {
 
 	if len(a) != len(b) {

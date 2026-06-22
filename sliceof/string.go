@@ -9,8 +9,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// String is a slice of string values with typed accessors and schema-traversal support.
 type String []string
 
+// NewString returns a String slice containing the provided values (or an empty slice if none are given).
 func NewString(values ...string) String {
 	if len(values) == 0 {
 		return make(String, 0)
@@ -116,6 +118,7 @@ func (x String) Contains(value string) bool {
 	return slice.Contains(x, value)
 }
 
+// NotContains returns TRUE if the slice does not contain the provided value.
 func (x String) NotContains(value string) bool {
 	return !slice.Contains(x, value)
 }
@@ -206,6 +209,11 @@ func (x *String) SetIndex(index int, value any) bool {
 	growSlice(x, index)
 	(*x)[index] = convert.String(value)
 	return true
+}
+
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x String) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
 }
 
 // SetString sets the string value at the specified key

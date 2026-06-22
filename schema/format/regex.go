@@ -5,6 +5,7 @@ import (
 	"regexp"
 )
 
+// MatchRegex returns a StringFormat that requires the value to match the regular expression arg.
 func MatchRegex(arg string) StringFormat {
 
 	rx, err := regexp.Compile(arg)

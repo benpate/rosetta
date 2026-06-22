@@ -2,6 +2,7 @@ package schema
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/exp"
@@ -19,7 +20,6 @@ type String struct {
 	Enum       []string `json:"enum"`
 	MinValue   string   `json:"minValue"`
 	MaxValue   string   `json:"maxValue"`
-	Pattern    string   `json:"pattern"`
 	Format     string   `json:"format"`
 	Required   bool     `json:"required"`
 	RequiredIf string   `json:"required-if"`
@@ -45,54 +45,57 @@ func (element String) Validate(value any) error {
 	stringValue, ok := value.(string)
 
 	if !ok {
-		return derp.Validation(" must be a string")
+		return derp.Validation("Must be a string")
 	}
 
 	// Verify required fields (after format functions are applied)
 	if element.Required {
 		if stringValue == "" {
-			return derp.Validation(" string field is required")
+			return derp.Validation("Value is required")
 		}
 	}
 
 	// Validate minimum value
 	if element.MinValue != "" {
 		if stringValue < element.MinValue {
-			return derp.Validation(" minimum string value is " + element.MinValue)
+			return derp.Validation("Minimum string value is " + element.MinValue)
 		}
 	}
 
 	// Validate maximum value
 	if element.MaxValue != "" {
 		if stringValue > element.MaxValue {
-			return derp.Validation(" maximum string value is " + element.MaxValue)
+			return derp.Validation("Maximum string value is " + element.MaxValue)
 		}
 	}
 
-	// Validate minimum length
+	// Validate minimum length (measured in runes, not bytes)
 	if element.MinLength > 0 {
-		if len(stringValue) < element.MinLength {
-			return derp.Validation(" minimum string length is " + convert.String(element.MinLength))
+		if utf8.RuneCountInString(stringValue) < element.MinLength {
+			return derp.Validation("Minimum string length is " + convert.String(element.MinLength))
 		}
 	}
 
-	// Validate maximum length
+	// Validate maximum length (measured in runes, not bytes)
 	if element.MaxLength > 0 {
-		if len(stringValue) > element.MaxLength {
-			return derp.Validation(" maximum string length is " + convert.String(element.MaxLength))
+		if utf8.RuneCountInString(stringValue) > element.MaxLength {
+			return derp.Validation("Maximum string length is " + convert.String(element.MaxLength))
 		}
 	}
 
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (stringValue != "") && (!compare.Contains(element.Enum, stringValue)) {
-			return derp.Validation(" string must match one of the required values", stringValue, element.Enum)
+			return derp.Validation("Must be one of the specified values", stringValue, element.Enum)
 		}
 	}
 
 	// Validate against all formatting functions
 	for _, formatFunc := range element.formatFunctions() {
-		if _, err := formatFunc(stringValue); err != nil {
+		var err error
+		stringValue, err = formatFunc(stringValue)
+
+		if err != nil {
 			return err
 		}
 	}
@@ -114,7 +117,7 @@ func (element String) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+		return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 	}
 
 	if !isRequired {
@@ -122,9 +125,9 @@ func (element String) ValidateRequiredIf(schema Schema, path list.List, globalVa
 	}
 
 	if localValue, err := schema.Get(globalValue, path.String()); err != nil {
-		return derp.Wrap(err, location, "Error getting value for path", path)
+		return derp.Wrap(err, location, "Getting value for path", path)
 	} else if compare.IsZero(localValue) {
-		return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+		return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 	}
 
 	return nil
@@ -186,8 +189,12 @@ func (element String) MarshalMap() map[string]any {
 		result["maxLength"] = element.MaxLength
 	}
 
-	if element.Pattern != "" {
-		result["pattern"] = element.Pattern
+	if element.MinValue != "" {
+		result["minValue"] = element.MinValue
+	}
+
+	if element.MaxValue != "" {
+		result["maxValue"] = element.MaxValue
 	}
 
 	if element.Format != "" {
@@ -210,8 +217,6 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 
 	const location = "schema.String.UnmarshalMap"
 
-	var err error
-
 	if convert.String(data["type"]) != "string" {
 		return derp.Internal(location, "Data is not type 'string'", data)
 	}
@@ -219,13 +224,16 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.Default = convert.String(data["default"])
 	element.MinLength = convert.Int(data["minLength"])
 	element.MaxLength = convert.Int(data["maxLength"])
-	element.Pattern = convert.String(data["pattern"])
+	element.MinValue = convert.String(data["minValue"])
+	element.MaxValue = convert.String(data["maxValue"])
 	element.Format = convert.String(data["format"])
-	element.Enum = convert.SliceOfString(data["enum"])
+	if raw, ok := data["enum"]; ok {
+		element.Enum = convert.SliceOfString(raw)
+	}
 	element.Required = convert.Bool(data["required"])
 	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }
 
 /***********************************
@@ -245,7 +253,7 @@ func (element String) formatFunctions() []format.StringFormat {
 
 		name, value := list.Equal(arg).Split()
 
-		if formatFunction, ok := formats[name]; ok {
+		if formatFunction, ok := lookupFormat(name); ok {
 			result = append(result, formatFunction(value.String()))
 		}
 	}
@@ -253,7 +261,9 @@ func (element String) formatFunctions() []format.StringFormat {
 	// If there are no valid formats defined, then default to
 	// no-html, which strictly removes all HTML tags from the value.
 	if len(result) == 0 {
-		result = []format.StringFormat{formats["no-html"]("")}
+		if noHTML, ok := lookupFormat("no-html"); ok {
+			result = []format.StringFormat{noHTML("")}
+		}
 	}
 
 	return result

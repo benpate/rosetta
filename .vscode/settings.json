@@ -1,0 +1,6 @@
+{
+	"sonarlint.connectedMode.project": {
+		"connectionId": "benpate",
+		"projectKey": "benpate_rosetta"
+	}
+}

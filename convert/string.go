@@ -82,11 +82,17 @@ func StringOk(value any, defaultValue string) (string, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return StringOk(v[0], defaultValue)
+		}
 		return v[0], false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return StringOk(v[0], defaultValue)
 		}
 		return StringDefault(v[0], defaultValue), false
 

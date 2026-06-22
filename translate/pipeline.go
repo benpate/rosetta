@@ -1,3 +1,4 @@
+// Package translate provides a rule-based pipeline for transforming data structures
 package translate
 
 import (
@@ -75,10 +76,12 @@ func (pipeline Pipeline) Execute(inSchema schema.Schema, inObject any, outSchema
 	return nil
 }
 
+// IsEmpty returns TRUE if the pipeline contains no rules.
 func (pipeline Pipeline) IsEmpty() bool {
 	return len(pipeline) == 0
 }
 
+// NotEmpty returns TRUE if the pipeline contains at least one rule.
 func (pipeline Pipeline) NotEmpty() bool {
 	return len(pipeline) > 0
 }
@@ -87,10 +90,12 @@ func (pipeline Pipeline) NotEmpty() bool {
  * Serialization Methods
  ******************************************/
 
+// MarshalJSON implements the json.Marshaler interface, encoding the pipeline as an array of rule maps.
 func (pipeline Pipeline) MarshalJSON() ([]byte, error) {
 	return json.Marshal(pipeline.MarshalSliceOfMap())
 }
 
+// MarshalSliceOfMap returns each rule in the pipeline as a map[string]any.
 func (pipeline Pipeline) MarshalSliceOfMap() []map[string]any {
 
 	result := make([]map[string]any, len(pipeline))

@@ -7,6 +7,14 @@ import (
 	"strconv"
 )
 
+// Float boundaries for safe int64 conversion. math.MaxInt64 is not exactly representable as a
+// float64 (it rounds up to 2^63), so we compare against the exact powers of two instead: any float
+// >= 2^63 or < -2^63 is out of int64 range.
+const (
+	maxInt64AsFloat = float64(1 << 63)  // 2^63, the first float64 above math.MaxInt64
+	minInt64AsFloat = -float64(1 << 63) // -2^63, exactly math.MinInt64
+)
+
 // Int64 forces a conversion from an arbitrary value into an int.
 // If the value cannot be converted, then the zero value for the type (0) is used.
 func Int64(value any) int64 {
@@ -65,23 +73,25 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 		return int64(v), true
 
 	case float32:
-		if v > math.MaxInt64 {
-			return math.MaxInt, false
+		// math.MaxInt64 rounds UP to 2^63 as a float, so a plain `> MaxInt64` lets 2^63 slip
+		// through and overflow. Compare against the 2^63 power-of-two boundary with >= instead.
+		if float64(v) >= maxInt64AsFloat {
+			return math.MaxInt64, false
 		}
 
-		if v < math.MinInt64 {
-			return math.MinInt, false
+		if float64(v) < minInt64AsFloat {
+			return math.MinInt64, false
 		}
 
 		return int64(v), hasDecimal(float64(v))
 
 	case float64:
-		if v > math.MaxInt64 {
-			return math.MaxInt, false
+		if v >= maxInt64AsFloat {
+			return math.MaxInt64, false
 		}
 
-		if v < math.MinInt64 {
-			return math.MinInt, false
+		if v < minInt64AsFloat {
+			return math.MinInt64, false
 		}
 
 		return int64(v), hasDecimal(v)
@@ -98,11 +108,17 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 		if len(v) == 0 {
 			return defaultValue, false
 		}
+		if len(v) == 1 {
+			return Int64Ok(v[0], defaultValue)
+		}
 		return Int64Default(v[0], defaultValue), false
 
 	case []any:
 		if len(v) == 0 {
 			return defaultValue, false
+		}
+		if len(v) == 1 {
+			return Int64Ok(v[0], defaultValue)
 		}
 		return Int64Default(v[0], defaultValue), false
 

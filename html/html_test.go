@@ -17,6 +17,15 @@ func TestRemoveTags(t *testing.T) {
 	require.Equal(t, "start this tag", RemoveTags("I don't know ><where to <<em>start</em> this tag<."))
 }
 
+// TestRemoveTags_Multibyte confirms that text ending in a multi-byte rune is
+// not dropped (the trailing run must be flushed regardless of rune width).
+func TestRemoveTags_Multibyte(t *testing.T) {
+	require.Equal(t, "日本語です", RemoveTags("日本語です"))
+	require.Equal(t, "日本語です", RemoveTags("<b>日本語です</b>"))
+	require.Equal(t, "日本語です", RemoveTags("<b>日本語</b>です"))
+	require.Equal(t, "emoji 😀", RemoveTags("emoji <i>😀</i>"))
+}
+
 func TestRemoveAnchors(t *testing.T) {
 	require.Equal(t, "Regular string", RemoveAnchors("Regular string"))
 	require.Equal(t, "Regular string <b>with tags</b>", RemoveAnchors("Regular string <b>with tags</b>"))

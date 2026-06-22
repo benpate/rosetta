@@ -3,6 +3,7 @@ package schema
 import (
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,52 +13,73 @@ func TestArray_GetSet(t *testing.T) {
 
 	{
 		result, err := schema.Get(value, "0")
-		require.NotNil(t, err)
+		require.Error(t, err)
 		require.Equal(t, nil, result)
 	}
 
 	{
-		require.Nil(t, schema.Set(&value, "0", "one"))
+		require.NoError(t, schema.Set(&value, "0", "one"))
 		result, err := schema.Get(value, "0")
-		require.Nil(t, err)
+		require.NoError(t, err)
 		require.Equal(t, "one", result)
 	}
 
 	{
-		require.Nil(t, schema.Set(&value, "1", "two"))
+		require.NoError(t, schema.Set(&value, "1", "two"))
 		result, err := schema.Get(value, "1")
-		require.Nil(t, err)
+		require.NoError(t, err)
 		require.Equal(t, "two", result)
 	}
 
 	{
-		require.NotNil(t, schema.Set(&value, "10", "out of bounds"))
+		require.Error(t, schema.Set(&value, "10", "out of bounds"))
 	}
 }
 
 func TestArray_Validation(t *testing.T) {
 
-	s := New(Array{
+	spew.Config.DisableMethods = true
+
+	schema := New(Array{
 		Items: String{MaxLength: 10},
 	})
 
 	{
 		v := testArrayA{"one", "two", "three", "valid"}
-		require.Nil(t, s.Validate(&v))
+		value, changed, err := Validate(schema, &v)
+		require.NoError(t, err)
+		require.False(t, changed)
+		require.Equal(t, &testArrayA{"one", "two", "three", "valid"}, value)
 	}
 
 	{
 		v := testArrayA{"one", "two", "three", "invalid because its way too long"}
-		require.NotNil(t, s.Validate(&v))
+		value, changed, err := Validate(schema, &v)
+		require.NoError(t, err)
+		require.True(t, changed)
+		require.Equal(t, &testArrayA{"one", "two", "three", "invalid be"}, value)
 	}
 }
 
-func TestArray_Validation_Fail(t *testing.T) {
+func TestArray_Validation_Success(t *testing.T) {
 
-	s := New(Array{
+	schema := New(Array{
 		Items: String{MaxLength: 10},
 	})
 
-	err := s.Validate(17)
-	require.NotNil(t, err)
+	newValue, changed, err := Validate(schema, &testArrayA{"one", "two", "three", "valid"})
+	require.NoError(t, err)
+	require.False(t, changed)
+	require.Equal(t, &testArrayA{"one", "two", "three", "valid"}, newValue)
+}
+
+func TestArray_Validation_Fail1(t *testing.T) {
+
+	schema := New(Array{
+		Items: String{MaxLength: 10},
+	})
+
+	// This should fail because &testArrayA{} is not addressable
+	_, _, err := Validate(schema, testArrayA{"one", "two", "three", "valid"})
+	require.Error(t, err)
 }

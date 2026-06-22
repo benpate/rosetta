@@ -37,31 +37,6 @@ func Wildcard() Schema {
  * Validation Methods
  ******************************************/
 
-// Validate checks a particular value against this schema, updating values when
-// possible so that they pass validation.  If the provided value is not valid
-// (and cannot be coerced into being valid) then it returns an error.
-func (schema Schema) Validate(value any) error {
-
-	const location = "schema.Schema.Validate"
-
-	// RULE: Schema element cannot be nil
-	if isNil(schema.Element) {
-		return derp.Internal(location, "Schema must not be nil")
-	}
-
-	// Validate all elements in the value
-	if err := schema.Element.Validate(value); err != nil {
-		return derp.Wrap(err, location, "Value is not valid for this schema", value)
-	}
-
-	// Handle special cases for "required-if" fields
-	if err := schema.ValidateRequiredIf(value); err != nil {
-		return derp.Wrap(err, location, "Unable to validate `required-if` fields", value)
-	}
-
-	return nil
-}
-
 // Match returns TRUE if the provided value (as accessed via this schema) matches
 // the provided expression.  This is useful for server-side data validation.
 func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
@@ -105,6 +80,26 @@ func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 	result := expression.Match(evaluatePredicate)
 
 	return result, resultError
+}
+
+// Validate checks the provided value against this schema, returning whether it was changed and any validation error.
+func (schema Schema) Validate(value any) (bool, error) {
+
+	const location = "schema.Schema.Validate"
+
+	// Validate the top-level item, reporting changes if necessary
+	_, changed, err := Validate(schema, value)
+
+	if err != nil {
+		return false, derp.Wrap(err, location, "Validation error")
+	}
+
+	// Validate required-if conditions.
+	if err := schema.ValidateRequiredIf(value); err != nil {
+		return false, derp.Wrap(err, location, "RequiredIf validation error")
+	}
+
+	return changed, nil
 }
 
 // ValidateRequiredIf implements the Element interface
@@ -265,7 +260,7 @@ func (schema *Schema) UnmarshalJSON(data []byte) error {
 	}
 
 	if err := schema.UnmarshalMap(unmarshalled); err != nil {
-		return derp.Wrap(err, "schema.UnmarshalJSON", "Unable to unmarshal from Map", unmarshalled)
+		return derp.Wrap(err, "schema.UnmarshalJSON", "Unmarshalling from map", unmarshalled)
 	}
 
 	return nil
@@ -280,7 +275,7 @@ func (schema *Schema) UnmarshalMap(data map[string]any) error {
 	element, err := UnmarshalMap(data)
 
 	if err != nil {
-		return derp.Wrap(err, "schema.Schema.UnmarshalMap", "Error unmarshalling element")
+		return derp.Wrap(err, "schema.Schema.UnmarshalMap", "Unmarshalling element")
 	}
 
 	schema.Element = element
@@ -300,8 +295,10 @@ func isNil(i any) bool {
 		return true
 	}
 
+	// Only call IsNil() for kinds that are actually nillable; calling it on a
+	// non-nillable kind (e.g. Array, Struct) panics.
 	switch reflect.TypeOf(i).Kind() {
-	case reflect.Ptr, reflect.Array, reflect.Slice, reflect.Chan, reflect.Map:
+	case reflect.Pointer, reflect.Slice, reflect.Chan, reflect.Map, reflect.Func:
 		return reflect.ValueOf(i).IsNil()
 	}
 	return false

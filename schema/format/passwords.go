@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/derp"
 )
 
+// HasLowercase returns a StringFormat requiring at least arg lowercase letters (default 1).
 func HasLowercase(arg string) StringFormat {
 
 	return func(value string) (string, error) {
@@ -15,6 +16,7 @@ func HasLowercase(arg string) StringFormat {
 	}
 }
 
+// HasUppercase returns a StringFormat requiring at least arg uppercase letters (default 1).
 func HasUppercase(arg string) StringFormat {
 
 	return func(value string) (string, error) {
@@ -24,6 +26,7 @@ func HasUppercase(arg string) StringFormat {
 	}
 }
 
+// HasNumbers returns a StringFormat requiring at least arg numeric digits (default 1).
 func HasNumbers(arg string) StringFormat {
 
 	return func(value string) (string, error) {

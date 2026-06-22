@@ -1,10 +1,12 @@
 package sliceof
 
+// AnyGrouper reports group boundaries within an Any slice, grouped by a named field.
 type AnyGrouper struct {
 	slice Any
 	field string
 }
 
+// GroupBy returns a grouper that detects boundaries in this slice using the named field.
 func (x Any) GroupBy(field string) AnyGrouper {
 	return AnyGrouper{
 		slice: x,
@@ -12,6 +14,7 @@ func (x Any) GroupBy(field string) AnyGrouper {
 	}
 }
 
+// IsHeader returns TRUE if the element at index begins a new group.
 func (grouper AnyGrouper) IsHeader(index int) bool {
 
 	if index <= 0 {
@@ -36,6 +39,7 @@ func (grouper AnyGrouper) IsHeader(index int) bool {
 	return false
 }
 
+// IsFooter returns TRUE if the element at index ends a group.
 func (grouper AnyGrouper) IsFooter(index int) bool {
 
 	if index <= 0 {

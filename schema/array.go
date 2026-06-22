@@ -19,32 +19,6 @@ type Array struct {
 }
 
 /******************************************
- * Container Interface
- ******************************************/
-
-// GetProperty returns the property with the specified name
-func (element Array) GetProperty(name string) (Element, error) {
-
-	const location = "schema.Array.GetProperty"
-
-	index, err := strconv.Atoi(name)
-
-	if err != nil {
-		return nil, derp.Wrap(err, location, "Invalid array index", name)
-	}
-
-	if index < 0 {
-		return nil, derp.BadRequest(location, "Array index must not be negative", name)
-	}
-
-	if index > element.MaxLength {
-		return nil, derp.BadRequest(location, "Array index must not be greater than the maximum", name, element.MaxLength)
-	}
-
-	return element.Items, nil
-}
-
-/******************************************
  * Element Interface
  ******************************************/
 
@@ -60,44 +34,6 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-// Validate implements the Element interface
-// It validates a value against this schema
-func (element Array) Validate(object any) error {
-
-	const location = "schema.Array.Validate"
-
-	length, isLengthGetter := getLength(object)
-
-	if !isLengthGetter {
-		return derp.Internal(location, "Array must implement LengthGetter interface")
-	}
-
-	// Check minimum/maximum lengths
-	if element.Required && length == 0 {
-		return derp.Validation(" array value is required")
-	}
-
-	if (element.MinLength > 0) && (length < element.MinLength) {
-		return derp.Validation(" minimum array length is " + convert.String(element.MinLength))
-	}
-
-	if (element.MaxLength > 0) && (length > element.MaxLength) {
-		return derp.Validation(" maximum array length is " + convert.String(element.MaxLength))
-	}
-
-	// Validate each item in the array
-	for index := 0; index < length; index = index + 1 {
-		indexString := strconv.Itoa(index)
-
-		if err := validate(element.Items, object, indexString); err != nil {
-			return derp.Wrap(err, location, "Unable to validate object at index", index)
-		}
-	}
-
-	// Valid
-	return nil
-}
-
 // ValidateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
 func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
@@ -110,10 +46,10 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 	}
 
 	// Get the value at this path
-	localValue, err := schema.getFromList(globalValue, element, path)
+	localValue, err := getPropertyRecursive(element, globalValue, path.String())
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error getting value for path", path)
+		return derp.Wrap(err, location, "Getting value for path", path)
 	}
 
 	// Get the length of the value
@@ -128,11 +64,11 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
 
 		if err != nil {
-			return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+			return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 		}
 
 		if isRequired {
-			return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+			return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 		}
 
 		return nil
@@ -147,7 +83,7 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 		}
 
 		if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Error Validating object at index", index)
+			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Validating object at index", index)
 		}
 	}
 
@@ -225,7 +161,7 @@ func (element Array) Append(value ArraySetter, item any) error {
 
 	// Try to set the value at the end of the array
 	if success := value.SetIndex(value.Length(), item); !success {
-		return derp.Internal(location, "Unable to set value at end of array", value)
+		return derp.Internal(location, "Setting value at end of array", value)
 	}
 
 	// Success
@@ -265,7 +201,7 @@ func (element *Array) UnmarshalMap(data map[string]any) error {
 	items, err := UnmarshalMap(data["items"])
 
 	if err != nil {
-		return derp.Wrap(err, location, "Unable to unmarshal 'items'", data["items"])
+		return derp.Wrap(err, location, "Unmarshalling 'items'", data["items"])
 	}
 
 	if items == nil {

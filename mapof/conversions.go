@@ -1,5 +1,7 @@
 package mapof
 
+// MapOfAny converts a supported map type (any of the mapof types, or a plain/pointer map[string]X)
+// into a mapof.Any, returning the result and TRUE on success, or (nil, false) for unsupported types.
 func MapOfAny(value any) (Any, bool) {
 
 	switch typed := value.(type) {

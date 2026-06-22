@@ -16,10 +16,7 @@ func Contains(value1 any, value2 any) bool {
 		return value1.ContainsInterface(value2)
 
 	case string:
-
-		if value2 := convert.String(value2); value2 != "" {
-			return strings.Contains(value1, value2)
-		}
+		return strings.Contains(value1, convert.String(value2))
 
 	case []string:
 
@@ -30,12 +27,7 @@ func Contains(value1 any, value2 any) bool {
 	case []int:
 
 		if value2, ok := convert.IntOk(value2, 0); ok {
-
-			for index := range value1 {
-				if value1[index] == value2 {
-					return true
-				}
-			}
+			return slices.Contains(value1, value2)
 		}
 
 	case []int64:
@@ -52,4 +44,9 @@ func Contains(value1 any, value2 any) bool {
 	}
 
 	return false
+}
+
+// NotContains returns TRUE if value1 does not contain value2.  It is the inverse of Contains.
+func NotContains(value1 any, value2 any) bool {
+	return !Contains(value1, value2)
 }

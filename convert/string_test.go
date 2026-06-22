@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO: LOW: These tests still don't account for overflow errors.
-
 func TestString(t *testing.T) {
 
 	assert.Equal(t, "hello there", StringDefault("hello there", ""))

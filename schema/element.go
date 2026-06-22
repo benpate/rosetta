@@ -18,7 +18,7 @@ type Element interface {
 	IsRequired() bool
 
 	// Validate validates the provided value
-	Validate(value any) error
+	// Validate(value any) error
 
 	// ValidateRequiredIf handles conditional validation of a required field
 	ValidateRequiredIf(schema Schema, path list.List, globalValue any) error
@@ -51,13 +51,13 @@ func UnmarshalJSON(data []byte) (Element, error) {
 	var result map[string]any
 
 	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, derp.Wrap(err, location, "Unable to unmarshal JSON", string(data))
+		return nil, derp.Wrap(err, location, "Unmarshalling JSON", string(data))
 	}
 
 	element, err := UnmarshalMap(result)
 
 	if err != nil {
-		return nil, derp.Wrap(err, location, "Unable to unmarshal map", string(data))
+		return nil, derp.Wrap(err, location, "Unmarshalling map", string(data))
 	}
 
 	if element == nil {
@@ -81,11 +81,18 @@ func UnmarshalMap(data any) (Element, error) {
 	dataMap, isMap := data.(map[string]any)
 
 	if !isMap {
-		return nil, derp.Internal(location, "data is not map[string]any", data)
+		return nil, derp.Internal(location, "Data is not a map[string]any", data)
 	}
 
 	// Convert the map value into the correct element.
 	switch Type(convert.String(dataMap["type"])) {
+
+	case TypeAny:
+		result := Any{}
+		if err := result.UnmarshalMap(dataMap); err != nil {
+			return nil, err
+		}
+		return result, nil
 
 	case TypeArray:
 		result := Array{}

@@ -1,5 +1,6 @@
 package channel
 
+// Predicate is a function that reports whether a value should be included by Filter.
 type Predicate[T any] func(T) bool
 
 // Filter returns a channel that contains only the items that pass the predicate function.

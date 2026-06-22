@@ -12,6 +12,7 @@ type Rule struct {
 	Runner
 }
 
+// MarshalJSON implements the json.Marshaler interface, encoding the rule's underlying Runner.
 func (rule *Rule) MarshalJSON() ([]byte, error) {
 
 	if rule.Runner == nil {
@@ -21,6 +22,7 @@ func (rule *Rule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(rule.Runner)
 }
 
+// MarshalMap returns the rule's underlying Runner as a map[string]any.
 func (rule *Rule) MarshalMap() map[string]any {
 
 	if rule.Runner == nil {

@@ -1,5 +1,6 @@
 package list
 
+// Stringlike constrains the underlying string-like types a list may be built from.
 type Stringlike interface {
 	~string | []byte
 }

@@ -6,13 +6,13 @@ import (
 	"github.com/benpate/derp"
 )
 
-// Int64 provides a nullable bool
+// Int64 provides a nullable int64
 type Int64 struct {
 	value   int64
 	present bool
 }
 
-// NewInt64 returns a fully populated, nullable bool
+// NewInt64 returns a fully populated, nullable int64
 func NewInt64(value int64) Int64 {
 	return Int64{
 		value:   value,

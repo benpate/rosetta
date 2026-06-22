@@ -17,6 +17,7 @@ func TestContains(t *testing.T) {
 
 func TestContainsString(t *testing.T) {
 
+	require.True(t, Contains("one", ""))
 	require.True(t, Contains("one", "on"))
 	require.True(t, Contains("one", "ne"))
 	require.True(t, Contains("three", "th"))

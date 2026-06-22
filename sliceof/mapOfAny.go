@@ -11,8 +11,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// MapOfAny is a slice of mapof.Any objects with typed accessors and schema-traversal support.
 type MapOfAny []mapof.Any
 
+// NewMapOfAny returns a MapOfAny slice containing the provided values (or an empty slice if none are given).
 func NewMapOfAny(values ...mapof.Any) MapOfAny {
 
 	if len(values) == 0 {
@@ -95,6 +97,7 @@ func (x MapOfAny) At(index int) mapof.Any {
 	return slice.At(x, index)
 }
 
+// AtOK returns the element at the index and TRUE, or the zero value and FALSE if out of range.
 func (x MapOfAny) AtOK(index int) (mapof.Any, bool) {
 	return slice.AtOK(x, index)
 }
@@ -131,7 +134,7 @@ func (x *MapOfAny) Append(values ...mapof.Any) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x MapOfAny) Shuffle() MapOfAny {
-	rand.Shuffle(len(x), func(i, j int) {
+	rand.Shuffle(len(x), func(i, j int) { // NOSONAR: does not need to be cyptographically secure.
 		x[i], x[j] = x[j], x[i]
 	})
 	return x
@@ -152,11 +155,13 @@ func (x MapOfAny) Keys() []string {
  * Getter Interfaces
  ******************************************/
 
+// GetAny returns the value for the key index, or nil if absent.
 func (x MapOfAny) GetAny(key string) any {
 	result, _ := x.GetAnyOK(key)
 	return result
 }
 
+// GetAnyOK returns the value for the key index and TRUE if present.
 func (x MapOfAny) GetAnyOK(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
 		return x[index], true
@@ -173,6 +178,7 @@ func (x MapOfAny) GetAnyOK(key string) (any, bool) {
 	return nil, false
 }
 
+// GetPointer returns a pointer to the element at the key index, growing the slice as needed (implements schema PointerGetter).
 func (x *MapOfAny) GetPointer(name string) (any, bool) {
 
 	// Get a valid index for the slice
@@ -199,6 +205,7 @@ func (x *MapOfAny) GetPointer(name string) (any, bool) {
  * Setter Interfaces
  ******************************************/
 
+// SetIndex stores the value at the index, growing the slice to fit if necessary.
 func (s *MapOfAny) SetIndex(index int, value any) bool {
 
 	mapValue := convert.MapOfAny(value)
@@ -208,6 +215,12 @@ func (s *MapOfAny) SetIndex(index int, value any) bool {
 	return true
 }
 
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x MapOfAny) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
+}
+
+// SetValue replaces the entire slice with the provided value, if it can be converted.
 func (s *MapOfAny) SetValue(value any) error {
 
 	if typed, ok := value.(MapOfAny); ok {
@@ -218,6 +231,7 @@ func (s *MapOfAny) SetValue(value any) error {
 	return derp.Internal("sliceof.Map.SetValue", "Unable to convert value to Map", value)
 }
 
+// Remove deletes the element identified by the key index.
 func (x *MapOfAny) Remove(key string) bool {
 
 	if index, ok := sliceStringIndex(key, x.Length()); ok {
@@ -228,6 +242,7 @@ func (x *MapOfAny) Remove(key string) bool {
 	return false
 }
 
+// RemoveAt deletes the element at the given index.
 func (x *MapOfAny) RemoveAt(index int) bool {
 
 	if index, ok := sliceIndex(index, x.Length()); ok {

@@ -43,7 +43,7 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) 
 	isRequired, err := schema.Match(value, exp.Parse(element.RequiredIf))
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error evaluating condition", element.RequiredIf)
+		return derp.Wrap(err, location, "Evaluating condition", element.RequiredIf)
 	}
 
 	// If the expression did not evaluat to TRUE, then exit
@@ -55,12 +55,12 @@ func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) 
 	propertyValue, err := schema.Get(value, path.String())
 
 	if err != nil {
-		return derp.Wrap(err, location, "Error getting value for path", path)
+		return derp.Wrap(err, location, "Getting value for path", path)
 	}
 
 	// The value is required, but missing, so.. error.
 	if compare.IsZero(propertyValue) {
-		return derp.Validation("field: " + path.String() + " is required based on condition: " + element.RequiredIf)
+		return derp.Validation("Field: " + path.String() + " is required based on condition: " + element.RequiredIf)
 	}
 
 	// The value is required, but present, so.. success.
@@ -104,13 +104,12 @@ func (element Any) MarshalMap() map[string]any {
 // UnmarshalMap tries to populate this object using data from a map[string]any
 func (element *Any) UnmarshalMap(data map[string]any) error {
 
-	var err error
-
 	if convert.String(data["type"]) != "any" {
-		return derp.Internal("schema.String.UnmarshalMap", "Data is not type 'string'", data)
+		return derp.Internal("schema.Any.UnmarshalMap", "Data is not type 'any'", data)
 	}
 
 	element.Required = convert.Bool(data["required"])
+	element.RequiredIf = convert.String(data["required-if"])
 
-	return err
+	return nil
 }

@@ -8,8 +8,10 @@ import (
 	"github.com/benpate/rosetta/slice"
 )
 
+// Float is a slice of float64 values with typed accessors and schema-traversal support.
 type Float []float64
 
+// NewFloat returns a Float slice containing the provided values (or an empty slice if none are given).
 func NewFloat(values ...float64) Float {
 
 	if len(values) == 0 {
@@ -122,6 +124,7 @@ func (x Float) Contains(value float64) bool {
 	return slice.Contains(x, value)
 }
 
+// NotContains returns TRUE if the slice does not contain the provided value.
 func (x Float) NotContains(value float64) bool {
 	return !slice.Contains(x, value)
 }
@@ -209,6 +212,11 @@ func (s *Float) SetIndex(index int, value any) bool {
 	growSlice(s, index)
 	(*s)[index] = convert.Float(value)
 	return true
+}
+
+// GetIndex returns the value at the specified index, and a boolean indicating success
+func (x Float) GetIndex(index int) (any, bool) {
+	return slice.AtOK(x, index)
 }
 
 // SetFloat sets the value at the specified key, growing the slice if necessary

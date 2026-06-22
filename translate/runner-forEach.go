@@ -108,9 +108,10 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 		targetSlice.Append(targetMap)
 	}
 
-	// Write the updated targetValue back to the targetValue
+	// Write the updated targetValue back to the targetValue. We pass a pointer
+	// so that Set's validation can treat the slice as an ArrayGetterSetter.
 	if len(targetSlice) > 0 {
-		if err := targetSchema.Set(targetValue, runner.TargetPath, targetSlice); err != nil {
+		if err := targetSchema.Set(targetValue, runner.TargetPath, &targetSlice); err != nil {
 			return derp.Wrap(err, location, "Unable to set value in target", runner.TargetPath)
 		}
 	}

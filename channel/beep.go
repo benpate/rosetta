@@ -1,3 +1,4 @@
+// Package channel provides utility functions for working with Go channels
 package channel
 
 import "github.com/davecgh/go-spew/spew"
