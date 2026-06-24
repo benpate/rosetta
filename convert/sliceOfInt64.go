@@ -45,16 +45,19 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 		return makeSliceOfInt64Ok(split)
 
 	case reflect.Value:
-		return SliceOfInt64(Interface(typed)), true
+		return SliceOfInt64Ok(Interface(typed))
 
 	case Floater:
-		return SliceOfInt64(typed.Float()), true
+		item, ok := Int64Ok(typed.Float(), 0)
+		return []int64{item}, ok
 
 	case Inter:
-		return SliceOfInt64(typed.Int()), true
+		item, ok := Int64Ok(typed.Int(), 0)
+		return []int64{item}, ok
 
 	case Int64er:
-		return SliceOfInt64(typed.Int64()), true
+		item, ok := Int64Ok(typed.Int64(), 0)
+		return []int64{item}, ok
 
 	case Stringer:
 		item, ok := Int64Ok(typed.String(), 0)

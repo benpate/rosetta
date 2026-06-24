@@ -24,15 +24,17 @@ func FloatDefault(value any, defaultValue float64) float64 {
 // FloatOk converts an arbitrary value (passed in the first parameter) into a float64,
 // no matter what. The first result is the final converted value, or the default value
 // (passed in the second parameter)
-// The second result is TRUE if the value was naturally a floating point number, and
-// FALSE otherwise
+// The second result is TRUE if the conversion was lossless (the converted value round-trips
+// back to the original input), and FALSE otherwise.
 //
 // Conversion Rules:
-// Nils and Bools return default value and Ok=false
-// Ints and Floats are converted into float64, with Ok=true
-// String values are attempted to parse as a float64.
-// If unsuccessful, default value is returned.
-// For all strings, Ok=false
+// Nils return default value and Ok=false
+// Bools map losslessly to 0/1 with Ok=true
+// Floats and small integers convert with Ok=true; integer magnitudes above 2^53 cannot be
+// represented exactly and are lossy (Ok=false)
+// String values are parsed as a float64; a clean parse is lossless (Ok=true), otherwise the
+// default value is returned with Ok=false
+// A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
 func FloatOk(value any, defaultValue float64) (float64, bool) {
@@ -50,7 +52,9 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 		return 0, true
 
 	case int:
-		return float64(v), true
+		// Magnitudes above 2^53 cannot be represented exactly in a float64,
+		// so the conversion is lossy.
+		return float64(v), int64IsExactFloat64(int64(v))
 
 	case int8:
 		return float64(v), true
@@ -62,7 +66,9 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 		return float64(v), true
 
 	case int64:
-		return float64(v), true
+		// Magnitudes above 2^53 cannot be represented exactly in a float64,
+		// so the conversion is lossy.
+		return float64(v), int64IsExactFloat64(v)
 
 	case float32:
 		return float64(v), true
@@ -103,7 +109,8 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 
 	// Use standard interfaces, if available
 	case Inter:
-		return float64(v.Int()), true
+		i := int64(v.Int())
+		return float64(i), int64IsExactFloat64(i)
 
 	case Floater:
 		return v.Float(), true
@@ -121,4 +128,13 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 func hasDecimal(value float64) bool {
 
 	return (value == math.Floor(value))
+}
+
+// maxExactFloat64Int is 2^53, the largest magnitude for which every integer is
+// exactly representable in a float64. Beyond it, integer-to-float64 conversions lose precision.
+const maxExactFloat64Int = int64(1) << 53
+
+// int64IsExactFloat64 reports whether an int64 can be represented exactly as a float64.
+func int64IsExactFloat64(value int64) bool {
+	return value >= -maxExactFloat64Int && value <= maxExactFloat64Int
 }

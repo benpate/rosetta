@@ -24,14 +24,17 @@ func StringDefault(value any, defaultValue string) string {
 
 // StringOk converts an arbitrary value (passed in the first parameter) into a string, no matter what.
 // The first result is the final converted value, or the default value (passed in the second parameter)
-// The second result is TRUE if the value was naturally a string, and FALSE otherwise
+// The second result is TRUE if the conversion was lossless (the converted value round-trips back to
+// the original input), and FALSE otherwise.
 //
 // Conversion Rules:
 // Nils return default value and Ok=false
-// Bools are formated as "true" or "false" with Ok=false
-// Ints are formated as strings with Ok=false
-// Floats are formatted with 2 decimal places, with Ok=false
-// String are passed through directly, with Ok=true
+// Bools are formatted as "true" or "false" losslessly, with Ok=true
+// Ints are formatted as decimal strings losslessly, with Ok=true
+// Floats are formatted with two decimal places; Ok=true only when that two-decimal
+// string parses back to the original value, otherwise the rounding is lossy (Ok=false)
+// Strings are passed through directly, with Ok=true
+// A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
 func StringOk(value any, defaultValue string) (string, bool) {
@@ -46,34 +49,34 @@ func StringOk(value any, defaultValue string) (string, bool) {
 	case bool:
 
 		if v {
-			return "true", false
+			return "true", true
 		}
 
-		return "false", false
+		return "false", true
 
 	case []byte:
 		return string(v), true
 
 	case int:
-		return strconv.Itoa(v), false
+		return strconv.Itoa(v), true
 
 	case int8:
-		return strconv.FormatInt(int64(v), 10), false
+		return strconv.FormatInt(int64(v), 10), true
 
 	case int16:
-		return strconv.FormatInt(int64(v), 10), false
+		return strconv.FormatInt(int64(v), 10), true
 
 	case int32:
-		return strconv.FormatInt(int64(v), 10), false
+		return strconv.FormatInt(int64(v), 10), true
 
 	case int64:
-		return strconv.FormatInt(v, 10), false
+		return strconv.FormatInt(v, 10), true
 
 	case float32:
-		return strconv.FormatFloat(float64(v), 'f', -2, 64), false
+		return floatToString(float64(v))
 
 	case float64:
-		return strconv.FormatFloat(v, 'f', -2, 64), false
+		return floatToString(v)
 
 	case string:
 		return v, true
@@ -103,10 +106,10 @@ func StringOk(value any, defaultValue string) (string, bool) {
 		return StringOk(v.Bool(), defaultValue)
 
 	case Inter:
-		return strconv.FormatInt(int64(v.Int()), 10), false
+		return strconv.FormatInt(int64(v.Int()), 10), true
 
 	case Floater:
-		return strconv.FormatFloat(v.Float(), 'f', -2, 64), false
+		return floatToString(v.Float())
 
 	case Hexer:
 		return v.Hex(), true
@@ -125,6 +128,15 @@ func StringOk(value any, defaultValue string) (string, bool) {
 	}
 
 	return defaultValue, false
+}
+
+// floatToString formats a float64 with two decimal places. The conversion is
+// lossless (ok=true) only when the two-decimal string parses back to the original
+// value; a value needing more than two decimals rounds and is reported lossy.
+func floatToString(value float64) (string, bool) {
+	result := strconv.FormatFloat(value, 'f', 2, 64)
+	roundTrip, _ := strconv.ParseFloat(result, 64)
+	return result, roundTrip == value
 }
 
 // JoinString converts the value into a string.

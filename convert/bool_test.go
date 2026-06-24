@@ -31,190 +31,197 @@ func TestBoolToBool(t *testing.T) {
 
 func TestIntToBool(t *testing.T) {
 
+	// 0 and 1 map losslessly to false/true (ok=true); other ints are lossy (ok=false).
 	{
-		result, natural := BoolOk(0, false)
+		result, lossless := BoolOk(0, false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(1, false)
+		result, lossless := BoolOk(1, false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(0, true)
+		result, lossless := BoolOk(0, true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(1, true)
+		result, lossless := BoolOk(1, true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
+	}
+
+	{
+		result, lossless := BoolOk(5, false)
+		assert.False(t, result)
+		assert.False(t, lossless)
 	}
 }
 
 func TestInt8ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(int8(0), false)
+		result, lossless := BoolOk(int8(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int8(1), false)
+		result, lossless := BoolOk(int8(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int8(0), true)
+		result, lossless := BoolOk(int8(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int8(1), true)
+		result, lossless := BoolOk(int8(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 
 func TestInt16ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(int16(0), false)
+		result, lossless := BoolOk(int16(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int16(1), false)
+		result, lossless := BoolOk(int16(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int16(0), true)
+		result, lossless := BoolOk(int16(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int16(1), true)
+		result, lossless := BoolOk(int16(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 
 func TestInt32ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(int32(0), false)
+		result, lossless := BoolOk(int32(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int32(1), false)
+		result, lossless := BoolOk(int32(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int32(0), true)
+		result, lossless := BoolOk(int32(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int32(1), true)
+		result, lossless := BoolOk(int32(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 
 func TestInt64ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(int64(0), false)
+		result, lossless := BoolOk(int64(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int64(1), false)
+		result, lossless := BoolOk(int64(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int64(0), true)
+		result, lossless := BoolOk(int64(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(int64(1), true)
+		result, lossless := BoolOk(int64(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 
 func TestFloat32ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(float32(0), false)
+		result, lossless := BoolOk(float32(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float32(1), false)
+		result, lossless := BoolOk(float32(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float32(0), true)
+		result, lossless := BoolOk(float32(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float32(1), true)
+		result, lossless := BoolOk(float32(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 
 func TestFloat64ToBool(t *testing.T) {
 
 	{
-		result, natural := BoolOk(float64(0), false)
+		result, lossless := BoolOk(float64(0), false)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float64(1), false)
+		result, lossless := BoolOk(float64(1), false)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float64(0), true)
+		result, lossless := BoolOk(float64(0), true)
 		assert.False(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 
 	{
-		result, natural := BoolOk(float64(1), true)
+		result, lossless := BoolOk(float64(1), true)
 		assert.True(t, result)
-		assert.False(t, natural)
+		assert.True(t, lossless)
 	}
 }
 

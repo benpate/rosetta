@@ -16,8 +16,9 @@ func TestSliceOfString_Nil(t *testing.T) {
 
 func TestSliceOfString_Float64(t *testing.T) {
 	input := float64(3.14159)
-	expected := []string{"3.14159"}
+	expected := []string{"3.14"}
 
+	// The float formats to two decimals; 3.14159 needs more, so the conversion is lossy.
 	actual, ok := SliceOfStringOk(input)
 	require.False(t, ok)
 	require.Equal(t, expected, actual)
@@ -27,8 +28,9 @@ func TestSliceOfString_Int(t *testing.T) {
 	input := int(42)
 	expected := []string{"42"}
 
+	// An int formats to a decimal string losslessly, so ok=true.
 	actual, ok := SliceOfStringOk(input)
-	require.False(t, ok)
+	require.True(t, ok)
 	require.Equal(t, expected, actual)
 }
 
@@ -36,8 +38,9 @@ func TestSliceOfString_Int64(t *testing.T) {
 	input := int64(42)
 	expected := []string{"42"}
 
+	// An int64 formats to a decimal string losslessly, so ok=true.
 	actual, ok := SliceOfStringOk(input)
-	require.False(t, ok)
+	require.True(t, ok)
 	require.Equal(t, expected, actual)
 }
 
@@ -72,8 +75,9 @@ func TestSliceOfString_SliceOfInt(t *testing.T) {
 	input := []int{69, 420}
 	expected := []string{"69", "420"}
 
+	// Every element formats losslessly, so the slice conversion is lossless (ok=true).
 	actual, ok := SliceOfStringOk(input)
-	require.False(t, ok)
+	require.True(t, ok)
 	require.Equal(t, expected, actual)
 }
 
@@ -81,8 +85,9 @@ func TestSliceOfString_SliceOfInt64(t *testing.T) {
 	input := []int64{69, 420}
 	expected := []string{"69", "420"}
 
+	// Every element formats losslessly, so the slice conversion is lossless (ok=true).
 	actual, ok := SliceOfStringOk(input)
-	require.False(t, ok)
+	require.True(t, ok)
 	require.Equal(t, expected, actual)
 }
 

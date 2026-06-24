@@ -105,3 +105,80 @@ func FuzzFloatNarrowing(f *testing.F) {
 		}
 	})
 }
+
+// FuzzBoolRoundTrip asserts the BoolOk lossless rule for arbitrary integers:
+// Ok=true exactly when the value is 0 or 1 (the only integers that round-trip
+// through a bool), and the result then matches that value.
+func FuzzBoolRoundTrip(f *testing.F) {
+
+	f.Add(int64(0))
+	f.Add(int64(1))
+	f.Add(int64(2))
+	f.Add(int64(-1))
+	f.Add(int64(math.MaxInt64))
+
+	f.Fuzz(func(t *testing.T, value int64) {
+
+		result, ok := BoolOk(value, false)
+
+		wantOk := (value == 0 || value == 1)
+		if ok != wantOk {
+			t.Fatalf("BoolOk(%d): ok=%v, want %v", value, ok, wantOk)
+		}
+
+		// When lossless, the bool must encode the original value exactly.
+		if ok && result != (value == 1) {
+			t.Fatalf("BoolOk(%d) reported lossless but result=%v", value, result)
+		}
+	})
+}
+
+// FuzzStringIntRoundTrip asserts that converting an int to a string is lossless
+// and that the resulting string parses back to the original integer.
+func FuzzStringIntRoundTrip(f *testing.F) {
+
+	f.Add(int64(0))
+	f.Add(int64(-1))
+	f.Add(int64(123456789))
+	f.Add(int64(math.MaxInt64))
+	f.Add(int64(math.MinInt64))
+
+	f.Fuzz(func(t *testing.T, value int64) {
+
+		str, ok := StringOk(value, "DEFAULT")
+		if !ok {
+			t.Fatalf("StringOk(%d) reported lossy; int-to-string must be lossless", value)
+		}
+
+		// The string must round-trip back to the same integer.
+		back, backOk := Int64Ok(str, -1)
+		if !backOk || back != value {
+			t.Fatalf("StringOk(%d)=%q did not round-trip back (got %d, ok=%v)", value, str, back, backOk)
+		}
+	})
+}
+
+// FuzzFloatIntRoundTrip asserts that FloatOk reports Ok=true for an int64 only when
+// the value is representable exactly in a float64 (it round-trips back unchanged).
+func FuzzFloatIntRoundTrip(f *testing.F) {
+
+	f.Add(int64(0))
+	f.Add(int64(1) << 53)
+	f.Add((int64(1) << 53) + 1)
+	f.Add(int64(math.MaxInt64))
+	f.Add(int64(math.MinInt64))
+
+	f.Fuzz(func(t *testing.T, value int64) {
+
+		_, ok := FloatOk(value, -1)
+
+		// An int64 is exactly representable in float64 exactly when its magnitude
+		// is at most 2^53. Ok must agree with that, in both directions.
+		const maxExact = int64(1) << 53
+		exact := value >= -maxExact && value <= maxExact
+
+		if ok != exact {
+			t.Fatalf("FloatOk(%d): ok=%v, want %v (exactly representable)", value, ok, exact)
+		}
+	})
+}

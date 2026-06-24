@@ -24,15 +24,17 @@ func BoolDefault(value any, defaultValue bool) bool {
 // BoolOk converts an arbitrary value (passed in the first parameter) into a boolean, somehow,
 // no matter what. The first result is the final converted value, or the default value
 // (passed in the second parameter)
-// The second result is TRUE if the value was naturally a bool, and FALSE otherwise
+// The second result is TRUE if the conversion was lossless (the converted value round-trips
+// back to the original input), and FALSE otherwise.
 //
 // Conversion Rules:
 // Nils return default value and Ok=false
 // Bools are passed through with Ok=true
-// Ints and Floats all convert to FALSE if they are zero, and TRUE if they are non-zero.
-// In these cases, Ok=false
-// String values of "true" and "false" convert normall, and Ok=true.
+// Ints and Floats of exactly 0 or 1 map losslessly to false/true with Ok=true; any other
+// numeric value is lossy and returns Ok=false
+// String values of "true" and "false" convert losslessly with Ok=true
 // All other strings return the default value, with Ok=false
+// A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Booler, Inter, Floater, Stringer) are handled like their corresponding types
 // All other values return the default value with Ok=false
 func BoolOk(value any, defaultValue bool) (bool, bool) {
@@ -47,25 +49,25 @@ func BoolOk(value any, defaultValue bool) (bool, bool) {
 		return v, true
 
 	case int:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case int8:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case int16:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case int32:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case int64:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case float32:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case float64:
-		return (v != 0), false
+		return boolFromNumber(v)
 
 	case string:
 
@@ -119,4 +121,15 @@ func BoolOk(value any, defaultValue bool) (bool, bool) {
 	}
 
 	return defaultValue, false
+}
+
+// boolFromNumber reports a numeric-to-bool conversion. A numeric value of exactly
+// 0 or 1 maps losslessly (ok=true); any other value is lossy (ok=false) and yields
+// FALSE, since it cannot round-trip back to the original number.
+func boolFromNumber[T int | int8 | int16 | int32 | int64 | float32 | float64](value T) (bool, bool) {
+
+	result := (value == 1)
+	lossless := (value == 0 || value == 1)
+
+	return result, lossless
 }

@@ -37,23 +37,27 @@ func SliceOfIntOk(value any) ([]int, bool) {
 		return []int{typed}, true
 
 	case int64:
-		return []int{Int(typed)}, true
+		item, ok := IntOk(typed, 0)
+		return []int{item}, ok
 
 	case string:
 		split := strings.Split(typed, ",")
 		return makeSliceOfIntOk(split)
 
 	case reflect.Value:
-		return SliceOfInt(Interface(typed)), true
+		return SliceOfIntOk(Interface(typed))
 
 	case Floater:
-		return SliceOfInt(typed.Float()), true
+		item, ok := IntOk(typed.Float(), 0)
+		return []int{item}, ok
 
 	case Inter:
-		return SliceOfInt(typed.Int()), true
+		item, ok := IntOk(typed.Int(), 0)
+		return []int{item}, ok
 
 	case Int64er:
-		return SliceOfInt(typed.Int64()), true
+		item, ok := IntOk(typed.Int64(), 0)
+		return []int{item}, ok
 
 	case Stringer:
 		item, ok := IntOk(typed.String(), 0)

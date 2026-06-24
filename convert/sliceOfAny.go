@@ -97,7 +97,7 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
 	case reflect.Pointer:
-		return SliceOfAny(valueOf.Elem().Interface()), true
+		return SliceOfAnyOk(valueOf.Elem().Interface())
 
 	case reflect.Array, reflect.Slice:
 		length := valueOf.Len()

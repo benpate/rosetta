@@ -23,8 +23,8 @@ func TestStringOk_AllTypes(t *testing.T) {
 	assert(int16(5), "5")
 	assert(int32(5), "5")
 	assert(int64(5), "5")
-	assert(float32(5), "5")
-	assert(float64(5), "5")
+	assert(float32(5), "5.00") // floats format to two decimals
+	assert(float64(5), "5.00")
 	assert("hello", "hello")
 	assert([]string{}, "DEFAULT")
 	assert([]string{"a"}, "a")
@@ -33,7 +33,7 @@ func TestStringOk_AllTypes(t *testing.T) {
 	assert([]any{"x"}, "x")
 	assert([]any{"x", "y"}, "x")
 	assert(customInter(7), "7")
-	assert(customFloater(7), "7")
+	assert(customFloater(7), "7.00")
 	assert(customHexer("ff"), "ff")
 	assert(customStringer("custom"), "custom")
 }

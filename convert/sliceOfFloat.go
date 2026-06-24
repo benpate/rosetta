@@ -33,26 +33,31 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 		return []float64{typed}, true
 
 	case int:
-		return []float64{float64(typed)}, true
+		item, ok := FloatOk(typed, 0)
+		return []float64{item}, ok
 
 	case int64:
-		return []float64{float64(typed)}, true
+		item, ok := FloatOk(typed, 0)
+		return []float64{item}, ok
 
 	case string:
 		split := strings.Split(typed, ",")
 		return makeSliceOfFloatOk(split)
 
 	case reflect.Value:
-		return SliceOfFloat(Interface(typed)), true
+		return SliceOfFloatOk(Interface(typed))
 
 	case Floater:
-		return SliceOfFloat(typed.Float()), true
+		item, ok := FloatOk(typed.Float(), 0)
+		return []float64{item}, ok
 
 	case Inter:
-		return SliceOfFloat(typed.Int()), true
+		item, ok := FloatOk(typed.Int(), 0)
+		return []float64{item}, ok
 
 	case Int64er:
-		return SliceOfFloat(typed.Int64()), true
+		item, ok := FloatOk(typed.Int64(), 0)
+		return []float64{item}, ok
 
 	case Stringer:
 		item, ok := FloatOk(typed.String(), 0.0)

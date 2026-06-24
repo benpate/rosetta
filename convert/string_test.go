@@ -33,56 +33,66 @@ func TestByteArrayToString(t *testing.T) {
 
 func TestIntToString(t *testing.T) {
 
+	// Integers format to decimal strings losslessly (ok=true).
 	{
-		result, natural := StringOk(int(10), "default")
+		result, lossless := StringOk(int(10), "default")
 
-		assert.False(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, "10")
 	}
 
 	{
-		result, natural := StringOk(int8(10), "default")
+		result, lossless := StringOk(int8(10), "default")
 
-		assert.False(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, "10")
 	}
 
 	{
-		result, natural := StringOk(int16(10), "default")
+		result, lossless := StringOk(int16(10), "default")
 
-		assert.False(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, "10")
 	}
 
 	{
-		result, natural := StringOk(int32(10), "default")
+		result, lossless := StringOk(int32(10), "default")
 
-		assert.False(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, "10")
 	}
 
 	{
-		result, natural := StringOk(int64(10), "default")
+		result, lossless := StringOk(int64(10), "default")
 
-		assert.False(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, "10")
 	}
 }
 
 func TestFloatToString(t *testing.T) {
 
+	// Floats format to two decimal places; a value that fits exactly is lossless.
 	{
-		result, natural := StringOk(float32(10), "default")
+		result, lossless := StringOk(float32(10), "default")
 
-		assert.False(t, natural)
-		assert.Equal(t, result, "10")
+		assert.True(t, lossless)
+		assert.Equal(t, result, "10.00")
 	}
 
 	{
-		result, natural := StringOk(float64(10), "default")
+		result, lossless := StringOk(float64(10), "default")
 
-		assert.False(t, natural)
-		assert.Equal(t, result, "10")
+		assert.True(t, lossless)
+		assert.Equal(t, result, "10.00")
+	}
+
+	// A value needing more than two decimals rounds and is reported lossy.
+	{
+		result, lossless := StringOk(float64(10.129), "default")
+
+		assert.False(t, lossless)
+		assert.Equal(t, result, "10.13")
 	}
 }
 

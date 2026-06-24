@@ -31,15 +31,20 @@ func Int32Default(value any, defaultValue int32) int32 {
 	return result
 }
 
-// Int32Ok converts an arbitrary value (passed in the first parameter) into an int, no matter what.
+// Int32Ok converts an arbitrary value (passed in the first parameter) into an int32, no matter what.
 // The first result is the final converted value, or the default value (passed in the second parameter)
-// The second result is TRUE if the value was naturally an integer, and FALSE otherwise
+// The second result is TRUE if the conversion was lossless (the converted value round-trips back to
+// the original input), and FALSE otherwise.
 //
 // Conversion Rules:
-// Nils and Bools return default value and Ok=false
+// Nils return default value and Ok=false
+// Bools map losslessly to 0/1 with Ok=true
 // Int32s are returned directly with Ok=true
-// Floats are truncated into ints.  If there is no decimal value then Ok=true
-// String values are attempted to parse as a int.  If unsuccessful, default value is returned.  For all strings, Ok=false
+// Floats with no fractional part convert with Ok=true; a fractional part is lossy (Ok=false)
+// Out-of-range values are clamped to the int32 bounds and reported as lossy (Ok=false)
+// String values are parsed as an int; a clean parse is lossless (Ok=true), otherwise the
+// default value is returned with Ok=false
+// A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
 // All other values return the default value with Ok=false
 func Int32Ok(value any, defaultValue int32) (int32, bool) {
