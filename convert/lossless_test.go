@@ -161,10 +161,10 @@ func TestLossless_StringOk(t *testing.T) {
 	test(int64(1000), "1000", true)
 	test(true, "true", true) // bool -> string is lossless
 	test(false, "false", true)
-	test(3.5, "3.50", true)        // <=2 decimals -> lossless
-	test(12.34, "12.34", true)     // exactly 2 decimals -> lossless
-	test(123.45, "123.45", true)   // 2 decimals -> lossless
-	test(3.14159, "3.14", false)   // needs more than 2 decimals -> lossy (rounded)
+	test(3.5, "3.50", true)      // <=2 decimals -> lossless
+	test(12.34, "12.34", true)   // exactly 2 decimals -> lossless
+	test(123.45, "123.45", true) // 2 decimals -> lossless
+	test(3.14159, "3.14", false) // needs more than 2 decimals -> lossy (rounded)
 	test(123.4567890, "123.46", false)
 	test([]string{"x"}, "x", true)
 	test([]string{"x", "y"}, "x", false) // longer slice -> lossy

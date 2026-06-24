@@ -72,7 +72,8 @@ func TestNumber_AllProperties(t *testing.T) {
 }
 
 func TestNumber_Enumerate(t *testing.T) {
-	require.Equal(t, []string{"1.5", "2.5"}, Number{Enum: []float64{1.5, 2.5}}.Enumerate())
+	// Floats render with two decimal places via convert.SliceOfString.
+	require.Equal(t, []string{"1.50", "2.50"}, Number{Enum: []float64{1.5, 2.5}}.Enumerate())
 }
 
 func TestNumber_MarshalMap(t *testing.T) {
