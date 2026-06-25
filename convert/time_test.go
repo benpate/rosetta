@@ -34,7 +34,7 @@ func TestTimeInt(t *testing.T) {
 		require.Equal(t, baseTime, result)
 	}
 
-	// Test Miliseconds
+	// Test Milliseconds
 	{
 		result, ok := TimeOk(baseTime.UnixMilli(), oneTime)
 		require.True(t, ok)
