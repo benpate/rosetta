@@ -105,7 +105,7 @@ func addHTMLFuncs(target map[string]any) {
 			goldmark.WithRendererOptions(),
 		)
 
-		if err := md.Convert([]byte(valueBytes), &buffer); err != nil {
+		if err := md.Convert(valueBytes, &buffer); err != nil {
 			derp.Report(derp.Wrap(err, "tools.templates.functions.markdown", "Error converting Markdown to HTML"))
 		}
 
