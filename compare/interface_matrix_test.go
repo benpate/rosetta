@@ -328,12 +328,40 @@ func TestInterface_NumericVsNonNumeric(t *testing.T) {
 
 	incompatible(1, "1")
 	incompatible("1", 1)
-	incompatible(1, true) // a numeric value1 only compares against another number
 	incompatible(float64(1), struct{}{})
+}
 
-	// Note: Interface(true, 1) is NOT incompatible. When value1 is a bool, value2 is
-	// coerced to bool, so a bool-vs-number comparison succeeds in that direction only.
-	result, err := Interface(true, 1)
+// TestInterface_BoolCoercion confirms that a bool on either side coerces the other operand
+// to bool, so the comparison succeeds symmetrically in both directions.
+func TestInterface_BoolCoercion(t *testing.T) {
+
+	// equalBool asserts both operand orders compare as equal after bool coercion.
+	equalBool := func(a any, b any) {
+		t.Helper()
+
+		result, err := Interface(a, b)
+		require.Nil(t, err)
+		require.Equal(t, 0, result, "expected %#v == %#v after bool coercion", a, b)
+
+		result, err = Interface(b, a)
+		require.Nil(t, err)
+		require.Equal(t, 0, result, "expected %#v == %#v after bool coercion", b, a)
+	}
+
+	// 1 coerces to true and 0 coerces to false, in both directions.
+	equalBool(true, 1)
+	equalBool(false, 0)
+	equalBool(true, "true")
+	equalBool(false, "false")
+
+	// Unequal bools order per compare.Bool, which (by its own pinned contract) ranks
+	// true BELOW false. We assert the coerced result matches that direct comparison
+	// rather than a natural false<true ordering.
+	result, err := Interface(true, 0)
 	require.Nil(t, err)
-	require.Equal(t, 0, result, "bool(true) coerces 1 to true, so they compare equal")
+	require.Equal(t, Bool(true, false), result, "Interface(true, 0) matches Bool(true, false)")
+
+	result, err = Interface(0, true)
+	require.Nil(t, err)
+	require.Equal(t, Bool(false, true), result, "Interface(0, true) matches Bool(false, true)")
 }

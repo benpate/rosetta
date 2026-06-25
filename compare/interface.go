@@ -17,6 +17,16 @@ func Interface(value1 any, value2 any) (int, error) {
 	const location = "compare.Interface"
 	const incompatibleTypes = "Incompatible data types"
 
+	// A bool on either side coerces the other operand to bool, so the comparison
+	// succeeds symmetrically (Interface(true, 1) and Interface(1, true) both work).
+	// This runs before the numeric block so a bool is never treated as a number.
+	if v1, ok := value1.(bool); ok {
+		return Bool(v1, convert.Bool(value2)), nil
+	}
+	if v2, ok := value2.(bool); ok {
+		return Bool(convert.Bool(value1), v2), nil
+	}
+
 	// Numbers are compared on a common numeric kind, so every signed/unsigned/float
 	// combination is handled symmetrically without a per-type-pair switch.
 	if n1, ok := toNumber(value1); ok {
@@ -27,9 +37,6 @@ func Interface(value1 any, value2 any) (int, error) {
 	}
 
 	switch v1 := value1.(type) {
-
-	case bool:
-		return Bool(v1, convert.Bool(value2)), nil
 
 	case string:
 		if v2, ok := value2.(string); ok {
