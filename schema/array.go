@@ -34,11 +34,11 @@ func (element Array) IsRequired() bool {
 	return element.Required
 }
 
-// ValidateRequiredIf implements the Element interface
+// validateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
-func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+func (element Array) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.Array.ValidateRequiredIf"
+	const location = "schema.Array.validateRequiredIf"
 
 	// If there is no `required-if` condition, then skip this step
 	if element.RequiredIf == "" {
@@ -82,8 +82,8 @@ func (element Array) ValidateRequiredIf(schema Schema, path list.List, globalVal
 			return derp.Internal(location, "Array items cannot be nil", path)
 		}
 
-		if err := element.Items.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
-			return derp.Wrap(err, "schema.Array.ValidateRequiredIf", "Validating object at index", index)
+		if err := element.Items.validateRequiredIf(schema, subPath, globalValue); err != nil {
+			return derp.Wrap(err, "schema.Array.validateRequiredIf", "Validating object at index", index)
 		}
 	}
 

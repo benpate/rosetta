@@ -29,10 +29,10 @@ func (element Any) Validate(_ any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
-func (element Any) ValidateRequiredIf(schema Schema, path list.List, value any) error {
+// validateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element Any) validateRequiredIf(schema Schema, path list.List, value any) error {
 
-	const location = "schema.Any.ValidateRequiredIf"
+	const location = "schema.Any.validateRequiredIf"
 
 	// If RequiredIf is not set, then exit
 	if element.RequiredIf == "" {

@@ -17,12 +17,6 @@ type Element interface {
 	// IsRequired returns true if this a value is required for this element
 	IsRequired() bool
 
-	// Validate validates the provided value
-	// Validate(value any) error
-
-	// ValidateRequiredIf handles conditional validation of a required field
-	ValidateRequiredIf(schema Schema, path list.List, globalValue any) error
-
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
 
@@ -32,6 +26,9 @@ type Element interface {
 	Inherit(Element)
 
 	AllProperties() ElementMap
+
+	// validateRequiredIf handles conditional validation of a required field
+	validateRequiredIf(schema Schema, path list.List, globalValue any) error
 }
 
 // WritableElement represents an Element (usually a pointer to a concrete type) whose value can be changed.

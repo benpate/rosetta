@@ -50,11 +50,11 @@ func (element Boolean) Validate(object any) error {
 	return nil
 }
 
-// ValidateRequiredIf is a part of the Element interface
+// validateRequiredIf is a part of the Element interface
 // It returns an error if the conditional expression is true but the value is empty
-func (element Boolean) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+func (element Boolean) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.Boolean.ValidateRequiredIf"
+	const location = "schema.Boolean.validateRequiredIf"
 
 	if element.RequiredIf != "" {
 

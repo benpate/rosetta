@@ -14,7 +14,7 @@ type unknownElement struct{}
 
 func (unknownElement) DefaultValue() any                               { return nil }
 func (unknownElement) IsRequired() bool                                { return false }
-func (unknownElement) ValidateRequiredIf(Schema, list.List, any) error { return nil }
+func (unknownElement) validateRequiredIf(Schema, list.List, any) error { return nil }
 func (unknownElement) MarshalMap() map[string]any                      { return map[string]any{} }
 func (unknownElement) GetElement(string) (Element, bool)               { return nil, false }
 func (unknownElement) Inherit(Element)                                 {}

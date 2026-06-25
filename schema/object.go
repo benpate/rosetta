@@ -76,15 +76,15 @@ func (element Object) Validate(object any) error {
 	return nil
 }*/
 
-// ValidateRequiredIf implements the Element interface
+// validateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
-func (element Object) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+func (element Object) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.Object.ValidateRequiredIf"
+	const location = "schema.Object.validateRequiredIf"
 
 	for name, subElement := range element.Properties {
 		subPath := path.PushTail(name)
-		if err := subElement.ValidateRequiredIf(schema, subPath, globalValue); err != nil {
+		if err := subElement.validateRequiredIf(schema, subPath, globalValue); err != nil {
 			return derp.Wrap(err, location, "Validating property", subPath.String())
 		}
 	}

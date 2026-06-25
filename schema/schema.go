@@ -102,10 +102,10 @@ func (schema Schema) Validate(value any) (bool, error) {
 	return changed, nil
 }
 
-// ValidateRequiredIf implements the Element interface
-// It returns an error if the conditional expression is true but the value is empty
+// ValidateRequiredIf returns an error if any conditionally-required field in the
+// schema is missing while its condition is true.
 func (schema Schema) ValidateRequiredIf(value any) error {
-	return schema.Element.ValidateRequiredIf(schema, list.ByDot(""), value)
+	return schema.Element.validateRequiredIf(schema, list.ByDot(""), value)
 }
 
 /******************************************

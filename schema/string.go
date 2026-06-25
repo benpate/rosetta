@@ -104,10 +104,10 @@ func (element String) Validate(value any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
-func (element String) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+// validateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element String) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.String.ValidateRequiredIf"
+	const location = "schema.String.validateRequiredIf"
 
 	// If there is no `required-if` condition, then skip this step
 	if element.RequiredIf == "" {

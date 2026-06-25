@@ -84,11 +84,11 @@ func (element Integer) Validate(value any) error {
 	return nil
 }
 
-// ValidateRequiredIf implements the Element interface
+// validateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
-func (element Integer) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+func (element Integer) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.Integer.ValidateRequiredIf"
+	const location = "schema.Integer.validateRequiredIf"
 
 	// If there's no required-if condition, then skip this step
 	if element.RequiredIf == "" {

@@ -87,10 +87,10 @@ func (element Number) Validate(value any) error {
 	return nil
 }
 
-// ValidateRequiredIf returns an error if the conditional expression is true but the value is empty
-func (element Number) ValidateRequiredIf(schema Schema, path list.List, globalValue any) error {
+// validateRequiredIf returns an error if the conditional expression is true but the value is empty
+func (element Number) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
 
-	const location = "schema.Number.ValidateRequiredIf"
+	const location = "schema.Number.validateRequiredIf"
 
 	if element.RequiredIf != "" {
 		isRequired, err := schema.Match(globalValue, exp.Parse(element.RequiredIf))
