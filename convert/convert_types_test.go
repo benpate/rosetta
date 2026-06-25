@@ -63,7 +63,7 @@ func TestInt64Ok_AllTypes(t *testing.T) {
 	assert(customFloater(12), 12)
 	assert(customStringer("13"), 13)
 	assert(customHexer("ff"), 255)
-	assert(customHexer("xyz"), 0) // invalid hex
+	assert(customHexer("xyz"), -1) // invalid hex returns the default value
 }
 
 // --- IntOk / Int32Ok mirror Int64Ok's structure ---
