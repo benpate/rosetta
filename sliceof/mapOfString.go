@@ -2,7 +2,7 @@ package sliceof
 
 import (
 	"iter"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 
 	"github.com/benpate/derp"
@@ -134,7 +134,7 @@ func (x *MapOfString) Append(values ...mapof.String) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x MapOfString) Shuffle() MapOfString {
-	rand.Shuffle(len(x), func(i, j int) { // NOSONAR: does not need to be cyptographically secure.
+	rand.Shuffle(len(x), func(i, j int) { // NOSONAR: does not need to be cryptographically secure.
 		x[i], x[j] = x[j], x[i]
 	})
 	return x
