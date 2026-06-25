@@ -10,44 +10,6 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// narrowIntegerBitSize narrows a 64-bit integer to the element's declared bit size,
-// returning a validation error if the value falls outside the range of that width.
-// This guards against a raw conversion silently wrapping an out-of-range value
-// (for example int8(300) == 44) before the minimum/maximum rules are applied.
-func narrowIntegerBitSize(bitSize int, value int64) (any, error) {
-
-	switch bitSize {
-
-	case 8:
-		if (value < math.MinInt8) || (value > math.MaxInt8) {
-			return nil, derp.Validation("Value must fit within an 8-bit integer", value)
-		}
-		return int8(value), nil
-
-	case 16:
-		if (value < math.MinInt16) || (value > math.MaxInt16) {
-			return nil, derp.Validation("Value must fit within a 16-bit integer", value)
-		}
-		return int16(value), nil
-
-	case 32:
-		if (value < math.MinInt32) || (value > math.MaxInt32) {
-			return nil, derp.Validation("Value must fit within a 32-bit integer", value)
-		}
-		return int32(value), nil
-
-	case 64:
-		return value, nil
-
-	default:
-		// A bare "int" follows the platform width; on 32-bit platforms it matches int32.
-		if (strconv.IntSize == 32) && ((value < math.MinInt32) || (value > math.MaxInt32)) {
-			return nil, derp.Validation("Value must fit within an integer", value)
-		}
-		return int(value), nil
-	}
-}
-
 // validate_Integer checks that the provided value meets the requirements of the Integer schema element, and updates the value if necessary.
 func validate_Integer(element Integer, value any) (any, bool, error) {
 
@@ -100,4 +62,43 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (
 
 	// Return the value converted back to the target type
 	return value, false, nil
+}
+
+// narrowIntegerBitSize narrows a 64-bit integer to the element's declared bit size,
+// returning a validation error if the value falls outside the range of that width.
+func narrowIntegerBitSize(bitSize int, value int64) (any, error) {
+
+	// This guards against a raw conversion silently wrapping an out-of-range value
+	// (for example int8(300) == 44) before the minimum/maximum rules are applied.
+
+	switch bitSize {
+
+	case 8:
+		if (value < math.MinInt8) || (value > math.MaxInt8) {
+			return nil, derp.Validation("Value must fit within an 8-bit integer", value)
+		}
+		return int8(value), nil
+
+	case 16:
+		if (value < math.MinInt16) || (value > math.MaxInt16) {
+			return nil, derp.Validation("Value must fit within a 16-bit integer", value)
+		}
+		return int16(value), nil
+
+	case 32:
+		if (value < math.MinInt32) || (value > math.MaxInt32) {
+			return nil, derp.Validation("Value must fit within a 32-bit integer", value)
+		}
+		return int32(value), nil
+
+	case 64:
+		return value, nil
+
+	default:
+		// A bare "int" follows the platform width; on 32-bit platforms it matches int32.
+		if (strconv.IntSize == 32) && ((value < math.MinInt32) || (value > math.MaxInt32)) {
+			return nil, derp.Validation("Value must fit within an integer", value)
+		}
+		return int(value), nil
+	}
 }

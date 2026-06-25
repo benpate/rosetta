@@ -24,6 +24,13 @@ func Validate(schema Schema, value any) (any, bool, error) {
 		return value, false, derp.Wrap(err, location, "Value is not valid for this schema", value)
 	}
 
+	// RULE: A value that had to be rewritten (clamped or formatted) is not valid as-given.
+	// Set() can rewrite values in place; Validate() answers whether the value already conforms,
+	// so any required modification means the value fails validation.
+	if updated {
+		return value, false, derp.Validation("Value is not valid for this schema", value)
+	}
+
 	// Handle special cases for "required-if" fields
 	if err := schema.ValidateRequiredIf(value); err != nil {
 		return value, false, derp.Wrap(err, location, "Validating `required-if` fields", value)

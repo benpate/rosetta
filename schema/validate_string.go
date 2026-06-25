@@ -12,9 +12,41 @@ import (
 // validate_String checks that the provided value meets the requirements of the String schema element, and updates the value if necessary.
 func validate_String(element String, value string) (string, bool, error) {
 
-	changed := false
+	// Steps that REWRITE the value run first, in an order that reaches a stable result:
+	// format the value, truncate it to the maximum length, then format once more (truncation
+	// can leave an artifact, such as a trailing space, that the formatter would still collapse).
+	// Only then do the accept/reject rules run, against the value as it will actually be stored,
+	// so that a value produced by Set always passes a subsequent Validate.
 
-	// Verify required fields (after format functions are applied)
+	const location = "schema.validate_String"
+
+	// Remember the original so we can report whether any rewrite step changed the value.
+	original := value
+
+	// REWRITE: apply formatting functions (they may shrink or rewrite the value).
+	value, err := applyStringFormats(element, value)
+	if err != nil {
+		return value, false, derp.Wrap(err, location, "Applying format functions", value)
+	}
+
+	// REWRITE: truncate to the maximum length (measured in runes, not bytes). Truncation
+	// happens on a rune boundary so that multi-byte characters are never split into invalid UTF-8.
+	if (element.MaxLength > 0) && (utf8.RuneCountInString(value) > element.MaxLength) {
+		value = string([]rune(value)[:element.MaxLength])
+	}
+
+	// REWRITE: format again, because truncation can re-introduce something the formatter
+	// removes (e.g. a trailing space at the cut boundary). After this the value is stable.
+	value, err = applyStringFormats(element, value)
+	if err != nil {
+		return value, false, derp.Wrap(err, location, "Applying format functions", value)
+	}
+
+	changed := (value != original)
+
+	// All rewriting is complete; the remaining rules only accept or reject the final value.
+
+	// Verify required fields
 	if element.Required && (value == "") {
 		return value, false, derp.Validation("Value is required")
 	}
@@ -34,14 +66,6 @@ func validate_String(element String, value string) (string, bool, error) {
 		return value, false, derp.Validation("Minimum length is " + convert.String(element.MinLength))
 	}
 
-	// Validate maximum length (ACTUALLY TRUNCATES THE STRING TO THE MAXIMUM LENGTH).
-	// Length is measured in runes, and truncation happens on a rune boundary so that
-	// multi-byte characters are never split into invalid UTF-8.
-	if (element.MaxLength > 0) && (utf8.RuneCountInString(value) > element.MaxLength) {
-		value = string([]rune(value)[:element.MaxLength])
-		changed = true
-	}
-
 	// Validate enumerated values
 	if len(element.Enum) > 0 {
 		if (value != "") && (compare.NotContains(element.Enum, value)) {
@@ -49,32 +73,7 @@ func validate_String(element String, value string) (string, bool, error) {
 		}
 	}
 
-	// Validate against all formatting functions, tracking changes
-	return validate_String_Formats(element, value, changed)
-}
-
-func validate_String_Formats(element String, value string, changed bool) (string, bool, error) {
-
-	const location = "schema.validate_String_Formats"
-
-	// Validate against all formatting functions
-	for _, formatFunc := range element.formatFunctions() {
-
-		// Try formatting the value with this function
-		newValue, err := formatFunc(value)
-
-		if err != nil {
-			return value, false, derp.Wrap(err, location, "Applying format function", value)
-		}
-
-		// If the value has been changed, then flag it so.
-		if newValue != value {
-			changed = true
-			value = newValue
-		}
-	}
-
-	// Validate regex Pattern
+	// Validate regex Pattern (accept/reject only; it never rewrites the value)
 	if element.Pattern != "" {
 		if matched, err := regexp.MatchString(element.Pattern, value); err != nil {
 			return value, false, derp.Wrap(err, location, "Evaluating pattern", element.Pattern)
@@ -83,5 +82,19 @@ func validate_String_Formats(element String, value string, changed bool) (string
 		}
 	}
 
+	// Successfully validated/updated the value.
 	return value, changed, nil
+}
+
+// applyStringFormats runs every formatting function for the element over the value in order,
+// returning the rewritten value or the first formatting error.
+func applyStringFormats(element String, value string) (string, error) {
+	for _, formatFunc := range element.formatFunctions() {
+		formatted, err := formatFunc(value)
+		if err != nil {
+			return value, err
+		}
+		value = formatted
+	}
+	return value, nil
 }

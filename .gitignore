@@ -16,3 +16,4 @@
 
 # System files for macOS 
 .DS_Store
+/schema/testdata

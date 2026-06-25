@@ -53,11 +53,11 @@ func TestArray_Validation(t *testing.T) {
 	}
 
 	{
+		// An item that exceeds MaxLength would require rewriting, so Validate now
+		// rejects it rather than truncating (Set still clamps the value in place).
 		v := testArrayA{"one", "two", "three", "invalid because its way too long"}
-		value, changed, err := Validate(schema, &v)
-		require.NoError(t, err)
-		require.True(t, changed)
-		require.Equal(t, &testArrayA{"one", "two", "three", "invalid be"}, value)
+		_, _, err := Validate(schema, &v)
+		require.Error(t, err)
 	}
 }
 
