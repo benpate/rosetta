@@ -159,7 +159,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)
 		if err != nil {
-			return 0, false
+			return defaultValue, false
 		}
 
 		return IntOk(result, defaultValue)

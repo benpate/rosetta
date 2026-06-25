@@ -140,7 +140,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 64)
 		if err != nil {
-			return 0, false
+			return defaultValue, false
 		}
 
 		return Int64Ok(result, defaultValue)

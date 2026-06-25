@@ -156,7 +156,7 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 	case Hexer:
 		result, err := strconv.ParseInt(v.Hex(), 16, 32)
 		if err != nil {
-			return 0, false
+			return defaultValue, false
 		}
 
 		return Int32Ok(result, defaultValue)
