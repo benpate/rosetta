@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+// secondsThreshold separates seconds-based from milliseconds-based Unix
+// timestamps. It is ~2065-01-24 in seconds, but only ~1970-02-04 in
+// milliseconds, so any int64 above it is far more likely a millisecond value.
+// Genuine seconds-based timestamps after that date are misread as milliseconds.
+const secondsThreshold = 3000000000
+
 // Time converts the value into a time.Time.
 // It works with time.Time, Timer, ToTimer, string, int, and int64 values.
 // If the passed value cannot be converted, then the zero time is returned.
@@ -52,12 +58,13 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 
 	case int64:
 
-		// Assume Seconds until 2065
-		if typed > 3000000000 {
+		// A value past the secondsThreshold is too large to be a seconds-based
+		// timestamp, so treat it as milliseconds and divide down to seconds.
+		if typed > secondsThreshold {
 			return TimeOk(typed/1000, defaultValue)
 		}
 
-		// Assume Miliseconds
+		// Otherwise the value is small enough to be seconds since the Unix epoch.
 		return time.Unix(typed, 0).In(time.UTC), true
 	}
 
