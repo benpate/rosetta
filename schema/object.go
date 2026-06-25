@@ -62,20 +62,6 @@ func (element Object) IsRequired() bool {
 	return element.Required
 }
 
-/*
-// Validate implements the Element interface
-// It validates a value against this schema
-func (element Object) Validate(object any) error {
-
-	for name, subElement := range element.Properties {
-		if err := validate(subElement, object, name); err != nil {
-			return derp.Wrap(err, "schema.Object.Validate", "Validating property", name)
-		}
-	}
-
-	return nil
-}*/
-
 // validateRequiredIf implements the Element interface
 // It returns an error if the conditional expression is true but the value is empty
 func (element Object) validateRequiredIf(schema Schema, path list.List, globalValue any) error {
