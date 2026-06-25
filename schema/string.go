@@ -21,6 +21,7 @@ type String struct {
 	MinValue   string   `json:"minValue"`
 	MaxValue   string   `json:"maxValue"`
 	Format     string   `json:"format"`
+	Pattern    string   `json:"pattern"`
 	Required   bool     `json:"required"`
 	RequiredIf string   `json:"required-if"`
 }

@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"regexp"
 	"unicode/utf8"
 
 	"github.com/benpate/derp"
@@ -70,6 +71,15 @@ func validate_String_Formats(element String, value string, changed bool) (string
 		if newValue != value {
 			changed = true
 			value = newValue
+		}
+	}
+
+	// Validate regex Pattern
+	if element.Pattern != "" {
+		if matched, err := regexp.MatchString(element.Pattern, value); err != nil {
+			return value, false, derp.Wrap(err, location, "Evaluating pattern", element.Pattern)
+		} else if !matched {
+			return value, false, derp.Validation("Value must match pattern", value, element.Pattern)
 		}
 	}
 
