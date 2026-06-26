@@ -69,7 +69,7 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 		return element.Maximum.Float(), true, nil
 	}
 
-	// Return the value converted back to the target type
+	// The value satisfies every rule; return it unchanged
 	return value64, false, nil
 }
 

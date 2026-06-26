@@ -96,7 +96,7 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T, c
 		}
 	}
 
-	// Return the value converted back to the target type
+	// The value satisfies every rule; convert it back to the declared type and return it
 	return T(value64), false, nil
 }
 

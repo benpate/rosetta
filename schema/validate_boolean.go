@@ -5,10 +5,10 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-// validate_Boolean checks that the provided value meets the requirements of the schema element, and updates the value if necessary.
+// validate_Boolean checks that the provided value meets the requirements of the Boolean schema element.
 func validate_Boolean[T any](element Boolean, value T) (T, bool, error) {
 
-	// Make a boolean version of this value to compare schema rules
+	// Coerce to a bool so the schema rules can be checked against it
 	boolValue, isBoolean := convert.BoolOk(value, false)
 
 	// RULE: Value must be a boolean
