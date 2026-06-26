@@ -174,7 +174,10 @@ func IntOk(value any, defaultValue int) (int, bool) {
 	return defaultValue, false
 }
 
-// IntBitsizeOk converts an arbitrary value into an integer of the specified bit size.
+// IntBitsizeOk converts an arbitrary value into an integer of the requested bit size (8, 16, 32,
+// 64, or any other value for a platform-width int), clamping out-of-range values to that width.
+// "lossless" is TRUE when the underlying numeric conversion round-trips exactly; "inBounds" is
+// TRUE when the value fit the bit size without being clamped.
 func IntBitsizeOk(value any, defaultValue int, bitSize int) (result any, lossless bool, inBounds bool) {
 
 	integer, lossless := Int64Ok(value, int64(defaultValue))

@@ -21,6 +21,6 @@ func validate_Boolean[T any](element Boolean, value T) (T, bool, error) {
 		return value, false, derp.Validation("Value is required")
 	}
 
-	// Return the value converted back to the target type
+	// Return the original value unchanged; only its boolean form was needed to check the rules
 	return value, false, nil
 }
