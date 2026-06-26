@@ -16,7 +16,32 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 	value64, ok := convert.FloatOk(value, 0)
 
 	if !ok {
-		return value64, false, derp.Validation("Value must be a number")
+		return value64, false, derp.Validation("Value must be a valid floating point number")
+	}
+
+	// RULE: Number cannot be NaN
+	if math.IsNaN(value64) {
+		return value64, false, derp.Validation("Floating point value must not be NaN")
+	}
+
+	// RULE: Number cannot be "positive Infinity"
+	if math.IsInf(value64, 1) {
+
+		// If possible, clamp the value to the maximum
+		if element.Maximum.IsPresent() {
+			return element.Maximum.Float(), true, nil
+		}
+		return value64, false, derp.Validation("Floating point value must not be positive infinity")
+	}
+
+	// RULE: Number cannot be "negative Infinity"
+	if math.IsInf(value64, -1) {
+
+		// If possible, clamp the value to the minimum
+		if element.Minimum.IsPresent() {
+			return element.Minimum.Float(), true, nil
+		}
+		return value64, false, derp.Validation("Floating point value must not be negative infinity")
 	}
 
 	// RULE: Required value cannot be zero

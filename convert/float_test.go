@@ -16,8 +16,8 @@ func TestNilToFloat(t *testing.T) {
 
 func TestNaNToFloat(t *testing.T) {
 
-	result, lossless := FloatOk(float64(math.NaN()), float64(-1))
-	assert.Equal(t, result, float64(-1))
+	result, lossless := FloatOk(math.NaN(), float64(-1))
+	assert.True(t, math.IsNaN(result))
 	assert.True(t, lossless)
 }
 
