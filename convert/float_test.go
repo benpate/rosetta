@@ -1,6 +1,7 @@
 package convert
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,16 +9,23 @@ import (
 
 func TestNilToFloat(t *testing.T) {
 
-	result, natural := FloatOk(nil, float64(-1))
+	result, lossless := FloatOk(nil, float64(-1))
 	assert.Equal(t, result, float64(-1))
-	assert.False(t, natural)
+	assert.False(t, lossless)
+}
+
+func TestNaNToFloat(t *testing.T) {
+
+	result, lossless := FloatOk(float64(math.NaN()), float64(-1))
+	assert.Equal(t, result, float64(-1))
+	assert.True(t, lossless)
 }
 
 func TestFloat32ToFloat(t *testing.T) {
 
-	result, natural := FloatOk(float32(10), -1)
+	result, lossless := FloatOk(float32(10), -1)
 
-	assert.True(t, natural)
+	assert.True(t, lossless)
 	assert.Equal(t, result, float64(10))
 }
 
@@ -30,37 +38,37 @@ func TestFloatToFloat(t *testing.T) {
 func TestIntToFloat(t *testing.T) {
 
 	{
-		result, natural := FloatOk(int(10), -1)
+		result, lossless := FloatOk(int(10), -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 
 	{
-		result, natural := FloatOk(int8(10), -1)
+		result, lossless := FloatOk(int8(10), -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 
 	{
-		result, natural := FloatOk(int16(10), -1)
+		result, lossless := FloatOk(int16(10), -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 
 	{
-		result, natural := FloatOk(int32(10), -1)
+		result, lossless := FloatOk(int32(10), -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 
 	{
-		result, natural := FloatOk(int64(10), -1)
+		result, lossless := FloatOk(int64(10), -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 }
@@ -68,16 +76,16 @@ func TestIntToFloat(t *testing.T) {
 func TestStringToFloat(t *testing.T) {
 
 	{
-		result, natural := FloatOk("10", -1)
+		result, lossless := FloatOk("10", -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(10))
 	}
 
 	{
-		result, natural := FloatOk("invalid", -1)
+		result, lossless := FloatOk("invalid", -1)
 
-		assert.False(t, natural)
+		assert.False(t, lossless)
 		assert.Equal(t, result, float64(-1))
 	}
 }
@@ -87,24 +95,24 @@ func TestStringerToFloat(t *testing.T) {
 	s := getTestStringer()
 
 	{
-		result, natural := FloatOk(s, -1)
+		result, lossless := FloatOk(s, -1)
 
-		assert.False(t, natural)
+		assert.False(t, lossless)
 		assert.Equal(t, result, float64(-1))
 	}
 
 	s[0] = "100"
 	{
-		result, natural := FloatOk(s, -1)
+		result, lossless := FloatOk(s, -1)
 
-		assert.True(t, natural)
+		assert.True(t, lossless)
 		assert.Equal(t, result, float64(100))
 	}
 }
 
 func TestInvalidToFloat(t *testing.T) {
-	result, natural := FloatOk(map[string]any{}, -1)
+	result, lossless := FloatOk(map[string]any{}, -1)
 
-	assert.False(t, natural)
+	assert.False(t, lossless)
 	assert.Equal(t, result, float64(-1))
 }

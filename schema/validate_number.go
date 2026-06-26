@@ -44,6 +44,11 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 		return element.Maximum.Float(), true, nil
 	}
 
+	// RULE: Number cannot be NaN or Infinity
+	if math.IsNaN(value64) || math.IsInf(value64, 0) {
+		return value64, false, derp.Validation("Value must be a valid number")
+	}
+
 	// Return the value converted back to the target type
 	return value64, false, nil
 }
