@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"math"
 	"testing"
 
 	"github.com/benpate/rosetta/null"
@@ -141,6 +142,9 @@ func FuzzSetThenValidate_Number(f *testing.F) {
 	f.Add(1000.0)
 	f.Add(-1000.0)
 	f.Add(99.999)
+	f.Add(math.NaN())
+	f.Add(math.Inf(1))
+	f.Add(math.Inf(-1))
 
 	f.Fuzz(func(t *testing.T, value float64) {
 		schema := constrainedSchema()
@@ -151,6 +155,45 @@ func FuzzSetThenValidate_Number(f *testing.F) {
 		}
 
 		assertStoredValueIsValid(t, schema, object, "num")
+	})
+}
+
+// FuzzValidateNumber_Finite drives validate_Number directly across schemas with and without
+// bounds, asserting the core finiteness guarantee: whenever validation succeeds, the returned
+// value is a finite number (never NaN or ±Inf). A non-finite input must either be clamped to a
+// finite bound or rejected with an error.
+func FuzzValidateNumber_Finite(f *testing.F) {
+
+	f.Add(0.0)
+	f.Add(50.0)
+	f.Add(math.NaN())
+	f.Add(math.Inf(1))
+	f.Add(math.Inf(-1))
+	f.Add(math.MaxFloat64)
+
+	f.Fuzz(func(t *testing.T, value float64) {
+
+		// Exercise the bounded and unbounded shapes, since clamping is what lets a
+		// non-finite value through as a (finite) rewrite rather than an error.
+		elements := []Number{
+			{},
+			{Minimum: null.NewFloat(-100), Maximum: null.NewFloat(100)},
+			{Minimum: null.NewFloat(-100)},
+			{Maximum: null.NewFloat(100)},
+		}
+
+		for _, element := range elements {
+			result, _, err := validate_Number(element, value)
+
+			// A rejected value is always acceptable; we only constrain the success case.
+			if err != nil {
+				continue
+			}
+
+			if math.IsNaN(result) || math.IsInf(result, 0) {
+				t.Fatalf("validate_Number(%#v, %v) succeeded with non-finite result %v", element, value, result)
+			}
+		}
 	})
 }
 
