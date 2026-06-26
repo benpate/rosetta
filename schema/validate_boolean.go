@@ -13,7 +13,7 @@ func validate_Boolean[T any](element Boolean, value T) (T, bool, error) {
 
 	// RULE: Value must be a boolean
 	if !isBoolean {
-		return value, false, derp.Validation("Must be a boolean")
+		return value, false, derp.Validation("Value must be a boolean")
 	}
 
 	// RULE: Required value cannot be false

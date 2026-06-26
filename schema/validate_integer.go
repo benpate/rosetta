@@ -101,3 +101,21 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T, c
 	// Return the value converted back to the target type
 	return T(value64), changed, nil
 }
+
+// isMultipleOfInteger reports whether value is an exact integer multiple of
+// multipleOf.
+func isMultipleOfInteger[T constraints.Integer](value, multipleOf T) bool {
+
+	// A multipleOf of zero is treated as "no constraint" (and also avoids a divide-by-zero panic).
+	if multipleOf == 0 {
+		return true
+	}
+
+	// Using integer modulo so that large values are not corrupted by a detour through float64.
+	return value%multipleOf == 0
+}
+
+// notMultipleOfInteger returns TRUE when the value is not an exact integer multiple of multipleOf.
+func notMultipleOfInteger[T constraints.Integer](value, multipleOf T) bool {
+	return !isMultipleOfInteger(value, multipleOf)
+}

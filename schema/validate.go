@@ -54,19 +54,13 @@ func validate(element Element, value any) (any, bool, error) {
 		return validate_Array(typedElement, value)
 
 	case Boolean:
-		if coercedValue, ok := convert.BoolOk(value, false); ok {
-			return validate_Boolean(typedElement, coercedValue)
-		}
-		return false, false, derp.Validation("Value must be a boolean")
+		return validate_Boolean(typedElement, value)
 
 	case Integer:
 		return validate_Integer(typedElement, value)
 
 	case Number:
-		if coercedValue, ok := convert.FloatOk(value, 0); ok {
-			return validate_Number(typedElement, coercedValue)
-		}
-		return 0, false, derp.Validation("Value must be a number")
+		return validate_Number(typedElement, value)
 
 	case Object:
 		return validate_Object(typedElement, value)
