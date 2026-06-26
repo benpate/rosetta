@@ -42,12 +42,12 @@ func TestValidate_Boolean_Required(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestValidate_Boolean_CoercesInput(t *testing.T) {
+func TestValidate_Boolean_UsesExistingInputFormat(t *testing.T) {
 	// A coercible value is accepted and converted to a boolean
 	newValue, changed, err := validate(Boolean{}, "true")
 	require.NoError(t, err)
 	require.False(t, changed)
-	require.Equal(t, true, newValue)
+	require.Equal(t, "true", newValue)
 }
 
 func TestValidate_Boolean_NotCoercible(t *testing.T) {

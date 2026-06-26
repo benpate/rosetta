@@ -55,6 +55,18 @@ func TestIsMultipleOfFloat(t *testing.T) {
 
 	// A zero divisor is treated as "no constraint".
 	require.True(t, isMultipleOfFloat(10.0, 0.0))
+
+	// Exact decimal multiples must be accepted despite float representation error,
+	// where a naive math.Mod(value, multipleOf) == 0 check would wrongly fail.
+	require.True(t, isMultipleOfFloat(0.3, 0.1))
+	require.True(t, isMultipleOfFloat(0.2, 0.1))
+	require.True(t, isMultipleOfFloat(1.23, 0.01))
+	require.True(t, isMultipleOfFloat(21.0, 7.0))
+
+	// Genuine non-multiples are still rejected.
+	require.False(t, isMultipleOfFloat(0.35, 0.1))
+	require.False(t, isMultipleOfFloat(1.234, 0.01))
+	require.False(t, isMultipleOfFloat(200.0, 7.0))
 }
 
 func TestType_String(t *testing.T) {
