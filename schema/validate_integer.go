@@ -1,9 +1,6 @@
 package schema
 
 import (
-	"math"
-	"strconv"
-
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
@@ -15,90 +12,92 @@ func validate_Integer(element Integer, value any) (any, bool, error) {
 
 	const location = "schema.validate_Integer"
 
-	switch typedValue := value.(type) {
+	// Convert the value into an integer of the specified bit size.
+	coercedValue, lossless, inBounds := convert.IntBitsizeOk(value, 0, element.BitSize)
 
-	case int:
-		return validate_Integer_Generic(element, typedValue)
-	case int8:
-		return validate_Integer_Generic(element, typedValue)
-	case int16:
-		return validate_Integer_Generic(element, typedValue)
-	case int32:
-		return validate_Integer_Generic(element, typedValue)
-	case int64:
-		return validate_Integer_Generic(element, typedValue)
+	if !lossless {
+		return value, false, derp.Validation("Value must be an integer")
 	}
 
-	return nil, false, derp.Internal(location, "Value must be an integer", value)
+	if !inBounds {
+		return value, false, derp.Validation("Value must fit within the specified bit size")
+	}
+
+	switch typedValue := coercedValue.(type) {
+
+	case int:
+		return validate_Integer_Generic(element, typedValue, !lossless)
+	case int8:
+		return validate_Integer_Generic(element, typedValue, !lossless)
+	case int16:
+		return validate_Integer_Generic(element, typedValue, !lossless)
+	case int32:
+		return validate_Integer_Generic(element, typedValue, !lossless)
+	case int64:
+		return validate_Integer_Generic(element, typedValue, !lossless)
+	}
+
+	// This should never happen
+	return nil, false, derp.Internal(location, "Value must be an integer. This should never happen.", value)
 }
 
 // validate_Integer_Generic checks that the provided value meets the requirements of the schema element.
-func validate_Integer_Generic[T constraints.Integer](element Integer, value T) (T, bool, error) {
+func validate_Integer_Generic[T constraints.Integer](element Integer, value T, changed bool) (T, bool, error) {
+
+	const location = "schema.validate_Integer_Generic"
+
+	// Get this value as an int64 so we can compare it correctly.
+	value64 := int64(value)
 
 	// RULE: Required value cannot be zero
 	if element.Required && (value == 0) {
 		return 0, false, derp.Validation("Value is required")
 	}
 
-	// RULE: Rewrite value if it is below the minimum
-	if element.Minimum.IsPresent() && (value < T(element.Minimum.Int64())) {
-		return T(element.Minimum.Int64()), true, nil
-	}
-
-	// RULE: Rewrite value if it is above the maximum
-	if element.Maximum.IsPresent() && (value > T(element.Maximum.Int64())) {
-		return T(element.Maximum.Int64()), true, nil
-	}
-
 	// RULE: Value must be a multiple of the specified value
-	if element.MultipleOf.IsPresent() && notMultipleOfInteger(value, T(element.MultipleOf.Int64())) {
-		return value, false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
+	if element.MultipleOf.IsPresent() && notMultipleOfInteger(value64, element.MultipleOf.Int64()) {
+		return T(value), false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
 	}
 
 	// RULE: Value must be one of the specified values
 	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, value) {
-		return value, false, derp.Validation("Must be one of the specified values")
+		return T(value), false, derp.Validation("Must be one of the specified values")
+	}
+
+	// RULE: Rewrite value if it is below the minimum
+	if element.Minimum.IsPresent() {
+
+		minValue := element.Minimum.Int64()
+
+		// Verify the minimum value fits within the target bitsize
+		if _, _, ok := convert.IntBitsizeOk(minValue, 0, element.BitSize); !ok {
+			return 0, false, derp.Internal(location, "Minimum value is out of bounds for specified bit size", minValue, element.BitSize)
+		}
+
+		// Clamp the value to the minimum
+		if value64 < minValue {
+			value64 = minValue
+			changed = true
+		}
+	}
+
+	// RULE: Rewrite the value if it is above the maximum
+	if element.Maximum.IsPresent() {
+
+		maxValue := element.Maximum.Int64()
+
+		// Verify the maximum value fits within the target bitsize
+		if _, _, ok := convert.IntBitsizeOk(maxValue, 0, element.BitSize); !ok {
+			return 0, false, derp.Internal(location, "Maximum value is out of bounds for specified bit size", maxValue, element.BitSize)
+		}
+
+		// Clamp the value to the maximum
+		if value64 > maxValue {
+			value64 = maxValue
+			changed = true
+		}
 	}
 
 	// Return the value converted back to the target type
-	return value, false, nil
-}
-
-// narrowIntegerBitSize narrows a 64-bit integer to the element's declared bit size,
-// returning a validation error if the value falls outside the range of that width.
-func narrowIntegerBitSize(bitSize int, value int64) (any, error) {
-
-	// This guards against a raw conversion silently wrapping an out-of-range value
-	// (for example int8(300) == 44) before the minimum/maximum rules are applied.
-
-	switch bitSize {
-
-	case 8:
-		if (value < math.MinInt8) || (value > math.MaxInt8) {
-			return nil, derp.Validation("Value must fit within an 8-bit integer", value)
-		}
-		return int8(value), nil
-
-	case 16:
-		if (value < math.MinInt16) || (value > math.MaxInt16) {
-			return nil, derp.Validation("Value must fit within a 16-bit integer", value)
-		}
-		return int16(value), nil
-
-	case 32:
-		if (value < math.MinInt32) || (value > math.MaxInt32) {
-			return nil, derp.Validation("Value must fit within a 32-bit integer", value)
-		}
-		return int32(value), nil
-
-	case 64:
-		return value, nil
-
-	default:
-		// A bare "int" follows the platform width; on 32-bit platforms it matches int32.
-		if (strconv.IntSize == 32) && ((value < math.MinInt32) || (value > math.MaxInt32)) {
-			return nil, derp.Validation("Value must fit within an integer", value)
-		}
-		return int(value), nil
-	}
+	return T(value64), changed, nil
 }

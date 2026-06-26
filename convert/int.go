@@ -173,3 +173,59 @@ func IntOk(value any, defaultValue int) (int, bool) {
 
 	return defaultValue, false
 }
+
+// IntBitsizeOk converts an arbitrary value into an integer of the specified bit size.
+func IntBitsizeOk(value any, defaultValue int, bitSize int) (result any, lossless bool, inBounds bool) {
+
+	integer, lossless := Int64Ok(value, int64(defaultValue))
+
+	switch bitSize {
+
+	case 8:
+		if integer < math.MinInt8 {
+			return int8(math.MinInt8), lossless, false
+		}
+
+		if integer > math.MaxInt8 {
+			return int8(math.MaxInt8), lossless, false
+		}
+
+		return int8(integer), lossless, true
+
+	case 16:
+		if integer < math.MinInt16 {
+			return int16(math.MinInt16), lossless, false
+		}
+
+		if integer > math.MaxInt16 {
+			return int16(math.MaxInt16), lossless, false
+		}
+
+		return int16(integer), lossless, true
+
+	case 32:
+		if integer < math.MinInt32 {
+			return int32(math.MinInt32), lossless, false
+		}
+
+		if integer > math.MaxInt32 {
+			return int32(math.MaxInt32), lossless, false
+		}
+
+		return int32(integer), lossless, true
+
+	case 64:
+		return integer, lossless, true
+
+	default:
+		if integer < math.MinInt {
+			return math.MinInt, lossless, false
+		}
+
+		if integer > math.MaxInt {
+			return math.MaxInt, lossless, false
+		}
+
+		return int(integer), lossless, true
+	}
+}

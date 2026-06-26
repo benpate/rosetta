@@ -60,21 +60,7 @@ func validate(element Element, value any) (any, bool, error) {
 		return false, false, derp.Validation("Value must be a boolean")
 
 	case Integer:
-
-		if coercedValue, ok := convert.Int64Ok(value, 0); ok {
-
-			// Narrow to the declared bit size, rejecting values that would
-			// overflow that width instead of silently wrapping them.
-			narrowedValue, err := narrowIntegerBitSize(typedElement.BitSize, coercedValue)
-
-			if err != nil {
-				return value, false, err
-			}
-
-			return validate_Integer(typedElement, narrowedValue)
-		}
-
-		return 0, false, derp.Validation("Value must be an integer")
+		return validate_Integer(typedElement, value)
 
 	case Number:
 		if coercedValue, ok := convert.FloatOk(value, 0); ok {
