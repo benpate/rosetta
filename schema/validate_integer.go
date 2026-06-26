@@ -51,17 +51,17 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T, c
 
 	// RULE: Required value cannot be zero
 	if element.Required && (value == 0) {
-		return 0, false, derp.Validation("Value is required")
+		return 0, false, derp.Validation("Integer value is required")
 	}
 
 	// RULE: Value must be a multiple of the specified value
 	if element.MultipleOf.IsPresent() && notMultipleOfInteger(value64, element.MultipleOf.Int64()) {
-		return T(value), false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
+		return T(value), false, derp.Validation("Integer value must be a multiple of " + convert.String(element.MultipleOf))
 	}
 
 	// RULE: Value must be one of the specified values
 	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, value) {
-		return T(value), false, derp.Validation("Must be one of the specified values")
+		return T(value), false, derp.Validation("Integer value must be one of the specified values")
 	}
 
 	// RULE: Rewrite value if it is below the minimum

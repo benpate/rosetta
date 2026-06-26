@@ -46,17 +46,17 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 
 	// RULE: Required value cannot be zero
 	if element.Required && (value64 == 0) {
-		return value64, false, derp.Validation("Value is required")
+		return value64, false, derp.Validation("Floating point value is required")
 	}
 
 	// RULE: Value must be a multiple of the specified value
 	if element.MultipleOf.IsPresent() && notMultipleOfFloat(value64, element.MultipleOf.Float()) {
-		return value64, false, derp.Validation("Must be a multiple of " + convert.String(element.MultipleOf))
+		return value64, false, derp.Validation("Floating point value must be a multiple of " + convert.String(element.MultipleOf))
 	}
 
 	// RULE: Value must be one of the specified values
 	if (len(element.Enum) > 0) && !compare.Contains(element.Enum, value64) {
-		return value64, false, derp.Validation("Must be one of the specified values")
+		return value64, false, derp.Validation("Floating point value must be one of the specified values")
 	}
 
 	// RULE: Rewrite value if it is below the minimum
@@ -67,11 +67,6 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 	// RULE: Rewrite value if it is above the maximum
 	if element.Maximum.IsPresent() && (value64 > element.Maximum.Float()) {
 		return element.Maximum.Float(), true, nil
-	}
-
-	// RULE: Number cannot be NaN or Infinity
-	if math.IsNaN(value64) || math.IsInf(value64, 0) {
-		return value64, false, derp.Validation("Value must be a valid number")
 	}
 
 	// Return the value converted back to the target type
