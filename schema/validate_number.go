@@ -20,18 +20,8 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 	}
 
 	// RULE: Required value cannot be zero
-	if element.Required && (value == 0) {
+	if element.Required && (value64 == 0) {
 		return value64, false, derp.Validation("Value is required")
-	}
-
-	// RULE: Rewrite value if it is below the minimum
-	if element.Minimum.IsPresent() && (value64 < element.Minimum.Float()) {
-		return element.Minimum.Float(), true, nil
-	}
-
-	// RULE: Rewrite value if it is above the maximum
-	if element.Maximum.IsPresent() && (value64 > element.Maximum.Float()) {
-		return element.Maximum.Float(), true, nil
 	}
 
 	// RULE: Value must be a multiple of the specified value
@@ -44,17 +34,37 @@ func validate_Number(element Number, value any) (float64, bool, error) {
 		return value64, false, derp.Validation("Must be one of the specified values")
 	}
 
+	// RULE: Rewrite value if it is below the minimum
+	if element.Minimum.IsPresent() && (value64 < element.Minimum.Float()) {
+		return element.Minimum.Float(), true, nil
+	}
+
+	// RULE: Rewrite value if it is above the maximum
+	if element.Maximum.IsPresent() && (value64 > element.Maximum.Float()) {
+		return element.Maximum.Float(), true, nil
+	}
+
 	// Return the value converted back to the target type
 	return value64, false, nil
 }
 
-// isMultipleOfFloat reports whether value is an exact multiple of multipleOf.
+// isMultipleOfFloat reports whether value is a multiple of multipleOf.
 // A multipleOf of zero is treated as "no constraint".
 func isMultipleOfFloat[T constraints.Float](value, multipleOf T) bool {
+
+	// A zero divisor is treated as "no constraint" and must not panic.
 	if multipleOf == 0 {
 		return true
 	}
-	return math.Mod(float64(value), float64(multipleOf)) == 0
+
+	// Round the quotient to the nearest integer and confirm it reproduces the value. A direct
+	// math.Mod(value, multipleOf) == 0 check fails for exact decimal multiples (math.Mod(0.3, 0.1)
+	// is ~0.0999... not 0) because neither operand is representable exactly in float64, so we
+	// compare with a tolerance scaled to the magnitude of the value instead.
+	v := float64(value)
+	step := float64(multipleOf)
+	rounded := math.Round(v/step) * step
+	return math.Abs(v-rounded) <= 1e-9*math.Max(1, math.Abs(v))
 }
 
 // notMultipleOfFloat returns TRUE when the value is not an exact multiple of multipleOf.
