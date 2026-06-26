@@ -76,8 +76,7 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T, c
 
 		// Clamp the value to the minimum
 		if value64 < minValue {
-			value64 = minValue
-			changed = true
+			return T(minValue), true, nil
 		}
 	}
 
@@ -93,13 +92,12 @@ func validate_Integer_Generic[T constraints.Integer](element Integer, value T, c
 
 		// Clamp the value to the maximum
 		if value64 > maxValue {
-			value64 = maxValue
-			changed = true
+			return T(maxValue), true, nil
 		}
 	}
 
 	// Return the value converted back to the target type
-	return T(value64), changed, nil
+	return T(value64), false, nil
 }
 
 // isMultipleOfInteger reports whether value is an exact integer multiple of
