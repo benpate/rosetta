@@ -1,35 +1,24 @@
-# null 🚫
+# null
+
+Nullable scalar primitives for Go: `null.Bool`, `null.Int`, `null.Int64`, and `null.Float`. Each is a struct carrying a value plus a `present` flag, so it distinguishes "absent/null" from "present-but-zero". All satisfy the `Nullable` interface (`IsNull() bool`) and implement JSON marshal/unmarshal. Part of [rosetta](../README.md).
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/null)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/null/Go/master)](https://github.com/benpate/rosetta/null/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/null.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/null)
-[![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/null?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/null)
-[![Version](https://img.shields.io/github/v/release/benpate/rosetta/null?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/null/releases)
-
-## Simple library for null values in Go
-
-This library provides simple, (mostly) idiomatic primitives for nullable values in Go.  It supports Int, Bool, and Float types.
 
 ```go
-// "b" is null, and ready to use
+// A zero-value null.Bool is null and ready to use — no constructor needed
 var b null.Bool
 
-// Or, create a nullable value that's not null
-b := null.NewBool(true)
+b.Set(true)   // now present, value true
+b.Bool()      // read the value
+b.IsNull()    // false
+b.Unset()     // back to null
 
-// Set value to false
-b.Set(false)
-
-// Set value to true
-b.Set(true)
-
-// Get the value
-b.Bool()
-
-// Make the value null again
-b.Unset()
+b := null.NewBool(true) // or construct a non-null value directly
 ```
 
-## Pull Requests Welcome
+## What matters here
 
-Please use GitHub to make suggestions, pull requests, and enhancements.  We're all in this together! 🚫
+- **The zero value is a valid "null" — no constructor required.** `var x null.Int` is immediately usable and reads as null (`IsNull() == true`). This is the whole point of the package: it separates "never set" from "set to zero", which a plain `int`/`bool` cannot.
+- **`Unset()` resets BOTH the value and the present flag.** It zeroes the stored value and clears `present`, so an unset value reads back as the type's zero — don't rely on a stale value surviving an `Unset`.
+- **`MarshalJSON` emits the bare value or `null`; there is no `omitempty`-style elision.** A null value marshals to the literal `null`, and a present zero marshals to `0`/`false`/`0`. To omit a null field from JSON output entirely, the *containing* struct must handle that — this type always renders something.
+- **`UnmarshalJSON` is fuzzed** (`fuzz_test.go`). Keep the fuzzer green when touching the parse path; it guards against panics on malformed numeric/boolean JSON.

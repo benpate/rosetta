@@ -1,41 +1,14 @@
-# Compare
+# compare
+
+Comparison helpers for values of different or unknown data types. `Interface(a, b)` coerces two arbitrary values to a common kind and returns `-1`/`0`/`1`; `WithOperator(a, op, b)` evaluates a named operator (`greater-than`, `contains`, `begins-with`, …) to a bool. Typed helpers (`Int`/`Int8`/…/`Int64`, `Float32`/`Float64`, `String`, `BeginsWith`, `Contains`, `EndsWith`) cover the known-type cases. Part of [rosetta](../README.md).
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/compare)
-[![Build Status](https://img.shields.io/github/workflow/status/benpate/rosetta/compare/Go/main)](https://github.com/benpate/rosetta/compare/actions/workflows/go.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/compare.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/compare)
-[![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta/compare?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta/compare)
-[![Version](https://img.shields.io/github/v/release/benpate/rosetta/compare?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/compare/releases)
 
-## Easy Comparisions in Go
+## What matters here
 
-This library provides a number of helper functions that compare values of different or unknown data types.  It works around some of Go's more annoying issues with generics, and will probably be simplified or eliminated once the final generic proposals land in a stable release.
+- **A `bool` on either side coerces the *other* operand to bool, and this runs before the numeric block.** `Interface(true, 1)` and `Interface(1, true)` both succeed symmetrically, and a bool is never treated as a number. Know this before comparing mixed bool/number data — the bool wins.
+- **Numbers compare on a common numeric kind, not per-type-pair.** Any signed/unsigned/float combination is handled symmetrically through a single numeric path, so you don't get spurious "incompatible types" between, say, an `int` and a `float64`.
+- **Incompatible types return an error, not a silent `0`.** `Interface` (and `WithOperator`) return a non-nil error when the two values can't be coerced to a common comparable kind — callers must check it rather than assuming `0` means "equal".
+- **`BeginsWith`/`Contains`/`EndsWith` are substring operators handled outside the ordering path** (see `WithOperator`). They answer a containment question, not a `-1/0/1` ordering, so they're routed before the `Interface` coercion runs.
 
-## Interface(value1, value2) int
-
-Pass any two values into this function and it will attempt to convert them into comparable data types.
-
-If value1 < value2, it returns -1
-If value1 == value2, it returns 0
-If value1 > value2, it returns 1
-
-## IntXX Functions
-
-This is a series of functions `Int()` `Int8()` `Int16()` `Int32()` `Int64()` that compare similar values of their corresponding types.
-
-## FloatXX Functions
-
-This is a series of functions `Float32()` `Float64()` that compare similar values of their corresponding types.
-
-## String Functions
-
-There are several string comparison functions as well.  
-
-`String()` compares two string values with the same signatures as above
-
-`BeginsWith()` returns true if a string begins with a certain value
-`Contains()` returns true if a string contains a certain value
-`EndsWith()` returns true if a string ends with a certain value
-
-## Pull Requests Welcome
-
-This library is a work in progress, and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making this library better, send in a pull request.  We're all in this together! 📚
+This package works around Go's pre-generics comparison gaps and will likely shrink as the standard library grows; lean on the typed helpers when the type is known and reserve `Interface` for genuinely dynamic data.

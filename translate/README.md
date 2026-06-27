@@ -1,49 +1,25 @@
-# translate 🗺️
+# translate
+
+A JSON-defined mapping engine that copies and transforms data from a source object into a target object. A `Pipeline` is an ordered list of `Rule`s; `pipeline.Execute(inSchema, inObject, outSchema, outObject)` runs them in order. Both objects are accessed through [schema](../schema/) Getter/Setter interfaces, so the easiest carriers are [mapof.Any](../mapof/) values, which implement those interfaces already. Part of [rosetta](../README.md).
 
 [![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/translate)
-[![Version](https://img.shields.io/github/v/release/benpate/rosetta?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/benpate/rosetta/go.yml?branch=main&style=flat-square)](https://github.com/benpate/rosetta/actions/workflows/go.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta?style=flat-square)](https://app.codecov.io/gh/benpate/rosetta)
-[![Codecov](https://img.shields.io/codecov/c/github/benpate/rosetta/translate.svg?style=flat-square)](https://codecov.io/gh/benpate/rosetta/translate)
 
-## Object TranslationUtilities for Go
+## Rule types
 
-This library maps data from one variable into another.  requires a `schema` for both input and output values, which must be compatable with schema Getter and Setter interfaces.  The best way to use this library is with a `mapof.Any` which already includes these interfaces.
+Each rule is a JSON object whose keys select the rule kind:
 
+- **`value`** — write a static value to the target; ignores the source. `{"value":"FIXED", "target":"target.path"}`
+- **`path`** — copy a value from a source path to a target path, unchanged. `{"path":"source.path", "target":"target.path"}`
+- **`expression`** — run a Go template against the source and write the result. `{"expression":"{{ … }}", "target":"target.path"}`
+- **`append`** — append a value to a slice/collection at the target path. `{"append":"VALUE", "target":"target.path"}`
+- **`if`** — evaluate a Go template; run `then` rules when it returns `"true"`, otherwise `else`. `{"if":"{{ … }}", "then":[…], "else":[…]}`
+- **`forEach`** — loop a source map/array, running `rules` for each item under the target path (optionally filtered). `{"forEach":"source.path", "target":"target.path", "filter":"{{ … }}", "rules":[…]}`
+- **`first`** — run a list of rules, stopping after the first to set a non-zero value at the target. `{"first":"target.path", "rules":[…]}`
 
-## Mapping Utilities
+## What matters here
 
-
-### Value
-`value` sets a static value in the target object.  This does not use any data from the source
-
-`{"value":"FIXED VALUE HERE", "target":"target.path"}`
-
-### Path
-`path` maps a value from one path in the source object into a new path in the target object.  This is a direct copy, and no value is changed.
-
-`{"path":"original.path", "target":"target.path"}`
-
-### Expression
-`expression` executes a go template expression, using the result to set a value in the target object. This expression can pull from any data in the source object.
-
-`{"expression":"{{go template expression}}", "target":"target.path"}`
-
-### Conditionals
-`if` executes a go template expression (using data from the source object) to determine which additional rules to apply.  If the template returns "true",  the `then` rules are executed.  Otherwise, the `else` rules are executed.
-
-`{"if":"{{go template expression}}", "then":[/* additional rules */], "else":[/* additional rules */]}`
-
-### ForEach
-`forEach` loops over a map or array, executing a list of rules for each item in the source, prefixed by the target path.
-
-`{"forEach":"original.path", "target":"target.path", "filter":"{{go template expression}}", "rules":[/* additional rules */]}`
-
-### First
-`first` executes a list of rules, stopping after the first one sets a non-zero value in the target object
-
-`{"first":"target.path", "rules":[/* additional rules */]}`
-
-## Pull Requests Welcome
-
-This library is a work in progress, and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making this library better, send in a pull request.  We're all in this together! 🗺️
+- **The rule kind is chosen by which key is present, not by an explicit `type` field.** `Rule.UnmarshalMap` checks for `append`, `value`, `path`, `expression`, `if`, `forEach`, `first` in turn. A rule map carrying two of these keys is ambiguous — the first matched dispatch wins. Author one rule kind per object.
+- **Source and target must each implement the schema Getter/Setter interfaces.** Plain structs work only if they implement those interfaces (see [schema](../schema/)); a `mapof.Any` is the path of least resistance because it implements them out of the box.
+- **`expression`, `if`, and `forEach`'s `filter` are Go templates evaluated against the SOURCE object.** They can read anything in the source but write only via their rule's target — a template that "returns true" for `if` must emit the literal string `"true"`.
+- **Writes go through `schema.Set`/`Append`, which validate and may coerce.** A translated value can be clamped, truncated, or rewritten by the target schema's rules (see the [schema](../schema/) README) — the target schema is the final authority on stored values, not the rule.
+- **`NewFromJSON` parses untrusted JSON and is fuzzed** (`FuzzNewFromJSON`). Keep that fuzzer green when changing rule unmarshalling.
