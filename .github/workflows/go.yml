@@ -39,6 +39,5 @@ jobs:
         skip-cache: true
 
 #    - name: Nilaway
-#      uses: qbaware/nilaway-action@v0.0.13
-#      with:
+#      uses: qbaware/nilaway-action@18bae1177e15ef2cc9583baa872c43c50ad84d9e # v0.0.14
 #        package-to-scan: ./...
