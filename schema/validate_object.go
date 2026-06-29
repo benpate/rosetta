@@ -11,8 +11,15 @@ func validate_Object(element Object, value any) (any, bool, error) {
 	const location = "schema.validate_Object"
 
 	objectChanged := false
+	allowMissingKeys := false
 
-	// Validate each property IN THE ELEMENT (not the object)
+	// Maps are allowed to have missing keys, but non-maps are not.
+	// "Map-ness" must be declared, not inferred.
+	if mapTyper, ok := value.(MapTyper); ok {
+		allowMissingKeys = mapTyper.IsMap()
+	}
+
+	// Validate each property IN THE SCHEMA ELEMENT (not the object)
 	// This allows us to ignore properties that are not covered by the schema,
 	// which facilitates partial updates and multiple, semi-overlapping schemas per object.
 	for key, subElement := range element.Properties {
@@ -21,7 +28,21 @@ func validate_Object(element Object, value any) (any, bool, error) {
 		propertyValue, err := getProperty(element, value, key)
 
 		if err != nil {
-			return nil, false, derp.Wrap(err, location, "Getting property")
+
+			// If this is not a map, then this is a legitimate error to return to the caller
+			if !allowMissingKeys {
+				return nil, false, derp.Wrap(err, location, "Getting property")
+			}
+
+			// For maps, a missing property may not be an error (but required values are still required)
+			// An absent REQUIRED key fails validation with a clear "required" message,
+			// the same outcome as a present-but-empty required value.
+			if subElement.IsRequired() {
+				return nil, false, derp.Validation("Required property is missing", key)
+			}
+
+			// Otherwise, this property is not required, and an empty map value is fine.
+			continue
 		}
 
 		// Validate the property value
