@@ -70,6 +70,47 @@ func (s Slice[T]) GetValue() any {
 	return s.Values
 }
 
+// GetIndex implements schema.ArrayGetter, returning the value at the provided index
+// and TRUE, or (nil, false) if the index is out of range.
+func (s Slice[T]) GetIndex(index int) (any, bool) {
+
+	if (index < 0) || (index >= len(s.Values)) {
+		return nil, false
+	}
+
+	return s.Values[index], true
+}
+
+// SetIndex implements schema.ArraySetter, storing a value at the provided index (growing the
+// slice to fit if necessary) and tracking any newly-added value. Returns FALSE if the value
+// is not assignable to the slice's element type.
+func (s *Slice[T]) SetIndex(index int, value any) bool {
+
+	typed, ok := value.(T)
+
+	if !ok {
+		return false
+	}
+
+	if index < 0 {
+		return false
+	}
+
+	// Grow the slice to fit, recording each appended slot as a new value.
+	var zero T
+	for index >= len(s.Values) {
+		s.Values = append(s.Values, zero)
+	}
+
+	// Record the new value in the "added" list unless it was already present.
+	if slices.Index(s.Values, typed) == -1 {
+		s.Added = append(s.Added, typed)
+	}
+
+	s.Values[index] = typed
+	return true
+}
+
 // SetValue implements schema.ValueSetter and updates the current value,
 // tracking changes to the added and deleted lists.
 func (s *Slice[T]) SetValue(value any) error {
