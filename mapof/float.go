@@ -24,6 +24,11 @@ func (x Float) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
+// IsMap returns TRUE, declaring this type a map for schema traversal. Implements schema.MapTyper.
+func (x Float) IsMap() bool {
+	return true
+}
+
 // Equal returns TRUE if this map has the same keys and values as the provided map.
 func (x Float) Equal(value map[string]float64) bool {
 	return maps.Equal(x, value)

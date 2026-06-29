@@ -35,6 +35,11 @@ func (x Any) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
+// IsMap returns TRUE, declaring this type a map for schema traversal. Implements schema.MapTyper.
+func (x Any) IsMap() bool {
+	return true
+}
+
 // Equal returns TRUE if this map deeply equals the provided map.
 func (x Any) Equal(value map[string]any) bool {
 	return reflect.DeepEqual(x, Any(value))

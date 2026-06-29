@@ -63,6 +63,11 @@ func (m Matchable[T]) Keys() []string {
 	return maps.KeysSorted(m)
 }
 
+// IsMap returns TRUE, declaring this type a map for schema traversal. Implements schema.MapTyper.
+func (m Matchable[T]) IsMap() bool {
+	return true
+}
+
 // Values returns all of the map's values (in unspecified order).
 func (m Matchable[T]) Values() []T {
 	result := make([]T, 0, len(m))

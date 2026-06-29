@@ -31,6 +31,11 @@ func (x Object[T]) Keys() []string {
 	return maps.KeysSorted(x)
 }
 
+// IsMap returns TRUE, declaring this type a map for schema traversal. Implements schema.MapTyper.
+func (x Object[T]) IsMap() bool {
+	return true
+}
+
 // IsEmpty returns TRUE if the map contains no elements.
 func (x Object[T]) IsEmpty() bool {
 	return len(x) == 0

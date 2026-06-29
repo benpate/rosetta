@@ -88,6 +88,17 @@ type KeysGetter interface {
 	Keys() []string
 }
 
+// MapTyper allows an object to explicitly declare that it is a map (an open set of keys)
+// rather than a struct (a fixed set of fields). Object validation treats a key that the schema
+// names but the map omits as a legitimately-empty optional property; a struct that simply forgot
+// to wire up an accessor must NOT be mistaken for this case, so map-ness is declared explicitly
+// here rather than inferred from the presence/absence of other interfaces.
+type MapTyper interface {
+
+	// IsMap returns TRUE if this object should be treated as a map during schema traversal.
+	IsMap() bool
+}
+
 // LengthGetter allows an object to return the length of an array
 type LengthGetter interface {
 
