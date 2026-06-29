@@ -3,7 +3,7 @@
 <img alt="Plate 22 in volume I: five women in blue robes carrying white cloths in the centre, men with turbans rowing and sailing boats behind the women, many sailing boats moored at a bank in the left background; after Mayer. 1801-1803 Hand-coloured aquatint with etching © The Trustees of the British Museum" src="https://github.com/benpate/rosetta/raw/main/meta/city-of-rosetta.webp" style="width:100%; display:block; margin-bottom:20px;">
 
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta.svg)](https://pkg.go.dev/github.com/benpate/rosetta)
 [![Version](https://img.shields.io/github/v/release/benpate/rosetta?include_prereleases&style=flat-square&color=brightgreen)](https://github.com/benpate/rosetta/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/benpate/rosetta/go.yml?branch=main&style=flat-square)](https://github.com/benpate/rosetta/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/rosetta?style=flat-square)](https://goreportcard.com/report/github.com/benpate/rosetta)
@@ -11,7 +11,7 @@
 
 ## A Collection of Translation and Data Manipulation Tools
 
-Rosetta combines several different data manipulation tools into a single module.  While each was useful on its own, the dependencies between them made updates hellish, so this collection was born.  
+Rosetta combines several different data manipulation tools into a single module. While each was useful on its own, the dependencies between them made updates hellish, so this collection was born.
 
 Many of these packages pre-date Go generics, and many are being refactored to take advantage of this new capability.
 
@@ -41,5 +41,5 @@ Many of these packages pre-date Go generics, and many are being refactored to ta
 
 ## Pull Requests Welcome
 
-While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making Rosetta better, send in a pull request.  We're all in this together! 🌹
+While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions. If you have an idea for making Rosetta better, send in a pull request. We're all in this together! 🌹
 
