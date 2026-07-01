@@ -69,6 +69,7 @@ func init() {
 	// HTML
 	UseFormat("html", format.HTML)
 	UseFormat("no-html", format.NoHTML)
+	UseFormat("text", format.Text)
 
 	// Network
 	UseFormat("ipv4", format.IPv4)
