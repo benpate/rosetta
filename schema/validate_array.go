@@ -8,7 +8,7 @@ import (
 )
 
 // validate_Array checks that the provided value meets the requirements of the schema element, and updates the value if necessary.
-func validate_Array[T any](element Array, value T) (T, bool, error) {
+func validate_Array[T any](element Array, value T) (T, rewriteList, error) {
 
 	const location = "schema.validate_Array"
 
@@ -16,16 +16,16 @@ func validate_Array[T any](element Array, value T) (T, bool, error) {
 	getterSetter, isGetterSetter := any(value).(ArrayGetterSetter)
 
 	if !isGetterSetter {
-		return value, false, derp.Internal(location, "Value must implement ArrayGetterSetter interface")
+		return value, nil, derp.Internal(location, "Value must implement ArrayGetterSetter interface")
 	}
 
 	// Validate array length
 	if err := validate_Array_length(getterSetter, element); err != nil {
-		return value, false, err
+		return value, nil, err
 	}
 
-	// Track whether any values have been changed during validation
-	changed := false
+	// Track every value that is changed during validation
+	rewrites := make(rewriteList, 0)
 
 	// Validate each item in the array
 	for index := 0; index < getterSetter.Length(); index = index + 1 {
@@ -34,7 +34,7 @@ func validate_Array[T any](element Array, value T) (T, bool, error) {
 		indexValue, isValid := getterSetter.GetIndex(index)
 
 		if !isValid {
-			return value, false, derp.Internal(location, "Getting value at index", index)
+			return value, nil, derp.Internal(location, "Getting value at index", index)
 		}
 
 		// RULE: Composite items (Object/Array) reach their schema accessors through
@@ -44,21 +44,22 @@ func validate_Array[T any](element Array, value T) (T, bool, error) {
 		itemValue, restore := addressableItem(element.Items, indexValue)
 
 		// Validate the value using the schema's "Items" definition
-		validatedValue, indexChanged, err := validate(element.Items, itemValue)
+		validatedValue, itemRewrites, err := validate(element.Items, itemValue)
 
 		if err != nil {
-			return value, false, derp.Wrap(err, location, "Validating object at index", index)
+			return value, nil, derp.Wrap(err, location, "Validating object at index", index)
 		}
 
-		// If the value has been changed, then update the value in the array
-		if indexChanged {
+		// If the value has been changed, then update the value in the array, and record
+		// the rewrites (prefixed with this item's index) for the caller.
+		if len(itemRewrites) > 0 {
 			getterSetter.SetIndex(index, restore(validatedValue))
-			changed = true
+			rewrites = append(rewrites, itemRewrites.prefix(convert.String(index))...)
 		}
 	}
 
 	// Return results to caller
-	return value, changed, nil
+	return value, rewrites, nil
 }
 
 // addressableItem prepares an array element for nested validation. For composite item

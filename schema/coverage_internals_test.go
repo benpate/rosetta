@@ -63,7 +63,7 @@ func TestValidateString_FormatTransforms(t *testing.T) {
 	// The default no-html format strips HTML tags and flags the value as changed
 	value, changed, err := validate(String{}, "<b>hi</b>")
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 	require.Equal(t, "hi", value)
 }
 

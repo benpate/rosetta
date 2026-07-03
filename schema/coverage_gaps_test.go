@@ -15,7 +15,7 @@ import (
 func TestValidateString_Pattern_Match(t *testing.T) {
 	value, changed, err := validate_String(String{Pattern: "^[a-z]+$"}, "hello")
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 	require.Equal(t, "hello", value)
 }
 
@@ -51,7 +51,7 @@ func TestValidateString_Pattern_ViaSchema(t *testing.T) {
 func TestSchemaValidate_Method_OK(t *testing.T) {
 	changed, err := New(Integer{Minimum: null.NewInt64(0), Maximum: null.NewInt64(10)}).Validate(5)
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 }
 
 // TestSchemaValidate_Method_Error confirms the Schema.Validate method rejects an out-of-range
@@ -95,7 +95,7 @@ func TestValidateObject_WritesBackRewrittenValue(t *testing.T) {
 
 	value, changed, err := validate(element, &object)
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 
 	// The rewritten (truncated) value must have been stored back into the object.
 	stored, err := New(element).Get(value, "name")

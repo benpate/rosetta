@@ -28,7 +28,7 @@ func TestValidate_NilSchema(t *testing.T) {
 func TestValidate_Any(t *testing.T) {
 	value, changed, err := validate(Any{}, "anything")
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 	require.Equal(t, "anything", value)
 }
 
@@ -46,7 +46,7 @@ func TestValidate_Boolean_UsesExistingInputFormat(t *testing.T) {
 	// A coercible value is accepted and converted to a boolean
 	newValue, changed, err := validate(Boolean{}, "true")
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 	require.Equal(t, "true", newValue)
 }
 
@@ -66,7 +66,7 @@ func TestValidate_Integer_Clamps(t *testing.T) {
 	// With no BitSize, the validated result is a plain int.
 	value, changed, err := validate(Integer{Minimum: null.NewInt64(100)}, 5)
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 	require.Equal(t, 100, value)
 }
 
@@ -98,13 +98,13 @@ func TestValidate_Integer_NoTruncation(t *testing.T) {
 
 	value, changed, err := validate(Integer{BitSize: 64, Maximum: null.NewInt64(10_000_000_000)}, big)
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 	require.Equal(t, big, value)
 
 	// Clamping to a 64-bit maximum must also preserve full width.
 	value, changed, err = validate(Integer{BitSize: 64, Maximum: null.NewInt64(big)}, int64(9_000_000_000))
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 	require.Equal(t, big, value)
 }
 
@@ -144,7 +144,7 @@ func TestValidate_Integer_Enum(t *testing.T) {
 func TestValidate_Number(t *testing.T) {
 	value, changed, err := validate(Number{Maximum: null.NewFloat(10)}, 99.0)
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 	require.Equal(t, 10.0, value)
 }
 
@@ -171,14 +171,14 @@ func TestValidate_Number_Enum(t *testing.T) {
 func TestValidate_String_CoercesInput(t *testing.T) {
 	value, changed, err := validate(String{}, 42)
 	require.NoError(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 	require.Equal(t, "42", value)
 }
 
 func TestValidate_String_Truncates(t *testing.T) {
 	value, changed, err := validate(String{MaxLength: 5}, "this-is-too-long")
 	require.NoError(t, err)
-	require.True(t, changed)
+	require.NotEmpty(t, changed)
 	require.Equal(t, "this-", value)
 }
 

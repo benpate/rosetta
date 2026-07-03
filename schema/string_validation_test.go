@@ -77,7 +77,7 @@ func TestStringLength(t *testing.T) {
 
 		newValue, changed, err := validate(s, "this is ok")
 		require.Nil(t, err)
-		require.False(t, changed)
+		require.Empty(t, changed)
 		require.Equal(t, "this is ok", newValue)
 	}
 
@@ -87,7 +87,7 @@ func TestStringLength(t *testing.T) {
 
 		newValue, changed, err := validate(s, "1234567890 - this is a really long string and it should fail because it's too long.")
 		require.NoError(t, err)
-		require.True(t, changed)
+		require.NotEmpty(t, changed)
 		require.Equal(t, "1234567890", newValue)
 	}
 }
@@ -100,31 +100,31 @@ func TestStringEnum(t *testing.T) {
 
 	_, changed, err := validate(s, "Joseph")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "Simon")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "Sara")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "Mary")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "Mr. Black")
 	require.Error(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, 3.14159265358979323846)
 	require.Error(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 }
 
 func TestStringEnumRequired(t *testing.T) {
@@ -152,13 +152,13 @@ func TestStringMaxValue(t *testing.T) {
 
 	_, changed, err := validate(s, "ab")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "a")
 	require.Nil(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 
 	_, changed, err = validate(s, "abcd")
 	require.Error(t, err)
-	require.False(t, changed)
+	require.Empty(t, changed)
 }

@@ -6,11 +6,11 @@ import (
 
 // validate_Object checks that the provided value meets the requirements of the Object schema element,
 // and updates the value if necessary.
-func validate_Object(element Object, value any) (any, bool, error) {
+func validate_Object(element Object, value any) (any, rewriteList, error) {
 
 	const location = "schema.validate_Object"
 
-	objectChanged := false
+	rewrites := make(rewriteList, 0)
 	allowMissingKeys := false
 
 	// Maps are allowed to have missing keys, but non-maps are not.
@@ -31,14 +31,14 @@ func validate_Object(element Object, value any) (any, bool, error) {
 
 			// If this is not a map, then this is a legitimate error to return to the caller
 			if !allowMissingKeys {
-				return nil, false, derp.Wrap(err, location, "Getting property")
+				return nil, nil, derp.Wrap(err, location, "Getting property", key)
 			}
 
 			// For maps, a missing property may not be an error (but required values are still required)
 			// An absent REQUIRED key fails validation with a clear "required" message,
 			// the same outcome as a present-but-empty required value.
 			if subElement.IsRequired() {
-				return nil, false, derp.Validation("Required property is missing", key)
+				return nil, nil, derp.Validation("Required property is missing", key)
 			}
 
 			// Otherwise, this property is not required, and an empty map value is fine.
@@ -46,22 +46,23 @@ func validate_Object(element Object, value any) (any, bool, error) {
 		}
 
 		// Validate the property value
-		changedValue, itemChanged, err := validate(subElement, propertyValue)
+		changedValue, childRewrites, err := validate(subElement, propertyValue)
 
 		if err != nil {
-			return nil, false, derp.Wrap(err, location, "Validating property")
+			return nil, nil, derp.Wrap(err, location, "Validating property", key)
 		}
 
-		// If changed, then set the new value in the object
-		if itemChanged {
+		// If changed, then set the new value in the object, and record
+		// the rewrites (prefixed with this property's name) for the caller.
+		if len(childRewrites) > 0 {
 
 			if err := SetProperty(element, value, key, changedValue); err != nil {
-				return nil, false, derp.Wrap(err, location, "Setting property")
+				return nil, nil, derp.Wrap(err, location, "Setting property", key)
 			}
 
-			objectChanged = true
+			rewrites = append(rewrites, childRewrites.prefix(key)...)
 		}
 	}
 
-	return value, objectChanged, nil
+	return value, rewrites, nil
 }
