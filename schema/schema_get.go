@@ -117,8 +117,14 @@ func getProperty_Boolean(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_Boolean"
 
+	// Track whether the object actually implements one of the required interfaces,
+	// so that we can tell "object can't do booleans at all" apart from
+	// "object does booleans, but not this property".
+	satisfied := false
+
 	// If this is a BoolGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(BoolGetter); ok {
+		satisfied = true
 		if result, ok := getter.GetBoolOK(name); ok {
 			return result, nil
 		}
@@ -126,6 +132,7 @@ func getProperty_Boolean(object any, name string) (any, error) {
 
 	// If this is a PointerGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(PointerGetter); ok {
+		satisfied = true
 		if pointer, ok := getter.GetPointer(name); ok {
 			if value, ok := pointer.(*bool); ok {
 				return *value, nil
@@ -133,7 +140,12 @@ func getProperty_Boolean(object any, name string) (any, error) {
 		}
 	}
 
-	// Failure.
+	// If the object DID satisfy an interface, then the property itself is the problem.
+	if satisfied {
+		return nil, derp.Internal(location, "Object does not support this boolean property", name, object)
+	}
+
+	// Otherwise, the object doesn't implement the required interfaces at all.
 	return nil, derp.Internal(location, "Object must be a BoolGetter or a PointerGetter", object)
 }
 
@@ -142,8 +154,14 @@ func getProperty_Integer32(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_Integer32"
 
+	// Track whether the object actually implements one of the required interfaces,
+	// so that we can tell "object can't do integers at all" apart from
+	// "object does integers, but not this property".
+	satisfied := false
+
 	// If this is an IntGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(IntGetter); ok {
+		satisfied = true
 		if result, ok := getter.GetIntOK(name); ok {
 			return result, nil
 		}
@@ -151,6 +169,7 @@ func getProperty_Integer32(object any, name string) (any, error) {
 
 	// If this is a PointerGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(PointerGetter); ok {
+		satisfied = true
 		if pointer, ok := getter.GetPointer(name); ok {
 			if value, ok := pointer.(*int); ok {
 				return *value, nil
@@ -158,7 +177,12 @@ func getProperty_Integer32(object any, name string) (any, error) {
 		}
 	}
 
-	// Failure.
+	// If the object DID satisfy an interface, then the property itself is the problem.
+	if satisfied {
+		return nil, derp.Internal(location, "Object does not support this integer property", name, object)
+	}
+
+	// Otherwise, the object doesn't implement the required interfaces at all.
 	return nil, derp.Internal(location, "Object must be an IntGetter or PointerGetter", object)
 }
 
@@ -167,8 +191,14 @@ func getProperty_Integer64(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_Integer64"
 
+	// Track whether the object actually implements one of the required interfaces,
+	// so that we can tell "object can't do integers at all" apart from
+	// "object does integers, but not this property".
+	satisfied := false
+
 	// If this is an Int64Getter, then try to retrieve the value using that interface
 	if getter, ok := object.(Int64Getter); ok {
+		satisfied = true
 		if result, ok := getter.GetInt64OK(name); ok {
 			return result, nil
 		}
@@ -176,6 +206,7 @@ func getProperty_Integer64(object any, name string) (any, error) {
 
 	// If this is a PointerGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(PointerGetter); ok {
+		satisfied = true
 		if pointer, ok := getter.GetPointer(name); ok {
 			if value, ok := pointer.(*int64); ok {
 				return *value, nil
@@ -183,7 +214,12 @@ func getProperty_Integer64(object any, name string) (any, error) {
 		}
 	}
 
-	// Failure.
+	// If the object DID satisfy an interface, then the property itself is the problem.
+	if satisfied {
+		return nil, derp.Internal(location, "Object does not support this integer property", name, object)
+	}
+
+	// Otherwise, the object doesn't implement the required interfaces at all.
 	return nil, derp.Internal(location, "Object must be an Int64Getter or PointerGetter", object)
 }
 
@@ -192,8 +228,14 @@ func getProperty_Number(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_Number"
 
+	// Track whether the object actually implements one of the required interfaces,
+	// so that we can tell "object can't do numbers at all" apart from
+	// "object does numbers, but not this property".
+	satisfied := false
+
 	// If this is a FloatGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(FloatGetter); ok {
+		satisfied = true
 		if result, ok := getter.GetFloatOK(name); ok {
 			return result, nil
 		}
@@ -201,6 +243,7 @@ func getProperty_Number(object any, name string) (any, error) {
 
 	// If this is a PointerGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(PointerGetter); ok {
+		satisfied = true
 		if pointer, ok := getter.GetPointer(name); ok {
 			if value, ok := pointer.(*float64); ok {
 				return *value, nil
@@ -208,7 +251,12 @@ func getProperty_Number(object any, name string) (any, error) {
 		}
 	}
 
-	// Failure.
+	// If the object DID satisfy an interface, then the property itself is the problem.
+	if satisfied {
+		return nil, derp.Internal(location, "Object does not support this number property", name, object)
+	}
+
+	// Otherwise, the object doesn't implement the required interfaces at all.
 	return nil, derp.Internal(location, "Object must be a FloatGetter or PointerGetter", object)
 }
 
@@ -217,8 +265,14 @@ func getProperty_String(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_String"
 
+	// Track whether the object actually implements one of the required interfaces,
+	// so that we can tell "object can't do strings at all" apart from
+	// "object does strings, but not this property".
+	satisfied := false
+
 	// If this is a StringGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(StringGetter); ok {
+		satisfied = true
 		if result, ok := getter.GetStringOK(name); ok {
 			return result, nil
 		}
@@ -226,6 +280,7 @@ func getProperty_String(object any, name string) (any, error) {
 
 	// If this is a PointerGetter, then try to retrieve the value using that interface
 	if getter, ok := object.(PointerGetter); ok {
+		satisfied = true
 		if pointer, ok := getter.GetPointer(name); ok {
 			if value, ok := pointer.(*string); ok {
 				return *value, nil
@@ -233,6 +288,11 @@ func getProperty_String(object any, name string) (any, error) {
 		}
 	}
 
-	// Failure.
+	// If the object DID satisfy an interface, then the property itself is the problem.
+	if satisfied {
+		return nil, derp.Internal(location, "Object does not support this string property", name, object)
+	}
+
+	// Otherwise, the object doesn't implement the required interfaces at all.
 	return nil, derp.Internal(location, "Object must be a StringGetter or PointerGetter", object)
 }
