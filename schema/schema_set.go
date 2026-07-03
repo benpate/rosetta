@@ -2,6 +2,7 @@ package schema
 
 import (
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/benpate/derp"
@@ -93,17 +94,30 @@ func SetProperty(element Element, object any, path string, value any) (err error
 		}
 	}()
 
-	// In rare cases, we may need to set an entire element in one call.
-	// If the path is empty, then we're setting the entire element, which
-	// must implement the "ValueSetter" interface
+	// In rare cases, we may need to set an entire element in one call (for instance,
+	// when a nested Object property was rewritten during validation and must be written
+	// back to its parent).  The path is empty because we have already descended to the
+	// target.
 	if path == "" {
+
+		// A value that knows how to set itself is always preferred.
 		if setter, ok := object.(ValueSetter); ok {
 			if err := setter.SetValue(value); err != nil {
 				return derp.Wrap(err, location, "Setting value", object, value)
 			}
 			return nil
 		}
-		return derp.Internal(location, "Cannot set values on empty path", object, element, path, value)
+
+		// Otherwise, if we hold an addressable pointer to the target (the usual case for
+		// struct fields reached via PointerGetter), assign the value through it using
+		// reflection.  For pointer-backed properties the value was already mutated in
+		// place during validation, so this is typically a harmless self-assignment -- but
+		// it also correctly handles the case where validation returned a NEW value.
+		if err := setByReflection(object, value); err != nil {
+			return derp.Wrap(err, location, "Setting value on empty path", object, element, value)
+		}
+
+		return nil
 	}
 
 	// Split the path into head and tail
@@ -308,4 +322,48 @@ func setProperty_String(object any, path string, value any) error {
 
 	// Cannot set the value
 	return derp.Internal(location, "Target Object must be a StringSetter or PointerGetter", path, object)
+}
+
+// setByReflection assigns `value` to the target that `object` points to.  It is used to
+// write an entire element back to its parent (empty path) when the target does not
+// implement ValueSetter -- for example, a struct field reached via PointerGetter.
+//
+// `object` MUST be a non-nil pointer to a settable target.  `value` may be either the
+// target's own type (T) or a pointer to it (*T); a *T is dereferenced first so that,
+// e.g., a validated *Content can be written into a Content field.
+func setByReflection(object any, value any) error {
+
+	const location = "schema.setByReflection"
+
+	target := reflect.ValueOf(object)
+
+	// The target must be a non-nil pointer we can write through.
+	if target.Kind() != reflect.Pointer || target.IsNil() {
+		return derp.Internal(location, "Target must be a non-nil pointer", object, value)
+	}
+
+	target = target.Elem()
+
+	if !target.CanSet() {
+		return derp.Internal(location, "Target is not settable", object, value)
+	}
+
+	// Unwrap a pointer value (*T) down to its element (T) so it matches the target type.
+	source := reflect.ValueOf(value)
+	if source.Kind() == reflect.Pointer {
+
+		if source.IsNil() {
+			return derp.Internal(location, "Cannot set target from a nil pointer value", object, value)
+		}
+
+		source = source.Elem()
+	}
+
+	// The (unwrapped) value must be assignable to the target.
+	if !source.Type().AssignableTo(target.Type()) {
+		return derp.Internal(location, "Value type is not assignable to target", target.Type().String(), source.Type().String())
+	}
+
+	target.Set(source)
+	return nil
 }
