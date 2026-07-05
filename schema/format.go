@@ -76,6 +76,7 @@ func init() {
 	UseFormat("ipv6", format.IPv6)
 	UseFormat("hostname", format.Hostname)
 	UseFormat("uri", format.URI)
+	UseFormat("url", format.URL)
 
 	// Passwords
 	UseFormat("lower", format.HasLowercase)

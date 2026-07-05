@@ -1,6 +1,7 @@
 package format
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -76,4 +77,69 @@ func TestURI(t *testing.T) {
 		require.NotNil(t, err, invalid)
 		require.Equal(t, "", result, invalid)
 	}
+
+	// The length limit is inclusive: exactly 2048 bytes passes, 2049 fails
+	atLimit := "https://example.com/" + strings.Repeat("a", 2048-len("https://example.com/"))
+	result, err := validate(atLimit)
+	require.Nil(t, err)
+	require.Equal(t, atLimit, result)
+
+	result, err = validate(atLimit + "a")
+	require.NotNil(t, err)
+	require.Equal(t, "", result)
+}
+
+func TestURL(t *testing.T) {
+
+	validate := URL("")
+
+	valids := []string{
+		"",
+		"https://example.com",
+		"http://example.com/path?q=1#fragment",
+		"https://user:pass@example.com:8080/path",
+		"ftp://example.com/file.txt",
+		"HTTPS://EXAMPLE.COM",     // schemes and hosts are case-insensitive
+		"https://[::1]:8080/",     // IPv6 host
+		"https://example.com/a b", // url.Parse tolerates unencoded spaces in the path
+	}
+
+	for _, valid := range valids {
+		result, err := validate(valid)
+		require.Nil(t, err, valid)
+		require.Equal(t, valid, result, valid)
+	}
+
+	invalids := []string{
+		"example.com",             // no scheme
+		"/path/only",              // absolute path, not absolute URL
+		"//example.com/path",      // protocol-relative reference has no scheme
+		"not a url",               // garbage
+		"mailto:user@example.com", // opaque URI: scheme but no host
+		"urn:isbn:0451450523",     // opaque URI: scheme but no host
+		"javascript:alert(1)",     // opaque URI: scheme but no host
+		"data:text/html,hello",    // opaque URI: scheme but no host
+		"file:///etc/passwd",      // scheme but empty host
+		"http:opaque",             // scheme but no host
+		"https://",                // scheme but empty host
+		"http://exa mple.com",     // space in host fails url.Parse
+		"https://example.com/%zz", // invalid percent-escape fails url.Parse
+		"https://example.com\x00", // control character fails url.Parse
+	}
+
+	for _, invalid := range invalids {
+		result, err := validate(invalid)
+		require.NotNil(t, err, invalid)
+		require.Equal(t, "", result, invalid)
+	}
+
+	// The length limit is inclusive: exactly 2048 bytes passes, 2049 fails
+	atLimit := "https://example.com/" + strings.Repeat("a", 2048-len("https://example.com/"))
+	result, err := validate(atLimit)
+	require.Nil(t, err)
+	require.Equal(t, atLimit, result)
+
+	result, err = validate(atLimit + "a")
+	require.NotNil(t, err)
+	require.Equal(t, "", result)
 }

@@ -42,6 +42,37 @@ func TestStringUnmarshalComplete1(t *testing.T) {
 	assert.Equal(t, str.Format, "date")
 }
 
+func TestStringFormatURL(t *testing.T) {
+
+	uriSchema, err := UnmarshalJSON([]byte(`{"type":"string", "format":"uri"}`))
+	require.Nil(t, err)
+
+	urlSchema, err := UnmarshalJSON([]byte(`{"type":"string", "format":"url"}`))
+	require.Nil(t, err)
+
+	// Both formats accept an absolute web URL
+	_, _, err = validate(uriSchema, "https://example.com/path")
+	require.Nil(t, err)
+
+	_, _, err = validate(urlSchema, "https://example.com/path")
+	require.Nil(t, err)
+
+	// "url" is registered as the stricter validator: an opaque mailto: address
+	// has a scheme but no host, so "uri" accepts it and "url" rejects it
+	_, _, err = validate(uriSchema, "mailto:user@example.com")
+	require.Nil(t, err)
+
+	_, _, err = validate(urlSchema, "mailto:user@example.com")
+	require.NotNil(t, err)
+
+	// Neither format accepts a relative reference
+	_, _, err = validate(uriSchema, "example.com/path")
+	require.NotNil(t, err)
+
+	_, _, err = validate(urlSchema, "example.com/path")
+	require.NotNil(t, err)
+}
+
 func TestStringFormatLowercase1(t *testing.T) {
 
 	s, err := UnmarshalJSON([]byte(`{"type":"string", "format":"lower=2"}`))

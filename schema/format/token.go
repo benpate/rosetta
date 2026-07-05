@@ -9,6 +9,7 @@ import (
 // Token validates a simple token string suitable for use as URL identifiers
 func Token(_ string) StringFormat {
 
+	// A token is a string that contains only letters, numbers, dashes, and underscores. It is case-insensitive.
 	token := regexp.MustCompile(`(?i)^[\p{L}\p{N}-_]+$`)
 
 	return func(value string) (string, error) {
@@ -23,6 +24,6 @@ func Token(_ string) StringFormat {
 			return value, nil
 		}
 
-		return "", derp.Internal("schema.format.Token", "Value is not a valid Token", value)
+		return "", derp.Validation("Value must be a valid Token", value)
 	}
 }
