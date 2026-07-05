@@ -72,6 +72,7 @@ func FuzzURL(f *testing.F) {
 	f.Add("https://user:pass@example.com:8080/path")
 	f.Add("https://[::1]:8080/")
 	f.Add("https://example.com/a b")
+	f.Add("ftp://example.com/file.txt")
 	f.Add("mailto:user@example.com")
 	f.Add("javascript:alert(1)")
 	f.Add("file:///etc/passwd")
@@ -119,6 +120,11 @@ func FuzzURL(f *testing.F) {
 
 		if !parsed.IsAbs() {
 			t.Fatalf("URL accepted %q, which has no scheme", value)
+		}
+
+		// url.Parse lowercases the scheme, so this also covers "HTTPS://..." inputs.
+		if parsed.Scheme != "http" && parsed.Scheme != "https" {
+			t.Fatalf("URL accepted %q, whose scheme %q is not http or https", value, parsed.Scheme)
 		}
 
 		if parsed.Host == "" {
