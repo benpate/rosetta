@@ -32,9 +32,18 @@ func addHTMLFuncs(target map[string]any) {
 	}
 
 	target["highlight"] = func(text string, search string) template.HTML {
+
+		// Both `text` and `search` are untrusted (display names, query params), so they are
+		// HTML-escaped before anything is marked safe. Escaping happens FIRST so that the only
+		// live markup in the result is the <b> wrapper this function adds. Matching is done on
+		// the already-escaped strings so needle and haystack share the same encoding.
+		text = template.HTMLEscapeString(text)
+
 		if search == "" {
 			return template.HTML(text)
 		}
+
+		search = template.HTMLEscapeString(search)
 		result := strings.ReplaceAll(text, search, `<b class="highlight">`+search+"</b>")
 		return template.HTML(result)
 	}

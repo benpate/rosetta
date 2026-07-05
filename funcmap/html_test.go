@@ -41,6 +41,11 @@ func TestHTMLFuncs_Markup(t *testing.T) {
 	require.Equal(t, template.HTML(`a <b class="highlight">b</b> c`), highlight("a b c", "b"))
 	require.Equal(t, template.HTML("a b c"), highlight("a b c", "")) // empty search returns text unchanged
 
+	// Untrusted text and search terms are HTML-escaped; only the <b> wrapper is live markup.
+	require.Equal(t, template.HTML("&lt;img src=x onerror=alert(1)&gt;"), highlight("<img src=x onerror=alert(1)>", ""))
+	require.Equal(t, template.HTML(`&lt;script&gt;<b class="highlight">x</b>&lt;/script&gt;`), highlight("<script>x</script>", "x"))
+	require.Equal(t, template.HTML(`a <b class="highlight">&lt;b&gt;</b> c`), highlight("a <b> c", "<b>")) // markup in the search term is escaped too
+
 	hasImage := f["hasImage"].(func(string) bool)
 	require.True(t, hasImage(`<img src="x">`))
 	require.True(t, hasImage(`<picture>`))
