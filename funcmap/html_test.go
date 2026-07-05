@@ -50,9 +50,6 @@ func TestHTMLFuncs_Markup(t *testing.T) {
 	require.True(t, hasImage(`<img src="x">`))
 	require.True(t, hasImage(`<picture>`))
 	require.False(t, hasImage("plain text"))
-
-	removeLinks := f["removeLinks"].(func(string) template.HTML)
-	require.Equal(t, template.HTML(`<span href="x">y</span>`), removeLinks(`<a href="x">y</a>`))
 }
 
 func TestHTMLFuncs_JSON(t *testing.T) {

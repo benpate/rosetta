@@ -125,12 +125,6 @@ func addHTMLFuncs(target map[string]any) {
 		return url.QueryEscape(value)
 	}
 
-	target["removeLinks"] = func(value string) template.HTML {
-		result := strings.ReplaceAll(value, "<a ", "<span ")
-		result = strings.ReplaceAll(result, "</a", "</span")
-		return template.HTML(result)
-	}
-
 	target["summary"] = html.Summary
 
 	target["stripProtocol"] = func(value string) string {
