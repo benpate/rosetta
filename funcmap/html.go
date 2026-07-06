@@ -27,8 +27,24 @@ func addHTMLFuncs(target map[string]any) {
 		return template.HTMLAttr(value)
 	}
 
+	// css marks a string as trusted CSS, so html/template emits it with NO
+	// escaping. It is UNSAFE by construction: only pass owner- or admin-scoped
+	// values (e.g. a profile's custom stylesheet). Never pass remote, federated,
+	// or query-string data — use `cssValue` for a single computed property value.
 	target["css"] = func(value string) template.CSS {
 		return template.CSS(value)
+	}
+
+	// cssValue marks a single CSS property value as trusted, but ONLY after
+	// confirming it contains no context-breakout characters. It is the safe
+	// choice when the value is computed from data (colors, sizes, gradients)
+	// rather than authored by the owner. Anything containing a character outside
+	// the conservative property-value allowlist is rejected and returns empty,
+	// so a crafted value cannot escape the `style` attribute or the property it
+	// sits in. The allowlist covers identifiers, numbers, colors (#rrggbb),
+	// units (%), functions (rgba(), linear-gradient()), and their separators.
+	target["cssValue"] = func(value string) template.CSS {
+		return safeCSSValue(value)
 	}
 
 	target["highlight"] = func(text string, search string) template.HTML {
@@ -142,4 +158,57 @@ func addHTMLFuncs(target map[string]any) {
 	target["text"] = func(value string) template.HTML {
 		return template.HTML(html.FromText(value))
 	}
+}
+
+// safeCSSValue validates a single CSS property value and returns it as trusted
+// CSS only if it cannot break out of the value, the property, or the enclosing
+// `style` attribute; otherwise it returns empty. Callers use it for values
+// computed from data (colors, sizes, gradients) rather than authored by a
+// trusted owner. Validation is two-stage: a conservative character allowlist,
+// then a name check for the two dangerous functions (`expression`, `url`) whose
+// spellings happen to fall entirely within that allowlist.
+func safeCSSValue(value string) template.CSS {
+
+	if strings.IndexFunc(value, isUnsafeCSSValueRune) >= 0 {
+		return template.CSS("")
+	}
+
+	// The charset allowlist admits `()`, so it cannot block the two dangerous
+	// CSS functions spelled with allowlisted characters: `expression(...)`
+	// (legacy-IE script execution) and `url(...)` (can load remote or
+	// `javascript:` resources). Reject them by name.
+	lower := strings.ToLower(value)
+	if strings.Contains(lower, "expression") || strings.Contains(lower, "url") {
+		return template.CSS("")
+	}
+
+	return template.CSS(value)
+}
+
+// isUnsafeCSSValueRune reports whether a rune is outside the conservative
+// allowlist of characters permitted in a `cssValue` property value. The allowed
+// set is intentionally narrow: it admits identifiers, numbers, colors, units,
+// simple functions, and their separators, and nothing that could terminate the
+// value, the property, or the surrounding `style` attribute. Notably absent are
+// `"` `'` `;` `<` `>` `{` `}` `@` `\` `/` `*` and control characters — the
+// building blocks of quote/attribute breakouts, extra declarations, `@import`,
+// comments, and CSS escapes.
+func isUnsafeCSSValueRune(r rune) bool {
+
+	switch {
+
+	case r >= 'a' && r <= 'z':
+		return false
+
+	case r >= 'A' && r <= 'Z':
+		return false
+
+	case r >= '0' && r <= '9':
+		return false
+
+	case strings.ContainsRune(" \t,.()#%+-", r):
+		return false
+	}
+
+	return true
 }

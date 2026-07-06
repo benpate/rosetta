@@ -35,6 +35,22 @@ func TestHTMLFuncs_Markup(t *testing.T) {
 
 	require.Equal(t, template.HTMLAttr("data-x"), f["attr"].(func(string) template.HTMLAttr)("data-x"))
 	require.Equal(t, template.CSS("color:red"), f["css"].(func(string) template.CSS)("color:red"))
+
+	cssValue := f["cssValue"].(func(string) template.CSS)
+	// Legitimate computed values pass through unchanged.
+	require.Equal(t, template.CSS("#ff0000"), cssValue("#ff0000"))
+	require.Equal(t, template.CSS("rgba(255, 0, 0, 0.50)"), cssValue("rgba(255, 0, 0, 0.50)"))
+	require.Equal(t, template.CSS("linear-gradient(120deg, rgba(1, 2, 3, 1.00), rgba(4, 5, 6, 0.50))"), cssValue("linear-gradient(120deg, rgba(1, 2, 3, 1.00), rgba(4, 5, 6, 0.50))"))
+	// Anything with a context-breakout character is rejected wholesale.
+	require.Equal(t, template.CSS(""), cssValue("red; background:url(javascript:alert(1))")) // `;` and `:`
+	require.Equal(t, template.CSS(""), cssValue(`red" onmouseover="alert(1)`))               // `"` closes the attribute
+	require.Equal(t, template.CSS(""), cssValue("red}body{display:none"))                    // `}` breaks out of a rule
+	require.Equal(t, template.CSS(""), cssValue("@import 'evil.css'"))                       // `@` and `'`
+	require.Equal(t, template.CSS(""), cssValue(`\3c script\3e`))                            // `\` CSS escape
+	// Dangerous functions whose spelling is all-allowlisted are rejected by name.
+	require.Equal(t, template.CSS(""), cssValue("expression(alert(1))"))
+	require.Equal(t, template.CSS(""), cssValue("EXPRESSION(alert(1))")) // case-insensitive
+	require.Equal(t, template.CSS(""), cssValue("url(x)"))               // url() would still parse under the charset allowlist
 	require.Equal(t, template.HTML("<p>hi</p>"), f["html"].(func(string) template.HTML)("<p>hi</p>"))
 
 	highlight := f["highlight"].(func(string, string) template.HTML)
