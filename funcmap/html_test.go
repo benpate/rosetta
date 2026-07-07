@@ -33,7 +33,17 @@ func TestHTMLFuncs_Markup(t *testing.T) {
 
 	f := All()
 
-	require.Equal(t, template.HTMLAttr("data-x"), f["attr"].(func(string) template.HTMLAttr)("data-x"))
+	attr := f["attr"].(func(string) template.HTMLAttr)
+	// Legitimate attribute values (tokens, data values, ARIA states) pass through.
+	require.Equal(t, template.HTMLAttr("data-x"), attr("data-x"))
+	require.Equal(t, template.HTMLAttr("btn-primary"), attr("btn-primary"))
+	require.Equal(t, template.HTMLAttr("true"), attr("true"))
+	// Anything that could break out of the attribute or inject a new one is rejected.
+	require.Equal(t, template.HTMLAttr(""), attr(`x" onmouseover="alert(1)`)) // quote closes the attribute
+	require.Equal(t, template.HTMLAttr(""), attr("x onmouseover=alert(1)"))   // whitespace starts a new attribute
+	require.Equal(t, template.HTMLAttr(""), attr("x=y"))                      // `=` starts a value
+	require.Equal(t, template.HTMLAttr(""), attr("a<b"))                      // `<` opens a tag
+	require.Equal(t, template.HTMLAttr(""), attr("a&amp;b"))                  // `&` is entity-ambiguous
 	require.Equal(t, template.CSS("color:red"), f["css"].(func(string) template.CSS)("color:red"))
 
 	cssValue := f["cssValue"].(func(string) template.CSS)

@@ -23,8 +23,14 @@ func addHTMLFuncs(target map[string]any) {
 		return url + "?" + extraParams
 	}
 
+	// attr marks a string as a trusted HTML attribute value, which html/template
+	// emits with NO escaping. To keep that safe by construction it first confirms
+	// the value cannot break out of the attribute or inject a new one: any value
+	// containing a quote, angle bracket, `=`, `&`, backtick, or whitespace is
+	// rejected and returns empty. Legitimate attribute values (class/id tokens,
+	// data values, ARIA states) pass through unchanged.
 	target["attr"] = func(value string) template.HTMLAttr {
-		return template.HTMLAttr(value)
+		return safeAttr(value)
 	}
 
 	// css marks a string as trusted CSS, so html/template emits it with NO
@@ -158,6 +164,37 @@ func addHTMLFuncs(target map[string]any) {
 	target["text"] = func(value string) template.HTML {
 		return template.HTML(html.FromText(value))
 	}
+}
+
+// safeAttr validates an HTML attribute value and returns it as a trusted
+// template.HTMLAttr only if it cannot break out of the attribute or inject a new
+// one; otherwise it returns empty. Because template.HTMLAttr is emitted without
+// escaping, any value carrying a quote, angle bracket, `=`, `&`, backtick, or
+// whitespace — the characters needed to close the attribute, open a tag, or start
+// an adjacent attribute like `onmouseover=` — is rejected wholesale.
+func safeAttr(value string) template.HTMLAttr {
+
+	if strings.IndexFunc(value, isUnsafeAttrRune) >= 0 {
+		return template.HTMLAttr("")
+	}
+
+	return template.HTMLAttr(value)
+}
+
+// isUnsafeAttrRune reports whether a rune must not appear in a raw (unescaped)
+// HTML attribute value. It rejects the attribute-breakout characters directly,
+// plus all whitespace and control runes (which could split the value into an
+// additional attribute). Everything else — the characters that make up class and
+// id tokens, data values, and ARIA states — is permitted.
+func isUnsafeAttrRune(r rune) bool {
+
+	switch r {
+
+	case '"', '\'', '`', '<', '>', '=', '&':
+		return true
+	}
+
+	return r <= ' ' || r == 0x7f
 }
 
 // safeCSSValue validates a single CSS property value and returns it as trusted
