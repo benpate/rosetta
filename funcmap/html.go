@@ -147,6 +147,14 @@ func addHTMLFuncs(target map[string]any) {
 		return url.QueryEscape(value)
 	}
 
+	// safeURL returns a URL only if it is safe to use as a navigation target
+	// (href, redirect, or a data attribute read back by script); otherwise it
+	// returns empty. It permits same-site relative paths and absolute http(s)
+	// URLs, and rejects dangerous schemes (javascript:, data:, …), scheme-relative
+	// hosts, and unparseable values. The result is a plain string, so html/template
+	// still applies its own contextual escaping on top.
+	target["safeURL"] = safeURL
+
 	target["summary"] = html.Summary
 
 	target["stripProtocol"] = func(value string) string {
@@ -164,6 +172,48 @@ func addHTMLFuncs(target map[string]any) {
 	target["text"] = func(value string) template.HTML {
 		return template.HTML(html.FromText(value))
 	}
+}
+
+// safeURL returns value unchanged if it is safe to use as a navigation target,
+// or empty otherwise. It is the guard for URLs built from remote-influenced data
+// (federated object IDs, actor URLs) that flow into an href, a redirect, or a
+// data attribute that script later navigates to. Two shapes are permitted:
+//
+//   - A same-site relative path (empty scheme AND empty host), e.g. "/stream/123".
+//     A scheme-relative "//host/path" is rejected: it has an empty scheme but a
+//     non-empty host, so a browser treats it as an off-site absolute URL.
+//   - An absolute http:// or https:// URL. Off-site http(s) targets are allowed;
+//     only the scheme is bounded, which is what blocks javascript:, data:, urn:,
+//     and similar dangerous or non-navigational schemes.
+//
+// A value that cannot be parsed returns empty (fail closed), which also rejects
+// the leading-whitespace "\tjavascript:" trick that url.Parse errors on but a
+// browser would strip and execute.
+func safeURL(value string) string {
+
+	parsed, err := url.Parse(value)
+
+	if err != nil {
+		return ""
+	}
+
+	// Absolute URLs are allowed only with an http(s) scheme.
+	if parsed.Scheme != "" {
+
+		if parsed.Scheme == "http" || parsed.Scheme == "https" {
+			return value
+		}
+
+		return ""
+	}
+
+	// A schemeless value is safe only if it is a true relative path, i.e. it has
+	// no host either (this rejects scheme-relative "//host/path").
+	if parsed.Host != "" {
+		return ""
+	}
+
+	return value
 }
 
 // safeAttr validates an HTML attribute value and returns it as a trusted

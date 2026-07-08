@@ -24,6 +24,27 @@ func TestHTMLFuncs_URLsAndStrings(t *testing.T) {
 	require.Equal(t, "example.com", stripProtocol("http://example.com"))
 	require.Equal(t, "example.com", stripProtocol("example.com"))
 
+	safeURL := f["safeURL"].(func(string) string)
+	// Same-site relative paths and absolute http(s) URLs pass through unchanged.
+	require.Equal(t, "/stream/123", safeURL("/stream/123"))
+	require.Equal(t, "/stream/123?q=1#top", safeURL("/stream/123?q=1#top"))
+	require.Equal(t, "relative/path", safeURL("relative/path"))
+	require.Equal(t, "", safeURL(""))
+	require.Equal(t, "https://remote.example/@author", safeURL("https://remote.example/@author"))
+	require.Equal(t, "http://remote.example/news", safeURL("http://remote.example/news"))
+	// Dangerous or non-navigational schemes are rejected.
+	require.Equal(t, "", safeURL("javascript:alert(1)"))
+	require.Equal(t, "", safeURL("JavaScript:alert(1)")) // scheme is case-insensitive
+	require.Equal(t, "", safeURL("data:text/html,<script>alert(1)</script>"))
+	require.Equal(t, "", safeURL("urn:loaded")) // AS object IDs can be urn: — not navigable
+	require.Equal(t, "", safeURL("vbscript:msgbox(1)"))
+	require.Equal(t, "", safeURL("file:///etc/passwd"))
+	// Scheme-relative URLs have an empty scheme but a host, so a browser treats
+	// them as off-site absolute URLs — reject them.
+	require.Equal(t, "", safeURL("//evil.example/phish"))
+	// Leading-whitespace tricks fail to parse and must fail closed.
+	require.Equal(t, "", safeURL("\tjavascript:alert(1)"))
+
 	require.Equal(t, "a+b", f["queryEscape"].(func(string) string)("a b"))
 	// JSEscapeString escapes angle brackets to their unicode escapes
 	require.Equal(t, `\u003Cb\u003E`, f["js"].(func(string) string)("<b>"))
