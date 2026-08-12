@@ -26,21 +26,12 @@ type Integer struct {
  ******************************************/
 
 // DefaultValue implements the Element interface
-// It returns the default value for this element type
+// It returns the default value for this element type, sized to the element's
+// BitSize. A default that does not fit the declared bit size is clamped to
+// that size's range rather than silently wrapping around.
 func (element Integer) DefaultValue() any {
-
-	switch element.BitSize {
-	case 8:
-		return int8(element.Default.Int64())
-	case 16:
-		return int16(element.Default.Int64())
-	case 32:
-		return int32(element.Default.Int64())
-	case 64:
-		return int64(element.Default.Int64())
-	default:
-		return int(element.Default.Int64())
-	}
+	result, _, _ := convert.IntBitsizeOk(element.Default.Int64(), 0, element.BitSize)
+	return result
 }
 
 // IsRequired implements the Element interface

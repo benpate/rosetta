@@ -121,8 +121,7 @@ func FuzzBoolRoundTrip(f *testing.F) {
 
 		result, ok := BoolOk(value, false)
 
-		wantOk := (value == 0 || value == 1)
-		if ok != wantOk {
+		if wantOk := (value == 0 || value == 1); ok != wantOk {
 			t.Fatalf("BoolOk(%d): ok=%v, want %v", value, ok, wantOk)
 		}
 
@@ -151,8 +150,7 @@ func FuzzStringIntRoundTrip(f *testing.F) {
 		}
 
 		// The string must round-trip back to the same integer.
-		back, backOk := Int64Ok(str, -1)
-		if !backOk || back != value {
+		if back, backOk := Int64Ok(str, -1); !backOk || back != value {
 			t.Fatalf("StringOk(%d)=%q did not round-trip back (got %d, ok=%v)", value, str, back, backOk)
 		}
 	})
@@ -170,14 +168,12 @@ func FuzzFloatIntRoundTrip(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, value int64) {
 
-		_, ok := FloatOk(value, -1)
-
 		// An int64 is exactly representable in float64 exactly when its magnitude
 		// is at most 2^53. Ok must agree with that, in both directions.
 		const maxExact = int64(1) << 53
 		exact := value >= -maxExact && value <= maxExact
 
-		if ok != exact {
+		if _, ok := FloatOk(value, -1); ok != exact {
 			t.Fatalf("FloatOk(%d): ok=%v, want %v (exactly representable)", value, ok, exact)
 		}
 	})

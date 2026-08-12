@@ -180,9 +180,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 // TRUE when the value fit the bit size without being clamped.
 func IntBitsizeOk(value any, defaultValue int, bitSize int) (result any, lossless bool, inBounds bool) {
 
-	integer, lossless := Int64Ok(value, int64(defaultValue))
-
-	switch bitSize {
+	switch integer, lossless := Int64Ok(value, int64(defaultValue)); bitSize {
 
 	case 8:
 		if integer < math.MinInt8 {

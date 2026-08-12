@@ -38,7 +38,7 @@ func addHTMLFuncs(target map[string]any) {
 	// values (e.g. a profile's custom stylesheet). Never pass remote, federated,
 	// or query-string data — use `cssValue` for a single computed property value.
 	target["css"] = func(value string) template.CSS {
-		return template.CSS(value)
+		return template.CSS(value) // #nosec G203 -- deliberate trust cast, documented above: owner/admin-scoped values only, never remote or federated data
 	}
 
 	// cssValue marks a single CSS property value as trusted, but ONLY after
@@ -62,12 +62,12 @@ func addHTMLFuncs(target map[string]any) {
 		text = template.HTMLEscapeString(text)
 
 		if search == "" {
-			return template.HTML(text)
+			return template.HTML(text) // #nosec G203 -- text is HTML-escaped above; no live markup remains
 		}
 
 		search = template.HTMLEscapeString(search)
 		result := strings.ReplaceAll(text, search, `<b class="highlight">`+search+"</b>")
-		return template.HTML(result)
+		return template.HTML(result) // #nosec G203 -- both inputs HTML-escaped above; the only live markup is the <b> wrapper added here
 	}
 
 	target["domainOnly"] = func(value string) string {
@@ -89,12 +89,17 @@ func addHTMLFuncs(target map[string]any) {
 		return false
 	}
 
+	// html marks a string as trusted HTML, so html/template emits it with NO
+	// escaping. It is UNSAFE by construction: only pass content that has already
+	// been sanitized (or is owner-authored). Call sites are audited in Emissary.
 	target["html"] = func(value string) template.HTML {
-		return template.HTML(value)
+		return template.HTML(value) // #nosec G203 -- deliberate trust cast, documented above; call sites audited
 	}
 
+	// htmlMinimal reduces the value to a minimal allowlisted tag set before
+	// marking it as trusted, so arbitrary markup cannot survive the cast.
 	target["htmlMinimal"] = func(value string) template.HTML {
-		return template.HTML(html.Minimal(value))
+		return template.HTML(html.Minimal(value)) // #nosec G203 -- html.Minimal sanitizes to a minimal tag allowlist first
 	}
 
 	target["js"] = func(value string) string {
@@ -140,7 +145,7 @@ func addHTMLFuncs(target map[string]any) {
 			derp.Report(derp.Wrap(err, "tools.templates.functions.markdown", "Error converting Markdown to HTML"))
 		}
 
-		return template.HTML(buffer.String())
+		return template.HTML(buffer.String()) // #nosec G203 -- goldmark output; raw HTML in the source is escaped by default (no html.WithUnsafe)
 	}
 
 	target["queryEscape"] = func(value string) string {
@@ -169,8 +174,10 @@ func addHTMLFuncs(target map[string]any) {
 
 	target["textOnly"] = html.RemoveTags
 
+	// text escapes plain text and converts line breaks to markup, so the only
+	// live HTML in the result is what html.FromText itself generates.
 	target["text"] = func(value string) template.HTML {
-		return template.HTML(html.FromText(value))
+		return template.HTML(html.FromText(value)) // #nosec G203 -- html.FromText escapes the input; only its own <br> markup is live
 	}
 }
 
@@ -228,7 +235,7 @@ func safeAttr(value string) template.HTMLAttr {
 		return template.HTMLAttr("")
 	}
 
-	return template.HTMLAttr(value)
+	return template.HTMLAttr(value) // #nosec G203 -- guarded above: any attribute-breakout character rejects the whole value
 }
 
 // isUnsafeAttrRune reports whether a rune must not appear in a raw (unescaped)
@@ -264,12 +271,12 @@ func safeCSSValue(value string) template.CSS {
 	// CSS functions spelled with allowlisted characters: `expression(...)`
 	// (legacy-IE script execution) and `url(...)` (can load remote or
 	// `javascript:` resources). Reject them by name.
-	lower := strings.ToLower(value)
-	if strings.Contains(lower, "expression") || strings.Contains(lower, "url") {
+	if lower := strings.ToLower(value); strings.Contains(lower, "expression") ||
+		strings.Contains(lower, "url") {
 		return template.CSS("")
 	}
 
-	return template.CSS(value)
+	return template.CSS(value) // #nosec G203 -- guarded above: allowlist plus expression/url name check rejects breakout values
 }
 
 // isUnsafeCSSValueRune reports whether a rune is outside the conservative
