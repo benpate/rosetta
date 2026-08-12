@@ -15,17 +15,26 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	const location = "schema.Schema.Set"
 
-	// Find the element for this path
+	// RULE: An unknown path is a client-input problem (a form posting a field the schema
+	// does not define), so it is a validation error that names the field -- not a 400.
 	element, ok := schema.GetElement(path)
 
 	if !ok {
-		return derp.BadRequest(location, "Invalid path", path)
+		return derp.Validation("Unknown field: "+path, location, path)
 	}
 
 	// Validate the value (and update if necessary) against the schema rules for this element
 	value, _, err := validate(element, value)
 
 	if err != nil {
+
+		// Re-root a validation failure with the failing path prefixed, so handlers that
+		// surface the ROOT message of a 422 chain can tell the user WHICH field failed.
+		// The original error rides along as a detail (outside the unwrap chain) for the log.
+		if derp.IsValidationError(err) {
+			return derp.Validation(path+": "+derp.RootMessage(err), location, err)
+		}
+
 		return derp.Wrap(err, location, "Value is not valid for this schema", path, value)
 	}
 
