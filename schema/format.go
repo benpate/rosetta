@@ -71,6 +71,9 @@ func init() {
 	UseFormat("no-html", format.NoHTML)
 	UseFormat("text", format.Text)
 
+	// Markdown
+	UseFormat("markdown", format.Markdown)
+
 	// Network
 	UseFormat("ipv4", format.IPv4)
 	UseFormat("ipv6", format.IPv6)
