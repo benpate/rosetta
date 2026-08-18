@@ -135,7 +135,17 @@ func (m Matchable[T]) IsZeroValue(name string) bool {
 // MapOfAny implements the MapOfAny interface.
 // It returns this value as a map[string]any
 func (m Matchable[T]) MapOfAny() map[string]any {
-	return convert.MapOfAny(m)
+
+	// Copy the entries directly.  Handing `m` to convert.MapOfAny would come straight back
+	// here through its MapOfAnyGetter case and recurse until the stack overflows, because
+	// Matchable[T] is a map[string]T and so matches none of that function's concrete cases.
+	result := make(map[string]any, len(m))
+
+	for key, value := range m {
+		result[key] = value
+	}
+
+	return result
 }
 
 // MapOfString implements the MapOfString interface.
