@@ -39,6 +39,7 @@ func (runner appendRunner) Execute(_ schema.Schema, _ any, targetSchema schema.S
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `append` rule back into its map representation.
 func (runner appendRunner) MarshalMap() map[string]any {
 	return mapof.Any{
 		"append": runner.Append,
@@ -46,6 +47,7 @@ func (runner appendRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `append` rule from its map representation.
 func (runner *appendRunner) UnmarshalMap(data mapof.Any) error {
 
 	runner.Append = upscale(data.GetAny("append"))

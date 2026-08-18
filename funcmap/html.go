@@ -14,6 +14,7 @@ import (
 	"github.com/yuin/goldmark/extension"
 )
 
+// addHTMLFuncs registers the HTML, Markdown, and URL helpers in the template funcmap.
 func addHTMLFuncs(target map[string]any) {
 
 	target["addQueryParams"] = func(extraParams string, url string) string {

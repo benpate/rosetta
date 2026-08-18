@@ -61,6 +61,7 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `path` rule back into its map representation.
 func (runner pathRunner) MarshalMap() map[string]any {
 	return map[string]any{
 		"path":   runner.Path,
@@ -68,6 +69,7 @@ func (runner pathRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `path` rule from its map representation.
 func (runner *pathRunner) UnmarshalMap(data mapof.Any) error {
 
 	runner.Path = data.GetString("path")

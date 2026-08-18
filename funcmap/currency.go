@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
+// addCurrencyFuncs registers the currency formatting helpers in the template funcmap.
 func addCurrencyFuncs(target map[string]any) {
 
 	target["dollarFormat"] = func(value any) string {

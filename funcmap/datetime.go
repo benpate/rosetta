@@ -6,7 +6,8 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-func addDateFuncs(target map[string]interface{}) {
+// addDateFuncs registers the date and time helpers in the template funcmap.
+func addDateFuncs(target map[string]any) {
 
 	target["now"] = time.Now
 

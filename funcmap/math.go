@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
+// addMathFuncs registers the arithmetic helpers in the template funcmap.
 func addMathFuncs(target map[string]any) {
 
 	target["add"] = func(a any, b any) int {

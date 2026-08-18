@@ -36,6 +36,8 @@ func HasNumbers(arg string) StringFormat {
 	}
 }
 
+// countCharacters returns an error unless the value contains at least `arg` bytes that
+// satisfy fn.  A non-numeric `arg` is treated as a minimum of one.
 func countCharacters(arg string, value string, fn func(byte) bool) (string, error) {
 
 	minCount, err := strconv.Atoi(arg)

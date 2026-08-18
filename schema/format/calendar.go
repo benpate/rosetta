@@ -7,6 +7,7 @@ import (
 	"github.com/benpate/derp"
 )
 
+// iso8601 matches an ISO-8601 date/time string, with optional seconds and timezone offset.
 var iso8601 = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(Z[+-]\d{2}:\d{2})?)?$`)
 
 // ISO8601 returns a StringFormat that validates a value as an ISO-8601 date string.

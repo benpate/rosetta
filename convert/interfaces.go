@@ -5,7 +5,7 @@ import "time"
 // Booler interface wraps the Bool() method that enables custom types to convert themselves to bool.
 type Booler interface {
 
-	// Bool returns the float64 value of the underlying object
+	// Bool returns the bool value of the underlying object
 	Bool() bool
 }
 
@@ -18,6 +18,8 @@ type Floater interface {
 
 // Hexer interface wraps the Hex() method that enables a custom type to convert itself into a hexadecimal string
 type Hexer interface {
+
+	// Hex returns the hexadecimal string value of the underlying object
 	Hex() string
 }
 
@@ -58,7 +60,8 @@ type Nuller interface {
 
 // SliceOfStringer interface wraps the SliceOfStringer() method that enables a custom type to convert itself into a slice of strings
 type SliceOfStringer interface {
-	// SliceOfStringer returns a slice of Stringer objects
+
+	// SliceOfString returns the underlying data structure as a slice of strings
 	SliceOfString() []string
 }
 
@@ -71,6 +74,7 @@ type Stringer interface {
 
 // Timer interface wraps the Time() method that returns the time.Time value of the underlying object
 type Timer interface {
+
 	// Time returns the time.Time value of the underlying object
 	Time() time.Time
 }
@@ -78,6 +82,7 @@ type Timer interface {
 // ToTimer interface wraps the ToTime() method that returns the time.Time value of the underlying object.
 // This is a cheap hack for instances where we can't use the Timer interface
 type ToTimer interface {
-	// Time returns the time.Time value of the underlying object
+
+	// ToTime returns the time.Time value of the underlying object
 	ToTime() time.Time
 }

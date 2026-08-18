@@ -21,6 +21,7 @@ func (b Bool) Bool() bool {
 	return b.value
 }
 
+// String returns "true" or "false" for a present value, or an empty string when null
 func (b Bool) String() string {
 
 	if b.present {

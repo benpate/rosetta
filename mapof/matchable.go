@@ -11,6 +11,8 @@ import (
 
 // Matcher interface wraps the Match method, which allows objects to declare if they match a given predicate
 type Matcher interface {
+
+	// Match returns TRUE if this object matches the provided predicate
 	Match(predicate exp.Predicate) bool
 }
 

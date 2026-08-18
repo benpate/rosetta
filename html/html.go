@@ -6,16 +6,21 @@ import (
 	"unicode/utf8"
 )
 
-var findHTML *regexp.Regexp
-var spaces *regexp.Regexp
-var breaks *regexp.Regexp
-var paragraphs *regexp.Regexp
-var divs *regexp.Regexp
-var headings *regexp.Regexp
-var styles *regexp.Regexp
-var anchors *regexp.Regexp
-var tags *regexp.Regexp
+// Patterns used to recognize and strip HTML markup.  They are compiled once, at
+// startup, because ToText and IsHTML are called on every rendered message.
+var (
+	findHTML   *regexp.Regexp // Matches anything that "looks like" an opening HTML tag
+	spaces     *regexp.Regexp // Matches a run of whitespace
+	breaks     *regexp.Regexp // Matches a <BR> tag
+	paragraphs *regexp.Regexp // Matches a closing </P> tag
+	divs       *regexp.Regexp // Matches a closing </DIV> tag
+	headings   *regexp.Regexp // Matches an opening or closing heading tag (H1-H9)
+	styles     *regexp.Regexp // Matches a <STYLE> element, along with its contents
+	anchors    *regexp.Regexp // Matches an <A> element, capturing its link text
+	tags       *regexp.Regexp // Matches any remaining HTML tag
+)
 
+// init compiles the HTML-matching patterns used throughout this package.
 func init() {
 	findHTML = regexp.MustCompile(`(?i)<[A-Z]+.*?>`)
 	spaces = regexp.MustCompile(`[[:space:]]+`)

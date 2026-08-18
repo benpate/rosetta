@@ -4,8 +4,10 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
+// htmlPolicy sanitizes user-generated HTML, stripping scripts and unsafe elements.
 var htmlPolicy *bluemonday.Policy
 
+// init builds the user-generated-content sanitizer policy.
 func init() {
 	htmlPolicy = bluemonday.UGCPolicy()
 	htmlPolicy.AddTargetBlankToFullyQualifiedLinks(true)

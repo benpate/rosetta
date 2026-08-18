@@ -277,6 +277,7 @@ func setProperty_Integer64(object any, path string, value any) error {
 	return derp.Internal(location, "Target Object must be an Int64Setter or PointerGetter", path, object)
 }
 
+// setProperty_Number writes a float64 value into the named property of the object.
 func setProperty_Number(object any, path string, value any) error {
 
 	const location = "schema.setProperty_Number"
@@ -305,6 +306,7 @@ func setProperty_Number(object any, path string, value any) error {
 	return derp.Internal(location, "Target Object must be a FloatSetter or PointerGetter", path, object)
 }
 
+// setProperty_String writes a string value into the named property of the object.
 func setProperty_String(object any, path string, value any) error {
 
 	const location = "schema.setProperty_String"

@@ -44,6 +44,7 @@ func (runner expressionRunner) Execute(_ schema.Schema, sourceValue any, targetS
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `expression` rule back into its map representation.
 func (runner expressionRunner) MarshalMap() map[string]any {
 	return map[string]any{
 		"expression": runner.ExpressionRaw,
@@ -52,6 +53,7 @@ func (runner expressionRunner) MarshalMap() map[string]any {
 }
 
 // newExpressionRunner returns a fully initialized expressionRunner
+// UnmarshalMap populates this `expression` rule from its map representation.
 func (runner *expressionRunner) UnmarshalMap(data mapof.Any) error {
 
 	return runner.populate(
@@ -60,6 +62,8 @@ func (runner *expressionRunner) UnmarshalMap(data mapof.Any) error {
 	)
 }
 
+// populate assigns the parsed fields of this `expression` rule, and is the one place that
+// both UnmarshalMap and the package constructors go through.
 func (runner *expressionRunner) populate(expression string, target string) error {
 
 	const location = "rosetta.translate.expressionRunner.populate"

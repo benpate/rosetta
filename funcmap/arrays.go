@@ -2,6 +2,7 @@ package funcmap
 
 import "github.com/benpate/rosetta/compare"
 
+// addArraysFuncs registers the array and sequence helpers in the template funcmap.
 func addArraysFuncs(target map[string]any) {
 
 	// array creates an array out of the provided items

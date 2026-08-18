@@ -7,6 +7,7 @@ import (
 	"github.com/benpate/rosetta/sliceof"
 )
 
+// addStringFuncs registers the string manipulation helpers in the template funcmap.
 func addStringFuncs(target map[string]any) {
 
 	target["string"] = func(value any) string {

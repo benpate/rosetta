@@ -51,6 +51,7 @@ func (runner firstRunner) Execute(sourceSchema schema.Schema, sourceValue any, t
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `first` rule back into its map representation.
 func (runner firstRunner) MarshalMap() map[string]any {
 	return map[string]any{
 		"first": runner.TargetPath,
@@ -58,6 +59,7 @@ func (runner firstRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `first` rule from its map representation.
 func (runner *firstRunner) UnmarshalMap(data mapof.Any) error {
 
 	return runner.populate(
@@ -66,6 +68,8 @@ func (runner *firstRunner) UnmarshalMap(data mapof.Any) error {
 	)
 }
 
+// populate assigns the parsed fields of this `first` rule, and is the one place that
+// both UnmarshalMap and the package constructors go through.
 func (runner *firstRunner) populate(target string, rules []map[string]any) error {
 
 	// Parse Rules

@@ -123,6 +123,7 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `forEach` rule back into its map representation.
 func (runner forEachRunner) MarshalMap() map[string]any {
 	return map[string]any{
 		"forEach": runner.SourcePath,
@@ -132,6 +133,7 @@ func (runner forEachRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `forEach` rule from its map representation.
 func (runner *forEachRunner) UnmarshalMap(data mapof.Any) error {
 
 	return runner.populate(
@@ -142,6 +144,8 @@ func (runner *forEachRunner) UnmarshalMap(data mapof.Any) error {
 	)
 }
 
+// populate assigns the parsed fields of this `forEach` rule, and is the one place that
+// both UnmarshalMap and the package constructors go through.
 func (runner *forEachRunner) populate(source string, target string, filter string, rules []map[string]any) error {
 
 	// Populate Filter

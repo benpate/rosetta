@@ -39,6 +39,7 @@ func (runner valueRunner) Execute(_ schema.Schema, _ any, targetSchema schema.Sc
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `value` rule back into its map representation.
 func (runner valueRunner) MarshalMap() map[string]any {
 	return mapof.Any{
 		"value":  runner.Value,
@@ -46,6 +47,7 @@ func (runner valueRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `value` rule from its map representation.
 func (runner *valueRunner) UnmarshalMap(data mapof.Any) error {
 
 	runner.Value = upscale(data.GetAny("value"))

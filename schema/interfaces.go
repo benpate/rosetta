@@ -6,6 +6,8 @@ import "github.com/benpate/rosetta/list"
 // to identify if it contains a null value or not.  This mirrors
 // the null.Nullable interface here, for convenience.
 type Nullable interface {
+
+	// IsNull returns TRUE if this object contains a null value
 	IsNull() bool
 }
 
@@ -192,7 +194,11 @@ type ArraySetter interface {
 
 // ArrayGetterSetter combines the ArrayGetter and ArraySetter interfaces, for objects that can both get and set array values.
 type ArrayGetterSetter interface {
+
+	// ArrayGetter reads values out of the array
 	ArrayGetter
+
+	// ArraySetter writes values into the array
 	ArraySetter
 }
 

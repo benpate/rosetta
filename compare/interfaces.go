@@ -35,7 +35,7 @@ type Stringer interface {
 	String() string
 }
 
-// Length interface wraps the Length() method, that returns the length of an array or map
+// LengthGetter interface wraps the Length() method, that returns the length of an array or map
 type LengthGetter interface {
 
 	// Length returns the length of the array or map

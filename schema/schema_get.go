@@ -12,6 +12,8 @@ func (schema Schema) Get(object any, path string) (any, error) {
 	return getPropertyRecursive(schema.Element, object, path)
 }
 
+// getPropertyRecursive walks the path one segment at a time, descending through the schema
+// and the object together, and returns the value found at the end of the path.
 func getPropertyRecursive(element Element, object any, path string) (any, error) {
 
 	const location = "schema.getPropertyRecursive"
@@ -113,6 +115,7 @@ func getProperty_PointerOnly(object any, name string) (any, error) {
 	return result, nil
 }
 
+// getProperty_Boolean reads a named boolean property from the object.
 func getProperty_Boolean(object any, name string) (any, error) {
 
 	const location = "schema.getProperty_Boolean"

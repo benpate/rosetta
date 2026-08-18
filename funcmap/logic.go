@@ -1,5 +1,6 @@
 package funcmap
 
+// addLogicFuncs registers the boolean and conditional helpers in the template funcmap.
 func addLogicFuncs(target map[string]any) {
 
 	target["iif"] = func(condition bool, trueValue any, falseValue any) any {

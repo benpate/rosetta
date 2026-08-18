@@ -5,8 +5,10 @@ import (
 	"strings"
 )
 
+// whitespace matches a run of one or more whitespace characters.
 var whitespace *regexp.Regexp
 
+// init compiles the whitespace pattern.
 func init() {
 	whitespace = regexp.MustCompile(`\s+`)
 }

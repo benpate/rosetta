@@ -52,6 +52,7 @@ func lookupFormat(name string) (format.Generator, bool) {
 	return fn, ok
 }
 
+// init registers every built-in string format under the name that schemas refer to it by.
 func init() {
 
 	// Calendar

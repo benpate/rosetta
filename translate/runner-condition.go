@@ -66,6 +66,7 @@ func (runner conditionRunner) Execute(sourceSchema schema.Schema, sourceValue an
  * Serialization Methods
  ******************************************/
 
+// MarshalMap converts this `condition` rule back into its map representation.
 func (runner conditionRunner) MarshalMap() map[string]any {
 	return map[string]any{
 		"if":   runner.ConditionRaw,
@@ -74,6 +75,7 @@ func (runner conditionRunner) MarshalMap() map[string]any {
 	}
 }
 
+// UnmarshalMap populates this `condition` rule from its map representation.
 func (runner *conditionRunner) UnmarshalMap(data mapof.Any) error {
 
 	return runner.populate(
@@ -83,6 +85,8 @@ func (runner *conditionRunner) UnmarshalMap(data mapof.Any) error {
 	)
 }
 
+// populate assigns the parsed fields of this `condition` rule, and is the one place that
+// both UnmarshalMap and the package constructors go through.
 func (runner *conditionRunner) populate(condition string, thenRules []map[string]any, elseRules []map[string]any) error {
 
 	const location = "rosetta.translate.conditionRunner.UnmarshalMap"

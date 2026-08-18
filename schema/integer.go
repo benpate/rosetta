@@ -204,6 +204,8 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	return nil
 }
 
+// toInt64 converts any signed or unsigned integer type into an int64, returning FALSE
+// if the value is not an integer at all.
 func toInt64(value any) (int64, bool) {
 	switch typed := value.(type) {
 

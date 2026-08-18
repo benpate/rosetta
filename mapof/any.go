@@ -337,7 +337,7 @@ func (m Any) IsZeroValue(name string) bool {
 	return compare.IsZero(m[name])
 }
 
-// GetSliceofAny returns a named property as a slice of any values
+// GetSliceOfAny returns a named property as a slice of any values
 func (m Any) GetSliceOfAny(name string) []any {
 	return convert.SliceOfAny(m[name])
 }
