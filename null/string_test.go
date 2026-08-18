@@ -164,7 +164,7 @@ func TestString_MarshalJSON_InvalidUTF8(t *testing.T) {
 
 	result, err := value.MarshalJSON()
 	require.Nil(t, err)
-	require.Equal(t, "\"��\"", string(result))
+	require.Equal(t, `"\ufffd\ufffd"`, string(result))
 
 	var restored String
 	require.Nil(t, restored.UnmarshalJSON(result))
@@ -180,7 +180,7 @@ func TestString_MarshalJSON_ControlCharacters(t *testing.T) {
 
 	result, err := value.MarshalJSON()
 	require.Nil(t, err)
-	require.Equal(t, `"tab\tnewline\nnul"`, string(result))
+	require.Equal(t, `"tab\tnewline\nnul\u0000"`, string(result))
 
 	// ...and unlike invalid UTF-8, they survive the round trip intact
 	var restored String
@@ -230,12 +230,17 @@ func TestString_UnmarshalJSON_ErrorKeepsPriorValue(t *testing.T) {
 
 func TestString_UnmarshalJSON_PaddedNull(t *testing.T) {
 
-	// GOTCHA: only the exact literal "null" is recognized.  A padded null is handed to
-	// encoding/json, which rejects it as a string -- so unlike Object[T], String errors here.
+	// GOTCHA: only the EXACT literal "null" is recognized as null.  A padded null falls
+	// through to encoding/json, which skips the whitespace and then treats a JSON null as
+	// a no-op on a string target -- so the value reads back as PRESENT and empty, NOT null.
+	// encoding/json never hands padded literals to UnmarshalJSON, so this only affects
+	// direct calls.  Object[T] has the same blind spot.
 	var value String
 
-	require.NotNil(t, value.UnmarshalJSON([]byte(` null`)))
-	require.True(t, value.IsNull())
+	require.Nil(t, value.UnmarshalJSON([]byte(` null`)))
+	require.True(t, value.IsPresent())
+	require.Equal(t, "", value.String())
+	require.True(t, value.IsZero())
 }
 
 func TestString_UnmarshalJSON_Whitespace(t *testing.T) {

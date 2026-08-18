@@ -84,13 +84,13 @@ func (s String) MarshalJSON() ([]byte, error) {
 	// RULE: encoding/json (not strconv.Quote) does the quoting, so escapes,
 	// invalid UTF-8, and HTML-sensitive runes render exactly as they would
 	// in any other JSON string field.
-	result, err := json.Marshal(s.value)
-
-	if err != nil {
-		return nil, derp.Wrap(err, "null.String.MarshalJSON", "Unable to marshal value", s.value)
-	}
-
-	return result, nil
+	//
+	// Marshalling a string cannot fail: invalid UTF-8 is replaced with U+FFFD rather
+	// than rejected.  The error is therefore passed straight through instead of being
+	// wrapped -- wrapping would decorate an error that cannot happen, and leave behind
+	// a branch no test can reach.  Object[T] DOES wrap, because an arbitrary T can
+	// genuinely fail to marshal.
+	return json.Marshal(s.value)
 }
 
 // UnmarshalJSON implements the json.Unmarshaller interface
