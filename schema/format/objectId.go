@@ -6,10 +6,12 @@ import (
 	"github.com/benpate/derp"
 )
 
+// objectIDPattern matches a 24-character hexadecimal identifier, with or without case.
+// It is compiled once, at package scope, because the constructor below runs on every validation.
+var objectIDPattern = regexp.MustCompile("(?i)^[A-F0-9]{24}$")
+
 // ObjectID validates a mongodb-style identifier (24 hexadecimal characters)
 func ObjectID(arg string) StringFormat {
-
-	objectID := regexp.MustCompile("(?i)^[A-F0-9]{24}$")
 
 	return func(value string) (string, error) {
 
@@ -19,7 +21,7 @@ func ObjectID(arg string) StringFormat {
 		}
 
 		// Non-empty IDs must be 24 hexadecimal characters
-		if objectID.MatchString(value) {
+		if objectIDPattern.MatchString(value) {
 			return value, nil
 		}
 

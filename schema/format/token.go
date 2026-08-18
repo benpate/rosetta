@@ -6,11 +6,13 @@ import (
 	"github.com/benpate/derp"
 )
 
+// tokenPattern matches letters, numbers, dashes, and underscores, case-insensitively.
+// It is compiled once, at package scope: this pattern is by far the most expensive in
+// the package to compile, and the StringFormat constructors below run on EVERY validation.
+var tokenPattern = regexp.MustCompile(`(?i)^[\p{L}\p{N}-_]+$`)
+
 // Token validates a simple token string suitable for use as URL identifiers
 func Token(_ string) StringFormat {
-
-	// A token is a string that contains only letters, numbers, dashes, and underscores. It is case-insensitive.
-	token := regexp.MustCompile(`(?i)^[\p{L}\p{N}-_]+$`)
 
 	return func(value string) (string, error) {
 
@@ -20,7 +22,7 @@ func Token(_ string) StringFormat {
 		}
 
 		// Non-empty IDs must look like a token (characters, numbers, dashes, and underscores)
-		if token.MatchString(value) {
+		if tokenPattern.MatchString(value) {
 			return value, nil
 		}
 
