@@ -83,10 +83,15 @@ func FuzzString_UnmarshalJSON(f *testing.F) {
 	f.Add([]byte(`"hello"`))
 	f.Add([]byte(`"\ud800"`))
 	f.Add([]byte(`"<script>&"`))
+	f.Add([]byte(`"\u0000"`))
+	f.Add([]byte(`"tab\tnewline\n"`))
+	f.Add([]byte("\"\xff\xfe\""))
 	f.Add([]byte(`null`))
 	f.Add([]byte(``))
 	f.Add([]byte(` null`))
 	f.Add([]byte(`123`))
+	f.Add([]byte(`true`))
+	f.Add([]byte(`{"a":1}`))
 	f.Add([]byte(`unquoted`))
 
 	f.Fuzz(func(t *testing.T, data []byte) {
