@@ -88,7 +88,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 			return math.MinInt64, false
 		}
 
-		return int64(v), hasDecimal(float64(v))
+		return int64(v), isWholeNumber(float64(v))
 
 	case float64:
 		if v >= maxInt64AsFloat {
@@ -99,7 +99,7 @@ func Int64Ok(value any, defaultValue int64) (int64, bool) {
 			return math.MinInt64, false
 		}
 
-		return int64(v), hasDecimal(v)
+		return int64(v), isWholeNumber(v)
 
 	case string:
 		if result, err := strconv.ParseInt(v, 10, 64); err == nil {

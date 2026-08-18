@@ -201,9 +201,10 @@ func (schema *Schema) Inherit(parent Schema) {
 
 	if isNil(schema.Element) {
 		schema.Element = parent.Element
-	} else {
-		schema.Element.Inherit(parent.Element)
+		return
 	}
+
+	schema.Element = inheritElement(schema.Element, parent.Element)
 }
 
 // AllProperties returns a flat slice of all properties in this schema

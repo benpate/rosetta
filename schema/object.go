@@ -82,20 +82,34 @@ func (element Object) validateRequiredIf(schema Schema, path list.List, globalVa
 // It inherits properties from the parent element
 func (element Object) Inherit(parent Element) {
 
+	// RULE: Only an Object can pass properties down to another Object
+	parentObject, isObject := parent.(Object)
+
+	if !isObject {
+		return
+	}
+
+	// RULE: Inheritance works by writing through the Properties map, and this value
+	// receiver cannot hand a freshly allocated map back to its caller.  Every call site
+	// inside this package goes through inheritElement, which allocates the map first,
+	// so a nil map here means a caller reached past that and there is nowhere to write.
 	if element.Properties == nil {
-		element.Properties = make(ElementMap)
+		return
 	}
 
 	// Inherit each property from the parent
-	if parentObject, ok := parent.(Object); ok {
-		for propertyName, parentProperty := range parentObject.Properties {
-			if property, ok := element.Properties[propertyName]; ok {
-				property.Inherit(parentProperty)
-				element.Properties[propertyName] = property
-			} else {
-				element.Properties[propertyName] = parentProperty
-			}
+	for propertyName, parentProperty := range parentObject.Properties {
+
+		property, isPresent := element.Properties[propertyName]
+
+		// A property the child does not declare is taken from the parent as-is
+		if !isPresent {
+			element.Properties[propertyName] = parentProperty
+			continue
 		}
+
+		// Otherwise, merge the parent's definition into the child's
+		element.Properties[propertyName] = inheritElement(property, parentProperty)
 	}
 }
 

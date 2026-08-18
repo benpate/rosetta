@@ -111,6 +111,70 @@ func TestSchema_Inherit_ExistingElement(t *testing.T) {
 	require.Contains(t, object.Properties, "b")
 }
 
+// REGRESSION: Object.Inherit has a value receiver, so it cannot allocate a Properties
+// map for its caller.  Inheriting into an Object that declares no properties of its own
+// used to allocate that map on the local copy and discard every inherited property.
+func TestSchema_Inherit_NilProperties(t *testing.T) {
+
+	child := New(Object{})
+	parent := New(Object{Properties: ElementMap{"name": String{MaxLength: 10}}})
+
+	child.Inherit(parent)
+
+	element, ok := child.GetElement("name")
+	require.True(t, ok)
+	require.Equal(t, String{MaxLength: 10}, element)
+}
+
+// REGRESSION: the same silent drop, one level down -- a nested Object that declares no
+// properties of its own.
+func TestSchema_Inherit_NestedNilProperties(t *testing.T) {
+
+	child := New(Object{Properties: ElementMap{"person": Object{}}})
+	parent := New(Object{Properties: ElementMap{
+		"person": Object{Properties: ElementMap{"name": String{MaxLength: 10}}},
+	}})
+
+	child.Inherit(parent)
+
+	element, ok := child.GetElement("person.name")
+	require.True(t, ok)
+	require.Equal(t, String{MaxLength: 10}, element)
+}
+
+// Inheriting into a nested Object that already declares properties keeps both its own
+// properties and the parent's.
+func TestSchema_Inherit_NestedMerge(t *testing.T) {
+
+	child := New(Object{Properties: ElementMap{
+		"person": Object{Properties: ElementMap{"nickname": String{}}},
+	}})
+
+	parent := New(Object{Properties: ElementMap{
+		"person": Object{Properties: ElementMap{"name": String{MaxLength: 10}}},
+	}})
+
+	child.Inherit(parent)
+
+	_, hasNickname := child.GetElement("person.nickname")
+	_, hasName := child.GetElement("person.name")
+	require.True(t, hasNickname)
+	require.True(t, hasName)
+}
+
+// A child property definition wins over the parent's definition of the same name.
+func TestSchema_Inherit_ChildWins(t *testing.T) {
+
+	child := New(Object{Properties: ElementMap{"name": String{MaxLength: 5}}})
+	parent := New(Object{Properties: ElementMap{"name": String{MaxLength: 99}}})
+
+	child.Inherit(parent)
+
+	element, ok := child.GetElement("name")
+	require.True(t, ok)
+	require.Equal(t, String{MaxLength: 5}, element)
+}
+
 func TestSchema_AllProperties(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{"name": String{}}})
 	require.Equal(t, String{}, schema.AllProperties()["name"])

@@ -114,3 +114,18 @@ func TestSlice_RoundTrip(t *testing.T) {
 	require.NoError(t, json.Unmarshal(data, &decoded))
 	require.Equal(t, []string{"a", "b", "c"}, decoded.Tags.Values)
 }
+
+// REGRESSION: NewSlice and Reset both guarantee that Added and Deleted are non-nil.
+// SetValue used to clone Values into Deleted, and slices.Clone returns nil for a nil
+// input, so calling SetValue on a zero-value Slice left Deleted nil.
+func TestSlice_SetValue_ListsStayNotNil(t *testing.T) {
+
+	var s Slice[string] // zero value: Values is nil
+
+	require.NoError(t, s.SetValue([]string{"a"}))
+
+	require.NotNil(t, s.Added)
+	require.NotNil(t, s.Deleted)
+	require.Equal(t, []string{"a"}, s.Added)
+	require.Empty(t, s.Deleted)
+}

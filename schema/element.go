@@ -23,8 +23,10 @@ type Element interface {
 	// getElement returns a named sub-element of this element, if it exists.
 	GetElement(string) (Element, bool)
 
+	// Inherit copies any properties that this element does not define from the parent element
 	Inherit(Element)
 
+	// AllProperties returns a flat map of every property reachable from this element
 	AllProperties() ElementMap
 
 	// validateRequiredIf handles conditional validation of a required field
@@ -37,7 +39,30 @@ type WritableElement interface {
 	// UnmarshalMap tries to populate this object using data from a map[string]any
 	UnmarshalMap(map[string]any) error
 
+	// Element provides the read-only half of the contract
 	Element
+}
+
+// inheritElement merges the parent element into the child, and returns the merged child.
+func inheritElement(child Element, parent Element) Element {
+
+	// An Object inherits by writing through its Properties map, but Inherit has a value
+	// receiver, so it cannot allocate that map on the caller's behalf.  Allocating here --
+	// before delegating -- is what keeps inheritance into an empty Object from being
+	// silently discarded.
+	if object, isObject := child.(Object); isObject {
+
+		if object.Properties == nil {
+			object.Properties = make(ElementMap)
+		}
+
+		object.Inherit(parent)
+		return object
+	}
+
+	// Every other element type inherits in place (all of them are no-ops today)
+	child.Inherit(parent)
+	return child
 }
 
 // UnmarshalJSON tries to parse a []byte into a schema.Element

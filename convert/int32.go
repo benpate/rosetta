@@ -102,7 +102,7 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 			return math.MinInt32, false
 		}
 
-		return int32(v), hasDecimal(float64(v))
+		return int32(v), isWholeNumber(float64(v))
 
 	case float64:
 		if v >= maxInt32AsFloat {
@@ -113,7 +113,7 @@ func Int32Ok(value any, defaultValue int32) (int32, bool) {
 			return math.MinInt32, false
 		}
 
-		return int32(v), hasDecimal(v)
+		return int32(v), isWholeNumber(v)
 
 	case string:
 		result, err := strconv.ParseInt(v, 10, 32)

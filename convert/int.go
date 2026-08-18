@@ -104,7 +104,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 			return math.MinInt, false
 		}
 
-		return int(v), hasDecimal(float64(v))
+		return int(v), isWholeNumber(float64(v))
 
 	case float64:
 		if v >= maxIntAsFloat {
@@ -115,7 +115,7 @@ func IntOk(value any, defaultValue int) (int, bool) {
 			return math.MinInt, false
 		}
 
-		return int(v), hasDecimal(v)
+		return int(v), isWholeNumber(v)
 
 	case string:
 		result, err := strconv.ParseInt(v, 10, 64)

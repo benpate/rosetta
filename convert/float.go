@@ -125,9 +125,10 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 	return defaultValue, false
 }
 
-func hasDecimal(value float64) bool {
-
-	return (value == math.Floor(value))
+// isWholeNumber returns TRUE if the value has no fractional part, meaning it can be
+// converted to an integer without losing precision.
+func isWholeNumber(value float64) bool {
+	return value == math.Floor(value)
 }
 
 // maxExactFloat64Int is 2^53, the largest magnitude for which every integer is
