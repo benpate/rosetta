@@ -75,6 +75,31 @@ func FuzzInt64_UnmarshalJSON(f *testing.F) {
 	})
 }
 
+// FuzzString_UnmarshalJSON feeds arbitrary bytes to String.UnmarshalJSON and asserts that it never
+// panics, and that any value it accepts marshals back to bytes that unmarshal to an equal value.
+func FuzzString_UnmarshalJSON(f *testing.F) {
+
+	f.Add([]byte(`""`))
+	f.Add([]byte(`"hello"`))
+	f.Add([]byte(`"\ud800"`))
+	f.Add([]byte(`"<script>&"`))
+	f.Add([]byte(`null`))
+	f.Add([]byte(``))
+	f.Add([]byte(` null`))
+	f.Add([]byte(`123`))
+	f.Add([]byte(`unquoted`))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+
+		var value String
+		if err := value.UnmarshalJSON(data); err != nil {
+			return
+		}
+
+		assertRoundTrip(t, &value, &String{})
+	})
+}
+
 // FuzzFloat_UnmarshalJSON feeds arbitrary bytes to Float.UnmarshalJSON and asserts that it never
 // panics, and that any value it accepts marshals back to bytes that unmarshal to an equal value.
 func FuzzFloat_UnmarshalJSON(f *testing.F) {
@@ -94,6 +119,31 @@ func FuzzFloat_UnmarshalJSON(f *testing.F) {
 		}
 
 		assertRoundTrip(t, &value, &Float{})
+	})
+}
+
+// FuzzObject_UnmarshalJSON feeds arbitrary bytes to Object.UnmarshalJSON and asserts that it never
+// panics, and that any value it accepts marshals back to bytes that unmarshal to an equal value.
+func FuzzObject_UnmarshalJSON(f *testing.F) {
+
+	f.Add([]byte(`{}`))
+	f.Add([]byte(`{"name":"Han","count":12}`))
+	f.Add([]byte(`{"name":"Han"}`))
+	f.Add([]byte(`{"count":1e999}`))
+	f.Add([]byte(`null`))
+	f.Add([]byte(``))
+	f.Add([]byte(` null`))
+	f.Add([]byte(`[1,2,3]`))
+	f.Add([]byte(`"not-an-object"`))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+
+		var value Object[testObject]
+		if err := value.UnmarshalJSON(data); err != nil {
+			return
+		}
+
+		assertRoundTrip(t, &value, &Object[testObject]{})
 	})
 }
 

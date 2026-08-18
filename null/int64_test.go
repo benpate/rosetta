@@ -69,3 +69,42 @@ func TestNewInt64(t *testing.T) {
 	require.Zero(t, i.Int64())
 	require.Equal(t, "", i.String())
 }
+
+func TestInt64_IsNil(t *testing.T) {
+
+	// IsNil must track IsNull exactly
+	var value Int64
+	require.True(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+
+	value.Set(410)
+	require.False(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+
+	value.Unset()
+	require.True(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+}
+
+func TestInt64_IsZero(t *testing.T) {
+
+	// A null value is always zero
+	var value Int64
+	require.True(t, value.IsZero())
+
+	// A present-but-zero value is ALSO zero
+	value.Set(0)
+	require.True(t, value.IsZero())
+	require.True(t, value.IsPresent())
+
+	// A present, non-zero value is not
+	value.Set(410)
+	require.False(t, value.IsZero())
+
+	value.Unset()
+	require.True(t, value.IsZero())
+
+	// The constructors agree
+	require.True(t, NewInt64(0).IsZero())
+	require.False(t, NewInt64(410).IsZero())
+}

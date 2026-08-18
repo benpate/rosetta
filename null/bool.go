@@ -61,6 +61,22 @@ func (b Bool) IsNull() bool {
 	return !b.present
 }
 
+// IsNil returns TRUE if this value is null.  It is an alias for IsNull
+func (b Bool) IsNil() bool {
+	return b.IsNull()
+}
+
+// IsZero returns TRUE if this value is null, or contains the zero value for its data type
+func (b Bool) IsZero() bool {
+
+	// A null value is always zero
+	if b.IsNull() {
+		return true
+	}
+
+	return !b.value
+}
+
 // IsPresent returns TRUE if this value is present
 func (b Bool) IsPresent() bool {
 	return b.present

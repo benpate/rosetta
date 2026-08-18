@@ -52,6 +52,22 @@ func (i Int64) IsNull() bool {
 	return !i.present
 }
 
+// IsNil returns TRUE if this value is null.  It is an alias for IsNull
+func (i Int64) IsNil() bool {
+	return i.IsNull()
+}
+
+// IsZero returns TRUE if this value is null, or contains the zero value for its data type
+func (i Int64) IsZero() bool {
+
+	// A null value is always zero
+	if i.IsNull() {
+		return true
+	}
+
+	return i.value == 0
+}
+
 // Interface returns the int value (if present) or NIL
 func (i Int64) Interface() any {
 

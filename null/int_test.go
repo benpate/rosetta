@@ -69,3 +69,42 @@ func TestNewInt(t *testing.T) {
 	require.Zero(t, i.Int())
 	require.Equal(t, "", i.String())
 }
+
+func TestInt_IsNil(t *testing.T) {
+
+	// IsNil must track IsNull exactly
+	var value Int
+	require.True(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+
+	value.Set(410)
+	require.False(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+
+	value.Unset()
+	require.True(t, value.IsNil())
+	require.Equal(t, value.IsNull(), value.IsNil())
+}
+
+func TestInt_IsZero(t *testing.T) {
+
+	// A null value is always zero
+	var value Int
+	require.True(t, value.IsZero())
+
+	// A present-but-zero value is ALSO zero
+	value.Set(0)
+	require.True(t, value.IsZero())
+	require.True(t, value.IsPresent())
+
+	// A present, non-zero value is not
+	value.Set(410)
+	require.False(t, value.IsZero())
+
+	value.Unset()
+	require.True(t, value.IsZero())
+
+	// The constructors agree
+	require.True(t, NewInt(0).IsZero())
+	require.False(t, NewInt(410).IsZero())
+}

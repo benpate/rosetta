@@ -8,9 +8,10 @@ import (
 )
 
 type testValue struct {
-	Int   Int   `json:"int"`
-	Float Float `json:"float"`
-	Bool  Bool  `json:"bool"`
+	Int    Int    `json:"int"`
+	Float  Float  `json:"float"`
+	Bool   Bool   `json:"bool"`
+	String String `json:"string"`
 }
 
 func TestUnmarshal_Empty(t *testing.T) {
@@ -25,18 +26,20 @@ func TestUnmarshal_Empty(t *testing.T) {
 	require.False(t, value.Int.present)
 	require.False(t, value.Float.present)
 	require.False(t, value.Bool.present)
+	require.False(t, value.String.present)
 
 	// Test zero values
 	require.Zero(t, value.Int.Int())
 	require.Zero(t, value.Float.Float())
 	require.False(t, value.Bool.Bool())
+	require.Zero(t, value.String.String())
 }
 
 func TestUnmarshal_Nulls(t *testing.T) {
 
 	var value testValue
 
-	j := []byte(`{"int": null, "float": null, "bool":null}`)
+	j := []byte(`{"int": null, "float": null, "bool":null, "string":null}`)
 
 	err := json.Unmarshal(j, &value)
 
@@ -44,19 +47,23 @@ func TestUnmarshal_Nulls(t *testing.T) {
 	require.False(t, value.Int.present)
 	require.False(t, value.Float.present)
 	require.False(t, value.Bool.present)
+	require.False(t, value.String.present)
 }
 
 func TestUnmarshal_Full(t *testing.T) {
 
 	var value testValue
 
-	j := []byte(`{"int": 1, "float": 3.14, "bool":true}`)
+	j := []byte(`{"int": 1, "float": 3.14, "bool":true, "string":"Watson"}`)
 
 	err := json.Unmarshal(j, &value)
 
 	require.Nil(t, err)
 	require.True(t, value.Int.present)
 	require.Equal(t, 1, value.Int.Int())
+
+	require.True(t, value.String.present)
+	require.Equal(t, "Watson", value.String.String())
 
 	require.True(t, value.Float.present)
 	require.Equal(t, 3.14, value.Float.Float())
@@ -117,6 +124,19 @@ func TestUnmarshal_ErrorBool(t *testing.T) {
 	require.False(t, value.Bool.present)
 }
 
+func TestUnmarshal_ErrorString(t *testing.T) {
+
+	var value testValue
+
+	// A bare number is not coerced into text
+	j := []byte(`{"string": 123}`)
+
+	err := json.Unmarshal(j, &value)
+
+	require.NotNil(t, err)
+	require.False(t, value.String.present)
+}
+
 func TestMarshal_Empty(t *testing.T) {
 
 	var value testValue
@@ -124,7 +144,7 @@ func TestMarshal_Empty(t *testing.T) {
 	result, err := json.Marshal(value)
 
 	require.Nil(t, err)
-	require.Equal(t, `{"int":null,"float":null,"bool":null}`, string(result))
+	require.Equal(t, `{"int":null,"float":null,"bool":null,"string":null}`, string(result))
 }
 
 func TestMarshal_Full(t *testing.T) {
@@ -134,11 +154,12 @@ func TestMarshal_Full(t *testing.T) {
 	value.Int.Set(1)
 	value.Float.Set(3.14)
 	value.Bool.Set(true)
+	value.String.Set("Watson")
 
 	result, err := json.Marshal(value)
 
 	require.Nil(t, err)
-	require.Equal(t, `{"int":1,"float":3.14,"bool":true}`, string(result))
+	require.Equal(t, `{"int":1,"float":3.14,"bool":true,"string":"Watson"}`, string(result))
 }
 
 func TestMarshal_Alt(t *testing.T) {
@@ -148,9 +169,10 @@ func TestMarshal_Alt(t *testing.T) {
 	value.Int.Set(1)
 	value.Float.Set(3.14)
 	value.Bool.Set(false)
+	value.String.Set("")
 
 	result, err := json.Marshal(value)
 
 	require.Nil(t, err)
-	require.Equal(t, `{"int":1,"float":3.14,"bool":false}`, string(result))
+	require.Equal(t, `{"int":1,"float":3.14,"bool":false,"string":""}`, string(result))
 }
