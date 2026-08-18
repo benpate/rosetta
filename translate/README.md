@@ -2,7 +2,7 @@
 
 A JSON-defined mapping engine that copies and transforms data from a source object into a target object. A `Pipeline` is an ordered list of `Rule`s; `pipeline.Execute(inSchema, inObject, outSchema, outObject)` runs them in order. Both objects are accessed through [schema](../schema/) Getter/Setter interfaces, so the easiest carriers are [mapof.Any](../mapof/) values, which implement those interfaces already. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/translate)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/translate.svg)](https://pkg.go.dev/github.com/benpate/rosetta/translate)
 
 ## Rule types
 

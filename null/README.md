@@ -2,7 +2,7 @@
 
 Nullable types for Go: the scalars `null.Bool`, `null.String`, `null.Int`, `null.Int64`, and `null.Float`, plus the generic `null.Object[T]` for everything else. Each is a struct carrying a value plus a `present` flag, so it distinguishes "absent/null" from "present-but-zero". All satisfy the `Nullable` interface (`IsNull() bool`, aliased as `IsNil()`) and implement JSON marshal/unmarshal. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/null)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/null.svg)](https://pkg.go.dev/github.com/benpate/rosetta/null)
 
 ```go
 // A zero-value null.Bool is null and ready to use — no constructor needed

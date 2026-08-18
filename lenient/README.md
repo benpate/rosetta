@@ -2,7 +2,7 @@
 
 Scalar types that are forgiving about how a remote system encodes them: `lenient.Int64` and `lenient.String`. They exist for the receiving half of Postel's law — be conservative in what you send, be liberal in what you accept. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/lenient)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/lenient.svg)](https://pkg.go.dev/github.com/benpate/rosetta/lenient)
 
 A plain `int64` field fails an *entire document* the first time a peer sends `"480"` instead of `480`. Swap in `lenient.Int64` and that document parses, along with every other numeric spelling in the wild — quoted integers, floats, nulls, empty strings, `"100%"`. `lenient.String` does the same for text fields that peers sometimes send as bare numbers or booleans, which is how oEmbed's `"version": 1.0` arrives from SoundCloud.
 

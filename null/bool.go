@@ -1,4 +1,3 @@
-// Package null provides nullable wrappers around Go primitive types
 package null
 
 import "github.com/benpate/derp"

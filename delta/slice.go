@@ -1,4 +1,3 @@
-// Package delta provides collection types that track their own additions and deletions
 package delta
 
 import (

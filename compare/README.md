@@ -2,7 +2,7 @@
 
 Comparison helpers for values of different or unknown data types. `Interface(a, b)` coerces two arbitrary values to a common kind and returns `-1`/`0`/`1`; `WithOperator(a, op, b)` evaluates a named operator (`greater-than`, `contains`, `begins-with`, …) to a bool. Typed helpers (`Int`/`Int8`/…/`Int64`, `Float32`/`Float64`, `String`, `BeginsWith`, `Contains`, `EndsWith`) cover the known-type cases. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/compare)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/compare.svg)](https://pkg.go.dev/github.com/benpate/rosetta/compare)
 
 ## What matters here
 

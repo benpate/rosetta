@@ -2,7 +2,7 @@
 
 Utilities for manipulating HTML content: `FromText` (plain text → lightly-formatted, escaped HTML), `ToText`/`ToSearchText` (strip markup back to text), `Minimal` (sanitize to a small allow-list of tags), `Summary` (a short plain-text excerpt), `RemoveTags`/`RemoveAnchors`/`RemoveSpecialCharacters`, `CollapseWhitespace`, and `IsHTML`. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/html)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/html.svg)](https://pkg.go.dev/github.com/benpate/rosetta/html)
 
 ## What matters here
 

@@ -2,7 +2,7 @@
 
 A fast, minimal subset of [JSON-Schema](http://json-schema.org). It unmarshals a schema from JSON, validates values against Array/Boolean/Integer/Number/Object/String element types (with custom string [formats](./format/)), and reads/writes data through a schema by [JSON-Pointer](https://tools.ietf.org/html/rfc6901) path. This is the heart of [rosetta](../README.md) — the engine that lets dynamic data (form inputs, CMS records) be typed and validated at runtime. If you need a complete, rigorous JSON-Schema implementation, use another tool.
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/schema)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/schema.svg)](https://pkg.go.dev/github.com/benpate/rosetta/schema)
 
 **Included:** unmarshal-from-JSON, the six element-type validators, custom `Format` rules, and a happy API for walking the schema tree and getting/setting data by path. **Left out:** `$ref` references and loading remote schemas by URI.
 

@@ -2,7 +2,7 @@
 
 Best-effort coercion between arbitrary Go types. Scalar converters (`Bool`, `Int`, `Int32`, `Int64`, `Float`, `String`, `Time`, `Bytes`) plus container converters (`SliceOfString`, `SliceOfInt`, `MapOfAny`, …) and generic pointer helpers (`Pointer[T]`, `Element[T]`). Each scalar has plain, `Default`, and `…Ok` variants. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/convert)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/convert.svg)](https://pkg.go.dev/github.com/benpate/rosetta/convert)
 
 ## What matters here
 

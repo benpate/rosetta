@@ -2,7 +2,7 @@
 
 Treats a *delimited string* as a list, without ever allocating a `[]string`. Generic free functions (`Head`, `Tail`, `First`, `Last`, `Split`, `SplitTail`, `At`, `PushHead`, `PushTail`, `RemoveLast`, `Index`, `LastIndex`, `IsEmpty`) operate on any `~string | []byte` value plus a delimiter byte. Named wrapper types (`Comma`, `Dot`, `Slash`, `Semicolon`, `Space`) bind a delimiter so you can call the same operations as methods. Part of [rosetta](../README.md).
 
-[![GoDoc](https://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://pkg.go.dev/github.com/benpate/rosetta/list)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/list.svg)](https://pkg.go.dev/github.com/benpate/rosetta/list)
 
 ## What matters here
 

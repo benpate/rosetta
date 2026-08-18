@@ -1,4 +1,3 @@
-// Package format provides validation functions for the string formats used by the schema package
 package format
 
 import (

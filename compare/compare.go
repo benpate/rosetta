@@ -1,4 +1,3 @@
-// Package compare provides functions for comparing values of arbitrary types
 package compare
 
 import (
