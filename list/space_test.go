@@ -137,3 +137,14 @@ func TestSpace_Split(t *testing.T) {
 func TestSpace_String(t *testing.T) {
 	require.Equal(t, "mystring", Space("mystring").String())
 }
+
+func TestSpace_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a b c"), BySpace("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Space("solo").Bytes())
+	require.Equal(t, []byte(""), Space("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := BySpace("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

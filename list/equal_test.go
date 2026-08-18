@@ -137,3 +137,14 @@ func TestEqual_Split(t *testing.T) {
 func TestEqual_String(t *testing.T) {
 	require.Equal(t, "mystring", Equal("mystring").String())
 }
+
+func TestEqual_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a=b=c"), ByEqual("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Equal("solo").Bytes())
+	require.Equal(t, []byte(""), Equal("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := ByEqual("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

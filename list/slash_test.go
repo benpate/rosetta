@@ -137,3 +137,14 @@ func TestSlash_Split(t *testing.T) {
 func TestSlash_String(t *testing.T) {
 	require.Equal(t, "mystring", Slash("mystring").String())
 }
+
+func TestSlash_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a/b/c"), BySlash("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Slash("solo").Bytes())
+	require.Equal(t, []byte(""), Slash("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := BySlash("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

@@ -42,3 +42,26 @@ func TestContainsAll(t *testing.T) {
 	require.False(t, ContainsAll([]string{"a", "b", "c"}, "b", "c", "d"))
 	require.False(t, ContainsAll([]string{"a", "b", "c"}, "1", "2"))
 }
+
+// NotContains is the exact inverse of Contains, for every input.
+func TestNotContains(t *testing.T) {
+
+	require.False(t, NotContains([]string{"a", "b", "c"}, "a"))
+	require.False(t, NotContains([]string{"a", "b", "c"}, "c"))
+	require.True(t, NotContains([]string{"a", "b", "c"}, "d"))
+	require.True(t, NotContains([]string{"a", "b", "c"}, ""))
+	require.True(t, NotContains([]string{}, "a"))
+	require.True(t, NotContains(nil, "a"))
+
+	// The zero value is found when it is genuinely present
+	require.False(t, NotContains([]string{"a", ""}, ""))
+	require.False(t, NotContains([]int{0}, 0))
+
+	inputs := [][]int{nil, {}, {0}, {1, 2, 3}, {5, 5, 5}}
+	for _, input := range inputs {
+		for _, value := range []int{0, 1, 5, -1} {
+			require.Equal(t, !Contains(input, value), NotContains(input, value),
+				"NotContains must invert Contains for slice %v, value %d", input, value)
+		}
+	}
+}

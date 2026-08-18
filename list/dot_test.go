@@ -137,3 +137,14 @@ func TestDot_Split(t *testing.T) {
 func TestDot_String(t *testing.T) {
 	require.Equal(t, "mystring", Dot("mystring").String())
 }
+
+func TestDot_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a.b.c"), ByDot("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Dot("solo").Bytes())
+	require.Equal(t, []byte(""), Dot("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := ByDot("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

@@ -137,3 +137,14 @@ func TestSemicolon_Split(t *testing.T) {
 func TestSemicolon_String(t *testing.T) {
 	require.Equal(t, "mystring", Semicolon("mystring").String())
 }
+
+func TestSemicolon_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a;b;c"), BySemicolon("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Semicolon("solo").Bytes())
+	require.Equal(t, []byte(""), Semicolon("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := BySemicolon("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

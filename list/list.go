@@ -97,6 +97,9 @@ func Split[T Stringlike](value T, delimiter byte) (string, T) {
 }
 
 // SplitTail behaves like split, but splits the beginning of the list from the last item in the list.  So, the list "a,b,c" => "a,b", "c"
+// A list with no delimiter at all keeps the whole value as the leading list and returns an empty
+// last item ("photo" => "photo", ""), which is what callers splitting a filename from its
+// extension rely on.  Note this is NOT the RemoveLast/Last decomposition, which would give "", "photo".
 func SplitTail[T Stringlike](value T, delimiter byte) (T, string) {
 
 	index := LastIndex(value, delimiter)

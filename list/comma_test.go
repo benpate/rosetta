@@ -145,3 +145,14 @@ func TestComma_Split(t *testing.T) {
 func TestComma_String(t *testing.T) {
 	require.Equal(t, "mystring", Comma("mystring").String())
 }
+
+func TestComma_Bytes(t *testing.T) {
+
+	require.Equal(t, []byte("a,b,c"), ByComma("a", "b", "c").Bytes())
+	require.Equal(t, []byte("solo"), Comma("solo").Bytes())
+	require.Equal(t, []byte(""), Comma("").Bytes())
+
+	// Bytes and String must describe the same list
+	list := ByComma("x", "y")
+	require.Equal(t, []byte(list.String()), list.Bytes())
+}

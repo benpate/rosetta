@@ -117,6 +117,70 @@ func FuzzCollapseWhitespace(f *testing.F) {
 	})
 }
 
+// FuzzMinimal asserts what Minimal is actually FOR: the sanitized result must never carry a
+// script-bearing element, an inline event handler, or a javascript: URL. FuzzHTMLDecoders only
+// confirms it does not panic, which would still hold if the policy stopped sanitizing entirely.
+func FuzzMinimal(f *testing.F) {
+	addHTMLSeeds(f)
+	f.Add("<img src=x onerror=alert(1)>")
+	f.Add("<iframe src=\"evil\"></iframe>")
+	f.Add("<a href=\"javascript:alert(1)\">x</a>")
+	f.Add("<a href=\"JaVaScRiPt:alert(1)\">x</a>")
+	f.Add("<script>alert(1)</script>")
+	f.Add("<svg onload=alert(1)>")
+	f.Add("<object data=\"evil\"></object>")
+	f.Add("<body onload=alert(1)>")
+
+	// forbidden are substrings that must never appear INSIDE A TAG of the sanitized output.
+	// The check is scoped to tag spans on purpose: bluemonday escapes `<` in text content to
+	// `&lt;`, so a literal `<` in the output always opens a real tag, while the bare words
+	// "onerror" or "javascript:" appearing as ordinary prose are harmless and must not fail.
+	// Compared lower-cased so mixed-case evasion (`JaVaScRiPt:`) is caught too.
+	forbidden := []string{
+		"script", "style", "iframe", "object", "embed", "svg", "link", "meta", "base",
+		"onerror", "onload", "onclick", "onmouseover", "onfocus", "javascript:",
+	}
+
+	f.Fuzz(func(t *testing.T, html string) {
+
+		result := strings.ToLower(Minimal(html))
+
+		for _, tag := range tagSpans(result) {
+			for _, needle := range forbidden {
+				if strings.Contains(tag, needle) {
+					t.Fatalf("Minimal(%q) = %q, whose tag %q contains %q", html, result, tag, needle)
+				}
+			}
+		}
+	})
+}
+
+// tagSpans returns every `<...>` span in the value, which for sanitizer output is exactly the
+// set of real tags -- text content can no longer contain a literal `<`.
+func tagSpans(value string) []string {
+
+	result := make([]string, 0)
+
+	for index := 0; index < len(value); index++ {
+
+		if value[index] != '<' {
+			continue
+		}
+
+		end := strings.IndexByte(value[index:], '>')
+
+		if end == -1 {
+			result = append(result, value[index:])
+			break
+		}
+
+		result = append(result, value[index:index+end+1])
+		index = index + end
+	}
+
+	return result
+}
+
 // FuzzHTMLDecoders is a no-panic + valid-UTF-8 sweep over the remaining HTML helpers, all of which
 // accept untrusted markup.
 func FuzzHTMLDecoders(f *testing.F) {
