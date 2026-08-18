@@ -28,6 +28,8 @@ func TestMapOfAny_Manipulations(t *testing.T) {
 	require.Equal(t, "alpha", x.First().GetString("name"))
 	require.Equal(t, "charlie", x.Last().GetString("name"))
 	require.Equal(t, 2, x.FirstN(2).Length())
+	require.Equal(t, 3, x.FirstN(99).Length()) // n greater than length returns all
+	require.Equal(t, 0, x.FirstN(-1).Length()) // a negative n returns an empty slice
 	require.Equal(t, "bravo", x.At(1).GetString("name"))
 
 	value, ok := x.AtOK(2)

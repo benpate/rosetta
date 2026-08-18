@@ -141,3 +141,22 @@ func test_mapOfAny_GroupValues() MapOfAny {
 		},
 	}
 }
+
+func TestMapOfAny_GroupFooter_FirstElementClosesItsGroup(t *testing.T) {
+
+	// A single element is both the header AND the footer of its group
+	single := MapOfAny{{"group": "a"}}.GroupBy("group")
+	require.True(t, single.IsHeader(0))
+	require.True(t, single.IsFooter(0), "the only element must close its group")
+
+	// So is element 0 when element 1 starts a different group
+	pair := MapOfAny{{"group": "a"}, {"group": "b"}}.GroupBy("group")
+	require.True(t, pair.IsHeader(0))
+	require.True(t, pair.IsFooter(0), "element 0 ends its group when element 1 differs")
+	require.True(t, pair.IsHeader(1))
+	require.True(t, pair.IsFooter(1))
+
+	// A negative index is still never a footer
+	require.False(t, single.IsFooter(-1))
+	require.False(t, pair.IsFooter(-1))
+}

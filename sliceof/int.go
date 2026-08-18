@@ -60,8 +60,14 @@ func (x Int) First() int {
 	return 0
 }
 
-// FirstN returns the first "n" elements in the slice, or all elements if "n" is greater than the length of the slice
+// FirstN returns the first "n" elements in the slice, or all elements if "n" is greater than the length of the slice.  A negative "n" returns an empty slice.
 func (x Int) FirstN(n int) Int {
+
+	// A negative count would panic the slice expression below
+	if n < 0 {
+		n = 0
+	}
+
 	if n > len(x) {
 		n = len(x)
 	}

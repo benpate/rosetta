@@ -19,6 +19,8 @@ func TestFloat_Manipulations(t *testing.T) {
 	require.Equal(t, 1.0, x.First())
 	require.Equal(t, 3.0, x.Last())
 	require.Equal(t, Float{1.0, 2.0}, x.FirstN(2))
+	require.Equal(t, x, x.FirstN(99))       // n greater than length returns all
+	require.Equal(t, Float{}, x.FirstN(-1)) // a negative n returns an empty slice
 	require.Equal(t, 2.0, x.At(1))
 	require.Equal(t, 0.0, x.At(99))
 }

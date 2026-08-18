@@ -18,6 +18,9 @@ func TestString_Manipulations(t *testing.T) {
 
 	require.Equal(t, "a", x.First())
 	require.Equal(t, "c", x.Last())
+	require.Equal(t, String{"a", "b"}, x.FirstN(2))
+	require.Equal(t, x, x.FirstN(99))        // n greater than length returns all
+	require.Equal(t, String{}, x.FirstN(-1)) // a negative n returns an empty slice
 	require.Equal(t, "b", x.At(1))
 	require.Equal(t, "", x.At(99))
 }

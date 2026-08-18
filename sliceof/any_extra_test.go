@@ -19,6 +19,8 @@ func TestAny_Manipulations(t *testing.T) {
 	require.Equal(t, any(1), x.First())
 	require.Equal(t, any(4), x.Last())
 	require.Equal(t, Any{1, 2}, x.FirstN(2))
+	require.Equal(t, x, x.FirstN(99))     // n greater than length returns all
+	require.Equal(t, Any{}, x.FirstN(-1)) // a negative n returns an empty slice
 	require.Equal(t, any(3), x.At(2))
 	require.Nil(t, x.At(99))
 }

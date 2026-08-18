@@ -42,7 +42,9 @@ func (grouper ObjectGrouper[T]) IsHeader(index int) bool {
 // IsFooter returns TRUE if the record at the given index is the LAST item in a group
 func (grouper ObjectGrouper[T]) IsFooter(index int) bool {
 
-	if index <= 0 {
+	// Index 0 IS a footer when it is the last element of its group,
+	// so only a NEGATIVE index can be rejected out of hand
+	if index < 0 {
 		return false
 	}
 

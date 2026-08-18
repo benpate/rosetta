@@ -19,6 +19,8 @@ func TestObject_Manipulations(t *testing.T) {
 	require.Equal(t, 1, x.First())
 	require.Equal(t, 4, x.Last())
 	require.Equal(t, Object[int]{1, 2}, x.FirstN(2))
+	require.Equal(t, x, x.FirstN(99))             // n greater than length returns all
+	require.Equal(t, Object[int]{}, x.FirstN(-1)) // a negative n returns an empty slice
 	require.Equal(t, 3, x.At(2))
 	require.Equal(t, 0, x.At(99))
 
