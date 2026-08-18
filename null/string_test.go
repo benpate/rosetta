@@ -145,3 +145,106 @@ func TestString_UnmarshalJSON(t *testing.T) {
 	require.NotNil(t, value.UnmarshalJSON([]byte(`true`)))
 	require.NotNil(t, value.UnmarshalJSON([]byte(`{"a":1}`)))
 }
+
+func TestString_Nullable(t *testing.T) {
+
+	// String must satisfy the Nullable interface
+	var value Nullable = String{}
+	require.True(t, value.IsNull())
+
+	value = NewString("")
+	require.False(t, value.IsNull(), "a present-but-empty string is not null")
+}
+
+func TestString_MarshalJSON_InvalidUTF8(t *testing.T) {
+
+	// GOTCHA: encoding/json replaces invalid UTF-8 with U+FFFD rather than failing,
+	// so a String holding raw bytes does NOT survive a marshal/unmarshal round trip.
+	value := NewString("\xff\xfe")
+
+	result, err := value.MarshalJSON()
+	require.Nil(t, err)
+	require.Equal(t, "\"��\"", string(result))
+
+	var restored String
+	require.Nil(t, restored.UnmarshalJSON(result))
+	require.True(t, restored.IsPresent())
+	require.Equal(t, "��", restored.String())
+	require.NotEqual(t, value.String(), restored.String(), "the raw bytes are lost, not preserved")
+}
+
+func TestString_MarshalJSON_ControlCharacters(t *testing.T) {
+
+	// Control characters are escaped, so the output is always a legal JSON string
+	value := NewString("tab\tnewline\nnul\x00")
+
+	result, err := value.MarshalJSON()
+	require.Nil(t, err)
+	require.Equal(t, `"tab\tnewline\nnul"`, string(result))
+
+	// ...and unlike invalid UTF-8, they survive the round trip intact
+	var restored String
+	require.Nil(t, restored.UnmarshalJSON(result))
+	require.Equal(t, value.String(), restored.String())
+}
+
+func TestString_MarshalJSON_Unicode(t *testing.T) {
+
+	// Valid multi-byte runes pass through unescaped and round-trip exactly
+	value := NewString("héllo wörld \U0001F389")
+
+	result, err := value.MarshalJSON()
+	require.Nil(t, err)
+	require.Equal(t, "\"héllo wörld \U0001F389\"", string(result))
+
+	var restored String
+	require.Nil(t, restored.UnmarshalJSON(result))
+	require.Equal(t, value.String(), restored.String())
+}
+
+func TestString_UnmarshalJSON_Escapes(t *testing.T) {
+
+	var value String
+
+	// Escape sequences are decoded, not preserved literally
+	require.Nil(t, value.UnmarshalJSON([]byte(`"line\nbreak"`)))
+	require.Equal(t, "line\nbreak", value.String())
+
+	require.Nil(t, value.UnmarshalJSON([]byte(`"Aé"`)))
+	require.Equal(t, "Aé", value.String())
+
+	// An unpaired surrogate escape decodes to the replacement character
+	require.Nil(t, value.UnmarshalJSON([]byte(`"\ud800"`)))
+	require.Equal(t, "�", value.String())
+}
+
+func TestString_UnmarshalJSON_ErrorKeepsPriorValue(t *testing.T) {
+
+	// A failed parse leaves the previous value untouched (matching the other null types)
+	value := NewString("keep me")
+
+	require.NotNil(t, value.UnmarshalJSON([]byte(`123`)))
+	require.True(t, value.IsPresent())
+	require.Equal(t, "keep me", value.String())
+}
+
+func TestString_UnmarshalJSON_PaddedNull(t *testing.T) {
+
+	// GOTCHA: only the exact literal "null" is recognized.  A padded null is handed to
+	// encoding/json, which rejects it as a string -- so unlike Object[T], String errors here.
+	var value String
+
+	require.NotNil(t, value.UnmarshalJSON([]byte(` null`)))
+	require.True(t, value.IsNull())
+}
+
+func TestString_UnmarshalJSON_Whitespace(t *testing.T) {
+
+	// Whitespace INSIDE the quotes is content, and is preserved exactly
+	var value String
+
+	require.Nil(t, value.UnmarshalJSON([]byte(`"   "`)))
+	require.True(t, value.IsPresent())
+	require.False(t, value.IsZero())
+	require.Equal(t, "   ", value.String())
+}
