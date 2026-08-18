@@ -121,9 +121,10 @@ func (s *Slice[T]) SetValue(value any) error {
 		newValues = make([]T, 0)
 	}
 
-	// Reset added/deleted lists
+	// Reset added/deleted lists.  Deleted must be a COPY of the previous values: the loop
+	// below compacts it in place, which would otherwise write through to the caller's slice.
 	s.Added = make([]T, 0)
-	s.Deleted = s.Values
+	s.Deleted = slices.Clone(s.Values)
 	s.Values = newValues
 
 	// Find all values that are in the new list, but not in the existing list
