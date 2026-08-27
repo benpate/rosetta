@@ -62,14 +62,22 @@ func TestSlice_Reset(t *testing.T) {
 	require.Equal(t, []int{}, s.Deleted)
 }
 
+// TestSlice_SetValue_WrongType confirms that a value that cannot be read as a collection of
+// T is REPORTED, and that the Slice is left exactly as it was.  Quietly swallowing the
+// mismatch (and clearing the values) is what let a broken multiselect wipe its field, and
+// populate Deleted, without anything upstream noticing.
 func TestSlice_SetValue_WrongType(t *testing.T) {
 
 	s := NewSlice[int](1, 2, 3)
 
-	// A value of the wrong type is treated as an empty slice
-	require.NoError(t, s.SetValue("not a slice"))
-	require.Equal(t, []int{}, s.Values)
-	require.Equal(t, []int{1, 2, 3}, s.Deleted)
+	// A channel is not a collection, and convert cannot render it as one
+	require.Error(t, s.SetValue(make(chan int)))
+
+	// Nothing moved: the values survive, and no phantom diff was recorded
+	require.Equal(t, []int{1, 2, 3}, s.Values)
+	require.Equal(t, []int{}, s.Added)
+	require.Equal(t, []int{}, s.Deleted)
+	require.False(t, s.IsChanged())
 }
 
 func TestSlice_MarshalJSON(t *testing.T) {

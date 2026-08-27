@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/slice"
 )
 
@@ -114,11 +115,30 @@ func (s *Slice[T]) SetIndex(index int, value any) bool {
 // tracking changes to the added and deleted lists.
 func (s *Slice[T]) SetValue(value any) error {
 
-	newValues, ok := value.([]T)
+	const location = "delta.Slice.SetValue"
 
-	if !ok {
-		newValues = make([]T, 0)
+	// The value is CONVERTED, never asserted: multi-value form widgets hand rosetta a
+	// *sliceof.String rather than a plain []T, since that is the only shape satisfying the
+	// ArrayGetterSetter validation schema.validate_Array requires. A strict assertion here
+	// silently discarded every one of those writes.
+
+	// RULE: A nil value clears the slice. convert reports nil as unconvertible, but an
+	// absent value is a legitimate way to say "nothing is selected any more".
+	if value == nil {
+		value = make([]T, 0)
 	}
+
+	// RULE: Refuse a value that is not a collection BEFORE touching any state, so that it
+	// leaves this Slice -- and its change lists -- exactly as they were. SliceOfAnyOk answers
+	// the question without converting anything, so it cannot confuse "lossy" with "no good".
+	if _, isCollection := convert.SliceOfAnyOk(value); !isCollection {
+		return derp.BadRequest(location, "Unable to convert value into a slice", value)
+	}
+
+	// A LOSSY conversion is kept: whatever convert can render is a value this Slice will hold.
+	// The lossless flag is deliberately discarded -- refusing on it would reject usable input
+	// like a float rendered to two decimal places.
+	newValues := convert.SliceOf[T](value)
 
 	// Reset added/deleted lists.  Deleted must be a COPY of the previous values: the loop
 	// below compacts it in place, which would otherwise write through to the caller's slice.
@@ -126,7 +146,11 @@ func (s *Slice[T]) SetValue(value any) error {
 	// input) keeps both lists non-nil, matching what NewSlice and Reset guarantee.
 	s.Added = make([]T, 0)
 	s.Deleted = append(make([]T, 0, len(s.Values)), s.Values...)
-	s.Values = newValues
+
+	// RULE: Values must also be a COPY. The caller's slice reaches us straight from a
+	// url.Values entry (by way of form.schemaSafeValue), and must never become the
+	// backing array that this object goes on to mutate.
+	s.Values = append(make([]T, 0, len(newValues)), newValues...)
 
 	// Find all values that are in the new list, but not in the existing list
 	for _, newValue := range s.Values {
@@ -142,6 +166,7 @@ func (s *Slice[T]) SetValue(value any) error {
 		s.Added = append(s.Added, newValue)
 	}
 
+	// Everything is different now, but nothing has changed
 	return nil
 }
 

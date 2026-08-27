@@ -10,4 +10,11 @@
 // json:"-" and bson:"-" on purpose: they describe one in-memory editing
 // session, not durable state, so a value that round-trips through storage comes
 // back with its current contents and an empty change set.
+//
+// SetValue is the seam that the schema package writes through, and it converts
+// whatever it is handed rather than asserting a []T: form widgets deliver array
+// values as a *sliceof.String, and several other shapes are possible besides.
+// The conversion is delegated to convert.SliceOfOk, so it is as forgiving as
+// that package allows -- lossy renderings included -- and only a value that is
+// not a collection at all is reported, without disturbing the slice.
 package delta
