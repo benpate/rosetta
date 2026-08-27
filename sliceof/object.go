@@ -243,7 +243,7 @@ func (s *Object[T]) SetValue(value any) error {
 		return nil
 	}
 
-	return derp.Internal("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
+	return derp.BadRequest("sliceof.Object[T].SetValue", "Unable to convert value to Object[T]", value)
 }
 
 // Remove deletes the element identified by the key index.
