@@ -127,6 +127,13 @@ func SliceOfStringOk(value any) ([]string, bool) {
 		return result, allOk
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		if items, ok := readArrayGetter(getter); ok {
+			return makeSliceOfString(items)
+		}
+	}
+
 	// Fall through is failure.  This is a nothing
 	return make([]string, 0), false
 }

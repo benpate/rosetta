@@ -116,6 +116,13 @@ func SliceOfIntOk(value any) ([]int, bool) {
 		return result, allOk
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		if items, ok := readArrayGetter(getter); ok {
+			return makeSliceOfIntOk(items)
+		}
+	}
+
 	return make([]int, 0), false
 }
 

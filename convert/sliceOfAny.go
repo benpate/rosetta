@@ -115,6 +115,11 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 		return result, true
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		return readArrayGetter(getter)
+	}
+
 	// Fall through means this isn't even an array/slice.  Admit defeat and go home.
 	return make([]any, 0), false
 }

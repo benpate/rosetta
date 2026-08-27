@@ -2,6 +2,17 @@ package convert
 
 import "time"
 
+// ArrayGetter interface wraps the Length() and GetIndex() methods that enable a custom
+// type to present itself as an array without being a Go slice.
+type ArrayGetter interface {
+
+	// Length returns the number of items in the array
+	Length() int
+
+	// GetIndex returns the value at the specified index
+	GetIndex(int) (any, bool)
+}
+
 // Booler interface wraps the Bool() method that enables custom types to convert themselves to bool.
 type Booler interface {
 

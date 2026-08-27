@@ -84,3 +84,30 @@ func SliceLength(value any) int {
 
 	return 0
 }
+
+// readArrayGetter reads every item out of an ArrayGetter into a []any.
+// It returns FALSE if the getter does not hold up its end of the interface.
+func readArrayGetter(getter ArrayGetter) ([]any, bool) {
+
+	length := getter.Length()
+
+	// RULE: A negative length is a broken implementation, not an empty array
+	if length < 0 {
+		return make([]any, 0), false
+	}
+
+	result := make([]any, 0, length)
+
+	for index := range length {
+
+		item, ok := getter.GetIndex(index)
+
+		if !ok {
+			return make([]any, 0), false
+		}
+
+		result = append(result, item)
+	}
+
+	return result, true
+}

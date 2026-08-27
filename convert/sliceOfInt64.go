@@ -116,6 +116,13 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 		return result, allOk
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		if items, ok := readArrayGetter(getter); ok {
+			return makeSliceOfInt64Ok(items)
+		}
+	}
+
 	return make([]int64, 0), false
 }
 

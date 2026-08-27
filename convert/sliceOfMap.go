@@ -81,6 +81,13 @@ func SliceOfMapOk(value any) ([]map[string]any, bool) {
 		return result, true
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		if items, ok := readArrayGetter(getter); ok {
+			return SliceOfMapOk(items)
+		}
+	}
+
 	// Fall through means the conversion was unsuccessful
 	return make([]map[string]any, 0), false
 }

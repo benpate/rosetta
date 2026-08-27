@@ -116,6 +116,13 @@ func SliceOfFloatOk(value any) ([]float64, bool) {
 		return result, allOk
 	}
 
+	// A value that presents itself as an array is read through that interface
+	if getter, ok := value.(ArrayGetter); ok {
+		if items, ok := readArrayGetter(getter); ok {
+			return makeSliceOfFloatOk(items)
+		}
+	}
+
 	return make([]float64, 0), false
 }
 
