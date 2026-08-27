@@ -7,8 +7,10 @@ import (
 	"github.com/benpate/derp"
 )
 
-// iso8601 matches an ISO-8601 date/time string, with optional seconds and timezone offset.
-var iso8601 = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(Z[+-]\d{2}:\d{2})?)?$`)
+// iso8601 matches an ISO-8601 date/time string, with optional seconds and timezone.
+// The zone is EITHER a literal "Z" OR a numeric offset -- never both. Requiring "Z" to be
+// followed by an offset rejected every canonical timestamp and accepted only nonsense.
+var iso8601 = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(Z|[+-]\d{2}:\d{2})?)?$`)
 
 // ISO8601 returns a StringFormat that validates a value as an ISO-8601 date string.
 func ISO8601(arg string) StringFormat {

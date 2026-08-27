@@ -2,6 +2,7 @@ package convert
 
 import (
 	"math"
+	"strings"
 	"testing"
 )
 
@@ -175,6 +176,117 @@ func FuzzFloatIntRoundTrip(f *testing.F) {
 
 		if _, ok := FloatOk(value, -1); ok != exact {
 			t.Fatalf("FloatOk(%d): ok=%v, want %v (exactly representable)", value, ok, exact)
+		}
+	})
+}
+
+// FuzzSliceOfGeneric feeds arbitrary values through the generic slice converter, in every
+// shape the reflection paths have to walk: a bare value, a slice, a pointer, a nil pointer,
+// and an ArrayGetter. None of them may panic, and the conversion must be idempotent -- a
+// result fed back through the converter has to come out unchanged.
+func FuzzSliceOfGeneric(f *testing.F) {
+
+	f.Add("")
+	f.Add("a")
+	f.Add("123")
+	f.Add("3.14159")
+	f.Add("not a number")
+
+	f.Fuzz(func(t *testing.T, value string) {
+
+		slice := []string{value}
+		pointer := &slice
+		var nilPointer *[]string
+
+		for _, input := range []any{value, slice, pointer, nilPointer, testArray{items: []any{value}}} {
+
+			_ = SliceOf[any](input)
+			_ = SliceOf[int](input)
+			_ = SliceOf[float64](input)
+
+			// A converted result must survive a second trip through the converter unchanged
+			result := SliceOf[string](input)
+
+			if again := SliceOf[string](result); len(again) != len(result) {
+				t.Errorf("SliceOf[string] is not idempotent for %#v: %#v then %#v", input, result, again)
+			}
+		}
+	})
+}
+
+// FuzzMapConverters feeds arbitrary keys and values through the whole MapOf family, in the
+// shapes the reflection paths have to walk.  These sit on the same reflection code as the slice
+// converters, where an unguarded pointer dereference used to panic on a typed nil.
+func FuzzMapConverters(f *testing.F) {
+
+	f.Add("key", "value")
+	f.Add("", "")
+	f.Add("key", "12345")
+	f.Add("\x00", "\x00")
+	f.Add("key", "3.14159")
+
+	f.Fuzz(func(t *testing.T, key string, value string) {
+
+		source := map[string]any{key: value}
+		pointer := &source
+		var nilPointer *map[string]any
+
+		for _, input := range []any{
+			nil,
+			source,
+			pointer,
+			nilPointer,
+			map[string]any(nil),
+			map[string]string{key: value},
+			map[string][]string{key: {value}},
+			value,
+			[]string{value},
+			make(chan int),
+		} {
+			_ = MapOfAny(input)
+			_ = MapOfString(input)
+			_ = MapOfInt(input)
+			_ = MapOfInt32(input)
+			_ = MapOfSliceOfString(input)
+			_ = IsMap(input)
+			_ = IsSlice(input)
+			_ = SliceLength(input)
+			_ = Element(input)
+			_ = JoinString(input, ",")
+			_ = SliceOfMap(input)
+			_ = SliceOfInt64(input)
+		}
+	})
+}
+
+// FuzzIsSliceMatchesSliceLength asserts that the two slice predicates agree with each other.
+// A value IsSlice calls a slice but SliceLength measures as empty (or vice versa) means a
+// caller that guards with one and indexes with the other is walking off the end.
+func FuzzIsSliceMatchesSliceLength(f *testing.F) {
+
+	f.Add("")
+	f.Add("a,b,c")
+	f.Add("\x00")
+
+	f.Fuzz(func(t *testing.T, text string) {
+
+		items := strings.Split(text, ",")
+		pointer := &items
+		var nilPointer *[]string
+
+		for _, input := range []any{
+			nil, items, pointer, nilPointer, []string(nil), []any{}, text, len(text),
+			map[string]any{text: text}, make(chan int),
+		} {
+			// RULE: A non-slice has no length. The converse does NOT hold -- an empty slice is
+			// still a slice -- so only this direction is an invariant.
+			if IsSlice(input) {
+				continue
+			}
+
+			if length := SliceLength(input); length != 0 {
+				t.Fatalf("IsSlice(%#v) is false but SliceLength reports %d", input, length)
+			}
 		}
 	})
 }

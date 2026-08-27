@@ -48,10 +48,12 @@ func TestNotIn(t *testing.T) {
 
 	validate := NotIn("red,green,blue")
 
+	// RULE: An accepted value is returned as itself. NotIn used to return `arg` here, which
+	// silently overwrote every field it validated with its own option list.
 	{
 		result, err := validate("purple")
 		require.NoError(t, err)
-		require.Equal(t, "red,green,blue", result) // NotIn returns the arg on success
+		require.Equal(t, "purple", result)
 	}
 	{
 		_, err := validate("green")
