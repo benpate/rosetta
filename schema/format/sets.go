@@ -35,6 +35,9 @@ func NotIn(arg string) StringFormat {
 			}
 		}
 
-		return arg, nil
+		// RULE: Return the VALUE, never `arg`. A format returns what the caller supplied, and
+		// schema.Set writes that result back into the object -- so returning the option list
+		// here overwrote every accepted field with its own configuration.
+		return value, nil
 	}
 }
