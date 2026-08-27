@@ -17,9 +17,14 @@ func IsMap(value any) bool {
 	// Otherwise, use reflection to see what's inside there...
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	// Dereference pointers (if necessary)
+	// Dereference pointers (if necessary). A nil pointer holds nothing to look inside.
 	case reflect.Pointer:
-		return IsSlice(valueOf.Elem().Interface())
+
+		if valueOf.IsNil() {
+			return false
+		}
+
+		return IsMap(valueOf.Elem().Interface())
 
 	// Arrays and slices are both valid
 	case reflect.Map:

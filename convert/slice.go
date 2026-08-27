@@ -25,8 +25,13 @@ func IsSlice(value any) bool {
 	// Otherwise, use reflection to see what's inside there...
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
-	// Dereference pointers (if necessary)
+	// Dereference pointers (if necessary). A nil pointer holds nothing to look inside.
 	case reflect.Pointer:
+
+		if valueOf.IsNil() {
+			return false
+		}
+
 		return IsSlice(valueOf.Elem().Interface())
 
 	// Arrays and slices are both valid
@@ -64,7 +69,13 @@ func SliceLength(value any) int {
 	// Reflection for unknown types
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
+	// RULE: A nil pointer has no length, and cannot be dereferenced
 	case reflect.Pointer:
+
+		if valueOf.IsNil() {
+			return 0
+		}
+
 		return SliceLength(valueOf.Elem().Interface())
 
 	case reflect.Array, reflect.Slice:

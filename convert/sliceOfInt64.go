@@ -94,7 +94,14 @@ func SliceOfInt64Ok(value any) ([]int64, bool) {
 	// Use reflection to see if this is even an array/slice
 	switch valueOf := reflect.ValueOf(value); valueOf.Kind() {
 
+	// RULE: A nil pointer holds no value to dereference. Calling Interface() on
+	// the zero Value that Elem() hands back for one would panic.
 	case reflect.Pointer:
+
+		if valueOf.IsNil() {
+			return make([]int64, 0), false
+		}
+
 		return SliceOfInt64Ok(valueOf.Elem().Interface())
 
 	case reflect.Array, reflect.Slice:
