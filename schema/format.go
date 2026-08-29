@@ -72,6 +72,9 @@ func init() {
 	UseFormat("no-html", format.NoHTML)
 	UseFormat("text", format.Text)
 
+	// CSS
+	UseFormat("css", format.CSS)
+
 	// Markdown
 	UseFormat("markdown", format.Markdown)
 

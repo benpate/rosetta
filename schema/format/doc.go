@@ -10,7 +10,7 @@
 // IPv4, IPv6, URI, URL, ObjectID, token, username, WebFinger), dates and times,
 // constraints on the text itself (In, NotIn, MatchRegex, HasUppercase,
 // HasLowercase, HasNumbers), and the content formats that decide how much
-// markup survives (Text, NoHTML, HTML, Markdown, UnsafeAny).
+// markup survives (Text, NoHTML, HTML, Markdown, CSS, UnsafeAny).
 //
 // Those content formats are a trust boundary: the format named on a string
 // element is what decides whether a value is escaped, sanitized, or passed
