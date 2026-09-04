@@ -111,12 +111,34 @@ func init() {
 // stylesheet with a nil error, so a value that is partly unsafe is stored
 // stripped instead of failing the whole write.
 //
+// The result is reformatted, not echoed: whitespace inside a rule collapses and
+// each block is emitted on one line. An author's indentation does not survive,
+// but neither does it decide what does.
+//
 // The result is a stylesheet, not a fragment, and it is still global in scope --
 // nothing here confines its selectors to one subtree. A caller embedding it in a
 // shared page is responsible for scoping the rules it emits.
 func CSS(arg string) StringFormat {
 	return func(value string) (string, error) {
 		return sanitizeStylesheet(value, 0), nil
+	}
+}
+
+// CSSDeclarations sanitizes ONE list of CSS declarations -- the contents of an
+// element's `style` attribute -- rather than a whole stylesheet. It applies the
+// same property and value allowlists as CSS, so a declaration list can be
+// accepted from the same authors and trusted to the same degree.
+//
+// Use it wherever the stored value is written into a `style` attribute. Passing
+// such a value to CSS instead discards it entirely: that format parses rules,
+// finds no selector or block, and returns "".
+//
+// Like CSS, this sanitizes rather than rejects, returning the cleaned value with
+// a nil error. A declaration list containing a quote is dropped whole, because
+// the quote is what the sanitizer's own round trip is delimited by.
+func CSSDeclarations(arg string) StringFormat {
+	return func(value string) (string, error) {
+		return sanitizeDeclarations(value), nil
 	}
 }
 
@@ -254,6 +276,11 @@ const cssPlaceholderElement = "x"
 // recovered value is unescaped before being returned to CSS context.
 func sanitizeDeclarations(declarations string) string {
 
+	// A declaration list written across several lines is the normal way to write
+	// CSS, and it is not the shape the round trip below can carry -- see
+	// normalizeCSSDeclarations for what each part of that costs.
+	declarations = normalizeCSSDeclarations(declarations)
+
 	// A quote would let a declaration close the attribute early and change what
 	// bluemonday parses, so no value containing one may enter the round trip.
 	// isSafeCSSValue rejects quotes too; this is the check that protects the
@@ -274,12 +301,18 @@ func sanitizeDeclarations(declarations string) string {
 
 	value, _, found := strings.Cut(after, `"`)
 
+	// UNREACHABLE by test: bluemonday always closes an attribute it emits, so no
+	// input can reach here. Kept because the recovery below reads a delimited
+	// value, and a policy that stopped delimiting it must fail closed.
 	if !found {
 		return ""
 	}
 
 	value = strings.TrimSpace(html.UnescapeString(value))
 
+	// UNREACHABLE by test: a policy that rejects every declaration drops the
+	// attribute entirely rather than emitting an empty one, which the `found`
+	// check above already caught.
 	if value == "" {
 		return ""
 	}
@@ -287,11 +320,61 @@ func sanitizeDeclarations(declarations string) string {
 	// RULE: Re-check the recovered text. Unescaping can only shorten the value or
 	// reintroduce characters that were escaped on the way out, so the result is
 	// verified in the form it will actually be written to the stylesheet.
+	//
+	// UNREACHABLE by test: the guard before the round trip refuses these
+	// characters going in, and the policy cannot invent them. This is the check
+	// that stays correct if either of those two facts ever stops being true.
 	if strings.ContainsAny(value, `"'<>{}\`) {
 		return ""
 	}
 
 	return strings.TrimSuffix(value, ";") + ";"
+}
+
+// normalizeCSSDeclarations rewrites a declaration list into the single-line,
+// no-empty-declaration form that the bluemonday round trip requires. Every run
+// of CSS whitespace becomes one space, and a declaration holding nothing but
+// whitespace is dropped.
+//
+// Both halves are load-bearing, and between them they decide whether ordinary
+// hand-written CSS survives at all:
+//
+// Bluemonday trims only the SPACE character off a style attribute before
+// deciding whether to append its own `;`, so a list ending `red;\n` becomes
+// `red;\n;`. The empty declaration that creates fails the CSS parse, and a
+// failed parse empties the WHOLE attribute -- taking every sibling declaration
+// with it. That is the shape of every rule whose closing brace sits on its own
+// line, which is to say almost all of them.
+//
+// A newline inside a value is the same story one level down: isSafeCSSValue
+// admits only space and tab, so a value wrapped across two lines is rejected on
+// a character CSS itself treats as insignificant.
+//
+// Collapsing whitespace cannot merge two tokens into one -- a run is replaced by
+// a space, never removed -- and dropping an empty declaration removes nothing a
+// browser would have applied. Neither can introduce a character the checks below
+// would have caught.
+func normalizeCSSDeclarations(declarations string) string {
+
+	result := make([]string, 0, strings.Count(declarations, ";")+1)
+
+	// RULE: Splitting on `;` is safe because no declaration that survives may
+	// contain one -- isSafeCSSValue rejects `;`, and the quote check above means
+	// there is no string literal for one to hide inside.
+	for _, declaration := range strings.Split(declarations, ";") {
+
+		if fields := strings.FieldsFunc(declaration, isCSSWhitespace); len(fields) > 0 {
+			result = append(result, strings.Join(fields, " "))
+		}
+	}
+
+	return strings.Join(result, "; ")
+}
+
+// isCSSWhitespace reports whether a rune is one of the characters CSS treats as
+// whitespace between tokens.
+func isCSSWhitespace(r rune) bool {
+	return strings.ContainsRune(cssWhitespace, r)
 }
 
 // isSafeCSSValue reports whether a single CSS property value is safe to emit.
@@ -366,6 +449,11 @@ func isUnsafeCSSValueRune(r rune) bool {
 // which between them cover a `</style>` escape, comment openers, CSS escapes,
 // and any attempt to open a block or rule the parser did not account for. `>`
 // stays (the child combinator) because a `<` can never accompany it.
+//
+// The whitespace it admits is exactly cssWhitespace. A prelude is emitted
+// verbatim, so a character CSS treats as insignificant must not be the reason a
+// rule is dropped -- form feed is rare in hand-written CSS but legal, and the
+// walk that produced this prelude already skipped over it as whitespace.
 func isSafeCSSPrelude(prelude string) bool {
 
 	if prelude == "" {
@@ -385,7 +473,7 @@ func isSafeCSSPrelude(prelude string) bool {
 		case r >= '0' && r <= '9':
 			continue
 
-		case strings.ContainsRune(" \t\r\n,.#:()[]=+~>*_-", r):
+		case strings.ContainsRune(cssWhitespace+",.#:()[]=+~>*_-", r):
 			continue
 		}
 

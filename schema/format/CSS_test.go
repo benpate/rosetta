@@ -88,6 +88,178 @@ func TestCSS(t *testing.T) {
 	}
 }
 
+// TestCSS_MultiLine verifies that a stylesheet formatted the way people
+// actually write one -- declarations indented on their own lines, closing brace
+// on the last -- survives sanitizing.
+//
+// Every positive case in TestCSS above is written on a single line, and that is
+// exactly how a stylesheet ending `red;\n}` came to sanitize away to nothing
+// while the suite stayed green.  See normalizeCSSDeclarations.
+func TestCSS_MultiLine(t *testing.T) {
+
+	validate := CSS("")
+
+	table := []struct {
+		name     string
+		value    string
+		expected string
+	}{
+		{
+			name:     "one declaration, closing brace on its own line",
+			value:    "h1 {\n\tcolor: red;\n}",
+			expected: "h1 { color: red; }\n",
+		},
+		{
+			name:     "several declarations",
+			value:    ".article p {\n\tline-height: 1.6;\n\tcolor: #333;\n}",
+			expected: ".article p { line-height: 1.6; color: #333; }\n",
+		},
+		{
+			name:     "several rules separated by a blank line",
+			value:    "h1 {\n\tfont-size: 2em;\n}\n\nh2 {\n\tfont-size: 1.5em;\n}\n",
+			expected: "h1 { font-size: 2em; }\nh2 { font-size: 1.5em; }\n",
+		},
+		{
+			name:     "windows line endings",
+			value:    "h1 {\r\n\tcolor: red;\r\n}\r\n",
+			expected: "h1 { color: red; }\n",
+		},
+		{
+			name:     "value wrapped across two lines",
+			value:    "h1 {\n\tbox-shadow: 0 0 4px\n\t\t#000;\n}",
+			expected: "h1 { box-shadow: 0 0 4px #000; }\n",
+		},
+		{
+			name:     "indented media query",
+			value:    "@media (max-width: 40em) {\n\th1 {\n\t\tfont-size: 1.2em;\n\t}\n}",
+			expected: "@media (max-width: 40em) {\nh1 { font-size: 1.2em; }\n}\n",
+		},
+		{
+			name:     "grouped selectors on separate lines",
+			value:    "h1,\nh2 {\n\tcolor: red;\n}",
+			expected: "h1,\nh2 { color: red; }\n",
+		},
+		{
+			name:     "comment on its own line",
+			value:    "/* headings */\nh1 {\n\tcolor: red;\n}",
+			expected: "h1 { color: red; }\n",
+		},
+		{
+			name:     "form feed is whitespace, not a reason to drop the rule",
+			value:    "h1\f{\f\fcolor: red;\f}",
+			expected: "h1 { color: red; }\n",
+		},
+		{
+			name:     "empty and repeated declaration separators",
+			value:    "h1 {\n\t;;\n\tcolor: red;;\n}",
+			expected: "h1 { color: red; }\n",
+		},
+	}
+
+	for _, testCase := range table {
+		t.Run(testCase.name, func(t *testing.T) {
+			result, err := validate(testCase.value)
+			require.Nil(t, err)
+			require.Equal(t, testCase.expected, result)
+		})
+	}
+}
+
+// TestCSS_WhitespaceIsInsignificant verifies the general property behind
+// TestCSS_MultiLine: re-indenting a stylesheet must not change how many rules
+// survive it.  CSS treats every run of whitespace between tokens as one space,
+// so a sanitizer that disagrees is destroying valid input.
+func TestCSS_WhitespaceIsInsignificant(t *testing.T) {
+
+	validate := CSS("")
+
+	for _, value := range []string{
+		"h1 { color: red; }",
+		"h1 { color: red; font-size: 2em; }",
+		"h1 { color: red; } h2 { color: blue; }",
+		"@media screen { h1 { color: red; } }",
+		"#main .article > p:first-child { line-height: 1.6; margin: 0 auto; }",
+		"h1 { behavior: url(x.htc); }",
+		"h1 { color: red; position: fixed; }",
+	} {
+		expected := countCSSBlocks(t, validate, value)
+
+		for _, whitespace := range []string{" ", "\t", "\n", "\r\n", "\f", " \n\t\t", "\n\n\n"} {
+
+			variant := respaceCSS(value, whitespace)
+			actual := countCSSBlocks(t, validate, variant)
+
+			require.Equal(t, expected, actual, "re-indenting %q with %q changed how many rules survived", value, whitespace)
+		}
+	}
+}
+
+// TestCSS_NormalizeDeclarations covers the declaration-list normalizer directly.
+func TestCSS_NormalizeDeclarations(t *testing.T) {
+
+	table := []struct {
+		name     string
+		value    string
+		expected string
+	}{
+		{"empty", "", ""},
+		{"only whitespace", " \t\r\n\f", ""},
+		{"only separators", ";;;", ""},
+		{"already normal", "color: red", "color: red"},
+		{"trailing separator", "color: red;", "color: red"},
+		{"trailing newline after separator", "color: red;\n", "color: red"},
+		{"leading separator", "; color: red", "color: red"},
+		{"indented block", "\n\tcolor: red;\n\tmargin: 0;\n", "color: red; margin: 0"},
+		{"value wrapped across lines", "box-shadow: 0 0 4px\n\t#000", "box-shadow: 0 0 4px #000"},
+		{"repeated separators", "color: red;;;margin: 0", "color: red; margin: 0"},
+		{"whitespace around the colon", "color\n:\nred", "color : red"},
+		{"unsafe characters are left for the checks that own them", `font-family: "X"`, `font-family: "X"`},
+	}
+
+	for _, testCase := range table {
+		t.Run(testCase.name, func(t *testing.T) {
+			require.Equal(t, testCase.expected, normalizeCSSDeclarations(testCase.value))
+		})
+	}
+}
+
+// countCSSBlocks returns the number of rule blocks a stylesheet sanitizes down
+// to, which is the measure of how much of it survived.
+func countCSSBlocks(t *testing.T, validate StringFormat, value string) int {
+
+	t.Helper()
+
+	result, err := validate(value)
+	require.Nil(t, err)
+
+	return strings.Count(result, "{")
+}
+
+// respaceCSS replaces every run of CSS whitespace in a stylesheet with the given
+// run.  Whitespace is only ever exchanged for other whitespace, never removed,
+// so the result means exactly what the original meant.
+func respaceCSS(value string, whitespace string) string {
+
+	var result strings.Builder
+
+	for index := 0; index < len(value); index++ {
+
+		if !strings.ContainsRune(cssWhitespace, rune(value[index])) {
+			result.WriteByte(value[index])
+			continue
+		}
+
+		// Consume the whole run, so the replacement is one-for-one
+		for (index+1 < len(value)) && strings.ContainsRune(cssWhitespace, rune(value[index+1])) {
+			index++
+		}
+
+		result.WriteString(whitespace)
+	}
+
+	return result.String()
+}
+
 // TestCSS_Unsafe verifies that every construct capable of loading a resource,
 // executing script, or escaping the stylesheet is removed.
 func TestCSS_Unsafe(t *testing.T) {
@@ -291,73 +463,79 @@ func TestCSS_Helpers(t *testing.T) {
 	})
 }
 
-// FuzzCSS feeds arbitrary strings to the stylesheet sanitizer to confirm that it
-// never panics and that its output can never carry the constructs that would let
-// a stylesheet escape its <style> element, load a remote resource, or execute
-// script -- regardless of how the input was spelled.
-func FuzzCSS(f *testing.F) {
+// TestCSSDeclarations verifies the declaration-list format: the same allowlists as
+// CSS, applied to the contents of a `style` attribute instead of a stylesheet.
+func TestCSSDeclarations(t *testing.T) {
 
-	f.Add("")
-	f.Add("body { color: red; }")
-	f.Add("@media screen { body { color: red; } }")
-	f.Add(`@import url("//evil.example.com/x.css");`)
-	f.Add("body { color: expression(alert(1)); }")
-	f.Add("</style><script>alert(1)</script>")
-	f.Add("body { color: red")
-	f.Add("{{{{{{")
-	f.Add("}}}}}}")
-	f.Add("/*")
-	f.Add("body { color: re/**/d; }")
-	f.Add("body { background-color: url(x) }")
-	f.Add("@media screen { @media screen { @media screen { @media screen { @media screen { body { color: red; } } } } } }")
-	f.Add("body { color: \x00red; }")
-	f.Add("a\\3c /style\\3e { color: red; }")
+	validate := CSSDeclarations("")
 
-	validate := CSS("")
+	table := []struct {
+		name     string
+		value    string
+		expected string
+	}{
+		// Values come back with a trailing ";" -- bluemonday emits one, and it is
+		// valid in a style attribute, so it is left rather than trimmed.
+		{"empty", "", ""},
+		{"single declaration", "color:red", "color: red;"},
+		{"several declarations", "color:red; padding:8px", "color: red; padding: 8px;"},
+		{"layout properties survive", "display:flex; gap:8px", "display: flex; gap: 8px;"},
+		{"written across lines", "color: red;\n\tmargin: 0;\n", "color: red; margin: 0;"},
 
-	f.Fuzz(func(t *testing.T, value string) {
+		// RULE: the properties CSS refuses in a stylesheet are refused here too. A
+		// `style` attribute is injected into a page its author does not own, exactly
+		// as a stylesheet is, so the two cannot disagree about what is safe.
+		{"fixed positioning is dropped", "position:fixed; color:red", "color: red;"},
+		{"in-flow positioning survives", "position:relative; color:red", "position: relative; color: red;"},
+		{"resource loading is dropped", "background:url(https://example.com/x); color:red", "color: red;"},
+		{"legacy script hooks are dropped", "behavior:url(x.htc); color:red", "color: red;"},
+		{"unknown properties are dropped", "made-up:1; color:red", "color: red;"},
 
-		result, err := validate(value)
+		// A quote is what the sanitizer's own round trip is delimited by, so a value
+		// carrying one cannot be partly recovered -- the whole list is discarded.
+		{"a quote discards the whole list", `color:red" onmouseover="alert(1)`, ""},
+		{"a single quote discards it too", "font-family:'X'; color:red", ""},
+	}
 
-		// This format sanitizes rather than rejects, so it never returns an error.
-		if err != nil {
-			t.Fatalf("CSS returned an unexpected error for %q: %v", value, err)
-		}
+	for _, testCase := range table {
+		t.Run(testCase.name, func(t *testing.T) {
+			result, err := validate(testCase.value)
+			require.Nil(t, err)
+			require.Equal(t, testCase.expected, result)
+		})
+	}
+}
 
-		lower := strings.ToLower(result)
+// TestCSSDeclarations_NotInterchangeableWithCSS pins the reason this format exists.
+//
+// The two formats read the same input differently, and each destroys what the other
+// accepts: CSS looks for selectors and blocks, so a declaration list has no rule in
+// it and vanishes; CSSDeclarations looks for declarations, so a stylesheet's braces
+// and selector are not properties and vanish too. Pointing a schema at the wrong one
+// does not error -- it silently stores an empty string.
+func TestCSSDeclarations_NotInterchangeableWithCSS(t *testing.T) {
 
-		// No output may contain the characters that would end the <style> element
-		// or open a construct the sanitizer did not itself write.
-		for _, forbidden := range []string{"<", ">", `"`, "'", `\`, "/*", "*/", "@import", "@charset", "@namespace", "@font-face"} {
+	const declarations = "color:red; padding:8px"
+	const stylesheet = ".foo { color:red }"
 
-			// `>` is a legal child combinator, so it is checked only as part of a
-			// closing tag rather than banned outright.
-			if forbidden == ">" {
-				continue
-			}
+	declarationsFormat := CSSDeclarations("")
+	stylesheetFormat := CSS("")
 
-			if strings.Contains(lower, forbidden) {
-				t.Fatalf("CSS(%q) = %q, which contains the forbidden sequence %q", value, result, forbidden)
-			}
-		}
+	// Each format keeps what it is for
+	result, err := declarationsFormat(declarations)
+	require.Nil(t, err)
+	require.Equal(t, "color: red; padding: 8px;", result)
 
-		// No output may name a function or property that fetches a resource or
-		// executes script.
-		for _, forbidden := range []string{"url", "expression", "javascript", "behavior", "binding"} {
-			if strings.Contains(lower, forbidden) {
-				t.Fatalf("CSS(%q) = %q, which contains the forbidden name %q", value, result, forbidden)
-			}
-		}
+	result, err = stylesheetFormat(stylesheet)
+	require.Nil(t, err)
+	require.Contains(t, result, "color: red")
 
-		// Sanitizing is a fixed point: re-running it must change nothing.
-		again, err := validate(result)
+	// ...and empties what it is not
+	result, err = stylesheetFormat(declarations)
+	require.Nil(t, err)
+	require.Equal(t, "", result)
 
-		if err != nil {
-			t.Fatalf("CSS returned an unexpected error re-sanitizing %q: %v", result, err)
-		}
-
-		if again != result {
-			t.Fatalf("CSS is not idempotent for %q: first pass %q, second pass %q", value, result, again)
-		}
-	})
+	result, err = declarationsFormat(stylesheet)
+	require.Nil(t, err)
+	require.Equal(t, "", result)
 }

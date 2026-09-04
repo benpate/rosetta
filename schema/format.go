@@ -74,6 +74,7 @@ func init() {
 
 	// CSS
 	UseFormat("css", format.CSS)
+	UseFormat("css-declarations", format.CSSDeclarations)
 
 	// Markdown
 	UseFormat("markdown", format.Markdown)
