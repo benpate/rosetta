@@ -9,6 +9,7 @@ func All() map[string]any {
 	addCompareFuncs(result)
 	addCurrencyFuncs(result)
 	addDateFuncs(result)
+	addDebugFuncs(result)
 	addHTMLFuncs(result)
 	addLogicFuncs(result)
 	addMathFuncs(result)

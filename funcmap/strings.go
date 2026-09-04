@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/benpate/rosetta/convert"
+	"github.com/benpate/rosetta/first"
 	"github.com/benpate/rosetta/sliceof"
 )
 
@@ -19,6 +20,10 @@ func addStringFuncs(target map[string]any) {
 			return sliceof.String{}
 		}
 		return strings.Split(value, separator)
+	}
+
+	target["firstNonZero"] = func(values ...string) string {
+		return first.String(values...)
 	}
 
 	target["join"] = func(values ...string) string {

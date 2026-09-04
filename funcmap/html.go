@@ -180,6 +180,17 @@ func addHTMLFuncs(target map[string]any) {
 	target["text"] = func(value string) template.HTML {
 		return template.HTML(html.FromText(value)) // #nosec G203 -- html.FromText escapes the input; only its own <br> markup is live
 	}
+
+	// match is used to select <option> values in a <select> box.
+	// This survives the aggressive "lowercase-ification" that
+	// the minifier performs on HTML templates.
+	target["select"] = func(matchValue string, value string) template.HTMLAttr {
+		if strings.ToUpper(matchValue) == strings.ToUpper(value) {
+			return "selected"
+		}
+		return ""
+	}
+
 }
 
 // safeURL returns value unchanged if it is safe to use as a navigation target,
