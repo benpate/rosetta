@@ -34,6 +34,7 @@ func WebFinger(arg string) StringFormat {
 		}
 
 		// RULE: A display name or angle brackets are not part of a handle
+		// (This prevents "@Barry Gibbs <bg@example.com>" from parsing)
 		if address.Address != account {
 			return "", derp.BadRequest(location, message, value, "WebFinger handles must be a bare @user@host")
 		}
