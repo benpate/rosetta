@@ -126,15 +126,15 @@ func FuzzFormats_AcceptedValueIsDerivedFromInput(f *testing.F) {
 	// The formats that legitimately REWRITE their input rather than returning it verbatim.
 	// Each strips or renders content, so the result is checked only for not being the config.
 	transforms := map[string]bool{
-		"HTML":      true,
-		"NoHTML":    true,
-		"Text":      true,
-		"CSS":       true,
-		"Markdown":  true,
-		"WebFinger": true,
-		"URL":       true,
-		"URI":       true,
-		"Email":     true,
+		"HTML":            true,
+		"NoHTML":          true,
+		"Text":            true,
+		"CSS":             true,
+		"CSSDeclarations": true,
+		"Markdown":        true,
+		"URL":             true,
+		"URI":             true,
+		"Email":           true,
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
@@ -179,21 +179,9 @@ func FuzzFormats_Idempotent(f *testing.F) {
 	generators := allGenerators()
 	args := formatArgs()
 
-	// KNOWN GAP: WebFinger requires a leading "@" but strips it from the result, so its own
-	// output fails its own validation. Whether a handle should be STORED with or without the
-	// "@" is an upstream decision that has not been made, so the format is excluded here
-	// rather than quietly changed. Remove this entry once that decision lands.
-	knownNotIdempotent := map[string]bool{
-		"WebFinger": true,
-	}
-
 	f.Fuzz(func(t *testing.T, value string) {
 
 		for name, generator := range generators {
-
-			if knownNotIdempotent[name] {
-				continue
-			}
 
 			validate := generator(args[name])
 

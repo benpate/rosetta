@@ -336,7 +336,7 @@ func sanitizeDeclarations(declarations string) string {
 // of CSS whitespace becomes one space, and a declaration holding nothing but
 // whitespace is dropped.
 //
-// Both halves are load-bearing, and between them they decide whether ordinary
+// Both halves are important, and between them they decide whether ordinary
 // hand-written CSS survives at all:
 //
 // Bluemonday trims only the SPACE character off a style attribute before

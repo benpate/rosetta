@@ -68,34 +68,6 @@ func TestUnsafeAny(t *testing.T) {
 	require.Equal(t, "<script>anything</script>", result)
 }
 
-func TestWebFinger(t *testing.T) {
-
-	validate := WebFinger("")
-
-	{
-		// Valid handle, with the leading @ stripped from the result
-		result, err := validate("@sara@sky.net")
-		require.NoError(t, err)
-		require.Equal(t, "sara@sky.net", result)
-	}
-	{
-		// Empty string is allowed
-		result, err := validate("")
-		require.NoError(t, err)
-		require.Equal(t, "", result)
-	}
-	{
-		// Missing leading @
-		_, err := validate("sara@sky.net")
-		require.Error(t, err)
-	}
-	{
-		// Not a valid email after the @
-		_, err := validate("@not an email")
-		require.Error(t, err)
-	}
-}
-
 func TestHasNumbers(t *testing.T) {
 
 	// arg "2" requires at least 2 numeric characters
