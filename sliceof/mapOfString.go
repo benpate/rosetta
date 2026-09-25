@@ -140,7 +140,7 @@ func (x *MapOfString) Append(values ...mapof.String) {
 
 // Shuffle randomizes the order of the elements in the slice
 func (x MapOfString) Shuffle() MapOfString {
-	rand.Shuffle(len(x), func(i, j int) { // NOSONAR #nosec G404 -- shuffle order does not need to be cryptographically secure
+	rand.Shuffle(len(x), func(i, j int) { // #nosec G404 -- shuffle order does not need to be cryptographically secure. NOSONAR
 		x[i], x[j] = x[j], x[i]
 	})
 	return x
