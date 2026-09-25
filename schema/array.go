@@ -161,7 +161,7 @@ func (element Array) Append(value ArraySetter, item any) error {
 
 	// Try to set the value at the end of the array
 	if success := value.SetIndex(value.Length(), item); !success {
-		return derp.Internal(location, "Setting value at end of array", value)
+		return derp.Internal(location, "Setting value at end of array", typeName(value))
 	}
 
 	// Success

@@ -1,5 +1,7 @@
 package schema
 
+import "fmt"
+
 // getLength returns the length of an object, if it is an ArrayGetter
 func getLength(object any) (int, bool) {
 
@@ -18,4 +20,10 @@ func getIndex(object any, index int) (any, bool) {
 	}
 
 	return nil, false
+}
+
+// typeName names a value's Go type for an error detail.  Errors name the type and never the
+// value, because an object being validated or set can hold a password, key, or token.
+func typeName(value any) string {
+	return fmt.Sprintf("%T", value)
 }
