@@ -35,16 +35,15 @@ func (schema Schema) Set(object any, path string, value any) error {
 			return derp.Validation(path+": "+derp.RootMessage(err), location, err)
 		}
 
-		return derp.Wrap(err, location, "Value is not valid for this schema", path, value)
+		return derp.Wrap(err, location, "Value is not valid for this schema", path, typeName(value))
 	}
 
 	// set the property value in the object
 	return SetProperty(schema.Element, object, path, value)
 }
 
-// SetAll iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are added successfully, then SetAll
-// also runs ValidateRequiredIf() to confirm that the object is still correct.
+// SetAll sets every value in the object through Set, stopping at the first error, then
+// confirms the object's required-if conditions.
 func (schema Schema) SetAll(object any, values map[string]any) error {
 
 	const location = "schema.Schema.SetAll"
@@ -54,22 +53,21 @@ func (schema Schema) SetAll(object any, values map[string]any) error {
 
 		// Try to set the value in the object.
 		if err := schema.Set(object, path, value); err != nil {
-			return derp.Wrap(err, location, "Setting value", path, value)
+			return derp.Wrap(err, location, "Setting value", path, typeName(value))
 		}
 	}
 
 	// Confirm required-if constraints once all values are set
 	if err := schema.ValidateRequiredIf(object); err != nil {
-		return derp.Wrap(err, location, "Validating values", object)
+		return derp.Wrap(err, location, "Validating values", typeName(object))
 	}
 
 	// Success!!
 	return nil
 }
 
-// SetURLValues iterates over Set to apply all of the values to the object one at a time, stopping
-// at the first error it encounters.  If all values are added successfully, then SetURLValues
-// also runs ValidateRequiredIf() to confirm that the object is still correct.
+// SetURLValues sets every form value in the object through Set, stopping at the first error,
+// then confirms the object's required-if conditions.
 func (schema Schema) SetURLValues(object any, values url.Values) error {
 
 	const location = "schema.Schema.SetURLValues"
@@ -79,13 +77,13 @@ func (schema Schema) SetURLValues(object any, values url.Values) error {
 
 		// Try to set the value in the object
 		if err := schema.Set(object, path, value); err != nil {
-			return derp.Wrap(err, location, "Setting value", path, value)
+			return derp.Wrap(err, location, "Setting value", path, typeName(value))
 		}
 	}
 
 	// Confirm required-if constraints once all values are set
 	if err := schema.ValidateRequiredIf(object); err != nil {
-		return derp.Wrap(err, location, "Validating values", object)
+		return derp.Wrap(err, location, "Validating values", typeName(object))
 	}
 
 	// Success!!
@@ -99,7 +97,9 @@ func SetProperty(element Element, object any, path string, value any) (err error
 
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			err = derp.Internal(location, "Panic while setting value", path, value, recovered)
+			err = derp.Internal(
+				location, "Panic while setting value", path, typeName(value), recovered,
+			)
 		}
 	}()
 
@@ -112,7 +112,7 @@ func SetProperty(element Element, object any, path string, value any) (err error
 		// A value that knows how to set itself is always preferred.
 		if setter, ok := object.(ValueSetter); ok {
 			if err := setter.SetValue(value); err != nil {
-				return derp.Wrap(err, location, "Setting value", object, value)
+				return derp.Wrap(err, location, "Setting value", typeName(object), typeName(value))
 			}
 			return nil
 		}
@@ -123,7 +123,10 @@ func SetProperty(element Element, object any, path string, value any) (err error
 		// place during validation, so this is typically a harmless self-assignment -- but
 		// it also correctly handles the case where validation returned a NEW value.
 		if err := setByReflection(object, value); err != nil {
-			return derp.Wrap(err, location, "Setting value on empty path", object, element, value)
+			return derp.Wrap(
+				err, location,
+				"Setting value on empty path", typeName(object), element, typeName(value),
+			)
 		}
 
 		return nil
@@ -162,15 +165,17 @@ func SetProperty(element Element, object any, path string, value any) (err error
 		return setProperty_String(object, path, value)
 	}
 
-	return derp.Internal(location, "Unsupported element type", path, subElement, object)
+	return derp.Internal(location, "Unsupported element type", path, subElement, typeName(object))
 }
 
-// setProperty_Object sets a value in the object using either the ObjectSetter or PointerGetter interface.
-// parentElement describes the object being set (its properties are the object's keys); childElement is
-// the schema for the first path segment (head).
+// setProperty_Object sets a value in the object through its ObjectSetter or PointerGetter
+// interface
 func setProperty_Object(parentElement Element, childElement Element, object any, path string, head string, tail string, value any) error {
 
 	const location = "schema.setProperty_Object"
+
+	// parentElement describes the object being set, whose properties are its keys.
+	// childElement is the schema for the first path segment (head).
 
 	// ObjectSetter interface is required for Maps. The map's own schema is the
 	// parent element, and SetObject descends the full path itself.
@@ -187,7 +192,9 @@ func setProperty_Object(parentElement Element, childElement Element, object any,
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be an ObjectSetter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be an ObjectSetter or PointerGetter", path, typeName(object),
+	)
 }
 
 // setProperty_Boolean sets a boolean value in the object.
@@ -216,7 +223,9 @@ func setProperty_Boolean(object any, path string, value any) error {
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be a BoolSetter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be a BoolSetter or PointerGetter", path, typeName(object),
+	)
 }
 
 // setProperty_Integer32 sets a 32-bit integer value in the object.
@@ -245,7 +254,9 @@ func setProperty_Integer32(object any, path string, value any) error {
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be an IntSetter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be an IntSetter or PointerGetter", path, typeName(object),
+	)
 }
 
 // setProperty_Integer64 sets a 64-bit integer value in the object.
@@ -274,7 +285,9 @@ func setProperty_Integer64(object any, path string, value any) error {
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be an Int64Setter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be an Int64Setter or PointerGetter", path, typeName(object),
+	)
 }
 
 // setProperty_Number writes a float64 value into the named property of the object.
@@ -303,7 +316,9 @@ func setProperty_Number(object any, path string, value any) error {
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be a FloatSetter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be a FloatSetter or PointerGetter", path, typeName(object),
+	)
 }
 
 // setProperty_String writes a string value into the named property of the object.
@@ -332,17 +347,18 @@ func setProperty_String(object any, path string, value any) error {
 	}
 
 	// Cannot set the value
-	return derp.Internal(location, "Target Object must be a StringSetter or PointerGetter", path, object)
+	return derp.Internal(
+		location, "Target Object must be a StringSetter or PointerGetter", path, typeName(object),
+	)
 }
 
-// setByReflection assigns `value` to the target that `object` points to.  It is used to
-// write an entire element back to its parent (empty path) when the target does not
-// implement ValueSetter -- for example, a struct field reached via PointerGetter.
-//
-// `object` MUST be a non-nil pointer to a settable target.  `value` may be either the
-// target's own type (T) or a pointer to it (*T); a *T is dereferenced first so that,
-// e.g., a validated *Content can be written into a Content field.
+// setByReflection assigns `value` to the target that `object` points to, which must be a
+// non-nil pointer to a settable target.  `value` may be a T or a *T.
 func setByReflection(object any, value any) error {
+
+	// This writes a whole element back to its parent (an empty path) when the target is not a
+	// ValueSetter, such as a struct field reached through PointerGetter.  A *T is dereferenced
+	// first, so a validated *Content can be written into a Content field.
 
 	const location = "schema.setByReflection"
 
@@ -350,13 +366,15 @@ func setByReflection(object any, value any) error {
 
 	// The target must be a non-nil pointer we can write through.
 	if target.Kind() != reflect.Pointer || target.IsNil() {
-		return derp.Internal(location, "Target must be a non-nil pointer", object, value)
+		return derp.Internal(
+			location, "Target must be a non-nil pointer", typeName(object), typeName(value),
+		)
 	}
 
 	target = target.Elem()
 
 	if !target.CanSet() {
-		return derp.Internal(location, "Target is not settable", object, value)
+		return derp.Internal(location, "Target is not settable", typeName(object), typeName(value))
 	}
 
 	// Unwrap a pointer value (*T) down to its element (T) so it matches the target type.
@@ -364,7 +382,10 @@ func setByReflection(object any, value any) error {
 	if source.Kind() == reflect.Pointer {
 
 		if source.IsNil() {
-			return derp.Internal(location, "Cannot set target from a nil pointer value", object, value)
+			return derp.Internal(
+				location, "Cannot set target from a nil pointer value",
+				typeName(object), typeName(value),
+			)
 		}
 
 		source = source.Elem()

@@ -5,9 +5,8 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-// Validate checks a particular value against this schema, updating values when
-// possible so that they pass validation.  If the provided value is not valid
-// (and cannot be coerced into being valid) then it returns an error.
+// Validate checks a value against the schema, returning an error when it does not conform
+// as given, including when a value had to be rewritten to conform.
 func Validate(schema Schema, value any) (any, bool, error) {
 
 	const location = "schema.Schema.Validate"
@@ -20,36 +19,40 @@ func Validate(schema Schema, value any) (any, bool, error) {
 	// Validate the value using the schema's element
 	result, rewrites, err := validate(schema.Element, value)
 
-	// On error, report the ORIGINAL value; validate() returns nil results on error.
+	// On error, name the ORIGINAL value's type; validate() returns nil results on error.
 	if err != nil {
-		return result, false, derp.Wrap(err, location, "Value is not valid for this schema", value)
+		return result, false, derp.Wrap(
+			err, location, "Value is not valid for this schema", typeName(value),
+		)
 	}
 
 	value = result
 
-	// RULE: A value that had to be rewritten (clamped or formatted) is not valid as-given.
-	// Set() can rewrite values in place; Validate() answers whether the value already conforms,
-	// so any required modification means the value fails validation.  The error details name
-	// each rewritten property with its before/after values.
+	// RULE: A value that had to be rewritten (clamped or formatted) is not valid as-given, because
+	// Validate() answers whether the value already conforms.  The error details name each
+	// rewritten property with its before/after values.
 	if len(rewrites) > 0 {
 		return value, false, derp.Validation("Value is not valid for this schema", rewrites.details()...)
 	}
 
 	// Handle special cases for "required-if" fields
 	if err := schema.ValidateRequiredIf(value); err != nil {
-		return value, false, derp.Wrap(err, location, "Validating `required-if` fields", value)
+		return value, false, derp.Wrap(
+			err, location, "Validating `required-if` fields", typeName(value),
+		)
 	}
 
 	return value, false, nil
 }
 
-// validate verifies that the provided value meets the requirements of the schema element,
-// and updates the value if necessary.  The returned rewriteList records every value that
-// had to be modified; leaf validators report a simple changed flag, which is converted
-// here (where both the before and after values are in hand) into a rewrite record.
+// validate checks a value against a schema element and updates it where necessary,
+// returning a rewriteList that records every value that had to be modified
 func validate(element Element, value any) (any, rewriteList, error) {
 
 	const location = "schema.validate"
+
+	// Leaf validators report only a changed flag.  It becomes a rewrite record here, where
+	// both the before and after values are in hand.
 
 	switch typedElement := element.(type) {
 
