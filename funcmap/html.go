@@ -185,7 +185,7 @@ func addHTMLFuncs(target map[string]any) {
 	// This survives the aggressive "lowercase-ification" that
 	// the minifier performs on HTML templates.
 	target["select"] = func(matchValue string, value string) template.HTMLAttr {
-		if strings.ToUpper(matchValue) == strings.ToUpper(value) {
+		if strings.EqualFold(matchValue, value) {
 			return "selected"
 		}
 		return ""
