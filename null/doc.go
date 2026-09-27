@@ -14,5 +14,5 @@
 // field entirely is the containing struct's decision. Unmarshaling never
 // coerces across JSON types: a bare number is an error for String, and a quoted
 // number is an error for Int. When a remote peer's encoding is not yours to
-// control, the lenient package is the tolerant counterpart to this one.
+// control, the loose package is the tolerant counterpart to this one.
 package null

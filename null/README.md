@@ -39,7 +39,7 @@ These types are strict on the way in and plain on the way out.
 
 Marshaling emits either the bare value or the literal `null`. There is no `omitempty`-style elision — a null field always renders as `null`, and a present zero always renders as `0`/`false`/`""`. Dropping the field entirely is the containing struct's decision, not this package's.
 
-Unmarshaling never coerces across JSON types. A bare `123` is an error for `null.String`, not the text `"123"`; a quoted `"123"` is an error for `null.Int`. This is the deliberate opposite of the sibling [lenient](../lenient/README.md) package, which exists for the receiving half of Postel's law — reach for `lenient` when a remote peer's encoding is out of your control, and for `null` when the schema is yours to enforce.
+Unmarshaling never coerces across JSON types. A bare `123` is an error for `null.String`, not the text `"123"`; a quoted `"123"` is an error for `null.Int`. This is the deliberate opposite of the sibling [loose](../loose/README.md) package, which exists for the receiving half of Postel's law — reach for `loose` when a remote peer's encoding is out of your control, and for `null` when the schema is yours to enforce.
 
 `null.Object[T]` is the exception in one respect: it hands `T` to `encoding/json` rather than parsing it itself, so `T` marshals and unmarshals exactly as it would anywhere else, and only the `null` literal is special-cased.
 

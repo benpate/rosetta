@@ -27,7 +27,7 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 
 ## convert
 
-- **`convert.String` formats floats with a fixed 2 decimal places — it is lossy.** `100` becomes `"100.00"`, `3.14159` becomes `"3.14"`. Never round-trip numeric data through `convert.String`; format explicitly when precision matters. `lenient.String` deliberately avoids this path to preserve exact source text.
+- **`convert.String` formats floats with a fixed 2 decimal places — it is lossy.** `100` becomes `"100.00"`, `3.14159` becomes `"3.14"`. Never round-trip numeric data through `convert.String`; format explicitly when precision matters. `loose.String` deliberately avoids this path to preserve exact source text.
 - **The `*Ok` functions' second return means "the conversion was lossless", not "the value was naturally this type."** The non-Ok wrappers discard it.
 - **`convert.Int` clamps to platform int width and clamps out-of-range floats.** Use `Int64` for wire data; a plain `Int` caps at 2^31 on 32-bit targets (including `GOARCH=wasm`).
 - **There is no reflection fallback.** A named type (`type Foo string`, or any struct) that matches no concrete case or interface converts to `""`. This is why `mapof.Matchable[T].MapOfString()` loses every value for struct-typed `T` — pinned as a KNOWN LIMITATION in [mapof/matchable_test.go](mapof/matchable_test.go), not a bug to fix in mapof.
@@ -48,6 +48,7 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 
 - **Mutating methods take pointer receivers and call `makeNotNil()` first.** A value-receiver setter panics on a nil map (the zero value of every mapof type). `Slices.Add` follows the pattern; any new method that writes must too.
 - **`Matchable[T].MapOfAny()` must copy entries directly — never hand `m` to `convert.MapOfAny`.** `Matchable[T]` is a `map[string]T`, which matches none of `MapOfAnyOk`'s concrete map cases (Go type switches match exact types, not underlying types) and falls through to its `MapOfAnyGetter` case, which calls straight back into the method: unbounded mutual recursion, fatal stack overflow, for every `T`. The in-code comment marks this; do not "simplify" it back.
+- **`mapof.LooseTemplate` is a sibling of `mapof.Any`, and the two must stay in agreement.** Its getters and setters shadow `Any`'s one for one, unwrapping any `loose.Template` to its source string first; when `Any` gains or changes a method, change `LooseTemplate` to match. A string that compiles as a template is stored as a `loose.Template`, and every other string as itself, so a raw index read can return either: read it only through its methods. `Clone` deep-copies every map and slice but shares each `loose.Template`, which never changes once compiled.
 - **`mapof.String.GetStringOK` returns `("", false)` for absent keys, on purpose.** Absent-key tolerance during schema validation is handled by `MapTyper`, not by loosening the getter contract. All mapof types implement `IsMap() bool` returning true, with compile-time assertions.
 
 ## funcmap
@@ -61,12 +62,13 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 - **The fuzz file is [html/html_fuzz_test.go](html/html_fuzz_test.go), not `fuzz_test.go`.** A `fuzz*_test.go` glob misses it and you will write a duplicate.
 - **When fuzzing sanitizer output, scope substring checks to tag spans only.** bluemonday escapes `<` in text to `&lt;`, so bare prose containing "onerror" is harmless; a naive `strings.Contains` assertion fails instantly on safe output.
 
-## lenient
+## loose
 
-- **This package is the receiving half of Postel's law: scalars that accept whatever encoding a remote system actually sends.** Its strict counterpart is `null`, which never coerces across JSON types; the split is deliberate — don't widen `null` or tighten `lenient` to merge them.
+- **This package is the receiving half of Postel's law: types that accept whatever a remote system or a hand-written file actually sends.** Its strict counterpart is `null`, which never coerces across JSON types; the split is deliberate — don't widen `null` or tighten `loose` to merge them.
 - **`String` decodes with `json.Decoder.UseNumber()` to keep a number's exact source text** (`1.0` stays `"1.0"`). Never route it through `convert.String`, which would force two decimals.
 - **`Int64` is `Int64`, not `Int`, on purpose, and its exact-integer fast path is important.** `convert.Int` clamps to platform int width (2^31 on 32-bit/wasm targets), and `json.Unmarshal` into `any` yields `float64`, silently rounding above 2^53 — the fast path preserves large integers. Precision beyond int64 is explicitly NOT a goal: larger values clamp, and integers nested inside arrays still round through `float64`.
-- **A new tolerant type goes into `jsonTargets` in [lenient/fuzz_test.go](lenient/fuzz_test.go)** to inherit the universal properties (no panic, valid re-encode, fixed-point round trip). Gate cross-arch with `GOOS=linux GOARCH=386 go vet ./...` (plus `arm`, `js/wasm`).
+- **A new tolerant type goes into `jsonTargets` in [loose/fuzz_test.go](loose/fuzz_test.go)** to inherit the universal properties (no panic, valid re-encode, fixed-point round trip). Gate cross-arch with `GOOS=linux GOARCH=386 go vet ./...` (plus `arm`, `js/wasm`).
+- **`Template` never rejects a malformed template: it keeps the string as plain text, with no compiled template.** A typo in a template therefore renders literally instead of failing, so a caller that needs every template to compile must check `IsTemplate()` itself. `UnmarshalJSON` decodes through `String`, so it accepts the same scalars and rejects objects and arrays. Its fuzz target compares encodings, not values, because each decode compiles a new template. Its own `FuzzTemplate_*` targets check the compile decision against `text/template` directly, and skip executing templates that use `range`, `define`, `block`, `break`, or `continue`: those can loop without end, and templates come from trusted authors, so their running time is out of scope.
 
 ## null
 

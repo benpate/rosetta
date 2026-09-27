@@ -29,7 +29,7 @@ Many of these packages pre-date Go generics, and many are being refactored to ta
 
 ### Enhanced Data Types
 
-* [Lenient](https://github.com/benpate/rosetta/tree/main/lenient) scalar types (`Int64`, `String`) that accept whatever encoding a remote system actually sends
+* [Loose](https://github.com/benpate/rosetta/tree/main/loose) types (`Int64`, `String`, `Template`) that accept whatever a remote system or a hand-written file actually sends
 * [List](https://github.com/benpate/rosetta/tree/main/list) parsing library
 * [MapOf](https://github.com/benpate/rosetta/tree/main/mapof) data type with type safe getters/setters
 * [Null](https://github.com/benpate/rosetta/tree/main/null)-able data types

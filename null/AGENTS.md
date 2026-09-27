@@ -20,7 +20,7 @@ A present `*Foo(nil)` marshals to `null`, which reads back as *unset*. The round
 
 ## The scalars never coerce across JSON types
 
-`String` rejects `123` and `true`; `Int`/`Int64`/`Float` reject `"123"`; `Bool` accepts only the literals `true`, `false`, and `null`. Widening any of these to "be helpful" breaks the package's contract — [lenient](../lenient/README.md) is the package that tolerates loose encodings, and the split between the two is deliberate.
+`String` rejects `123` and `true`; `Int`/`Int64`/`Float` reject `"123"`; `Bool` accepts only the literals `true`, `false`, and `null`. Widening any of these to "be helpful" breaks the package's contract — [loose](../loose/README.md) is the package that tolerates any encoding, and the split between the two is deliberate.
 
 ## String marshals through encoding/json, not strconv.Quote
 
