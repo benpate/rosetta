@@ -18,7 +18,7 @@ Tolerance never leaks into what you publish: `Int64` and `String` marshal to the
 
 ### Templates
 
-`loose.Template` is a string that `NewTemplate` compiles as a `text/template` when it holds a `{{` followed later by a `}}`. A string that does not compile is kept as plain text, not rejected, so a typo renders literally instead of failing. `Execute` renders a template against a value, or returns plain text as it is. It decodes any JSON scalar the way `loose.String` does, and marshals to its source string. It is compiled once and never changed, so it is safe to execute from many goroutines. [mapof.LooseTemplate](../mapof/looseTemplate.go) is a map whose strings are stored this way.
+`loose.Template` is a string that `NewTemplate` compiles as a `text/template` when it holds a `{{` followed later by a `}}`. A string that does not compile is kept as plain text, not rejected, so a typo renders literally instead of failing. `Execute` renders a template against a value, or returns plain text as it is. It decodes any JSON scalar the way `loose.String` does, and marshals to its source string. `loose.CachedTemplate` compiles each source string once for the life of the process, up to a fixed limit, for template strings that are rendered repeatedly; `NewTemplate` never caches. It is compiled once and never changed, so it is safe to execute from many goroutines. [mapof.Template](../mapof/template.go) is a map whose strings are stored this way.
 
 ### What survives, and what doesn't
 

@@ -13,5 +13,6 @@
 // followed later by a "}}". A string that does not compile is kept as plain
 // text rather than rejected. Execute renders a template against a value, or
 // returns plain text as it is. It encodes to JSON as its source string, and is
-// safe to execute from many goroutines at once.
+// safe to execute from many goroutines at once. CachedTemplate compiles each
+// source string once, for strings that are rendered repeatedly.
 package loose
