@@ -12,6 +12,12 @@ func MapOfAny(value any) (Any, bool) {
 	case *Any:
 		return *typed, true
 
+	case LooseTemplate:
+		return typed.MapOfAny(), true
+
+	case *LooseTemplate:
+		return typed.MapOfAny(), true
+
 	case Bool:
 		result := make(Any, len(typed))
 

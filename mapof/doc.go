@@ -11,4 +11,8 @@
 // That schema integration is the reason these types exist: they are the
 // carriers a JSON-Schema-shaped document is read into and written back out of
 // when there is no Go struct to bind to.
+//
+// LooseTemplate is the exception to "exactly like the maps they wrap": its
+// strings may be stored as loose.Template values, compiled when decoded or
+// set, and rendered by Evaluate. Read it only through its methods.
 package mapof

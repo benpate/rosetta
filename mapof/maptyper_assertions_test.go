@@ -16,4 +16,5 @@ var (
 	_ schema.MapTyper = mapof.Float(nil)
 	_ schema.MapTyper = mapof.String(nil)
 	_ schema.MapTyper = mapof.Object[string](nil)
+	_ schema.MapTyper = mapof.LooseTemplate(nil)
 )
