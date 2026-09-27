@@ -1,4 +1,4 @@
-package lenient
+package loose
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func (i Int64) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON decodes any JSON value into the integer, tolerantly.
 func (i *Int64) UnmarshalJSON(data []byte) error {
 
-	const location = "lenient.Int64.UnmarshalJSON"
+	const location = "loose.Int64.UnmarshalJSON"
 
 	// Decode to a raw value so numbers and strings can share one path.
 	var raw any
@@ -70,7 +70,7 @@ func (i *Int64) UnmarshalJSON(data []byte) error {
 // numeric parsing as UnmarshalJSON.
 func (i *Int64) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
 
-	const location = "lenient.Int64.UnmarshalXML"
+	const location = "loose.Int64.UnmarshalXML"
 
 	// Read the element's character data as a raw string.
 	var text string

@@ -1,4 +1,4 @@
-package lenient
+package loose
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"text/template"
 	"unicode/utf8"
 )
 
@@ -14,7 +15,7 @@ import (
  * Shared Corpus
  ******************************************/
 
-// jsonCorpus is every JSON shape worth throwing at either type: the
+// jsonCorpus is every JSON shape worth throwing at every type: the
 // documented behaviors, the numeric extremes, the encodings that have broken
 // real parsers, and plain garbage.
 var jsonCorpus = []string{
@@ -53,6 +54,9 @@ var jsonCorpus = []string{
 	`!!!`, `NaN`, `Infinity`, `-Infinity`, `+1`, `01`, `.5`, `5.`, `1e`,
 	`"abc`, `{`, `[`, ``, ` `, `nul`, `truex`, `"a" "b"`, `00`,
 
+	// Templates, valid and malformed
+	`"{{.ID}}"`, `"/v?id={{.ID}}"`, `"{{"`, `"}} {{"`, `"{{.ID | nosuchfunc}}"`, `{"a":"{{.ID}}"}`,
+
 	// Bytes that are not text at all
 	"\x00", "\xff\xfe", "\x00480",
 }
@@ -80,7 +84,7 @@ func seedJSON(f *testing.F) {
  * Universal Properties
  ******************************************/
 
-// The properties below hold for BOTH types, so a new lenient type gets its
+// The properties below hold for EVERY type, so a new loose type gets its
 // whole safety net by being added to this one list.
 
 // unmarshalJSON decodes into a fresh value of T and reports the result.
@@ -115,9 +119,21 @@ var jsonTargets = []jsonTarget{
 			return remarshaled, value, err
 		},
 	},
+	{
+		// Each decode compiles a new template, so its encoding stands in for its value
+		name: "Template",
+		decode: func(data []byte) ([]byte, any, error) {
+			var value Template
+			if err := json.Unmarshal(data, &value); err != nil {
+				return nil, nil, err
+			}
+			remarshaled, err := json.Marshal(value)
+			return remarshaled, string(remarshaled), err
+		},
+	},
 }
 
-// FuzzJSONProperties asserts the invariants every lenient type must hold:
+// FuzzJSONProperties asserts the invariants every loose type must hold:
 // it never panics, a successful decode always re-encodes to valid JSON, and
 // that re-encoding is a fixed point — decoding it again yields the same value.
 // The fixed-point property is the one that matters: it means a value can make
@@ -511,6 +527,230 @@ func FuzzString_RoundTrip(f *testing.F) {
 
 		if third != parsed {
 			t.Fatalf("value is not a fixed point: %q -> %q", parsed, third)
+		}
+	})
+}
+
+/******************************************
+ * Template
+ ******************************************/
+
+// templateCorpus is the template shapes worth throwing at Template: valid
+// templates, near misses that only look like templates, and malformed ones.
+var templateCorpus = []string{
+
+	// Plain strings, and strings that only look like templates
+	"", "off", "/a/b", "{{", "}}", "}} {{", "{{.ID", ".ID}}", "{}", "{{}",
+
+	// Valid templates
+	"{{.ID}}", "/v?id={{.ID}}", "}} {{.ID}}", "{{.ID}}{{.ID}}", "{{- .ID -}}",
+	"{{if .ID}}yes{{else}}no{{end}}", "{{with .ID}}{{.}}{{end}}", `{{printf "%s" .ID}}`,
+	"{{/* comment */}}", `{{"literal"}}`, "{{.Missing}}", "{{.ID.Nope}}",
+
+	// Malformed templates, which are kept as plain strings
+	"{{.ID | nosuchfunc}}", "{{end}}", "{{if .ID}}", "{{.ID}", "{{{.ID}}}",
+	"{{ .ID }} {{", `{{"unterminated}}`, "{{template}}", "{{else}}",
+
+	// Escapes and bytes that are not text at all
+	"{{.ID}}\x00", "\xff{{.ID}}", "café {{.ID}} 🎉",
+}
+
+// templateFuzzData is the value the fuzz targets render against, so that a
+// field that does not exist is an error and not "<no value>".
+type templateFuzzData struct {
+	ID string
+}
+
+// FuzzTemplate_NewTemplate pins the promises that NewTemplate makes for ANY
+// string: it never panics, it always keeps the source, and it compiles exactly
+// the strings that look like templates and parse, keeping the rest as text.
+func FuzzTemplate_NewTemplate(f *testing.F) {
+
+	for _, seed := range templateCorpus {
+		f.Add(seed)
+	}
+
+	f.Fuzz(func(t *testing.T, source string) {
+
+		value := NewTemplate(source)
+
+		// Property: the source string is always kept, compiled or not.
+		if value.String() != source {
+			t.Fatalf("source %q was stored as %q", source, value.String())
+		}
+
+		// Property: a string compiles if, and only if, it looks like a template
+		// and text/template accepts it. This is checked against the standard
+		// library directly, so a shortcut in NewTemplate cannot hide here.
+		_, parseErr := template.New("").Parse(source)
+		expected := looksLikeTemplate(source) && (parseErr == nil)
+
+		if value.IsTemplate() != expected {
+			t.Fatalf("IsTemplate() = %t, want %t (source %q, parse error %v)", value.IsTemplate(), expected, source, parseErr)
+		}
+
+		// Property: plain text executes as itself, whatever the data.
+		if !value.IsTemplate() {
+			result, err := value.Execute(templateFuzzData{ID: "x"})
+
+			if (err != nil) || (result != source) {
+				t.Fatalf("plain text %q executed as %q, %v", source, result, err)
+			}
+			return
+		}
+
+		// RULE: templates are written by trusted authors, so their running time
+		// is not under test. Skip the actions that can loop or recurse without end.
+		for _, keyword := range []string{"range", "define", "block", "break", "continue"} {
+			if strings.Contains(source, keyword) {
+				return
+			}
+		}
+
+		// Property: executing a compiled template never panics, and a failure
+		// never returns partial output.
+		result, err := value.Execute(templateFuzzData{ID: "x"})
+
+		if (err != nil) && (result != "") {
+			t.Fatalf("failed execution of %q still returned %q", source, result)
+		}
+	})
+}
+
+// FuzzTemplate_UnmarshalJSON pins that Template decodes exactly as String does,
+// because it decodes through String, and then compiles what NewTemplate would.
+func FuzzTemplate_UnmarshalJSON(f *testing.F) {
+
+	seedJSON(f)
+
+	for _, seed := range templateCorpus {
+		if encoded, err := json.Marshal(seed); err == nil {
+			f.Add(string(encoded))
+		}
+	}
+
+	f.Fuzz(func(t *testing.T, input string) {
+
+		var text String
+		textErr := json.Unmarshal([]byte(input), &text)
+
+		value := NewTemplate("unchanged")
+		templateErr := json.Unmarshal([]byte(input), &value)
+
+		// Property: Template accepts and rejects exactly what String does.
+		if (textErr == nil) != (templateErr == nil) {
+			t.Fatalf("String error %v, Template error %v (input %q)", textErr, templateErr, input)
+		}
+
+		// Property: a failed decode leaves the value untouched.
+		if templateErr != nil {
+			if value.String() != "unchanged" {
+				t.Fatalf("failed decode of %q still wrote %q", input, value.String())
+			}
+			return
+		}
+
+		// Property: the decoded text matches String's, and compiles exactly as
+		// NewTemplate would compile it.
+		if value.String() != string(text) {
+			t.Fatalf("decoded %q as %q, but String decoded %q", input, value.String(), text)
+		}
+
+		if value.IsTemplate() != NewTemplate(string(text)).IsTemplate() {
+			t.Fatalf("decoding %q compiled differently from NewTemplate(%q)", input, text)
+		}
+	})
+}
+
+// FuzzTemplate_RoundTrip drives the encode side from arbitrary strings: every
+// Template must survive being marshaled and read back, still compiled or still
+// plain as it was.
+func FuzzTemplate_RoundTrip(f *testing.F) {
+
+	for _, seed := range templateCorpus {
+		f.Add(seed)
+	}
+
+	f.Fuzz(func(t *testing.T, source string) {
+
+		value := NewTemplate(source)
+
+		data, err := json.Marshal(value)
+
+		if err != nil {
+			t.Fatalf("marshal of %q failed: %v", source, err)
+		}
+
+		var parsed Template
+
+		if err := json.Unmarshal(data, &parsed); err != nil {
+			t.Fatalf("re-parsing own output %q failed: %v", data, err)
+		}
+
+		// json.Marshal replaces invalid UTF-8 with U+FFFD, so an exact match
+		// is only required of input that was valid UTF-8 to begin with.
+		if !utf8.ValidString(source) {
+			return
+		}
+
+		if parsed.String() != source {
+			t.Fatalf("round trip changed %q to %q (encoded as %q)", source, parsed.String(), data)
+		}
+
+		if parsed.IsTemplate() != value.IsTemplate() {
+			t.Fatalf("round trip of %q changed IsTemplate from %t", source, value.IsTemplate())
+		}
+	})
+}
+
+// FuzzTemplate_StructField runs Template as a field of a real struct, so that
+// an unmarshaler consuming the wrong number of tokens shows up in its neighbors.
+func FuzzTemplate_StructField(f *testing.F) {
+
+	type document struct {
+		Before   string   `json:"before"`
+		Template Template `json:"template"`
+		After    string   `json:"after"`
+	}
+
+	for _, seed := range jsonCorpus {
+		f.Add(`{"before":"a","template":` + seed + `,"after":"c"}`)
+	}
+
+	for _, seed := range templateCorpus {
+		if encoded, err := json.Marshal(seed); err == nil {
+			f.Add(`{"before":"a","template":` + string(encoded) + `,"after":"c"}`)
+		}
+	}
+
+	f.Fuzz(func(t *testing.T, input string) {
+
+		var parsed document
+
+		if err := json.Unmarshal([]byte(input), &parsed); err != nil {
+			return
+		}
+
+		remarshaled, err := json.Marshal(parsed)
+
+		if err != nil {
+			t.Fatalf("marshal failed after successful unmarshal of %q: %v", input, err)
+		}
+
+		var second document
+
+		if err := json.Unmarshal(remarshaled, &second); err != nil {
+			t.Fatalf("re-marshaled %q failed to decode: %v (input %q)", remarshaled, err, input)
+		}
+
+		// Property: every field survives the round trip. The Templates are
+		// compared by source, because each decode compiles a new template.
+		if (second.Before != parsed.Before) || (second.After != parsed.After) {
+			t.Fatalf("neighbors drifted on round trip: %#v -> %#v (input %q)", parsed, second, input)
+		}
+
+		if second.Template.String() != parsed.Template.String() {
+			t.Fatalf("template drifted on round trip: %q -> %q (input %q)", parsed.Template.String(), second.Template.String(), input)
 		}
 	})
 }

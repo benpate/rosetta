@@ -1,4 +1,4 @@
-package lenient
+package loose
 
 import (
 	"encoding/json"

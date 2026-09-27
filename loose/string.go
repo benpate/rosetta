@@ -1,4 +1,4 @@
-package lenient
+package loose
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ type String string
 // UnmarshalJSON decodes any scalar JSON value into the string, tolerantly.
 func (s *String) UnmarshalJSON(data []byte) error {
 
-	const location = "lenient.String.UnmarshalJSON"
+	const location = "loose.String.UnmarshalJSON"
 
 	// Decode with UseNumber so numeric source text survives verbatim. This
 	// also sidesteps convert.String, which formats floats to two decimals.
