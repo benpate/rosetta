@@ -12,10 +12,10 @@ func MapOfAny(value any) (Any, bool) {
 	case *Any:
 		return *typed, true
 
-	case LooseTemplate:
+	case Template:
 		return typed.MapOfAny(), true
 
-	case *LooseTemplate:
+	case *Template:
 		return typed.MapOfAny(), true
 
 	case Bool:
