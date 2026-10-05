@@ -45,11 +45,12 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 		return derp.Internal(location, "Source element must exist in sourceSchema", runner.SourcePath)
 	}
 
-	// Get the array value from the sourceValue
+	// RULE: A source that is missing or nil has no items, so the following rules still run.
+	// This matches the path rule, which writes "" for a source it cannot read.
 	sourceArray, err := sourceSchema.Get(sourceValue, runner.SourcePath)
 
-	if err != nil {
-		return derp.Internal(location, "Error getting value from source", runner.SourcePath)
+	if (err != nil) || (sourceArray == nil) {
+		return nil
 	}
 
 	sourceGetter, ok := sourceArray.(schema.KeysGetter)

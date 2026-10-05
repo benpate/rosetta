@@ -220,3 +220,19 @@ func ExamplePipeline_Execute() {
 	// person
 	// John is Male
 }
+
+// TestExecuteRules_StopsAtFirstError pins that a failed rule ends the pipeline: earlier rules
+// keep their writes, and later rules never run
+func TestExecuteRules_StopsAtFirstError(t *testing.T) {
+
+	rules := New(
+		Value("b", "before"),
+		ForEach("missing", "items", "", []map[string]any{}),
+		Value("a", "after"),
+	)
+
+	target := mapof.Any{}
+	err := rules.Execute(activityStreamSchema(), mapof.Any{"missing": "not a list"}, activityStreamSchema(), &target)
+	require.Error(t, err)
+	require.Equal(t, mapof.Any{"before": "b"}, target)
+}

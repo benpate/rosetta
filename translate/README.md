@@ -13,11 +13,12 @@ Each rule is a JSON object whose keys select the rule kind:
 - **`expression`** — run a Go template against the source and write the result. `{"expression":"{{ … }}", "target":"target.path"}`
 - **`append`** — append a value to a slice/collection at the target path. `{"append":"VALUE", "target":"target.path"}`
 - **`if`** — evaluate a Go template; run `then` rules when it returns `"true"`, otherwise `else`. `{"if":"{{ … }}", "then":[…], "else":[…]}`
-- **`forEach`** — loop a source map/array, running `rules` for each item under the target path (optionally filtered). `{"forEach":"source.path", "target":"target.path", "filter":"{{ … }}", "rules":[…]}`
+- **`forEach`** — loop a source map/array, running `rules` for each item under the target path (optionally filtered). A missing or nil source has no items and writes nothing. `{"forEach":"source.path", "target":"target.path", "filter":"{{ … }}", "rules":[…]}`
 - **`first`** — run a list of rules, stopping after the first to set a non-zero value at the target. `{"first":"target.path", "rules":[…]}`
 
 ## What matters here
 
+- **A failed rule stops the whole pipeline.** `Pipeline.Execute` returns at the first error, so every later rule is skipped while earlier writes stay. A rule that writes into a value of the wrong kind, such as `url.href` when `url` is a string or a list, now fails rather than replacing it (BUG-234).
 - **The rule kind is chosen by which key is present, not by an explicit `type` field.** `Rule.UnmarshalMap` checks for `append`, `value`, `path`, `expression`, `if`, `forEach`, `first` in turn. A rule map carrying two of these keys is ambiguous — the first matched dispatch wins. Author one rule kind per object.
 - **Source and target must each implement the schema Getter/Setter interfaces.** Plain structs work only if they implement those interfaces (see [schema](../schema/)); a `mapof.Any` is the path of least resistance because it implements them out of the box.
 - **`expression`, `if`, and `forEach`'s `filter` are Go templates evaluated against the SOURCE object.** They can read anything in the source but write only via their rule's target — a template that "returns true" for `if` must emit the literal string `"true"`.

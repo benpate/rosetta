@@ -3,6 +3,7 @@ package translate
 import (
 	"testing"
 
+	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
 	"github.com/benpate/rosetta/sliceof"
@@ -65,4 +66,67 @@ func TestForEach(t *testing.T) {
 	require.Equal(t, "sarah@sky.net", value2["emailAddress"])
 	require.Equal(t, "person", value2["type"])
 	require.Equal(t, "Sarah Connor <sarah@sky.net>", value2["comment"])
+}
+
+// activityStreamSchema matches the schema Emissary uses for both sides of its social rules
+func activityStreamSchema() schema.Schema {
+	return schema.New(schema.Object{
+		Properties: schema.ElementMap{"@context": schema.Array{Items: schema.Any{}}},
+		Wildcard:   schema.Any{},
+	})
+}
+
+// TestForEach_Source pins forEach with each shape of source: a missing or nil source has no
+// items, so the rule after it still runs
+func TestForEach_Source(t *testing.T) {
+
+	// BUG-234: a missing source used to stop every rule after it
+
+	rules, err := NewFromJSON(`[
+		{"target": "before", "value": "b"},
+		{"target": "links", "forEach": "data.links", "rules": [{"target": "href", "path": "value"}]},
+		{"target": "after", "value": "a"}
+	]`)
+	require.NoError(t, err)
+
+	run := func(source mapof.Any) (mapof.Any, error) {
+		target := mapof.Any{}
+		err := rules.Execute(activityStreamSchema(), source, activityStreamSchema(), &target)
+		return target, err
+	}
+
+	t.Run("missing parent, missing source, and nil source write nothing", func(t *testing.T) {
+		for _, source := range []mapof.Any{
+			{},
+			{"data": mapof.Any{}},
+			{"data": mapof.Any{"links": nil}},
+		} {
+			target, err := run(source)
+			require.NoError(t, err, "%#v", source)
+			require.Equal(t, mapof.Any{"before": "b", "after": "a"}, target, "%#v", source)
+		}
+	})
+
+	t.Run("a source that is not a list is still an error", func(t *testing.T) {
+		target, err := run(mapof.Any{"data": mapof.Any{"links": "not a list"}})
+		require.Error(t, err)
+		require.Equal(t, "Source value must implement schema.KeysGetter", derp.RootMessage(err))
+		require.Equal(t, mapof.Any{"before": "b"}, target)
+	})
+
+	t.Run("empty source writes nothing, and the next rule runs", func(t *testing.T) {
+		target, err := run(mapof.Any{"data": mapof.Any{"links": mapof.Any{}}})
+		require.NoError(t, err)
+		require.Equal(t, mapof.Any{"before": "b", "after": "a"}, target)
+	})
+
+	t.Run("each item is written as a pointer to a list of maps", func(t *testing.T) {
+		target, err := run(mapof.Any{"data": mapof.Any{"links": mapof.Any{"SPOTIFY": "https://spotify.example/a"}}})
+		require.NoError(t, err)
+		require.Equal(t, mapof.Any{
+			"before": "b",
+			"links":  &sliceof.Object[mapof.Any]{{"href": "https://spotify.example/a"}},
+			"after":  "a",
+		}, target)
+	})
 }
