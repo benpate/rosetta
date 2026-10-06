@@ -12,9 +12,10 @@ func TestArray_GetSet(t *testing.T) {
 	schema := New(testArrayA_Schema())
 
 	{
+		// Reading past the end of a list returns the element's zero value (BUG-234 follow-up 4)
 		result, err := schema.Get(value, "0")
-		require.Error(t, err)
-		require.Equal(t, nil, result)
+		require.NoError(t, err)
+		require.Equal(t, "", result)
 	}
 
 	{

@@ -3,6 +3,7 @@ package sliceof
 import (
 	"testing"
 
+	"github.com/benpate/rosetta/mapof"
 	"github.com/stretchr/testify/require"
 )
 
@@ -177,4 +178,61 @@ func TestAny_Remove(t *testing.T) {
 	require.True(t, x.RemoveAt(0))
 	require.Equal(t, Any{3}, x)
 	require.False(t, x.RemoveAt(99))
+}
+
+// TestAny_GetPointer_Items pins what GetPointer returns for each kind of item: a pointer to a
+// COPY of a value, so writing through it never changes the slice
+func TestAny_GetPointer_Items(t *testing.T) {
+
+	// BUG-234: schema stores whole items through SetAny because of this
+
+	t.Run("a string item is copied", func(t *testing.T) {
+		x := NewAny("a")
+		pointer, ok := x.GetPointer("0")
+		require.True(t, ok)
+		require.IsType(t, new(string), pointer)
+		*(pointer.(*string)) = "changed"
+		require.Equal(t, Any{"a"}, x)
+	})
+
+	t.Run("a map item is copied, but the copy shares the map's contents", func(t *testing.T) {
+		x := NewAny(mapof.Any{"type": "Artist"})
+		pointer, ok := x.GetPointer("0")
+		require.True(t, ok)
+		require.IsType(t, new(mapof.Any), pointer)
+
+		(*pointer.(*mapof.Any))["id"] = "https://example.com/@a"
+		require.Equal(t, Any{mapof.Any{"type": "Artist", "id": "https://example.com/@a"}}, x)
+
+		*(pointer.(*mapof.Any)) = mapof.Any{"replaced": true}
+		require.Equal(t, Any{mapof.Any{"type": "Artist", "id": "https://example.com/@a"}}, x)
+	})
+
+	t.Run("a pointer item is returned as it is", func(t *testing.T) {
+		item := &mapof.Any{"type": "Artist"}
+		x := NewAny(item)
+		pointer, ok := x.GetPointer("0")
+		require.True(t, ok)
+		require.Same(t, item, pointer)
+	})
+
+	t.Run("an index past the end grows the slice and returns nil", func(t *testing.T) {
+		x := NewAny("a")
+		pointer, ok := x.GetPointer("2")
+		require.True(t, ok)
+		require.Nil(t, pointer)
+		require.Equal(t, Any{"a", nil, nil}, x)
+	})
+
+	t.Run("last reads the final item, and fails on an empty slice", func(t *testing.T) {
+		x := NewAny("a", "b")
+		pointer, ok := x.GetPointer("last")
+		require.True(t, ok)
+		require.Equal(t, "b", *(pointer.(*string)))
+
+		empty := NewAny()
+		_, ok = empty.GetPointer("last")
+		require.False(t, ok)
+		require.Equal(t, NewAny(), empty)
+	})
 }

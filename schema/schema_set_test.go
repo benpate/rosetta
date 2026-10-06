@@ -75,7 +75,7 @@ func TestSet_ValidValueStillSets(t *testing.T) {
 	require.Equal(t, "Sarah Connor", object["name"])
 }
 
-// mapStringObject is a minimal ObjectSetter/PointerGetter target for Set tests.
+// mapStringObject is a minimal StringSetter/PointerGetter target for Set tests.
 type mapStringObject map[string]string
 
 func (object *mapStringObject) GetPointer(name string) (any, bool) {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 )
 
 // Set sets the value at the specified path within the object according to this schema
@@ -17,9 +16,10 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	// RULE: An unknown path is a client-input problem (a form posting a field the schema
 	// does not define), so it is a validation error that names the field -- not a 400.
+	// A path with an empty segment ("name.") names no field at all.
 	element, ok := schema.GetElement(path)
 
-	if !ok {
+	if !ok || hasEmptySegment(path) {
 		return derp.Validation("Unknown field: "+path, location, path)
 	}
 
@@ -168,33 +168,21 @@ func SetProperty(element Element, object any, path string, value any) (err error
 	return derp.Internal(location, "Unsupported element type", path, subElement, typeName(object))
 }
 
-// setProperty_Object sets a value in the object through its ObjectSetter or PointerGetter
-// interface
+// setProperty_Object sets a value beneath an Any, Array, or Object element.  Schema walks into
+// a map's children itself; structs and lists hand back each child through PointerGetter.
 func setProperty_Object(parentElement Element, childElement Element, object any, path string, head string, tail string, value any) error {
 
-	const location = "schema.setProperty_Object"
-
-	// parentElement describes the object being set, whose properties are its keys.
-	// childElement is the schema for the first path segment (head).
-
-	// ObjectSetter interface is required for Maps. The map's own schema is the
-	// parent element, and SetObject descends the full path itself.
-	if setter, ok := object.(ObjectSetter); ok {
-		return setter.SetObject(parentElement, list.ByDot(path), value)
+	// Maps store one key at a time, and schema chooses the container for each child
+	if setter, ok := object.(KeySetter); ok {
+		return setMapChild(setter, childElement, object, head, tail, value)
 	}
 
-	// PointerGetter works for Structs, Slices, and Arrays. We have already
-	// descended to "head", so continue with the child element and the tail.
-	if getter, ok := object.(PointerGetter); ok {
-		if subPointer, ok := getter.GetPointer(head); ok {
-			return SetProperty(childElement, subPointer, tail, value)
-		}
+	// A typed map, such as mapof.String, stores a single key through its own setter
+	if (tail == "") && setTypedMapKey(object, head, value) {
+		return nil
 	}
 
-	// Cannot set the value
-	return derp.Internal(
-		location, "Target Object must be an ObjectSetter or PointerGetter", path, typeName(object),
-	)
+	return setOtherChild(parentElement, childElement, object, path, head, tail, value)
 }
 
 // setProperty_Boolean sets a boolean value in the object.

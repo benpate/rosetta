@@ -1,7 +1,5 @@
 package schema
 
-import "github.com/benpate/rosetta/list"
-
 // Nullable interface wraps the IsNull method, that helps an object
 // to identify if it contains a null value or not.  This mirrors
 // the null.Nullable interface here, for convenience.
@@ -157,11 +155,11 @@ type Int64Setter interface {
 	SetInt64(string, int64) bool
 }
 
-// ObjectSetter allows an object to set a child object by path
-type ObjectSetter interface {
+// KeySetter allows a map to store a value under a single key, exactly as given
+type KeySetter interface {
 
-	// SetObject sets the child object at the specified path
-	SetObject(Element, list.List, any) error
+	// SetKey stores the value under the key, or returns an error if the map cannot hold it
+	SetKey(string, any) error
 }
 
 // StringSetter allows an object to set a string property by name

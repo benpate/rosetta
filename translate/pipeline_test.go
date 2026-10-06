@@ -8,6 +8,7 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/schema"
+	"github.com/benpate/rosetta/sliceof"
 	"github.com/stretchr/testify/require"
 )
 
@@ -219,6 +220,41 @@ func ExamplePipeline_Execute() {
 	// john@connor.mil
 	// person
 	// John is Male
+}
+
+// TestExecuteRules_IndexedTarget pins Bandwagon's album "artists" rules: the indexed target
+// writes into the first item of the list the first two rules built
+func TestExecuteRules_IndexedTarget(t *testing.T) {
+
+	// BUG-234: these rules used to replace the list with {"0": {...}}
+
+	source := mapof.Any{"attributedTo": mapof.Any{"profileUrl": "https://example.com/@a", "name": "Lime Bar"}}
+
+	t.Run("the first two rules build a list", func(t *testing.T) {
+		rules, err := NewFromJSON(`[
+			{"target": "artists", "value": []},
+			{"target": "artists", "append": {"type": "Artist"}}
+		]`)
+		require.NoError(t, err)
+
+		target := mapof.Any{}
+		require.NoError(t, rules.Execute(activityStreamSchema(), source, activityStreamSchema(), &target))
+		require.Equal(t, mapof.Any{"artists": &sliceof.Any{mapof.Any{"type": "Artist"}}}, target)
+	})
+
+	t.Run("the indexed rules write into its first item", func(t *testing.T) {
+		rules, err := NewFromJSON(`[
+			{"target": "artists", "value": []},
+			{"target": "artists", "append": {"type": "Artist"}},
+			{"target": "artists.0.id", "path": "attributedTo.profileUrl"},
+			{"target": "artists.0.name", "path": "attributedTo.name"}
+		]`)
+		require.NoError(t, err)
+
+		target := mapof.Any{}
+		require.NoError(t, rules.Execute(activityStreamSchema(), source, activityStreamSchema(), &target))
+		require.Equal(t, mapof.Any{"artists": &sliceof.Any{mapof.Any{"type": "Artist", "id": "https://example.com/@a", "name": "Lime Bar"}}}, target)
+	})
 }
 
 // TestExecuteRules_StopsAtFirstError pins that a failed rule ends the pipeline: earlier rules

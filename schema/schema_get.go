@@ -20,16 +20,17 @@ func getPropertyRecursive(element Element, object any, path string) (any, error)
 
 	// If the path is empty, then try to get the value of the entire object.
 	if path == "" {
-
-		if getter, ok := object.(ValueGetter); ok {
-			return getter.GetValue(), nil
-		}
-
-		return object, nil
+		return wholeValue(object), nil
 	}
 
 	// Split the path into head and tail
 	head, tail, _ := strings.Cut(path, ".")
+
+	// RULE: Reading past the end of a list returns the zero value, and never calls a getter,
+	// because sliceof's GetPointer grows the list (and allocates) to reach an index
+	if isListPastEnd(object, head) {
+		return zeroValueAt(element, path)
+	}
 
 	// Get the property value from the object
 	result, err := getProperty(element, object, head)
@@ -54,6 +55,16 @@ func getPropertyRecursive(element Element, object any, path string) (any, error)
 	return getPropertyRecursive(subElement, result, tail)
 }
 
+// wholeValue returns the value of an entire object, through ValueGetter when it has one
+func wholeValue(object any) any {
+
+	if getter, ok := object.(ValueGetter); ok {
+		return getter.GetValue()
+	}
+
+	return object
+}
+
 // getProperty retrieves a generic value from the object.
 func getProperty(element Element, object any, name string) (any, error) {
 
@@ -65,6 +76,9 @@ func getProperty(element Element, object any, name string) (any, error) {
 	if !ok {
 		return nil, derp.BadRequest(location, "Invalid property", name)
 	}
+
+	// A list or map held by value is read through a pointer to a copy
+	object = readableObject(object)
 
 	// Use the element type to find the correct property getter
 	switch typed := subElement.(type) {
@@ -110,6 +124,11 @@ func getProperty_PointerOnly(object any, name string) (any, error) {
 
 	if !ok {
 		return nil, derp.Internal(location, "Getting pointer to property", name, typeName(object))
+	}
+
+	// A list's GetPointer returns a pointer to a copy of a scalar item, so return the item itself
+	if _, isList := object.(ArrayGetter); isList {
+		return scalarValue(result), nil
 	}
 
 	return result, nil
