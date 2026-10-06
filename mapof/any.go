@@ -7,9 +7,7 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
-	"github.com/benpate/rosetta/schema"
 )
 
 // Any is a map of string keys to arbitrary values with typed, coercing accessors.
@@ -275,49 +273,11 @@ func (x Any) GetPointer(key string) (any, bool) {
 	return result, ok
 }
 
-// SetObject descends the path (creating child maps as needed) and sets the value (implements the schema ObjectSetter interface).
-func (x *Any) SetObject(element schema.Element, path list.List, value any) error {
-
-	const location = "mapof.Any.SetObject"
-
-	if path.IsEmpty() {
-		return derp.Internal(location, "Cannot set values on empty path")
-	}
-
+// SetKey stores the value under the key exactly as given, including a zero value (implements
+// the schema KeySetter interface).
+func (x *Any) SetKey(key string, value any) error {
 	x.makeNotNil()
-
-	head, tail := path.Split()
-
-	if tail.IsEmpty() {
-		(*x)[head] = value
-		return nil
-	}
-
-	// Fall through means we need to make a child map and set the remaining value in it.
-	subElement, ok := element.GetElement(head)
-
-	if !ok {
-		return derp.Internal(location, "Invalid property", head)
-	}
-
-	// Get or create the child map. We use a concrete Any (not a bare `any`) so
-	// that the recursive SetProperty call receives a *Any, which implements the
-	// setter interfaces; a *any (pointer to interface) would implement none.
-	var subMap Any
-
-	if existing, ok := (*x)[head].(Any); ok {
-		subMap = existing
-	} else {
-		subMap = make(Any)
-	}
-
-	if err := schema.SetProperty(subElement, &subMap, tail.String(), value); err != nil {
-		return derp.Wrap(err, location, "Setting value", path)
-	}
-
-	// Reapply the (mutated) child map back into this map.
-	(*x)[head] = subMap
-
+	(*x)[key] = value
 	return nil
 }
 

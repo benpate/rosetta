@@ -7,9 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/loose"
-	"github.com/benpate/rosetta/schema"
 	"github.com/stretchr/testify/require"
 )
 
@@ -362,28 +360,22 @@ func TestTemplate_Append(t *testing.T) {
 	require.Equal(t, []any{1}, empty["new"])
 }
 
-// TestTemplate_SetObject covers setting a value directly and through a child map
-func TestTemplate_SetObject(t *testing.T) {
-
-	element := schema.Object{Properties: schema.ElementMap{
-		"validator": schema.String{},
-		"child":     schema.Object{Properties: schema.ElementMap{"name": schema.String{}, "title": schema.String{}}},
-	}}
+// TestTemplate_SetKey requires that SetKey compiles a string that holds a template, and stores
+// every other value as given, including a zero value
+func TestTemplate_SetKey(t *testing.T) {
 
 	var value Template
 
-	require.NoError(t, value.SetObject(element, list.ByDot("validator"), "/v?id={{.ID}}"))
+	require.NoError(t, value.SetKey("validator", "/v?id={{.ID}}"))
 	require.True(t, value["validator"].(loose.Template).IsTemplate())
 
-	require.NoError(t, value.SetObject(element, list.ByDot("child.name"), "Sarah"))
+	require.NoError(t, value.SetKey("child", Any{"name": "Sarah"}))
 	require.Equal(t, Any{"name": "Sarah"}, value["child"])
 
-	require.NoError(t, value.SetObject(element, list.ByDot("child.title"), "Captain"))
-	require.Equal(t, Any{"name": "Sarah", "title": "Captain"}, value["child"], "an existing child map is reused")
-	require.Error(t, value.SetObject(element, list.ByDot(""), "x"))
-	require.Error(t, value.SetObject(element, list.ByDot("missing.name"), "x"))
-	require.Error(t, value.SetObject(element, list.ByDot("child.nope"), "x"), "the child schema has no such property")
-	require.NoError(t, value.SetObject(element, list.ByDot("validator"), "{{.ID | nosuchfunc}}"))
+	require.NoError(t, value.SetKey("empty", ""))
+	require.Equal(t, "", value["empty"])
+
+	require.NoError(t, value.SetKey("validator", "{{.ID | nosuchfunc}}"))
 	require.Equal(t, "{{.ID | nosuchfunc}}", value["validator"])
 }
 

@@ -1,12 +1,12 @@
 package mapof
 
 import (
+	"fmt"
+
 	"github.com/benpate/rosetta/compare"
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/maps"
 
 	"github.com/benpate/derp"
-	"github.com/benpate/rosetta/schema"
 )
 
 // Object is a map of string keys to values of a single type T, with schema-traversal support.
@@ -56,40 +56,18 @@ func (object Object[T]) GetPointer(name string) (any, bool) {
 	return value, ok
 }
 
-// SetObject descends the path (creating child entries as needed) and sets the value (implements the schema ObjectSetter interface).
-func (object *Object[T]) SetObject(element schema.Element, path list.List, value any) error {
+// SetKey stores the value under the key when it is a T, and returns an error otherwise
+// (implements the schema KeySetter interface).
+func (object *Object[T]) SetKey(key string, value any) error {
 
-	if path.IsEmpty() {
-		return derp.Internal("mapof.Object.SetObject", "Cannot set values on empty path")
+	typed, ok := value.(T)
+
+	if !ok {
+		return derp.Internal("mapof.Object.SetKey", "Invalid type", key, fmt.Sprintf("%T", value))
 	}
 
 	object.makeNotNil()
-
-	head, tail := path.Split()
-
-	if tail.IsEmpty() {
-		if typed, ok := value.(T); ok {
-			(*object)[head] = typed
-			return nil
-		}
-		return derp.Internal("mapof.Object.SetObject", "Invalid type", head, value)
-	}
-
-	subElement, ok := element.GetElement(head)
-
-	if !ok {
-		return derp.Internal("mapof.Object.SetObject", "Unknown property", head)
-	}
-
-	tempValue := (*object)[head]
-
-	if err := schema.SetProperty(subElement, &tempValue, tail.String(), value); err != nil {
-		return derp.Wrap(err, "mapof.Object.SetObject", "Unable to set value", path)
-	}
-
-	// Reapply the updated value to the map
-	(*object)[head] = tempValue
-
+	(*object)[key] = typed
 	return nil
 }
 

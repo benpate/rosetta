@@ -46,3 +46,21 @@ func TestObject_Remove(t *testing.T) {
 	require.True(t, n.Remove("key"))
 	require.NotNil(t, n)
 }
+
+// TestObject_SetKey requires that SetKey stores only a value of type T
+func TestObject_SetKey(t *testing.T) {
+
+	t.Run("a value of type T is stored", func(t *testing.T) {
+		var object Object[Any]
+		require.NoError(t, object.SetKey("child", Any{"name": "v"}))
+		require.Equal(t, Object[Any]{"child": {"name": "v"}}, object)
+	})
+
+	t.Run("a value of another type is an error, and nothing is stored", func(t *testing.T) {
+		object := Object[Any]{"child": {"keep": "k"}}
+		require.Error(t, object.SetKey("child", map[string]any{"name": "v"}))
+		require.Error(t, object.SetKey("other", "v"))
+		require.Error(t, object.SetKey("other", nil))
+		require.Equal(t, Object[Any]{"child": {"keep": "k"}}, object)
+	})
+}

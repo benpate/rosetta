@@ -9,10 +9,8 @@ import (
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/compare"
 	"github.com/benpate/rosetta/convert"
-	"github.com/benpate/rosetta/list"
 	"github.com/benpate/rosetta/loose"
 	"github.com/benpate/rosetta/maps"
-	"github.com/benpate/rosetta/schema"
 )
 
 // Template is a map of string keys to arbitrary values, whose strings may be templates that
@@ -532,48 +530,11 @@ func (x Template) GetPointer(key string) (any, bool) {
 	return x.unwrap(key)
 }
 
-// SetObject descends the path (creating child maps as needed) and sets the value, compiling a
-// string that holds a template (implements the schema ObjectSetter interface).
-func (x *Template) SetObject(element schema.Element, path list.List, value any) error {
-
-	const location = "mapof.Template.SetObject"
-
-	if path.IsEmpty() {
-		return derp.Internal(location, "Cannot set values on empty path")
-	}
-
+// SetKey stores the value under the key, including a zero value, compiling a string that holds
+// a template (implements the schema KeySetter interface).
+func (x *Template) SetKey(key string, value any) error {
 	x.makeNotNil()
-
-	head, tail := path.Split()
-
-	if tail.IsEmpty() {
-		(*x)[head] = wrapTemplate(value)
-		return nil
-	}
-
-	// Fall through means we need to make a child map and set the remaining value in it.
-	subElement, ok := element.GetElement(head)
-
-	if !ok {
-		return derp.Internal(location, "Invalid property", head)
-	}
-
-	// Child maps are plain Any maps: only this map's own strings are templates
-	var subMap Any
-
-	if existing, ok := (*x)[head].(Any); ok {
-		subMap = existing
-	} else {
-		subMap = make(Any)
-	}
-
-	if err := schema.SetProperty(subElement, &subMap, tail.String(), value); err != nil {
-		return derp.Wrap(err, location, "Setting value", path)
-	}
-
-	// Reapply the (mutated) child map back into this map.
-	(*x)[head] = subMap
-
+	(*x)[key] = wrapTemplate(value)
 	return nil
 }
 

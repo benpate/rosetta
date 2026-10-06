@@ -4,8 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/benpate/rosetta/list"
-	"github.com/benpate/rosetta/schema"
 	"github.com/stretchr/testify/require"
 )
 
@@ -201,32 +199,19 @@ func TestAny_MapOfAnyAndString(t *testing.T) {
 	require.Equal(t, "two", asStrings["b"])
 }
 
-func TestAny_SetObject(t *testing.T) {
+// TestAny_SetKey requires that SetKey stores every value as given, including a zero value,
+// which SetAny would delete instead
+func TestAny_SetKey(t *testing.T) {
 
-	s := schema.Object{
-		Properties: schema.ElementMap{
-			"outer": schema.Object{
-				Properties: schema.ElementMap{
-					"inner": schema.String{},
-				},
-			},
-		},
-	}
+	var m Any
 
-	m := NewAny()
+	require.NoError(t, m.SetKey("outer", Any{"inner": "value"}))
+	require.NoError(t, m.SetKey("empty", ""))
+	require.NoError(t, m.SetKey("nothing", nil))
+	require.Equal(t, Any{"outer": Any{"inner": "value"}, "empty": "", "nothing": nil}, m)
 
-	// Empty path is an error
-	require.Error(t, m.SetObject(s, list.ByDot(""), "value"))
-
-	// Single-segment path sets directly
-	require.NoError(t, m.SetObject(s, list.ByDot("outer"), Any{}))
-
-	// Nested path sets through a child map
-	require.NoError(t, m.SetObject(s, list.ByDot("outer.inner"), "value"))
-	require.Equal(t, "value", m.GetMapOfAny("outer").GetString("inner"))
-
-	// Unknown property is an error
-	require.Error(t, m.SetObject(s, list.ByDot("bogus.inner"), "value"))
+	require.True(t, m.SetAny("empty", ""))
+	require.Equal(t, Any{"outer": Any{"inner": "value"}, "nothing": nil}, m, "SetAny deletes a zero value")
 }
 
 func TestAny_GetTimeType(t *testing.T) {
