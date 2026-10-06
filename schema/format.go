@@ -63,6 +63,7 @@ func init() {
 
 	// Databases
 	UseFormat("objectId", format.ObjectID)
+	UseFormat("uuid", format.UUID)
 
 	// Email
 	UseFormat("email", format.Email)

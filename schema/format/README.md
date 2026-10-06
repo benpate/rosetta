@@ -1,6 +1,6 @@
 # schema/format
 
-String-format validators for the [schema](../) package. Each exported function (`Email`, `Color`, `ObjectID`, `IPv4`, `IPv6`, `Hostname`, `URI`, `Date`, `DateTime`, `Time`, `ISO8601`, `HTML`, `NoHTML`, `Markdown`, `CSS`, `In`, `NotIn`, `MatchRegex`, `Token`, `Username`, `WebFinger`, `UnsafeAny`) is a `Generator` — it takes a configuration `arg` and returns a `StringFormat` closure that validates (and may rewrite) a string. See the parent [schema README](../README.md).
+String-format validators for the [schema](../) package. Each exported function (`Email`, `Color`, `ObjectID`, `UUID`, `IPv4`, `IPv6`, `Hostname`, `URI`, `Date`, `DateTime`, `Time`, `ISO8601`, `HTML`, `NoHTML`, `Markdown`, `CSS`, `In`, `NotIn`, `MatchRegex`, `Token`, `Username`, `WebFinger`, `UnsafeAny`) is a `Generator` — it takes a configuration `arg` and returns a `StringFormat` closure that validates (and may rewrite) a string. See the parent [schema README](../README.md).
 
 ## What matters here
 

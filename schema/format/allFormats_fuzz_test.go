@@ -32,6 +32,7 @@ func allGenerators() map[string]Generator {
 		"HasUppercase":    HasUppercase,
 		"HasNumbers":      HasNumbers,
 		"ObjectID":        ObjectID,
+		"UUID":            UUID,
 		"Token":           Token,
 		"MatchRegex":      MatchRegex,
 		"UnsafeAny":       UnsafeAny,
@@ -135,6 +136,7 @@ func FuzzFormats_AcceptedValueIsDerivedFromInput(f *testing.F) {
 		"URL":             true,
 		"URI":             true,
 		"Email":           true,
+		"UUID":            true,
 	}
 
 	f.Fuzz(func(t *testing.T, value string) {
