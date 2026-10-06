@@ -46,3 +46,50 @@ func upscale(value any) any {
 		return typed
 	}
 }
+
+// copyValue returns a deep copy of a rule's constant value, so that no output object ever
+// shares a map or a list with the rule, which every caller reuses
+func copyValue(value any) any {
+
+	switch typed := value.(type) {
+
+	case mapof.Any:
+		return mapof.Any(copyMap(typed))
+
+	case map[string]any:
+		return copyMap(typed)
+
+	case sliceof.Any:
+		return sliceof.Any(copySlice(typed))
+
+	case []any:
+		return copySlice(typed)
+	}
+
+	// Scalars are copied by value already
+	return value
+}
+
+// copyMap returns a deep copy of a map
+func copyMap(value map[string]any) map[string]any {
+
+	result := make(map[string]any, len(value))
+
+	for key, item := range value {
+		result[key] = copyValue(item)
+	}
+
+	return result
+}
+
+// copySlice returns a deep copy of a slice
+func copySlice(value []any) []any {
+
+	result := make([]any, len(value))
+
+	for index, item := range value {
+		result[index] = copyValue(item)
+	}
+
+	return result
+}

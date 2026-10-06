@@ -28,7 +28,10 @@ func newValueRunner(value any, target string) valueRunner {
 // Execute implements the Runner interface
 func (runner valueRunner) Execute(_ schema.Schema, _ any, targetSchema schema.Schema, targteObject any) error {
 
-	if err := targetSchema.Set(targteObject, runner.Target, runner.Value); err != nil {
+	// Write a copy, because this rule is shared by every caller
+	value := copyValue(runner.Value)
+
+	if err := targetSchema.Set(targteObject, runner.Target, value); err != nil {
 		return derp.Wrap(err, "rosetta.translate.valueRunner.Set", "Unable to set value in target", runner.Target)
 	}
 
