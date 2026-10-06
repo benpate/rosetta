@@ -130,3 +130,81 @@ func TestForEach_Source(t *testing.T) {
 		}, target)
 	})
 }
+
+// TestForEach_TypedSources requires forEach to read through a typed source schema: a map
+// declared as an Object, and a list declared as an Array of a single type
+func TestForEach_TypedSources(t *testing.T) {
+
+	rules, err := NewFromJSON(`[
+		{"target": "links", "forEach": "links", "rules": [
+			{"target": "label", "path": "key"},
+			{"target": "href", "path": "value"}
+		]}
+	]`)
+	require.NoError(t, err)
+
+	run := func(sourceSchema schema.Schema, source mapof.Any) (mapof.Any, error) {
+		target := mapof.Any{}
+		err := rules.Execute(sourceSchema, source, activityStreamSchema(), &target)
+		return target, err
+	}
+
+	t.Run("a map declared as an Object iterates its keys", func(t *testing.T) {
+
+		// FUNKWHALE task 1.1 step 4: Bandwagon's data.links is an Object with a wildcard
+		sourceSchema := schema.New(schema.Object{Properties: schema.ElementMap{
+			"links": schema.Object{Wildcard: schema.String{Format: "url"}},
+		}})
+
+		source := mapof.Any{"links": mapof.Any{"SPOTIFY": "https://spotify.example/a"}}
+		target, err := run(sourceSchema, source)
+		require.NoError(t, err)
+		require.Equal(t, mapof.Any{
+			"links": &sliceof.Object[mapof.Any]{
+				{"label": "SPOTIFY", "href": "https://spotify.example/a"},
+			},
+		}, target)
+	})
+
+	t.Run("a list of strings gives item rules its key and value", func(t *testing.T) {
+
+		// FUNKWHALE task 1.1 step 4: item rules used to read through the item schema, so
+		// "key" and "value" were unreadable beneath a String and became ""
+		sourceSchema := schema.New(schema.Object{Properties: schema.ElementMap{
+			"links": schema.Array{Items: schema.String{}},
+		}})
+
+		source := mapof.Any{"links": sliceof.String{"https://a.example", "https://b.example"}}
+		target, err := run(sourceSchema, source)
+		require.NoError(t, err)
+		require.Equal(t, mapof.Any{
+			"links": &sliceof.Object[mapof.Any]{
+				{"label": "0", "href": "https://a.example"},
+				{"label": "1", "href": "https://b.example"},
+			},
+		}, target)
+	})
+
+	t.Run("an Object with named properties iterates them", func(t *testing.T) {
+		sourceSchema := schema.New(schema.Object{Properties: schema.ElementMap{
+			"links": schema.Object{Properties: schema.ElementMap{"home": schema.String{}}},
+		}})
+
+		source := mapof.Any{"links": mapof.Any{"home": "https://home.example"}}
+		target, err := run(sourceSchema, source)
+		require.NoError(t, err)
+		require.Equal(t, mapof.Any{
+			"links": &sliceof.Object[mapof.Any]{{"label": "home", "href": "https://home.example"}},
+		}, target)
+	})
+
+	t.Run("a scalar source element is still an error", func(t *testing.T) {
+		sourceSchema := schema.New(schema.Object{Properties: schema.ElementMap{
+			"links": schema.String{},
+		}})
+
+		_, err := run(sourceSchema, mapof.Any{"links": "https://a.example"})
+		require.Error(t, err)
+		require.Equal(t, "Source element must be a list or a map", derp.RootMessage(err))
+	})
+}

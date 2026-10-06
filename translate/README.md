@@ -13,7 +13,7 @@ Each rule is a JSON object whose keys select the rule kind:
 - **`expression`** — run a Go template against the source and write the result. `{"expression":"{{ … }}", "target":"target.path"}`
 - **`append`** — append a value to a slice/collection at the target path. `{"append":"VALUE", "target":"target.path"}`
 - **`if`** — evaluate a Go template; run `then` rules when it returns `"true"`, otherwise `else`. `{"if":"{{ … }}", "then":[…], "else":[…]}`
-- **`forEach`** — loop a source map/array, running `rules` for each item under the target path (optionally filtered). A missing or nil source has no items and writes nothing. `{"forEach":"source.path", "target":"target.path", "filter":"{{ … }}", "rules":[…]}`
+- **`forEach`** — loop a source map/array, running `rules` for each item under the target path (optionally filtered). A missing or nil source has no items and writes nothing. The source may be an Array, an Object (its keys), or Any, and item rules read each item as `key` and `value`, where `value` has the Array's item element or the Object's wildcard. `{"forEach":"source.path", "target":"target.path", "filter":"{{ … }}", "rules":[…]}`
 - **`first`** — run a list of rules, stopping after the first to set a non-zero value at the target. `{"first":"target.path", "rules":[…]}`
 
 ## What matters here

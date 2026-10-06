@@ -38,11 +38,11 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 
 	const location = "rosetta.translate.forEachRunner.Execute"
 
-	// Get the source element from the sourceSchema
-	sourceElement, ok := sourceSchema.GetArrayElement(runner.SourcePath)
+	// Get the element of each source item from the sourceSchema
+	sourceItemElement, err := itemElement(sourceSchema, runner.SourcePath)
 
-	if !ok {
-		return derp.Internal(location, "Source element must exist in sourceSchema", runner.SourcePath)
+	if err != nil {
+		return derp.Wrap(err, location, "Reading source element", runner.SourcePath)
 	}
 
 	// RULE: A source that is missing or nil has no items, so the following rules still run.
@@ -72,8 +72,12 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 		return derp.Internal(location, "Target element must exist in targetSchema", runner.TargetPath)
 	}
 
-	// Create the new schemas for the source/target array items
-	sourceItemSchema := schema.New(sourceElement.Items)
+	// Create the new schemas for the source/target array items.  Item rules read each
+	// source item as {key, value}, so the source item's own element describes "value".
+	sourceItemSchema := schema.New(schema.Object{Properties: schema.ElementMap{
+		"key":   schema.String{},
+		"value": sourceItemElement,
+	}})
 	targetItemSchema := schema.New(targetElement.Items)
 
 	targetSlice := sliceof.NewObject[mapof.Any]()
@@ -118,6 +122,36 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 	}
 
 	return nil
+}
+
+// itemElement returns the element of each item in the source at path: an Array's items, an
+// Object's wildcard (or Any, for named properties), or Any beneath an Any
+func itemElement(sourceSchema schema.Schema, path string) (schema.Element, error) {
+
+	const location = "rosetta.translate.itemElement"
+
+	element, ok := sourceSchema.GetElement(path)
+
+	if !ok {
+		return nil, derp.Internal(location, "Source element must exist in sourceSchema", path)
+	}
+
+	switch typed := element.(type) {
+
+	case schema.Array:
+		return typed.Items, nil
+
+	case schema.Object:
+		if typed.Wildcard != nil {
+			return typed.Wildcard, nil
+		}
+		return schema.Any{}, nil
+
+	case schema.Any:
+		return schema.Any{}, nil
+	}
+
+	return nil, derp.Internal(location, "Source element must be a list or a map", path)
 }
 
 /******************************************
