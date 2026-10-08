@@ -162,9 +162,10 @@ func TestString_MarshalJSON_InvalidUTF8(t *testing.T) {
 	// so a String holding raw bytes does NOT survive a marshal/unmarshal round trip.
 	value := NewString("\xff\xfe")
 
+	// Compared as JSON because Go 1.27 writes U+FFFD literally where earlier versions escaped it
 	result, err := value.MarshalJSON()
 	require.Nil(t, err)
-	require.Equal(t, `"\ufffd\ufffd"`, string(result))
+	require.JSONEq(t, `"\ufffd\ufffd"`, string(result))
 
 	var restored String
 	require.Nil(t, restored.UnmarshalJSON(result))
