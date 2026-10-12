@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/derp/plugins"
 	"github.com/benpate/rosetta/schema/format"
 	"github.com/stretchr/testify/require"
 )
@@ -105,9 +106,9 @@ func TestUseFormat_ConcurrentReadsAndLateWrites(t *testing.T) {
 
 	// Silence derp reporting so the many expected "ignored" reports don't
 	// flood the test output.
-	savedPlugins := derp.Plugins
-	derp.Plugins = nil
-	defer func() { derp.Plugins = savedPlugins }()
+	// derp.Plugins holds a mutex and exposes no getter, so restore derp's default reporter list
+	derp.Plugins.Clear()
+	defer derp.SetPlugins(plugins.JSON{})
 
 	element := String{Format: "no-html"}
 
