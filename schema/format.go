@@ -77,6 +77,9 @@ func init() {
 	UseFormat("css", format.CSS)
 	UseFormat("css-declarations", format.CSSDeclarations)
 
+	// Languages
+	UseFormat("language", format.Language)
+
 	// Markdown
 	UseFormat("markdown", format.Markdown)
 

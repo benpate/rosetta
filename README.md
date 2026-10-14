@@ -17,6 +17,7 @@ Many of these packages pre-date Go generics, and many are being refactored to ta
 
 ### What's Included
 
+* [BCP47](https://github.com/benpate/rosetta/tree/main/bcp47) language tags in their one canonical spelling
 * [Channel](https://github.com/benpate/rosetta/tree/main/channel) tools for manipulating Go channels
 * [Compare](https://github.com/benpate/rosetta/tree/main/compare) values of unknown data types.
 * [Convert](https://github.com/benpate/rosetta/tree/main/convert) between arbitrary data types with sensible, configurable defaults.

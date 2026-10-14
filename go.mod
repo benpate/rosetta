@@ -11,6 +11,7 @@ require (
 	github.com/tiendc/go-deepcopy v1.7.2
 	github.com/yuin/goldmark v1.8.6
 	golang.org/x/exp v0.0.0-20261007192929-f45ad48fbe92
+	golang.org/x/text v0.42.0
 )
 
 require (

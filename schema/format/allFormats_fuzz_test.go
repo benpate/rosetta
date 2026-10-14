@@ -22,6 +22,7 @@ func allGenerators() map[string]Generator {
 		"Time":            Time,
 		"Color":           Color,
 		"Email":           Email,
+		"Language":        Language,
 		"IPv4":            IPv4,
 		"IPv6":            IPv6,
 		"Hostname":        Hostname,
@@ -136,6 +137,7 @@ func FuzzFormats_AcceptedValueIsDerivedFromInput(f *testing.F) {
 		"URL":             true,
 		"URI":             true,
 		"Email":           true,
+		"Language":        true,
 		"UUID":            true,
 	}
 
