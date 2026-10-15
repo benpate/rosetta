@@ -47,8 +47,10 @@ func validate_Object(element Object, value any) (any, rewriteList, error) {
 			continue
 		}
 
-		// Validate the property value
-		changedValue, childRewrites, err := validate(subElement, propertyValue)
+		// Validate the property value.  A nested map held by value is wrapped in a pointer first,
+		// because map setters such as mapof.Any's take pointer receivers.
+		childValue, restore := addressableItem(subElement, propertyValue)
+		changedValue, childRewrites, err := validate(subElement, childValue)
 
 		if err != nil {
 			return nil, nil, derp.Wrap(err, location, "Validating property", key)
@@ -58,7 +60,7 @@ func validate_Object(element Object, value any) (any, rewriteList, error) {
 		// the rewrites (prefixed with this property's name) for the caller.
 		if len(childRewrites) > 0 {
 
-			if err := SetProperty(element, value, key, changedValue); err != nil {
+			if err := SetProperty(element, value, key, restore(changedValue)); err != nil {
 				return nil, nil, derp.Wrap(err, location, "Setting property", key)
 			}
 
