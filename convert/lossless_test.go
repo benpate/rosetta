@@ -186,7 +186,7 @@ func TestLossless_FloatToString(t *testing.T) {
 	test(123.45, "123.45", true)
 	test(12.34, "12.34", true)
 	test(3.5, "3.50", true)
-	test(100.0, "100.00", true)
+	test(100.0, "100", true)
 	test(0.1, "0.10", true)
 	test(2.5, "2.50", true)
 	test(-98.76, "-98.76", true)

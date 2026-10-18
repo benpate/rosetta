@@ -72,19 +72,19 @@ func TestIntToString(t *testing.T) {
 
 func TestFloatToString(t *testing.T) {
 
-	// Floats format to two decimal places; a value that fits exactly is lossless.
+	// Whole floats format as integers, and others to two decimal places.
 	{
 		result, lossless := StringOk(float32(10), "default")
 
 		assert.True(t, lossless)
-		assert.Equal(t, result, "10.00")
+		assert.Equal(t, result, "10")
 	}
 
 	{
 		result, lossless := StringOk(float64(10), "default")
 
 		assert.True(t, lossless)
-		assert.Equal(t, result, "10.00")
+		assert.Equal(t, result, "10")
 	}
 
 	// A value needing more than two decimals rounds and is reported lossy.
@@ -93,6 +93,22 @@ func TestFloatToString(t *testing.T) {
 
 		assert.False(t, lossless)
 		assert.Equal(t, result, "10.13")
+	}
+
+	// A fraction that fits in two decimal places keeps both.
+	{
+		result, lossless := StringOk(float64(2.5), "default")
+
+		assert.True(t, lossless)
+		assert.Equal(t, "2.50", result)
+	}
+
+	// A whole float, as hjson decodes `11`, converts back to an integer losslessly.
+	{
+		value, lossless := IntOk(String(float64(11)), 0)
+
+		assert.True(t, lossless)
+		assert.Equal(t, 11, value)
 	}
 }
 

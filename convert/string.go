@@ -3,6 +3,7 @@ package convert
 import (
 	"bytes"
 	"io"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -130,10 +131,15 @@ func StringOk(value any, defaultValue string) (string, bool) {
 	return defaultValue, false
 }
 
-// floatToString formats a float64 with two decimal places. The conversion is
-// lossless (ok=true) only when the two-decimal string parses back to the original
-// value; a value needing more than two decimals rounds and is reported lossy.
+// floatToString formats a whole number with no decimals, and any other float64
+// with two. It is lossless only when the result parses back to the original value.
 func floatToString(value float64) (string, bool) {
+
+	// Whole numbers format as integers, so that integer parsers accept them
+	if value == math.Trunc(value) {
+		return strconv.FormatFloat(value, 'f', 0, 64), true
+	}
+
 	result := strconv.FormatFloat(value, 'f', 2, 64)
 	roundTrip, _ := strconv.ParseFloat(result, 64)
 	return result, roundTrip == value
