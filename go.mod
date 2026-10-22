@@ -10,8 +10,8 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/tiendc/go-deepcopy v1.7.2
 	github.com/yuin/goldmark v1.8.6
-	golang.org/x/text v0.42.0
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
+	golang.org/x/text v0.43.0
 )
 
 require (
