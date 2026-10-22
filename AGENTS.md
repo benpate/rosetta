@@ -39,7 +39,7 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 
 ## convert
 
-- **`convert.String` formats floats with a fixed 2 decimal places — it is lossy.** `100` becomes `"100.00"`, `3.14159` becomes `"3.14"`. Never round-trip numeric data through `convert.String`; format explicitly when precision matters. `loose.String` deliberately avoids this path to preserve exact source text.
+- **`convert.String` formats a whole float as an integer, and any other float with a fixed 2 decimal places, which is lossy.** `100.0` becomes `"100"`, `2.5` becomes `"2.50"`, and `3.14159` becomes `"3.14"`. Whole floats lost their `.00` on 2026-10-16: hjson and JSON decode every number as a float, and Emissary's `set-data` step renders values to strings before `schema.Set`, so an integer field received `"11.00"` and refused it. Never round-trip fractional data through `convert.String`; format explicitly when precision matters. `loose.String` deliberately avoids this path to preserve exact source text.
 - **The `*Ok` functions' second return means "the conversion was lossless", not "the value was naturally this type."** The non-Ok wrappers discard it.
 - **`convert.Int` clamps to platform int width and clamps out-of-range floats.** Use `Int64` for wire data; a plain `Int` caps at 2^31 on 32-bit targets (including `GOARCH=wasm`).
 - **There is no reflection fallback.** A named type (`type Foo string`, or any struct) that matches no concrete case or interface converts to `""`. This is why `mapof.Matchable[T].MapOfString()` loses every value for struct-typed `T` — pinned as a KNOWN LIMITATION in [mapof/matchable_test.go](mapof/matchable_test.go), not a bug to fix in mapof.
