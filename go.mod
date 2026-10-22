@@ -1,6 +1,6 @@
 module github.com/benpate/rosetta
 
-go 1.26.0
+go 1.26.10
 
 require (
 	github.com/benpate/derp v0.44.0
