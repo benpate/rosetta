@@ -32,8 +32,9 @@ func StringDefault(value any, defaultValue string) string {
 // Nils return default value and Ok=false
 // Bools are formatted as "true" or "false" losslessly, with Ok=true
 // Ints are formatted as decimal strings losslessly, with Ok=true
-// Floats are formatted with two decimal places; Ok=true only when that two-decimal
-// string parses back to the original value, otherwise the rounding is lossy (Ok=false)
+// Whole floats are formatted as integers losslessly, with Ok=true
+// Other floats are formatted with two decimal places; Ok=true only when that string
+// parses back to the original value, otherwise the rounding is lossy (Ok=false)
 // Strings are passed through directly, with Ok=true
 // A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
