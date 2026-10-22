@@ -77,6 +77,15 @@ func getProperty(element Element, object any, name string) (any, error) {
 		return nil, derp.BadRequest(location, "Invalid property", name)
 	}
 
+	return getPropertyAs(subElement, object, name)
+}
+
+// getPropertyAs reads the key from the object with the getter that the element's type calls for.
+// The key is used as given, so a dot or an empty string is part of the key, not a path.
+func getPropertyAs(subElement Element, object any, name string) (any, error) {
+
+	const location = "schema.getPropertyAs"
+
 	// A list or map held by value is read through a pointer to a copy
 	object = readableObject(object)
 

@@ -184,3 +184,121 @@ func TestValidateObject_Wildcard_UnlistedKeysAreSkipped(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "<script>z</script>", inner["html"])
 }
+
+// TestValidateObject_Wildcard_EmptyKey confirms that an empty key is validated as one key, and
+// never replaces the whole document
+func TestValidateObject_Wildcard_EmptyKey(t *testing.T) {
+
+	s := New(Object{
+		Properties: ElementMap{"name": String{}},
+		Wildcard:   Object{Wildcard: String{MaxLength: 3}},
+	})
+	value := mapof.Any{"name": "Ben", "": mapof.Any{"k": "toolong"}}
+
+	_, err := s.Normalize(&value)
+	require.Nil(t, err)
+	require.Equal(t, "Ben", value["name"])
+	require.Equal(t, mapof.Any{"k": "too"}, value[""])
+}
+
+// TestValidateObject_Wildcard_DottedKey confirms that a key containing dots is one key, not a path
+func TestValidateObject_Wildcard_DottedKey(t *testing.T) {
+
+	s := New(Object{Wildcard: String{MaxLength: 10}})
+	value := mapof.String{"mastodon.social": "123"}
+
+	_, err := s.Validate(&value)
+	require.Nil(t, err)
+	require.Equal(t, mapof.String{"mastodon.social": "123"}, value)
+}
+
+// TestValidateObject_Wildcard_DottedKeyIsSanitized confirms that a dotted key is checked by the
+// Wildcard, even when its first segment names a property, and is written back under its own key
+func TestValidateObject_Wildcard_DottedKeyIsSanitized(t *testing.T) {
+
+	s := New(Object{
+		Properties: ElementMap{"a": Any{}},
+		Wildcard:   String{Format: "html"},
+	})
+	value := mapof.Any{"a.b": "<script>alert(1)</script>ok"}
+
+	rewrites, err := s.Normalize(&value)
+	require.Nil(t, err)
+	require.Equal(t, []string{"a.b"}, rewrites)
+	require.NotContains(t, value["a.b"], "<script>")
+	require.NotContains(t, value, "a", "the dotted key must not create a nested property")
+}
+
+// TestValidateObject_Wildcard_UnreadableValues confirms that a value the Wildcard cannot read is
+// left alone, exactly as an unreadable named property of a map is
+func TestValidateObject_Wildcard_UnreadableValues(t *testing.T) {
+
+	s := New(Object{Wildcard: String{MaxLength: 4096}})
+
+	newValue := func() mapof.Any {
+		return mapof.Any{
+			"null":  nil,
+			"map":   map[string]any{"x": "y"},
+			"list":  []any{"a", "b"},
+			"lossy": 1.0 / 3.0,
+			"int":   7,
+		}
+	}
+
+	value := newValue()
+	_, err := s.Validate(&value)
+	require.Nil(t, err)
+	require.Equal(t, newValue(), value)
+
+	rewrites, err := s.Normalize(&value)
+	require.Nil(t, err)
+	require.Empty(t, rewrites)
+	require.Equal(t, newValue(), value)
+}
+
+// TestValidateObject_Wildcard_RequiredUnreadableValue confirms that a required Wildcard still
+// rejects a value it cannot read, as a required named property does
+func TestValidateObject_Wildcard_RequiredUnreadableValue(t *testing.T) {
+
+	s := New(Object{Wildcard: String{Required: true}})
+
+	_, err := s.Validate(&mapof.Any{"list": []any{"a", "b"}})
+	require.NotNil(t, err)
+}
+
+// TestValidateObject_Wildcard_TypedMaps confirms that typed maps whose getters a scalar Wildcard
+// cannot use are left alone, as they were before wildcard validation existed
+func TestValidateObject_Wildcard_TypedMaps(t *testing.T) {
+
+	_, err := New(Object{Wildcard: String{}}).Validate(&mapof.Object[string]{"a": "hello"})
+	require.Nil(t, err)
+
+	_, err = New(Object{Wildcard: Integer{}}).Validate(&mapof.Object[int]{"a": 1})
+	require.Nil(t, err)
+
+	_, err = New(Object{Wildcard: String{}}).Validate(&mapof.Template{"a": "hello"})
+	require.Nil(t, err)
+}
+
+// keysAliasMap is a map whose Keys returns its own slice, as a caching map type might
+type keysAliasMap struct {
+	mapof.String
+	keys []string
+}
+
+// Keys returns the map's own slice of keys, not a copy
+func (m keysAliasMap) Keys() []string {
+	return m.keys
+}
+
+// TestValidateObject_Wildcard_KeysNotModified confirms that listing wildcard keys does not
+// reorder or overwrite the slice that Keys returns
+func TestValidateObject_Wildcard_KeysNotModified(t *testing.T) {
+
+	value := keysAliasMap{String: mapof.String{"a": "1", "b": "2"}, keys: []string{"a", "b"}}
+	s := New(Object{Properties: ElementMap{"a": String{}}, Wildcard: String{}})
+
+	_, err := s.Validate(&value)
+	require.Nil(t, err)
+	require.Equal(t, []string{"a", "b"}, value.keys)
+}

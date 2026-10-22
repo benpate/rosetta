@@ -2,6 +2,8 @@ package compare
 
 import (
 	"io"
+	"reflect"
+	"strings"
 
 	"github.com/benpate/rosetta/convert"
 )
@@ -15,6 +17,11 @@ func IsZero(value any) bool {
 
 	if IsNil(value) {
 		return true
+	}
+
+	// An array, such as an ObjectID, is zero only when every element is
+	if reflect.TypeOf(value).Kind() == reflect.Array {
+		return reflect.ValueOf(value).IsZero()
 	}
 
 	switch v := value.(type) {
@@ -67,7 +74,9 @@ func IsZero(value any) bool {
 		return IsZero(v.Float())
 
 	case Hexer:
-		return IsZero(convert.Int64(v))
+		// Judge the digits, because an ObjectID's 96 bits overflow an int64
+		digits := strings.TrimPrefix(strings.ToLower(v.Hex()), "0x")
+		return strings.Trim(digits, "0") == ""
 
 	case Stringer:
 		return IsZero(v.String())

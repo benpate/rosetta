@@ -202,6 +202,10 @@ func (element String) MarshalMap() map[string]any {
 		result["format"] = element.Format
 	}
 
+	if element.Pattern != "" {
+		result["pattern"] = element.Pattern
+	}
+
 	if len(element.Enum) > 0 {
 		result["enum"] = element.Enum
 	}
@@ -228,6 +232,7 @@ func (element *String) UnmarshalMap(data map[string]any) error {
 	element.MinValue = convert.String(data["minValue"])
 	element.MaxValue = convert.String(data["maxValue"])
 	element.Format = convert.String(data["format"])
+	element.Pattern = convert.String(data["pattern"])
 	if raw, ok := data["enum"]; ok {
 		element.Enum = convert.SliceOfString(raw)
 	}

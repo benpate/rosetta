@@ -1,6 +1,7 @@
 package compare
 
 import (
+	"encoding/hex"
 	"strings"
 	"testing"
 
@@ -86,6 +87,28 @@ func TestIsZero_Hexer(t *testing.T) {
 	require.True(t, IsZero(zeroHexer("0")))
 	// "ff" parses to int64(255), which is not zero
 	require.False(t, IsZero(zeroHexer("ff")))
+}
+
+// objectID has the shape of a MongoDB ObjectID: a byte array that prints itself as hex
+type objectID [12]byte
+
+func (id objectID) Hex() string { return hex.EncodeToString(id[:]) }
+
+// TestIsZero_Array confirms that an array is zero only when every element is
+func TestIsZero_Array(t *testing.T) {
+	require.True(t, IsZero([12]byte{}))
+	require.False(t, IsZero([12]byte{1}))
+	require.True(t, IsZero(objectID{}))
+	require.False(t, IsZero(objectID{0x65, 0x1a, 0xff}))
+}
+
+// TestIsZero_LongHex confirms that a hex value too long for an int64 is still judged by its digits
+func TestIsZero_LongHex(t *testing.T) {
+	require.False(t, IsZero(&objectID{0x65, 0x1a, 0xff}))
+	require.True(t, IsZero(&objectID{}))
+	require.False(t, IsZero(zeroHexer("ffffffffffffffffffffffff")))
+	require.True(t, IsZero(zeroHexer("000000000000000000000000")))
+	require.True(t, IsZero(zeroHexer("")))
 }
 
 func TestIsZero_Reader(t *testing.T) {

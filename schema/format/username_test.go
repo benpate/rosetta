@@ -31,3 +31,17 @@ func TestUsernameFormat(t *testing.T) {
 	no("USERNAME$-CANT-HAVE-$YMB@LS!")
 	no("USERNAMES_CANT_HAVE_<HTML>")
 }
+
+// TestUsernameFormat_ASCIIOnly confirms that Unicode letters which case-fold to ASCII are refused,
+// so a name that looks like "Ken" cannot be registered beside the real one
+func TestUsernameFormat_ASCIIOnly(t *testing.T) {
+
+	for _, value := range []string{"\u212Aen", "ki\u017Fs", "\u212A"} {
+		_, err := Username("")(value)
+		require.NotNil(t, err, "%q must be refused", value)
+	}
+
+	result, err := Username("")("Ken_99")
+	require.Nil(t, err)
+	require.Equal(t, "Ken_99", result)
+}

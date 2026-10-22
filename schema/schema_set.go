@@ -142,6 +142,36 @@ func SetProperty(element Element, object any, path string, value any) (err error
 		return derp.Internal(location, "Property does not exist in schema", head, path)
 	}
 
+	return setPropertyAs(element, subElement, object, path, head, tail, value)
+}
+
+// setPropertyKey writes the value to one key of the object, described by subElement.  The key is
+// used as given, so a dot or an empty string is part of the key, not a path.
+func setPropertyKey(
+	element Element, subElement Element, object any, key string, value any,
+) (err error) {
+
+	const location = "schema.setPropertyKey"
+
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = derp.Internal(
+				location, "Panic while setting value", key, typeName(value), recovered,
+			)
+		}
+	}()
+
+	return setPropertyAs(element, subElement, object, key, key, "", value)
+}
+
+// setPropertyAs writes the value at head.tail with the setter that subElement's type calls for
+func setPropertyAs(
+	element Element, subElement Element, object any,
+	path string, head string, tail string, value any,
+) error {
+
+	const location = "schema.setPropertyAs"
+
 	// Use the element type to find the correct property setter
 	switch typed := subElement.(type) {
 

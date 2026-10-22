@@ -78,7 +78,8 @@ func validate_String(element String, value string) (string, bool, error) {
 		if matched, err := regexp.MatchString(element.Pattern, value); err != nil {
 			return value, false, derp.Wrap(err, location, "Evaluating pattern", element.Pattern)
 		} else if !matched {
-			return value, false, derp.Validation("Value must match pattern", value, element.Pattern)
+			// Name the pattern, never the value: patterns guard secrets such as API keys
+			return value, false, derp.Validation("Value must match pattern", element.Pattern)
 		}
 	}
 

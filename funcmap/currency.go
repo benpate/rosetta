@@ -1,6 +1,7 @@
 package funcmap
 
 import (
+	"math"
 	"strings"
 
 	"github.com/benpate/rosetta/convert"
@@ -13,11 +14,13 @@ func addCurrencyFuncs(target map[string]any) {
 
 		var unitAmount int64
 
+		// Round floats to the nearest cent: 19.99 * 100 is 1998.9999999999998,
+		// which truncates to 1998
 		switch value := value.(type) {
 		case float32:
-			unitAmount = int64(value * 100)
+			unitAmount = int64(math.Round(float64(value) * 100))
 		case float64:
-			unitAmount = int64(value * 100)
+			unitAmount = int64(math.Round(value * 100))
 		default:
 			unitAmount = convert.Int64(value)
 		}

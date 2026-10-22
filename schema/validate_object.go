@@ -90,11 +90,18 @@ func validate_ObjectWildcard(element Object, value any) (rewriteList, error) {
 
 	for _, key := range wildcardKeys(element, value) {
 
-		// Get the property from the object
-		propertyValue, err := getProperty(element, value, key)
+		// Read the key itself, never as a path: a wildcard key may contain dots, or be empty
+		propertyValue, err := getPropertyAs(element.Wildcard, value, key)
 
+		// A value the Wildcard cannot read is skipped, as an unreadable named property of a map is,
+		// unless the Wildcard is required
 		if err != nil {
-			return nil, derp.Wrap(err, location, "Getting property", key)
+
+			if element.Wildcard.IsRequired() {
+				return nil, derp.Validation("Required property is missing", key)
+			}
+
+			continue
 		}
 
 		// Validate the property value against the Wildcard.  A nested map held by value is wrapped
@@ -110,8 +117,10 @@ func validate_ObjectWildcard(element Object, value any) (rewriteList, error) {
 			continue
 		}
 
-		// Write the changed value back, and record the rewrites under this key
-		if err := SetProperty(element, value, key, restore(changedValue)); err != nil {
+		// Write the changed value back to the same key, and record the rewrites under it
+		err = setPropertyKey(element, element.Wildcard, value, key, restore(changedValue))
+
+		if err != nil {
 			return nil, derp.Wrap(err, location, "Setting property", key)
 		}
 
@@ -148,8 +157,9 @@ func wildcardKeys(element Object, value any) []string {
 		return nil
 	}
 
-	// Named properties were already validated by their own elements
-	keys := slices.DeleteFunc(keysGetter.Keys(), func(key string) bool {
+	// Named properties were already validated by their own elements.  Keys may return the map's
+	// own slice, so filter a copy.
+	keys := slices.DeleteFunc(slices.Clone(keysGetter.Keys()), func(key string) bool {
 		_, isNamed := element.Properties[key]
 		return isNamed
 	})

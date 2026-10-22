@@ -46,3 +46,18 @@ func TestCurrencyFuncs_EdgeCases(t *testing.T) {
 	require.Equal(t, "$0.00", dollarFormat("not-a-number"))
 	require.Equal(t, "$0.00", dollarFormat(nil))
 }
+
+// TestCurrencyFuncs_FloatRounding confirms that a dollar amount rounds to the nearest cent, rather
+// than losing a cent to binary floating point
+func TestCurrencyFuncs_FloatRounding(t *testing.T) {
+
+	dollarFormat := All()["dollarFormat"].(func(any) string)
+
+	require.Equal(t, "$19.99", dollarFormat(19.99))
+	require.Equal(t, "$0.29", dollarFormat(0.29))
+	require.Equal(t, "$1.15", dollarFormat(1.15))
+	require.Equal(t, "$4.35", dollarFormat(4.35))
+	require.Equal(t, "$0.29", dollarFormat(float32(0.29)))
+	require.Equal(t, "-$19.99", dollarFormat(-19.99))
+	require.Equal(t, "$100.00", dollarFormat(100.0))
+}

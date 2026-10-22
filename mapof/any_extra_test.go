@@ -219,3 +219,19 @@ func TestAny_GetTimeType(t *testing.T) {
 	m := Any{"now": now}
 	require.Equal(t, now, m.GetTime("now"))
 }
+
+// testObjectID has the shape of a MongoDB ObjectID: a byte array with a Hex method
+type testObjectID [12]byte
+
+func (testObjectID) Hex() string { return "651aff000000000000000000" }
+
+// TestAny_SetAny_Array confirms that SetAny stores a non-zero array and removes a zero one
+func TestAny_SetAny_Array(t *testing.T) {
+
+	m := NewAny()
+	m.SetAny("id", testObjectID{0x65, 0x1a, 0xff})
+	require.Equal(t, testObjectID{0x65, 0x1a, 0xff}, m["id"])
+
+	m.SetAny("id", testObjectID{})
+	require.NotContains(t, m, "id")
+}

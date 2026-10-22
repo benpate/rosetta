@@ -1,8 +1,10 @@
 package schema
 
 import (
+	"encoding/json"
 	"testing"
 
+	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/null"
 	"github.com/stretchr/testify/require"
 )
@@ -30,11 +32,31 @@ func TestRoundTrip_String(t *testing.T) {
 		MaxValue:   "zzz",
 		Enum:       []string{"hello", "world"},
 		Format:     "no-html",
+		Pattern:    "^[a-z]+$",
 		Required:   true,
 		RequiredIf: "other == true",
 	}
 
 	require.Equal(t, original, roundTrip(t, original))
+}
+
+// TestRoundTrip_StringPatternFromJSON confirms that a schema loaded from JSON enforces its pattern,
+// and that a value which fails it is not copied into the error
+func TestRoundTrip_StringPatternFromJSON(t *testing.T) {
+
+	var s Schema
+	err := json.Unmarshal([]byte(`{"type":"object","properties":{"key":{"type":"string","format":"unsafe-any","pattern":"^pk_[a-z]+$"}}}`), &s)
+	require.NoError(t, err)
+
+	_, err = s.Validate(&mapof.Any{"key": "pk_live"})
+	require.NoError(t, err)
+
+	_, err = s.Validate(&mapof.Any{"key": "sk_SECRET-VALUE"})
+	require.Error(t, err)
+
+	encoded, encodeErr := json.Marshal(err)
+	require.NoError(t, encodeErr)
+	require.NotContains(t, string(encoded), "SECRET-VALUE")
 }
 
 // TestRoundTrip_Integer confirms that every Integer field survives a round trip.

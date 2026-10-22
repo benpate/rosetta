@@ -6,9 +6,11 @@ import (
 	"github.com/benpate/derp"
 )
 
-// usernamePattern matches letters, numbers, and underscores, case-insensitively.
-// It is compiled once, at package scope, because the constructor below runs on every validation.
-var usernamePattern = regexp.MustCompile(`(?i)^[A-Z0-9_]*$`)
+// usernamePattern matches ASCII letters, numbers, and underscores
+var usernamePattern = regexp.MustCompile(
+	// List both cases: (?i) folds the Kelvin sign (U+212A) and long s (U+017F) into K and s
+	`^[A-Za-z0-9_]*$`,
+)
 
 // Username validates a simple token string suitable for use as URL identifiers
 func Username(_ string) StringFormat {
