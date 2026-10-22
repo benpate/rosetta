@@ -106,9 +106,9 @@ func TestUseFormat_ConcurrentReadsAndLateWrites(t *testing.T) {
 
 	// Silence derp reporting so the many expected "ignored" reports don't
 	// flood the test output.
-	// derp.Plugins holds a mutex and exposes no getter, so restore derp's default reporter list
+	// derp.Plugins holds a mutex and cannot be copied, so restore derp's default reporter instead
 	derp.Plugins.Clear()
-	defer derp.SetPlugins(plugins.JSON{})
+	t.Cleanup(func() { derp.SetPlugins(plugins.JSON{}) })
 
 	element := String{Format: "no-html"}
 

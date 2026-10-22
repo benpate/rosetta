@@ -3,6 +3,7 @@ package convert
 import (
 	"bytes"
 	"io"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -31,8 +32,9 @@ func StringDefault(value any, defaultValue string) string {
 // Nils return default value and Ok=false
 // Bools are formatted as "true" or "false" losslessly, with Ok=true
 // Ints are formatted as decimal strings losslessly, with Ok=true
-// Floats are formatted with two decimal places; Ok=true only when that two-decimal
-// string parses back to the original value, otherwise the rounding is lossy (Ok=false)
+// Whole floats are formatted as integers losslessly, with Ok=true
+// Other floats are formatted with two decimal places; Ok=true only when that string
+// parses back to the original value, otherwise the rounding is lossy (Ok=false)
 // Strings are passed through directly, with Ok=true
 // A slice of length 1 carries the Ok of its single element; an empty or longer slice is lossy (Ok=false)
 // Known interfaces (Inter, Floater, Stringer) are handled like their corresponding types.
@@ -130,10 +132,15 @@ func StringOk(value any, defaultValue string) (string, bool) {
 	return defaultValue, false
 }
 
-// floatToString formats a float64 with two decimal places. The conversion is
-// lossless (ok=true) only when the two-decimal string parses back to the original
-// value; a value needing more than two decimals rounds and is reported lossy.
+// floatToString formats a whole number with no decimals, and any other float64
+// with two. It is lossless only when the result parses back to the original value.
 func floatToString(value float64) (string, bool) {
+
+	// Whole numbers format as integers, so that integer parsers accept them
+	if value == math.Trunc(value) {
+		return strconv.FormatFloat(value, 'f', 0, 64), true
+	}
+
 	result := strconv.FormatFloat(value, 'f', 2, 64)
 	roundTrip, _ := strconv.ParseFloat(result, 64)
 	return result, roundTrip == value

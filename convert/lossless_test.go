@@ -171,9 +171,8 @@ func TestLossless_StringOk(t *testing.T) {
 	test(nil, "DEFAULT", false)
 }
 
-// TestLossless_FloatToString pins the two-decimal formatting rule: a float that
-// fits in two decimals is lossless, while one that needs more precision rounds and
-// is reported lossy.
+// TestLossless_FloatToString pins the float formatting rules: whole floats print as integers,
+// and any other float prints to two decimals, which is lossy when it needs more.
 func TestLossless_FloatToString(t *testing.T) {
 
 	test := func(value float64, wantResult string, wantLossless bool) {
@@ -182,11 +181,13 @@ func TestLossless_FloatToString(t *testing.T) {
 		require.Equal(t, wantLossless, lossless, "lossless for %v", value)
 	}
 
+	// Lossless: a whole float formats as an integer.
+	test(100.0, "100", true)
+
 	// Lossless: representable exactly in two decimal places.
 	test(123.45, "123.45", true)
 	test(12.34, "12.34", true)
 	test(3.5, "3.50", true)
-	test(100.0, "100.00", true)
 	test(0.1, "0.10", true)
 	test(2.5, "2.50", true)
 	test(-98.76, "-98.76", true)

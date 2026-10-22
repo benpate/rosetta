@@ -22,7 +22,7 @@ func (s *String) UnmarshalJSON(data []byte) error {
 	const location = "loose.String.UnmarshalJSON"
 
 	// Decode with UseNumber so numeric source text survives verbatim. This
-	// also sidesteps convert.String, which formats floats to two decimals.
+	// also sidesteps convert.String, which drops a whole float's decimals and rounds the rest.
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.UseNumber()
 
