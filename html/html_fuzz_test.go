@@ -36,8 +36,9 @@ func addHTMLSeeds(f *testing.F) {
 	}
 }
 
-// FuzzRemoveTags asserts that RemoveTags strips every angle bracket and never panics or corrupts
-// UTF-8. RemoveTags walks byte indices from a rune range loop, so malformed input is the danger zone.
+// FuzzRemoveTags asserts that RemoveTags strips every angle bracket, never lengthens its input,
+// and never panics or corrupts UTF-8. It walks byte indices from a rune range loop, so malformed
+// input is the danger zone.
 func FuzzRemoveTags(f *testing.F) {
 	addHTMLSeeds(f)
 
@@ -48,6 +49,11 @@ func FuzzRemoveTags(f *testing.F) {
 		// No angle brackets may survive — that is the whole job of RemoveTags.
 		if strings.ContainsAny(result, "<>") {
 			t.Fatalf("RemoveTags(%q) = %q still contains an angle bracket", html, result)
+		}
+
+		// Removing tags can only shorten the text, never lengthen it
+		if len(result) > len(html) {
+			t.Fatalf("RemoveTags(%q) = %q is longer than its input", html, result)
 		}
 
 		// Valid input must stay valid: the function must not slice through a multi-byte rune.

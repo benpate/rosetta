@@ -1,6 +1,7 @@
 package html
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,6 +16,26 @@ func TestRemoveTags(t *testing.T) {
 	require.Equal(t, "I broke this", RemoveTags("h1>I broke this</h1>"))
 	require.Equal(t, "This is broken link.", RemoveTags("This is <a href='#'>>broken link</a>."))
 	require.Equal(t, "start this tag", RemoveTags("I don't know ><where to <<em>start</em> this tag<."))
+}
+
+// TestRemoveTags_RepeatedLessThan confirms that a run of `<` inside one tag writes the text before
+// it once, so the output never grows past the input however many there are
+func TestRemoveTags_RepeatedLessThan(t *testing.T) {
+
+	require.Equal(t, "ab", RemoveTags("a<<br>b"))
+	require.Equal(t, "xy", RemoveTags("x<<<<b>y"))
+
+	// Before 2026-10-22, these 20 KB produced 100 MB of output and allocated 504 MB
+	text := strings.Repeat("a", 10_000)
+	payload := text + strings.Repeat("<", 10_000)
+
+	var result string
+	allocs := testing.AllocsPerRun(1, func() {
+		result = RemoveTags(payload)
+	})
+
+	require.Equal(t, text, result)
+	require.LessOrEqual(t, allocs, 1.0, "one allocation, sized to the input")
 }
 
 // TestRemoveTags_Multibyte confirms that text ending in a multi-byte rune is

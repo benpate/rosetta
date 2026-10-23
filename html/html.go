@@ -168,15 +168,15 @@ func RemoveTags(html string) string {
 		}
 
 		if c == htmlTagStart {
-			// Only update the start if we are not in a tag.
-			// This make sure we strip out `<<br>` not just `<br>`
+
+			// Opening a tag writes the text since the last tag closed.  A `<` inside a tag (as in
+			// `<<br>`) writes nothing, or every extra `<` would write that same text again.
 			if !in {
 				start = i
+				builder.WriteString(html[end:start])
 			}
-			in = true
 
-			// Write the valid string between the close and start of the two tags.
-			builder.WriteString(html[end:start])
+			in = true
 			continue
 		}
 		// else c == htmlTagEnd
