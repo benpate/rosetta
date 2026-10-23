@@ -87,19 +87,15 @@ func addressableItem(items Element, indexValue any) (any, func(any) any) {
 	}
 
 	// Build an addressable pointer to a copy of the value.
-	pointer := reflect.New(reflectValue.Type())
-	pointer.Elem().Set(reflectValue)
+	pointer := addressableCopy(reflectValue)
 
 	// The restore function dereferences the (possibly-mutated) copy so SetIndex receives
 	// the same concrete type GetIndex returned.
 	restore := func(validated any) any {
-		if validatedPointer := reflect.ValueOf(validated); validatedPointer.Kind() == reflect.Pointer && !validatedPointer.IsNil() {
-			return validatedPointer.Elem().Interface()
-		}
-		return validated
+		return restoreType(validated, reflectValue.Type())
 	}
 
-	return pointer.Interface(), restore
+	return pointer, restore
 }
 
 // validate_Array_length checks that the length of the array meets the requirements of the schema element.
@@ -124,4 +120,47 @@ func validate_Array_length(getter ArrayGetter, element Array) error {
 
 	// Success!
 	return nil
+}
+
+// addressableCopy returns a pointer to a copy of the value.  A plain Go map has no getters behind
+// its pointer, so it is copied into a mapof.Any instead, exactly as Get reads it.
+func addressableCopy(original reflect.Value) any {
+
+	pointer := reflect.New(original.Type())
+	pointer.Elem().Set(original)
+
+	if original.Kind() != reflect.Map {
+		return pointer.Interface()
+	}
+
+	if _, isGetter := pointer.Interface().(PointerGetter); isGetter {
+		return pointer.Interface()
+	}
+
+	// pointerToCopy returns a mapof.Any for a plain map, and the map itself when none can hold it
+	if readable, ok := pointerToCopy(original.Interface()).(PointerGetter); ok {
+		return readable
+	}
+
+	return pointer.Interface()
+}
+
+// restoreType dereferences a validated pointer, and returns its value as the original type.  Any
+// other value is returned unchanged.
+func restoreType(validated any, originalType reflect.Type) any {
+
+	validatedPointer := reflect.ValueOf(validated)
+
+	if (validatedPointer.Kind() != reflect.Pointer) || validatedPointer.IsNil() {
+		return validated
+	}
+
+	// A plain map read through a mapof.Any is stored back as its own type
+	result := validatedPointer.Elem()
+
+	if (result.Type() != originalType) && result.Type().ConvertibleTo(originalType) {
+		result = result.Convert(originalType)
+	}
+
+	return result.Interface()
 }

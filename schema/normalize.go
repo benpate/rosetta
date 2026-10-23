@@ -17,7 +17,8 @@ func Normalize(schema Schema, value any) ([]string, error) {
 
 	// Validate the value, applying rewrites in place.  Unlike Validate, a value that had to be
 	// formatted, clamped, or truncated is not an error.
-	_, rewrites, err := validate(schema.Element, value)
+	rootValue, _ := addressableRoot(schema.Element, value)
+	_, rewrites, err := validate(schema.Element, rootValue)
 
 	if err != nil {
 		return nil, derp.Wrap(err, location, "Value is not valid for this schema", typeName(value))

@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"reflect"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 )
@@ -17,7 +19,8 @@ func Validate(schema Schema, value any) (any, bool, error) {
 	}
 
 	// Validate the value using the schema's element
-	result, rewrites, err := validate(schema.Element, value)
+	rootValue, restore := addressableRoot(schema.Element, value)
+	result, rewrites, err := validate(schema.Element, rootValue)
 
 	// On error, name the ORIGINAL value's type; validate() returns nil results on error.
 	if err != nil {
@@ -26,7 +29,7 @@ func Validate(schema Schema, value any) (any, bool, error) {
 		)
 	}
 
-	value = result
+	value = restore(result)
 
 	// RULE: A value that had to be rewritten (clamped or formatted) is not valid as-given, because
 	// Validate() answers whether the value already conforms.  The error details name each
@@ -43,6 +46,19 @@ func Validate(schema Schema, value any) (any, bool, error) {
 	}
 
 	return value, false, nil
+}
+
+// addressableRoot prepares the top-level value for validation: a map held by value is validated
+// through a pointer to a copy, as a nested map is, and anything else is returned unchanged
+func addressableRoot(element Element, value any) (any, func(any) any) {
+
+	// RULE: Only a map.  A struct held by value stays unwritable, because Emissary's
+	// newStartupStream relies on SetAll refusing a whole model.Content
+	if reflect.ValueOf(value).Kind() != reflect.Map {
+		return value, func(validated any) any { return validated }
+	}
+
+	return addressableItem(element, value)
 }
 
 // validate checks a value against a schema element and updates it where necessary,
@@ -76,6 +92,12 @@ func validate(element Element, value any) (any, rewriteList, error) {
 		return result, newRewriteList(changed, value, result), err
 
 	case Object:
+
+		// RULE: An Object describes a map or a struct, so a single value or a list is refused
+		if err := requireMapKind(value); err != nil {
+			return nil, nil, err
+		}
+
 		return validate_Object(typedElement, value)
 
 	case String:

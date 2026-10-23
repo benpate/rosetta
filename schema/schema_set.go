@@ -24,7 +24,8 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// Validate the value (and update if necessary) against the schema rules for this element
-	value, _, err := validate(element, value)
+	elementValue, restore := addressableRoot(element, value)
+	validated, _, err := validate(element, elementValue)
 
 	if err != nil {
 
@@ -39,7 +40,7 @@ func (schema Schema) Set(object any, path string, value any) error {
 	}
 
 	// set the property value in the object
-	return SetProperty(schema.Element, object, path, value)
+	return SetProperty(schema.Element, object, path, restore(validated))
 }
 
 // SetAll sets every value in the object through Set, stopping at the first error, then

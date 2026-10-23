@@ -47,8 +47,15 @@ func TestErrorDetails_NameTypesNotValues(t *testing.T) {
 
 	t.Run("Set", func(t *testing.T) {
 		object := newObject()
-		err := schema.Set(&object, "child", testSecret)
+		err := schema.Set(&object, "child", struct{ Inner string }{Inner: testSecret})
 		require.Equal(t, "schema.Schema.Set", derp.Location(err))
+		requireNoSecretInDetails(t, err)
+	})
+
+	t.Run("SetScalarForObject", func(t *testing.T) {
+		object := newObject()
+		err := schema.Set(&object, "child", testSecret)
+		require.True(t, derp.IsValidationError(err))
 		requireNoSecretInDetails(t, err)
 	})
 

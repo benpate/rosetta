@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"reflect"
 	"slices"
 
 	"github.com/benpate/derp"
@@ -166,4 +167,23 @@ func wildcardKeys(element Object, value any) []string {
 
 	slices.Sort(keys)
 	return keys
+}
+
+// requireMapKind returns a validation error when the value is neither a map nor a struct, or a
+// pointer to one.  A nil value is allowed, and left to the property checks.
+func requireMapKind(value any) error {
+
+	const location = "schema.requireMapKind"
+
+	if value == nil {
+		return nil
+	}
+
+	have := kindOf(reflect.TypeOf(value))
+
+	if have == kindMap {
+		return nil
+	}
+
+	return kindError(location, kindMap, have, typeName(value))
 }
