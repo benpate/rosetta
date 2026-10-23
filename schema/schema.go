@@ -87,7 +87,7 @@ func (schema Schema) Validate(value any) (bool, error) {
 
 	const location = "schema.Schema.Validate"
 
-	// Validate the top-level item, reporting changes if necessary
+	// Validate the top-level item; a rewrite comes back as an error, never as a change
 	_, changed, err := Validate(schema, value)
 
 	if err != nil {

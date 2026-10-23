@@ -71,7 +71,8 @@ func ToSearchText(html string) string {
 	return result
 }
 
-// RemoveSpecialCharacters replaces non-breaking spaces and a fixed set of HTML entities with plain-text equivalents
+// RemoveSpecialCharacters replaces non-breaking spaces and a fixed set of HTML entities
+// with plain-text equivalents
 func RemoveSpecialCharacters(html string) string {
 
 	result := html
