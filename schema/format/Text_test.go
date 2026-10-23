@@ -68,15 +68,15 @@ func TestText_UnescapedAngleBrackets(t *testing.T) {
 	check("bare greater-than drops the prefix", "6 > 5", " 5")
 	check("two bare greater-thans drop even more", "a > b > c", " c")
 
-	// A doubled `<` writes the preceding text twice.
-	check("doubled less-than duplicates the prefix", "a<<br>b", "aab")
+	// A doubled `<` opens one tag, so the preceding text is written once.
+	check("doubled less-than keeps the prefix once", "a<<br>b", "ab")
 }
 
-// Spells out the two html.RemoveTags defects that TestText_UnescapedAngleBrackets pins,
-// so that whoever reads a failure there knows these are known bugs rather than intent.
+// Spells out the html.RemoveTags defect that TestText_UnescapedAngleBrackets pins, so that whoever
+// reads a failure there knows it is a known bug rather than intent, and checks the fixed one.
 //
-// Both are reachable from user-supplied content, because Text is a schema string format.
-// Neither is a sanitizer hole -- tags are still stripped -- but both corrupt plain text.
+// It is reachable from user-supplied content, because Text is a schema string format. It is
+// not a sanitizer hole -- tags are still stripped -- but it corrupts plain text.
 func TestText_AngleBracketDataLoss(t *testing.T) {
 
 	format := Text("")
@@ -87,11 +87,11 @@ func TestText_AngleBracketDataLoss(t *testing.T) {
 	require.NotEqual(t, "2 > 1 is true", result, "if this now passes, DEFECT 1 was fixed")
 	require.Equal(t, " 1 is true", result, "KNOWN BUG: the leading \"2 \" is silently lost")
 
-	// DEFECT 2: a doubled `<` emits the preceding text twice.
+	// DEFECT 2, fixed 2026-10-22: a doubled `<` emitted the preceding text twice, and every further
+	// `<` emitted it again, so the output grew with the square of the input.
 	result, err = format("x<<b>y")
 	require.NoError(t, err)
-	require.NotEqual(t, "xy", result, "if this now passes, DEFECT 2 was fixed")
-	require.Equal(t, "xxy", result, "KNOWN BUG: the leading \"x\" is duplicated")
+	require.Equal(t, "xy", result)
 }
 
 // The `arg` parameter is unused by Text -- every value must behave identically.

@@ -14,6 +14,12 @@ func (schema Schema) Set(object any, path string, value any) error {
 
 	const location = "schema.Schema.Set"
 
+	// RULE: SetProperty walks a path one segment at a time, so an unbounded path could exhaust
+	// the stack.  The error never repeats the path, which can be very long.
+	if hasTooManySegments(path) {
+		return derp.Validation("Field path is too deep", location, maxPathSegments)
+	}
+
 	// RULE: An unknown path is a client-input problem (a form posting a field the schema
 	// does not define), so it is a validation error that names the field -- not a 400.
 	// A path with an empty segment ("name.") names no field at all.

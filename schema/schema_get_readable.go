@@ -82,6 +82,11 @@ func hasEmptySegment(path string) bool {
 	return (path != "") && slices.Contains(strings.Split(path, "."), "")
 }
 
+// hasTooManySegments returns TRUE if a dotted path has more than maxPathSegments segments
+func hasTooManySegments(path string) bool {
+	return strings.Count(path, ".") >= maxPathSegments
+}
+
 // isPastEnd returns TRUE if a key reads past the end of a list of this length: an index at or
 // beyond the length (including one too large for an int), or "next"
 func isPastEnd(key string, length int) bool {

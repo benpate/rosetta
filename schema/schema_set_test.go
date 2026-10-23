@@ -1,11 +1,36 @@
 package schema
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/benpate/derp"
+	"github.com/benpate/rosetta/mapof"
 	"github.com/stretchr/testify/require"
 )
+
+// TestSet_PathDepthIsBounded confirms that Set refuses a path with more than maxPathSegments
+// segments as a validation error, and does not repeat the path in that error
+func TestSet_PathDepthIsBounded(t *testing.T) {
+
+	s := New(Object{Properties: ElementMap{"data": Object{Wildcard: Any{}}}})
+
+	// "data", the segments in between, then "x"
+	deepest := "data." + strings.Repeat("a.", maxPathSegments-2) + "x"
+	require.NoError(t, s.Set(&mapof.Any{}, deepest, "v"))
+
+	tooDeep := "data." + strings.Repeat("a.", maxPathSegments-1) + "x"
+	require.True(t, derp.IsValidationError(s.Set(&mapof.Any{}, tooDeep, "v")))
+
+	// Before 2026-10-22, about 1 MB of such a path overflowed the stack, which no recover catches
+	long := "data." + strings.Repeat("a.", 50_000) + "x"
+	err := s.Set(&mapof.Any{}, long, "v")
+	require.True(t, derp.IsValidationError(err))
+
+	encoded, _ := json.Marshal(err)
+	require.Less(t, len(encoded), 1000, "the error does not repeat the path")
+}
 
 // TestSet_ValidationErrorNamesField confirms that a validation failure in Set is
 // re-rooted with the failing path prefixed, so handlers that surface the ROOT
