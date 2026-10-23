@@ -11,7 +11,7 @@ import (
 // Element interface wraps all of the methods required for schema elements.
 type Element interface {
 
-	// Default returns the default value for this element
+	// DefaultValue returns the default value for this element
 	DefaultValue() any
 
 	// IsRequired returns true if this a value is required for this element
@@ -20,7 +20,7 @@ type Element interface {
 	// MarshalMap populates the object data into a map[string]any
 	MarshalMap() map[string]any
 
-	// getElement returns a named sub-element of this element, if it exists.
+	// GetElement returns a named sub-element of this element, if it exists.
 	GetElement(string) (Element, bool)
 
 	// Inherit copies any properties that this element does not define from the parent element

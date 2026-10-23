@@ -33,8 +33,8 @@ func (element Boolean) IsRequired() bool {
 	return element.Required
 }
 
-// Validate is a part of the Element interface
-// It validates a generic value using this schema
+// Validate validates a generic value using this schema.
+// It is not part of the Element interface
 func (element Boolean) Validate(object any) error {
 
 	boolValue, ok := object.(bool)

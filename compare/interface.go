@@ -10,8 +10,8 @@ import (
 // If value1 is EQUAL TO value2, it returns 0, nil
 // If value1 is GREATER THAN value2, it returns 1, nil
 // If the two values are not compatible, then it returns 0, [DERP] with an explanation of the error.
-// Numeric values are compared across every signed, unsigned, and floating-point combination; strings
-// and Stringers are compared lexically. Other types (and mismatched non-numeric types) are incompatible.
+// Numeric values are compared across every signed, unsigned, and floating-point combination, a bool coerces
+// the other operand to bool, and strings and Stringers are compared lexically. Other pairs are incompatible.
 func Interface(value1 any, value2 any) (int, error) {
 
 	const location = "compare.Interface"

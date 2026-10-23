@@ -3,7 +3,7 @@ package compare
 // Booler interface wraps the Bool() method, that enables custom types to convert themselves to bool.
 type Booler interface {
 
-	// Bool returns the float64 value of the underlying object
+	// Bool returns the bool value of the underlying object
 	Bool() bool
 }
 
@@ -52,6 +52,6 @@ type Hexer interface {
 // ContainsInterfacer interface wraps the ContainsInterface() method, that returns TRUE if the underlying value contains the specified generic value
 type ContainsInterfacer interface {
 
-	// ContainsInterface returns TRUE if the underlying value is contained within the array.
+	// ContainsInterface returns TRUE if the underlying value contains the provided value.
 	ContainsInterface(any) bool
 }

@@ -5,7 +5,8 @@ func IsEmpty[T Stringlike](value T) bool {
 	return len(value) == 0
 }
 
-// IsEmptyTail returns TRUE if this list only has one element
+// IsEmptyTail returns TRUE if nothing follows the head: the list is empty, has no
+// delimiter, or ends at its first delimiter
 func IsEmptyTail[T Stringlike](value T, delimiter byte) bool {
 	place := Index(value, delimiter)
 	return (place == -1) || (place == len(value)-1)

@@ -474,8 +474,8 @@ func TestCSSDeclarations(t *testing.T) {
 		value    string
 		expected string
 	}{
-		// Values come back with a trailing ";" -- bluemonday emits one, and it is
-		// valid in a style attribute, so it is left rather than trimmed.
+		// Values come back with a trailing ";" -- sanitizeDeclarations adds one, and
+		// it is valid in a style attribute, so it is left rather than trimmed.
 		{"empty", "", ""},
 		{"single declaration", "color:red", "color: red;"},
 		{"several declarations", "color:red; padding:8px", "color: red; padding: 8px;"},

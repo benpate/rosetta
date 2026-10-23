@@ -32,15 +32,15 @@ Load-bearing: it keeps escaping, invalid UTF-8, and HTML-sensitive runes identic
 
 ## Float accepts NaN and Inf on a direct UnmarshalJSON call, and re-emits them
 
-`Float.UnmarshalJSON` uses `strconv.ParseFloat`, which accepts `NaN`, `Inf`, and `+Infinity` — none of which are valid JSON. `MarshalJSON` then writes `f.String()` as raw bytes, so the value round-trips back out as the literal `NaN` and poisons the enclosing document. This is unreachable through `encoding/json` (the outer decoder rejects those tokens first), so it only bites code that calls `UnmarshalJSON` directly.
+`Float.UnmarshalJSON` uses `strconv.ParseFloat`, which accepts `NaN`, `Inf`, and `+Infinity` — none of which are valid JSON. `MarshalJSON` then writes `f.String()` as raw bytes, so a direct call returns the literal `NaN` or `+Inf`, and `json.Marshal` of any document holding the value fails. The decode is unreachable through `encoding/json` (the outer decoder rejects those tokens first), so it only bites code that calls `UnmarshalJSON` directly, but `Set` with a computed `NaN` or `Inf` fails the same way. `FuzzFloat_UnmarshalJSON` skips `NaN` and not `Inf`, so an `Inf` input fails it.
 
 ## Float always formats without an exponent
 
 `Float.String()` uses `strconv.FormatFloat(value, 'f', -2, 64)` — shortest round-trippable digits, but `'f'` format, never `'e'`. A very small or very large magnitude renders as a long run of digits rather than exponent notation. `MarshalJSON` writes that string verbatim, so the format choice is the wire format.
 
-## Three copies of the Nullable interface exist on purpose
+## Four copies of the Nullable interface exist
 
-`null.Nullable`, [schema.Nullable](../schema/interfaces.go), and [compare.Nuller](../compare/interfaces.go) all declare `IsNull() bool`. They are duplicated so those packages don't import `null`; don't consolidate them into one shared declaration.
+`null.Nullable`, [schema.Nullable](../schema/interfaces.go), [compare.Nuller](../compare/interfaces.go), and [convert.Nuller](../convert/interfaces.go) all declare `IsNull() bool`. They do not keep those packages from importing `null`: `schema` and `convert` import it, and `compare` imports `convert`. Each is exported API, so removing one is a breaking change.
 
 ## Keep the fuzz corpus green
 

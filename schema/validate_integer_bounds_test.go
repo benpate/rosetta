@@ -49,8 +49,8 @@ func TestValidateInteger_Gates(t *testing.T) {
 // TestValidateInteger_OutOfRangeBound demonstrates the bounds-narrowing guard: a schema
 // bound that does not fit the declared integer type must produce an error rather than
 // silently wrapping. Before the guard, an int8 Minimum of 300 wrapped to 44 (int8(300)
-// == 44), so a value like 100 would clamp UP to the wrapped floor instead of being
-// recognized as below the real minimum.
+// == 44), so a value like 100 passed the wrapped floor instead of being recognized
+// as below the real minimum.
 func TestValidateInteger_OutOfRangeBound(t *testing.T) {
 
 	// An int8 field with a minimum of 300, which cannot fit in an int8.

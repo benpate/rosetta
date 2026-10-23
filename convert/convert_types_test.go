@@ -162,7 +162,7 @@ func TestBoolOk_AllTypes(t *testing.T) {
 	require.True(t, result)
 }
 
-// --- StringOk across supported input types ---
+// --- SliceOfStringOk across supported input types ---
 
 func TestSliceOfStringOk_AllTypes(t *testing.T) {
 

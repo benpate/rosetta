@@ -37,8 +37,8 @@ func FuzzUnmarshalJSON(f *testing.F) {
 
 // FuzzSchemaPaths feeds arbitrary path strings to the path-walking entry points against a fixed,
 // realistic schema and object. The danger zone is the string-cutting and array-index parsing in
-// GetElement/Get/Set; none of it may panic regardless of how malformed the path is. Set's own
-// recover() boundary is part of what this exercises.
+// GetElement/Get/Set; none of it may panic regardless of how malformed the path is. The recover()
+// boundary in SetProperty, which Set calls, is part of what this exercises.
 func FuzzSchemaPaths(f *testing.F) {
 
 	f.Add("name")
@@ -63,8 +63,8 @@ func FuzzSchemaPaths(f *testing.F) {
 		value := newTestStructA()
 		_, _ = schema.Get(&value, path)
 
-		// Set walks and mutates an object by path; must never panic (Set has a recover()
-		// boundary, so a panic here would mean that boundary failed).
+		// Set walks and mutates an object by path; must never panic (SetProperty has a recover()
+		// boundary, but Set validates the value before it reaches that boundary).
 		_ = schema.Set(&value, path, "fuzz-value")
 	})
 }

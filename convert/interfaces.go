@@ -69,7 +69,7 @@ type Nuller interface {
 	IsNull() bool
 }
 
-// SliceOfStringer interface wraps the SliceOfStringer() method that enables a custom type to convert itself into a slice of strings
+// SliceOfStringer interface wraps the SliceOfString() method that enables a custom type to convert itself into a slice of strings
 type SliceOfStringer interface {
 
 	// SliceOfString returns the underlying data structure as a slice of strings

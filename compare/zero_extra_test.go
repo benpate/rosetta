@@ -83,9 +83,9 @@ type zeroHexer string
 func (z zeroHexer) Hex() string { return string(z) }
 
 func TestIsZero_Hexer(t *testing.T) {
-	// "0" parses to int64(0), which is zero
+	// "0" has only zero digits, so it is zero
 	require.True(t, IsZero(zeroHexer("0")))
-	// "ff" parses to int64(255), which is not zero
+	// "ff" has a nonzero digit, so it is not zero
 	require.False(t, IsZero(zeroHexer("ff")))
 }
 

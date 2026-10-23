@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// MapOfInt32 attempts to convert the generic value into a map[string]string
+// MapOfInt32 attempts to convert the generic value into a map[string]int32
 func MapOfInt32(value any) map[string]int32 {
 	if result, _ := MapOfInt32Ok(value); result != nil {
 		return result
@@ -13,7 +13,7 @@ func MapOfInt32(value any) map[string]int32 {
 	return make(map[string]int32)
 }
 
-// MapOfInt32Ok attempts to convert the generic value into a map[string]string
+// MapOfInt32Ok attempts to convert the generic value into a map[string]int32
 // The boolean result value returns TRUE if successful.  FALSE otherwise
 func MapOfInt32Ok(value any) (map[string]int32, bool) {
 

@@ -32,7 +32,7 @@ func TestValidateObject_Map_OptionalAbsent_RequiredPresent(t *testing.T) {
 }
 
 // TestValidateObject_Map_RequiredAbsent: the rule under test. A map that omits the REQUIRED key
-// must FAIL validation, even though absent optional keys are tolerated. (If skipAbsentKeys causes
+// must FAIL validation, even though absent optional keys are tolerated. (If allowMissingKeys causes
 // the required check to be skipped, this test fails -- which is the bug it guards against.)
 func TestValidateObject_Map_RequiredAbsent(t *testing.T) {
 

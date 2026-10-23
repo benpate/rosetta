@@ -18,7 +18,7 @@ func SliceOfFloat(value any) []float64 {
 
 // SliceOfFloatOk converts the value into a slice of floats.
 // It works with any, []any, []float64, and float64 values.
-// It returns TRUE if the conversion was successful, and FALSE otherwise.
+// It returns TRUE if the conversion was lossless, and FALSE otherwise.
 func SliceOfFloatOk(value any) ([]float64, bool) {
 
 	// NILCHECK: value cannot be nil

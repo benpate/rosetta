@@ -182,8 +182,8 @@ func FuzzFloatIntRoundTrip(f *testing.F) {
 
 // FuzzSliceOfGeneric feeds arbitrary values through the generic slice converter, in every
 // shape the reflection paths have to walk: a bare value, a slice, a pointer, a nil pointer,
-// and an ArrayGetter. None of them may panic, and the conversion must be idempotent -- a
-// result fed back through the converter has to come out unchanged.
+// and an ArrayGetter. None of them may panic, and a result fed back through the converter
+// has to come out the same length.
 func FuzzSliceOfGeneric(f *testing.F) {
 
 	f.Add("")
@@ -204,7 +204,7 @@ func FuzzSliceOfGeneric(f *testing.F) {
 			_ = SliceOf[int](input)
 			_ = SliceOf[float64](input)
 
-			// A converted result must survive a second trip through the converter unchanged
+			// A converted result must come back from a second trip with the same length
 			result := SliceOf[string](input)
 
 			if again := SliceOf[string](result); len(again) != len(result) {
@@ -259,9 +259,8 @@ func FuzzMapConverters(f *testing.F) {
 	})
 }
 
-// FuzzIsSliceMatchesSliceLength asserts that the two slice predicates agree with each other.
-// A value IsSlice calls a slice but SliceLength measures as empty (or vice versa) means a
-// caller that guards with one and indexes with the other is walking off the end.
+// FuzzIsSliceMatchesSliceLength asserts that SliceLength reports zero for every value IsSlice
+// rejects, so a caller that guards with one and indexes with the other cannot walk off the end.
 func FuzzIsSliceMatchesSliceLength(f *testing.F) {
 
 	f.Add("")

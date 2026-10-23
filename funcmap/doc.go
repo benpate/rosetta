@@ -1,7 +1,7 @@
 // Package funcmap provides a registry of helper functions for Go templates.
 //
 // All returns a map[string]any suitable for passing to Template.Funcs, covering
-// comparison, arrays, dates, currency, HTML, math, logic, and string helpers.
+// comparison, arrays, dates, currency, debug, HTML, math, logic, and string helpers.
 // It rebuilds that map on every call, so call it once when templates are
 // parsed rather than once per request.
 //

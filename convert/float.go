@@ -8,7 +8,7 @@ import (
 )
 
 // Float forces a conversion from an arbitrary value into a float64.
-// If the value cannot be converted, then the zero value for the type (false) is used.
+// If the value cannot be converted, then the zero value for the type (0) is used.
 func Float(value any) float64 {
 	result, _ := FloatOk(value, 0)
 	return result
@@ -125,8 +125,8 @@ func FloatOk(value any, defaultValue float64) (float64, bool) {
 	return defaultValue, false
 }
 
-// isWholeNumber returns TRUE if the value has no fractional part, meaning it can be
-// converted to an integer without losing precision.
+// isWholeNumber returns TRUE if the value has no fractional part. It does not check
+// range, so callers clamp first: a whole float can still be too large for an integer.
 func isWholeNumber(value float64) bool {
 	return value == math.Floor(value)
 }

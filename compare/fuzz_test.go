@@ -31,9 +31,9 @@ func fuzzValues(text string) []any {
 }
 
 // FuzzWithOperator drives the operator dispatcher with an arbitrary operator string and every
-// awkward operand pairing.  This is the engine behind `show-if` and `required-if` expressions,
-// whose operators come out of template files rather than out of Go, so an unrecognized or
-// malformed operator must produce an error -- never a panic that takes down form rendering.
+// awkward operand pairing.  It evaluates exp criteria for callers such as data-mock, whose
+// operators arrive as strings rather than as Go constants, so an unrecognized or malformed
+// operator must produce an error -- never a panic that takes down the request.
 func FuzzWithOperator(f *testing.F) {
 
 	f.Add("=", "value")

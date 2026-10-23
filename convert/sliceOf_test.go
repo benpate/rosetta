@@ -43,7 +43,7 @@ func TestSliceOf_ScalarTypes(t *testing.T) {
 type namedString string
 
 // TestSliceOf_StructuralTypes confirms that an element type this package cannot convert is
-// reshaped structurally: pointers and named slice types are unwrapped, but each item must
+// reshaped structurally: a []T passes through and a []any is unwrapped, but each item must
 // already be a T.
 func TestSliceOf_StructuralTypes(t *testing.T) {
 
@@ -102,7 +102,7 @@ func TestSliceOf_PassthroughDoesNotCopy(t *testing.T) {
 	require.Equal(t, "changed", original[0])
 }
 
-// TestSliceOf_NilInputs confirms that every flavor of nil is reported rather than panicking.
+// TestSliceOf_NilInputs confirms that nil, a nil pointer, and a nil slice convert without panicking.
 func TestSliceOf_NilInputs(t *testing.T) {
 
 	var nilSlicePtr *[]string

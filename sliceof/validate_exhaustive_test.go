@@ -10,7 +10,7 @@ import (
 
 // TestSliceof_SchemaValidate_AllScalarTypes runs every concrete scalar sliceof type through
 // schema.Validate as an Array property. This is the exhaustive guard the array-interface fix calls
-// for: if a new sliceof type is added (or an existing one loses GetIndex/SetIndex), validation here
+// for: if one of these types loses GetIndex/SetIndex, validation here
 // fails with "Value must implement ArrayGetterSetter interface" instead of failing silently in a
 // downstream consumer like Emissary.
 func TestSliceof_SchemaValidate_AllScalarTypes(t *testing.T) {

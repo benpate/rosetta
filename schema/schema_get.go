@@ -6,8 +6,8 @@ import (
 	"github.com/benpate/derp"
 )
 
-// Get retrieves a generic value from the object.  If the object is nil,
-// Get still tries to return a default value if provided by the schema
+// Get retrieves a generic value from the object.  It never returns a schema default: a read past
+// the end of a list returns the zero value of the path's element, and a missing value is an error.
 func (schema Schema) Get(object any, path string) (any, error) {
 	return getPropertyRecursive(schema.Element, object, path)
 }

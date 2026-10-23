@@ -1,7 +1,7 @@
 package channel
 
-// Closed returns TRUE if this channel is closed, and FALSE otherwise.
-// It does not read from the channel, and is just a simple wrapper around a select statement.
+// Closed returns TRUE if a receive from the channel succeeds at once: the channel is closed, or
+// it holds a value, which this call consumes and discards. It returns FALSE otherwise.
 func Closed[T any](channel <-chan T) bool {
 	select {
 	case <-channel:

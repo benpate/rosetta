@@ -5,8 +5,9 @@
 // always returns a value, falling back to the zero value when the input cannot
 // be converted. The Default form substitutes a caller-supplied fallback
 // instead. The Ok form returns that same value alongside a boolean reporting
-// whether the conversion actually succeeded, for callers that need to tell
-// "absent" from "converted to zero".
+// whether the conversion was lossless, so a rounded value or a fallback to
+// the default reads FALSE. TimeOk, SliceOfAnyOk, SliceOfMapOk, and the map
+// converters report plain success instead.
 //
 // Conversions reach through pointers, interfaces, and the small accessor
 // interfaces shared with the compare package, so a type that can describe

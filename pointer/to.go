@@ -2,8 +2,8 @@ package pointer
 
 import "reflect"
 
-// To returns the provided value as a pointer to the original.
-// If the provided value is already a pointer, it is returned as-is.
+// To returns a pointer to a copy of the provided value.
+// A nil, or a value that is already a pointer, is returned as-is.
 func To(value any) any {
 
 	// RULE: A nil has no type to build a pointer to. reflect.TypeOf returns nil for it, and

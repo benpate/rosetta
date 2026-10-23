@@ -24,12 +24,12 @@ func addHTMLFuncs(target map[string]any) {
 		return url + "?" + extraParams
 	}
 
-	// attr marks a string as a trusted HTML attribute value, which html/template
-	// emits with NO escaping. To keep that safe by construction it first confirms
-	// the value cannot break out of the attribute or inject a new one: any value
-	// containing a quote, angle bracket, `=`, `&`, backtick, or whitespace is
-	// rejected and returns empty. Legitimate attribute values (class/id tokens,
-	// data values, ARIA states) pass through unchanged.
+	// attr marks a string as a trusted HTML attribute, which html/template emits
+	// with NO escaping inside a tag (inside an attribute value it still escapes it).
+	// To keep that safe by construction it first confirms the value cannot break out
+	// of the attribute or inject a new one: any value containing a quote, angle
+	// bracket, `=`, `&`, backtick, or whitespace is rejected and returns empty.
+	// Legitimate attribute values (class/id tokens, data values, ARIA states) pass.
 	target["attr"] = func(value string) template.HTMLAttr {
 		return safeAttr(value)
 	}
@@ -146,7 +146,7 @@ func addHTMLFuncs(target map[string]any) {
 			derp.Report(derp.Wrap(err, "tools.templates.functions.markdown", "Error converting Markdown to HTML"))
 		}
 
-		return template.HTML(buffer.String()) // #nosec G203 -- goldmark output; raw HTML in the source is escaped by default (no html.WithUnsafe)
+		return template.HTML(buffer.String()) // #nosec G203 -- goldmark output; raw HTML in the source is omitted by default (no html.WithUnsafe)
 	}
 
 	target["queryEscape"] = func(value string) string {
@@ -181,7 +181,7 @@ func addHTMLFuncs(target map[string]any) {
 		return template.HTML(html.FromText(value)) // #nosec G203 -- html.FromText escapes the input; only its own <br> markup is live
 	}
 
-	// match is used to select <option> values in a <select> box.
+	// select is used to select <option> values in a <select> box.
 	// This survives the aggressive "lowercase-ification" that
 	// the minifier performs on HTML templates.
 	target["select"] = func(matchValue string, value string) template.HTMLAttr {
@@ -237,8 +237,8 @@ func safeURL(value string) string {
 
 // safeAttr validates an HTML attribute value and returns it as a trusted
 // template.HTMLAttr only if it cannot break out of the attribute or inject a new
-// one; otherwise it returns empty. Because template.HTMLAttr is emitted without
-// escaping, any value carrying a quote, angle bracket, `=`, `&`, backtick, or
+// one; otherwise it returns empty. Because template.HTMLAttr is emitted inside a tag
+// without escaping, any value carrying a quote, angle bracket, `=`, `&`, backtick, or
 // whitespace — the characters needed to close the attribute, open a tag, or start
 // an adjacent attribute like `onmouseover=` — is rejected wholesale.
 func safeAttr(value string) template.HTMLAttr {
@@ -252,7 +252,7 @@ func safeAttr(value string) template.HTMLAttr {
 
 // isUnsafeAttrRune reports whether a rune must not appear in a raw (unescaped)
 // HTML attribute value. It rejects the attribute-breakout characters directly,
-// plus all whitespace and control runes (which could split the value into an
+// plus the space and every ASCII control rune (which could split the value into an
 // additional attribute). Everything else — the characters that make up class and
 // id tokens, data values, and ARIA states — is permitted.
 func isUnsafeAttrRune(r rune) bool {
@@ -296,7 +296,7 @@ func safeCSSValue(value string) template.CSS {
 // set is intentionally narrow: it admits identifiers, numbers, colors, units,
 // simple functions, and their separators, and nothing that could terminate the
 // value, the property, or the surrounding `style` attribute. Notably absent are
-// `"` `'` `;` `<` `>` `{` `}` `@` `\` `/` `*` and control characters — the
+// `"` `'` `;` `<` `>` `{` `}` `@` `\` `/` `*` and control characters but tab — the
 // building blocks of quote/attribute breakouts, extra declarations, `@import`,
 // comments, and CSS escapes.
 func isUnsafeCSSValueRune(r rune) bool {

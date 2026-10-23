@@ -43,7 +43,7 @@ func TestValidate_Boolean_Required(t *testing.T) {
 }
 
 func TestValidate_Boolean_UsesExistingInputFormat(t *testing.T) {
-	// A coercible value is accepted and converted to a boolean
+	// A coercible value is accepted, and returned in its original form
 	newValue, changed, err := validate(Boolean{}, "true")
 	require.NoError(t, err)
 	require.Empty(t, changed)
@@ -121,7 +121,7 @@ func TestValidateInteger_Direct_AllWidths(t *testing.T) {
 }
 
 func TestValidateInteger_Direct_NotInteger(t *testing.T) {
-	// A non-integer value reaches the fall-through error branch
+	// A non-integer value fails the lossless-conversion check
 	_, _, err := validate_Integer(Integer{}, "not-an-int")
 	require.Error(t, err)
 }

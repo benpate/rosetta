@@ -39,7 +39,7 @@ func TestSlice_ArrayGetterSetter(t *testing.T) {
 	_, ok = value.GetIndex(-1)
 	require.False(t, ok)
 
-	// SetIndex grows the slice and records the added value.
+	// SetIndex grows the slice to reach the index, and stores the value there.
 	require.True(t, value.SetIndex(3, "delta"))
 	require.Equal(t, 4, value.Length())
 	got, _ = value.GetIndex(3)

@@ -4,10 +4,8 @@ import (
 	"strconv"
 )
 
-// Index converts a string into an array index that is bounded
-// by zero and the maximum value provided.  It returns the
-// final index and a boolean that is TRUE if the index was
-// converted successfully, and FALSE if it was truncated.
+// Index converts a string into an array index, returning TRUE if it is a non-negative integer below
+// every maximum provided.  Otherwise it returns FALSE, with 0 or one less than the first maximum reached.
 func Index(token string, maxLengths ...int) (int, bool) {
 
 	result, err := strconv.Atoi(token)

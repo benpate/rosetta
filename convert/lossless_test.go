@@ -144,8 +144,8 @@ func TestLossless_FloatOk(t *testing.T) {
 	test(nil, false)
 }
 
-// TestLossless_StringOk covers int/bool/float formatting, all of which are lossless,
-// versus slice and nil inputs.
+// TestLossless_StringOk covers int and bool formatting, which is always lossless, float
+// formatting, which is lossless only when two decimals hold the value, and slice and nil inputs.
 func TestLossless_StringOk(t *testing.T) {
 
 	test := func(value any, wantResult string, wantLossless bool) {
@@ -203,7 +203,7 @@ func TestLossless_FloatToString(t *testing.T) {
 // scalar converters, confirming the lossless rule applies through interfaces too.
 func TestLossless_Interfaces(t *testing.T) {
 
-	// Inter -> int/int64/float is lossless for in-range values.
+	// Inter -> int is lossless for in-range values.
 	{
 		result, lossless := IntOk(customInter(42), -1)
 		require.Equal(t, 42, result)
@@ -229,7 +229,7 @@ func TestLossless_Interfaces(t *testing.T) {
 		require.True(t, lossless)
 	}
 
-	// Inter -> string and Floater -> string are both lossless (shortest exact form).
+	// Inter -> string is lossless, and so is Floater -> string when two decimals hold the value.
 	{
 		result, lossless := StringOk(customInter(99), "DEF")
 		require.Equal(t, "99", result)

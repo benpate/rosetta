@@ -37,10 +37,10 @@ func validate_Array[T any](element Array, value T) (T, rewriteList, error) {
 			return value, nil, derp.Internal(location, "Getting value at index", index)
 		}
 
-		// RULE: Composite items (Object/Array) reach their schema accessors through
+		// RULE: Composite items (Object/Array/Any) reach their schema accessors through
 		// pointer-receiver interfaces (PointerGetter, etc.). GetIndex hands back a copy
 		// by value, whose address is not the slice element's, so wrap it in an addressable
-		// pointer before validating. Scalars validate fine by value and are left alone.
+		// pointer before validating. Items under a scalar schema are left alone.
 		itemValue, restore := addressableItem(element.Items, indexValue)
 
 		// Validate the value using the schema's "Items" definition
@@ -62,11 +62,8 @@ func validate_Array[T any](element Array, value T) (T, rewriteList, error) {
 	return value, rewrites, nil
 }
 
-// addressableItem prepares an array element for nested validation. For composite item
-// schemas (Object/Array/Any) whose value is a non-pointer, it returns an addressable
-// pointer to a copy so that pointer-receiver accessors are reachable, along with a
-// "restore" function that converts the validated result back into the element's original
-// shape for SetIndex. Scalars (and values that are already pointers) pass through unchanged.
+// addressableItem wraps a non-pointer value under an Object, Array, or Any schema in a pointer to
+// a copy, and returns a function that converts the validated result back to the value's own type.
 func addressableItem(items Element, indexValue any) (any, func(any) any) {
 
 	identity := func(v any) any { return v }
@@ -89,8 +86,8 @@ func addressableItem(items Element, indexValue any) (any, func(any) any) {
 	// Build an addressable pointer to a copy of the value.
 	pointer := addressableCopy(reflectValue)
 
-	// The restore function dereferences the (possibly-mutated) copy so SetIndex receives
-	// the same concrete type GetIndex returned.
+	// The restore function dereferences the (possibly-mutated) copy so the caller writes
+	// back the same concrete type it read.
 	restore := func(validated any) any {
 		return restoreType(validated, reflectValue.Type())
 	}
@@ -122,8 +119,8 @@ func validate_Array_length(getter ArrayGetter, element Array) error {
 	return nil
 }
 
-// addressableCopy returns a pointer to a copy of the value.  A plain Go map has no getters behind
-// its pointer, so it is copied into a mapof.Any instead, exactly as Get reads it.
+// addressableCopy returns a pointer to a shallow copy of the value.  A plain map[string]any has no
+// getters behind its pointer, so it is copied into a mapof.Any instead, as Get reads it.
 func addressableCopy(original reflect.Value) any {
 
 	pointer := reflect.New(original.Type())
@@ -137,7 +134,8 @@ func addressableCopy(original reflect.Value) any {
 		return pointer.Interface()
 	}
 
-	// pointerToCopy returns a mapof.Any for a plain map, and the map itself when none can hold it
+	// pointerToCopy returns a *mapof.Any for a plain map[string]any, and the map itself when no
+	// rosetta type can hold it
 	if readable, ok := pointerToCopy(original.Interface()).(PointerGetter); ok {
 		return readable
 	}
@@ -145,8 +143,8 @@ func addressableCopy(original reflect.Value) any {
 	return pointer.Interface()
 }
 
-// restoreType dereferences a validated pointer, and returns its value as the original type.  Any
-// other value is returned unchanged.
+// restoreType dereferences a validated pointer, and returns its value converted to the original
+// type when it can be.  Any other value is returned unchanged.
 func restoreType(validated any, originalType reflect.Type) any {
 
 	validatedPointer := reflect.ValueOf(validated)

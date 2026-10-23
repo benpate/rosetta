@@ -22,13 +22,13 @@ Tolerance never leaks into what you publish: `Int64` and `String` marshal to the
 
 ### What survives, and what doesn't
 
-`Int64` defers to [convert.Int64](../convert/README.md), so floats truncate toward zero, out-of-range values clamp to the `int64` bounds, and anything unparseable quietly becomes zero — "not provided" rather than an error. Top-level integers are read from their **source text**, so IDs and timestamps above 2^53 stay exact instead of rounding through a `float64`.
+`Int64` defers to [convert.Int64](../convert/README.md), so floats truncate toward zero, out-of-range numbers clamp to the `int64` bounds, and anything unparseable, including a quoted float or a quoted out-of-range integer, quietly becomes zero — "not provided" rather than an error. Top-level integers are read from their **source text**, so IDs and timestamps above 2^53 stay exact instead of rounding through a `float64`.
 
 It is `Int64` rather than `Int` deliberately. `convert.Int` clamps to the *platform* int width, so on a 32-bit target — `GOARCH=wasm` is one — a plain `Int` would silently cap at 2^31. A sender's JSON has no idea what you built for. Precision beyond int64 is explicitly not a goal: larger values clamp, and an integer nested inside an array rounds.
 
 `String` keeps a number's source text too, which is the whole point: `1.0` must stay `"1.0"` and never become `"1"` or `"1.00"`.
 
-Tolerance stops at structure. `String` rejects objects and arrays outright, because coercing one would invent a value the sender never wrote. Both types error only on input that isn't valid JSON at all.
+Tolerance stops at structure. `String` rejects objects and arrays outright, because coercing one would invent a value the sender never wrote. Apart from that, both types error only on input that isn't valid JSON at all.
 
 ### Fuzzing
 

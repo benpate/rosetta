@@ -19,7 +19,7 @@ func SliceOfInt64(value any) []int64 {
 // SliceOfInt64Ok converts the value into a slice of int64s.
 // It works with float64, int, int64, string, and
 // []any, []float64, []int, []int64, and []string values.
-// It returns TRUE if the conversion was successful, and FALSE otherwise.
+// It returns TRUE if the conversion was lossless, and FALSE otherwise.
 func SliceOfInt64Ok(value any) ([]int64, bool) {
 
 	// NILCHECK: value cannot be nil

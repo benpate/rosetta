@@ -6,13 +6,13 @@ import (
 	"github.com/benpate/rosetta/schema"
 )
 
-// appendRunner applies a constant value to the output object
+// appendRunner appends a constant value to a list in the output object
 type appendRunner struct {
 	Append any
 	Target string
 }
 
-// Append creates a new Rule that writes a constant value to the output object
+// Append creates a new Rule that appends a constant value to the list at target in the output object
 func Append(append any, target string) Rule {
 	return Rule{newAppendRunner(append, target)}
 }

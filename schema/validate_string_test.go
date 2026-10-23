@@ -25,7 +25,7 @@ func (t *testStringGetter) SetString(_ string, value string) bool {
 	return true
 }
 
-// TestStringGetter tests getting/setting string values
+// TestStringGetter_Empty tests that an empty required string fails Validate
 func TestStringGetter_Empty(t *testing.T) {
 
 	schema := New(Object{
@@ -67,7 +67,7 @@ func TestStringSetter(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TestStringSetter tests getting/setting string values
+// TestStringSetter_Required tests getting/setting a required string value, then validating it
 func TestStringSetter_Required(t *testing.T) {
 
 	spew.Config.DisableMethods = true
@@ -92,7 +92,7 @@ func TestStringSetter_Required(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TestStringGetter tests getting/setting string values
+// TestStringGetter_ValidateOnly tests setting a required string value, then validating it
 func TestStringGetter_ValidateOnly(t *testing.T) {
 
 	schema := New(Object{
@@ -180,7 +180,7 @@ func TestStringValidator_Multibyte(t *testing.T) {
 	require.Error(t, schema.Set(&getter, "value", "日本"))
 }
 
-// testStringPointer tests getting/setting bool values via a pointer
+// testStringPointer tests getting/setting string values via a pointer
 type testStringPointer struct {
 	value string
 }

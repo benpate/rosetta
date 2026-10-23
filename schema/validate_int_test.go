@@ -23,7 +23,7 @@ func (t *testIntGetter) SetInt(_ string, value int) bool {
 	return true
 }
 
-// TestIntGetter tests getting/setting bool values
+// TestIntGetter tests getting/setting int values
 func TestIntGetter(t *testing.T) {
 
 	schema := New(Object{
@@ -43,7 +43,7 @@ func TestIntGetter(t *testing.T) {
 	require.Equal(t, 12345678, getter.value)
 }
 
-// testIntPointer tests getting/setting bool values via a pointer
+// testIntPointer tests getting/setting int values via a pointer
 type testIntPointer struct {
 	value int
 }

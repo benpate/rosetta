@@ -80,7 +80,7 @@ func TestSlice_SetValue_DoesNotAliasInput(t *testing.T) {
 	input[0] = "CLOBBERED"
 	require.Equal(t, []string{"bandwagon", "spotify"}, s.Values)
 
-	// And growing the Slice must not reach back into the caller's slice
+	// And writing into the Slice must not reach back into the caller's slice
 	require.True(t, s.SetIndex(0, "changed"))
 	require.Equal(t, sliceof.String{"CLOBBERED", "spotify"}, input)
 }
@@ -159,7 +159,7 @@ func TestSlice_SetValue_TypedNilPointer(t *testing.T) {
 		require.False(t, s.IsChanged())
 	}
 
-	{ // A pointer to a nil SLICE is an empty collection, and clears
+	{ // A pointer to an EMPTY slice is an empty collection, and clears
 		s := NewSlice("bandwagon")
 		require.NoError(t, s.SetValue(&sliceof.String{}))
 		require.Equal(t, []string{}, s.Values)

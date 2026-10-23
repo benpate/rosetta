@@ -40,7 +40,7 @@ func IsHTML(html string) bool {
 }
 
 // ToText returns a string that has been converted from HTML into plain text.
-// Mostly, this means replacing block level tags (BR, P, DIV) with carriage returns.
+// Mostly, this means replacing block level tags (BR, P, DIV) with newlines.
 func ToText(html string) string {
 
 	result := html
@@ -71,7 +71,7 @@ func ToSearchText(html string) string {
 	return result
 }
 
-// RemoveSpecialCharacters removes special Unicode characters from a string
+// RemoveSpecialCharacters replaces non-breaking spaces and a fixed set of HTML entities with plain-text equivalents
 func RemoveSpecialCharacters(html string) string {
 
 	result := html

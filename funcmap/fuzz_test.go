@@ -10,7 +10,7 @@ import (
 )
 
 // FuzzSafeAttr asserts the invariant behind the `attr` template function: whatever it
-// returns is emitted into an HTML attribute with NO escaping, so the result must either
+// returns is emitted inside an HTML tag with NO escaping, so the result must either
 // be empty, or be the input unchanged AND free of every character that could close the
 // attribute, open a tag, or start an adjacent one.
 func FuzzSafeAttr(f *testing.F) {

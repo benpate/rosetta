@@ -81,7 +81,8 @@ func (schema Schema) Match(value any, expression exp.Expression) (bool, error) {
 	return result, resultError
 }
 
-// Validate checks the provided value against this schema, returning whether it was changed and any validation error.
+// Validate checks the provided value against this schema and its required-if conditions.  The bool
+// is always FALSE, because a value that had to be rewritten is reported as a validation error.
 func (schema Schema) Validate(value any) (bool, error) {
 
 	const location = "schema.Schema.Validate"
@@ -207,7 +208,7 @@ func (schema *Schema) Inherit(parent Schema) {
 	schema.Element = inheritElement(schema.Element, parent.Element)
 }
 
-// AllProperties returns a flat slice of all properties in this schema
+// AllProperties returns a flat map of the named properties in this schema, keyed by dotted path
 func (schema *Schema) AllProperties() ElementMap {
 	return schema.Element.AllProperties()
 }

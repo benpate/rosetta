@@ -87,7 +87,7 @@ func seedJSON(f *testing.F) {
 // The properties below hold for EVERY type, so a new loose type gets its
 // whole safety net by being added to this one list.
 
-// unmarshalJSON decodes into a fresh value of T and reports the result.
+// jsonTarget names a loose type, and decodes JSON into a fresh value of it.
 type jsonTarget struct {
 	name string
 
@@ -509,10 +509,10 @@ func FuzzString_RoundTrip(f *testing.F) {
 		}
 
 		// Property: whatever survives the first trip is stable from here on.
-		// The comparison is on VALUES, not bytes: json.Marshal escapes the
-		// U+FFFD it substitutes for invalid UTF-8 ("�") but emits a
-		// genuine U+FFFD literally, so the encoding of a repaired string
-		// legitimately differs from the encoding of the broken original.
+		// The comparison is on VALUES, not bytes: before Go 1.27, json.Marshal
+		// escaped the U+FFFD it substitutes for invalid UTF-8 but emitted a
+		// genuine U+FFFD literally, so the encoding of a repaired string could
+		// differ from the encoding of the broken original.
 		second, err := json.Marshal(parsed)
 
 		if err != nil {

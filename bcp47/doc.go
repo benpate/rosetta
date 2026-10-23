@@ -8,5 +8,5 @@
 //
 // Every value is bounded before parsing, because language tags usually arrive from visitors
 // and authors. The schema package's "language" string format is built on Canonical, so a
-// value checked by a schema and a value checked here can never disagree.
+// schema and this package can never disagree about a non-empty value.
 package bcp47

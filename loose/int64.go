@@ -14,8 +14,8 @@ import (
 // Int64 is a tolerant integer that accepts whatever numeric encoding a remote
 // system actually sends. Parsing semantics are convert.Int64, applied per
 // Postel's law: JSON numbers and quoted integer strings parse, floats
-// truncate toward zero, out-of-range values clamp to the int64 bounds, and
-// null, empty, or unparseable values quietly become zero ("not provided").
+// truncate toward zero, out-of-range numbers clamp to the int64 bounds, and
+// null, empty, or unparseable values, such as a quoted float, become zero ("not provided").
 // Output is always a plain JSON number.
 //
 // Integers are exact across the whole int64 range: a top-level JSON integer is
@@ -66,8 +66,8 @@ func (i *Int64) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// UnmarshalXML decodes the element's character data with the same tolerant
-// numeric parsing as UnmarshalJSON.
+// UnmarshalXML decodes the element's character data with the tolerant parsing
+// that UnmarshalJSON applies to a quoted string.
 func (i *Int64) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
 
 	const location = "loose.Int64.UnmarshalXML"

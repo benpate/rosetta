@@ -124,7 +124,7 @@ func SliceOfAnyOk(value any) ([]any, bool) {
 	return make([]any, 0), false
 }
 
-// makeSliceOfAnyOk converts a slice of any type into a slice of int64s.
+// makeSliceOfAnyOk converts a slice of any type into a slice of any.
 func makeSliceOfAnyOk[T any](value []T) ([]any, bool) {
 	result := make([]any, len(value))
 	for index, v := range value {

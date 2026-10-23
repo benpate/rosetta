@@ -317,7 +317,7 @@ func setProperty_Number(object any, path string, value any) error {
 	// Convert the value to a float
 	floatValue := convert.Float(value)
 
-	// Try to set the value using the NumberSetter interface
+	// Try to set the value using the FloatSetter interface
 	if setter, ok := object.(FloatSetter); ok {
 		if setter.SetFloat(path, floatValue) {
 			return nil

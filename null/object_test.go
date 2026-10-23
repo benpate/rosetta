@@ -165,8 +165,8 @@ func TestObject_IsZero_NilTypes(t *testing.T) {
 	require.True(t, NewObject(map[string]int(nil)).IsZero())
 
 	// GOTCHA: an EMPTY but non-nil slice/map is not the zero value.  This follows
-	// Go's own definition of zero, and differs from compare.IsZero, which
-	// treats any zero-length collection as zero.
+	// Go's own definition of zero, and differs from compare.IsZero, which treats an
+	// empty []string, []int, []float64, []any, or LengthGetter as zero.
 	require.False(t, NewObject([]int{}).IsZero())
 	require.False(t, NewObject(map[string]int{}).IsZero())
 }

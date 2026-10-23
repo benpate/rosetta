@@ -52,7 +52,7 @@ func (x Int) NotEmpty() bool {
 	return len(x) > 0
 }
 
-// First returns the first element in the slice, or nil if the slice is empty
+// First returns the first element in the slice, or 0 if the slice is empty
 func (x Int) First() int {
 	if len(x) > 0 {
 		return x[0]
@@ -75,7 +75,7 @@ func (x Int) FirstN(n int) Int {
 	return x[:n]
 }
 
-// Last returns the last element in the slice, or nil if the slice is empty
+// Last returns the last element in the slice, or 0 if the slice is empty
 func (x Int) Last() int {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -94,7 +94,7 @@ func (x Int) Filter(fn func(int) bool) Int {
 }
 
 // At returns a bound-safe element from the slice.  If the index
-// is out of bounds, then `At` returns the zero value for the slice type
+// is out of bounds, then `At` returns the zero value for the element type
 func (x Int) At(index int) int {
 	return slice.At(x, index)
 }
@@ -121,7 +121,7 @@ func (x Int) ContainsInterface(value any) bool {
 		return slice.Contains(x, value)
 	}
 
-	// If we can't convert the value to a string, then it is not contained in the slice
+	// If we can't convert the value to an int, then it is not contained in the slice
 	return false
 }
 
@@ -165,7 +165,7 @@ func (x Int) Shuffle() Int {
 	return slice.Shuffle(x)
 }
 
-// Keys returns a slice of ints representing the indexes of this slice
+// Keys returns a slice of strings representing the indexes of this slice
 func (x Int) Keys() []string {
 	keys := make([]string, len(x))
 
@@ -180,7 +180,7 @@ func (x Int) Keys() []string {
  * Getter Interfaces/Setters
  ****************************************/
 
-// GetAny returns the value for the key index, or nil if absent.
+// GetAny returns the value for the key index, or 0 if absent.
 func (x Int) GetAny(key string) any {
 	result, _ := x.GetIntOK(key)
 	return result
@@ -242,7 +242,7 @@ func (s *Int) SetInt(key string, value int) bool {
 	return false
 }
 
-// SetValue replaces the entire slice with the provided value, if it can be converted.
+// SetValue replaces the entire slice with the provided value, converted to ints.
 func (s *Int) SetValue(value any) error {
 	*s = convert.SliceOfInt(value)
 	return nil

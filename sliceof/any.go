@@ -99,12 +99,12 @@ func (x Any) Filter(fn func(any) bool) Any {
 }
 
 // At returns a bound-safe element from the slice.  If the index
-// is out of bounds, then `At` returns the zero value for the slice type
+// is out of bounds, then `At` returns the zero value for the element type
 func (x Any) At(index int) any {
 	return slice.At(x, index)
 }
 
-// Reverse returns a new slice with the elements in reverse order
+// Reverse reverses the order of the elements in the slice in place, and returns it
 func (x Any) Reverse() Any {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]
@@ -261,7 +261,8 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
-// GetPointer returns a pointer to the element at the key index, growing the slice as needed (implements schema PointerGetter).
+// GetPointer returns a pointer to a copy of the element at the key index (a pointer element is returned as-is),
+// growing the slice as needed (implements schema PointerGetter).
 func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(x, index)

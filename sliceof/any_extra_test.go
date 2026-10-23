@@ -130,7 +130,7 @@ func TestAny_TypedGetters(t *testing.T) {
 	_, ok = x.GetIndex(99)
 	require.False(t, ok)
 
-	// GetPointer returns a pointer to the (any-typed) element
+	// GetPointer returns a pointer to a copy of the element
 	pointer, ok := x.GetPointer("1")
 	require.True(t, ok)
 	require.NotNil(t, pointer)

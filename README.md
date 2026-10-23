@@ -21,15 +21,20 @@ Many of these packages pre-date Go generics, and many are being refactored to ta
 * [Channel](https://github.com/benpate/rosetta/tree/main/channel) tools for manipulating Go channels
 * [Compare](https://github.com/benpate/rosetta/tree/main/compare) values of unknown data types.
 * [Convert](https://github.com/benpate/rosetta/tree/main/convert) between arbitrary data types with sensible, configurable defaults.
+* [First](https://github.com/benpate/rosetta/tree/main/first) non-empty value from a list of candidates
+* [FuncMap](https://github.com/benpate/rosetta/tree/main/funcmap) helper functions for Go templates
 * [HTML](https://github.com/benpate/rosetta/tree/main/html) conversion tools
 * [Iterator](https://github.com/benpate/rosetta/tree/main/iterator) tools for iterating over data structures
 * [Maps](https://github.com/benpate/rosetta/tree/main/maps) tools for working with map types
+* [Pointer](https://github.com/benpate/rosetta/tree/main/pointer) to a value whose type is not known at compile time
+* [Ranges](https://github.com/benpate/rosetta/tree/main/ranges) combinators for `iter.Seq` iterators
 * [Schema](https://github.com/benpate/rosetta/tree/main/schema) validation based on JSON Schema
 * [Slice](https://github.com/benpate/rosetta/tree/main/slice) manipulation library
 * [Translate](https://github.com/benpate/rosetta/tree/main/translate) data mapping library
 
 ### Enhanced Data Types
 
+* [Delta](https://github.com/benpate/rosetta/tree/main/delta) slices that track which values were added and deleted
 * [Loose](https://github.com/benpate/rosetta/tree/main/loose) types (`Int64`, `String`, `Template`) that accept whatever a remote system or a hand-written file actually sends
 * [List](https://github.com/benpate/rosetta/tree/main/list) parsing library
 * [MapOf](https://github.com/benpate/rosetta/tree/main/mapof) data type with type safe getters/setters

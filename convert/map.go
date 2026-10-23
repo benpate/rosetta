@@ -2,7 +2,8 @@ package convert
 
 import "reflect"
 
-// IsMap returns TRUE if the value is a map (Uses Reflection)
+// IsMap returns TRUE if the value is a map, a pointer to one, or a MapOfAnyGetter
+// (Uses Reflection)
 func IsMap(value any) bool {
 
 	// Get the obvious checks out of the way.
@@ -26,7 +27,7 @@ func IsMap(value any) bool {
 
 		return IsMap(valueOf.Elem().Interface())
 
-	// Arrays and slices are both valid
+	// Maps are valid
 	case reflect.Map:
 		return true
 	}

@@ -40,7 +40,7 @@ func TestInt64Getter(t *testing.T) {
 	require.Equal(t, int64(12345678), getter.value)
 }
 
-// testInt64Pointer tests getting/setting bool values via a pointer
+// testInt64Pointer tests getting/setting int64 values via a pointer
 type testInt64Pointer struct {
 	value int64
 }

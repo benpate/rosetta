@@ -8,9 +8,9 @@ import (
 )
 
 // cssMaxNestingDepth bounds how deeply conditional at-rules (@media, @supports)
-// may nest before the remainder of the stylesheet is discarded. A stylesheet is
-// a recursive format, so it needs an explicit depth limit: without one, deeply
-// nested input drives unbounded recursion here.
+// may nest. An at-rule nested deeper is dropped whole, and the rules around it
+// are kept. A stylesheet is a recursive format, so it needs an explicit depth
+// limit: without one, deeply nested input drives unbounded recursion here.
 const cssMaxNestingDepth = 4
 
 // cssWhitespace lists the characters CSS treats as whitespace between tokens.
@@ -292,7 +292,7 @@ func sanitizeDeclarations(declarations string) string {
 	sanitized := cssPolicy.Sanitize(`<` + cssPlaceholderElement + ` style="` + declarations + `"></` + cssPlaceholderElement + `>`)
 
 	// Recover the attribute value from the sanitized element. A policy that
-	// stripped every declaration emits the element with no attribute at all.
+	// stripped every declaration emits nothing, not even the placeholder element.
 	_, after, found := strings.Cut(sanitized, `style="`)
 
 	if !found {
@@ -321,9 +321,9 @@ func sanitizeDeclarations(declarations string) string {
 	// reintroduce characters that were escaped on the way out, so the result is
 	// verified in the form it will actually be written to the stylesheet.
 	//
-	// UNREACHABLE by test: the guard before the round trip refuses these
-	// characters going in, and the policy cannot invent them. This is the check
-	// that stays correct if either of those two facts ever stops being true.
+	// No test reaches this, but input does: bluemonday checks a value with its
+	// unicode escapes decoded and emits the original spelling, so `color: \72 ed`
+	// keeps its backslash. The guard before the round trip refuses only `"'<>`.
 	if strings.ContainsAny(value, `"'<>{}\`) {
 		return ""
 	}
@@ -379,7 +379,7 @@ func isCSSWhitespace(r rune) bool {
 
 // isSafeCSSValue reports whether a single CSS property value is safe to emit.
 // Bluemonday calls it for every declaration whose property is allowlisted, with
-// the value already lowercased and stripped of unicode escapes.
+// the value already lowercased and its unicode escapes decoded.
 //
 // Validation is two-stage, matching the approach used for single property
 // values elsewhere: a conservative character allowlist, then a check for the
@@ -415,9 +415,9 @@ func isSafeCSSValue(value string) bool {
 // numbers, colors, units, function calls, and `!important`.
 //
 // Notably absent are `"` `'` `;` `{` `}` `<` `>` `@` `\` `*` `&` and control
-// characters -- respectively the building blocks of attribute and string
-// breakouts, extra declarations, block breakouts, a `</style>` escape, new
-// at-rules, CSS escape sequences, and comment openers. `/` is allowed (the
+// characters other than tab -- respectively the building blocks of attribute
+// and string breakouts, extra declarations, block breakouts, a `</style>` escape,
+// new at-rules, CSS escape sequences, and comment openers. `/` is allowed (the
 // `font: 12px/1.5` and `grid-area: 1 / 2` separators) because without `*` it
 // cannot open a comment.
 func isUnsafeCSSValueRune(r rune) bool {

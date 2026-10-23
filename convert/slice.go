@@ -4,7 +4,8 @@ import (
 	"reflect"
 )
 
-// IsSlice returns TRUE if the value is a slice or array (Uses Reflection)
+// IsSlice returns TRUE if the value is a slice, an array, a pointer to one, or a
+// SliceOfStringer (Uses Reflection)
 func IsSlice(value any) bool {
 
 	// Get the obvious checks out of the way.

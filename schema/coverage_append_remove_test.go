@@ -6,12 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// NOTE: Schema.Append's success path is not exercised here. Append grows the
-// array correctly, but its final step re-validates the value via Schema.Set,
-// which passes the dereferenced (non-pointer) array to validate_Array. Because
-// array SetIndex methods are pointer-receivers, the non-pointer value does not
-// satisfy ArrayGetterSetter, so the re-validation fails. Only Append's error
-// branches are reachable. See the summary notes for details.
+// NOTE: These tests cover Schema.Append's error branches.  Its success path, which hands Set a
+// pointer to the grown array, is exercised by translate's TestAppend.
 
 func TestSchema_Append_NotAnArray(t *testing.T) {
 	// Appending to a non-array element returns an error

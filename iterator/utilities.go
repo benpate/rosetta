@@ -1,6 +1,6 @@
 package iterator
 
-// Map converts an iterator into a slice of items.
+// Map converts an Iterator into a slice, passing each item through fn.
 // Deprecated: freeing up this namespace to use for new Go 1.23 range functions
 func Map[In any, Out any](it Iterator, fn func(In) Out) []Out {
 

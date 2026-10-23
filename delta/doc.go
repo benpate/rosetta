@@ -15,6 +15,7 @@
 // whatever it is handed rather than asserting a []T: form widgets deliver array
 // values as a *sliceof.String, and several other shapes are possible besides.
 // The conversion is delegated to convert.SliceOfOk, so it is as forgiving as
-// that package allows -- lossy renderings included -- and only a value that is
-// not a collection at all is reported, without disturbing the slice.
+// that package allows -- lossy renderings included, and a bare scalar becomes a
+// one-item list -- and only a value it cannot read as a list is reported,
+// without disturbing the slice.
 package delta

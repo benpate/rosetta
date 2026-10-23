@@ -92,7 +92,8 @@ func isMultipleOfFloat[T constraints.Float](value, multipleOf T) bool {
 	return math.Abs(v-rounded) <= 1e-9*math.Max(1, math.Abs(v))
 }
 
-// notMultipleOfFloat returns TRUE when the value is not an exact multiple of multipleOf.
+// notMultipleOfFloat returns TRUE when the value is not a multiple of multipleOf, within the
+// tolerance that isMultipleOfFloat allows.
 func notMultipleOfFloat[T constraints.Float](value, multipleOf T) bool {
 	return !isMultipleOfFloat(value, multipleOf)
 }

@@ -31,7 +31,7 @@ func NewSlice[T comparable](values ...T) Slice[T] {
 	}
 }
 
-// Length returns the number of keys in the map
+// Length returns the number of values in the slice
 func (s Slice[T]) Length() int {
 	return len(s.Values)
 }

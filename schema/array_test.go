@@ -54,8 +54,8 @@ func TestArray_Validation(t *testing.T) {
 	}
 
 	{
-		// An item that exceeds MaxLength would require rewriting, so Validate now
-		// rejects it rather than truncating (Set still clamps the value in place).
+		// An item that exceeds MaxLength would require rewriting, so Validate rejects
+		// it, even though it also truncates the item in place through the pointer.
 		v := testArrayA{"one", "two", "three", "invalid because its way too long"}
 		_, _, err := Validate(schema, &v)
 		require.Error(t, err)
@@ -80,7 +80,8 @@ func TestArray_Validation_Fail1(t *testing.T) {
 		Items: String{MaxLength: 10},
 	})
 
-	// This should fail because &testArrayA{} is not addressable
+	// This should fail because a testArrayA held by value is not an ArrayGetterSetter (SetIndex
+	// has a pointer receiver)
 	_, _, err := Validate(schema, testArrayA{"one", "two", "three", "valid"})
 	require.Error(t, err)
 }

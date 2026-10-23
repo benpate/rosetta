@@ -9,4 +9,4 @@ Turns any [BCP 47](https://www.rfc-editor.org/info/bcp47) language tag into the 
 
 Values longer than 64 bytes are refused before parsing. Variants stay, because `ca-valencia` is a different written form of Catalan; extensions such as `-u-ca-gregory` go, because they describe formatting preferences.
 
-The schema package's `language` string format is built on `Canonical`, so `Set` stores `EN-us` as `en-US` and refuses anything that is not a language.
+The schema package's `language` string format is built on `Canonical`, so `Set` stores `EN-us` as `en-US`, keeps an empty value, and refuses any other value that is not a language.

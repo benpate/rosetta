@@ -17,7 +17,7 @@ func SliceOfString(value any) []string {
 
 // SliceOfStringOk converts the value into a slice of strings.
 // It works with any, []any, []string, and string values.
-// It returns TRUE if the value was converted successfullt, and FALSE otherwise.
+// It returns TRUE if the conversion was lossless, and FALSE otherwise.
 func SliceOfStringOk(value any) ([]string, bool) {
 
 	// NILCHECK: value cannot be nil

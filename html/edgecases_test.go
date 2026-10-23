@@ -57,8 +57,8 @@ func TestRemoveSpecialCharacters(t *testing.T) {
 	}
 }
 
-// TestToSearchText confirms tags are replaced with spaces (so adjacent words don't merge) and
-// entities are decoded — the behavior that distinguishes it from ToText.
+// TestToSearchText confirms tags are replaced with spaces (so adjacent words don't merge) — the
+// behavior that distinguishes it from ToText — and that entities are decoded.
 func TestToSearchText(t *testing.T) {
 
 	// Tags are replaced with whitespace so the words on either side stay separate (not "onetwo").

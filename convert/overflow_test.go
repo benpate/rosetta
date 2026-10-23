@@ -8,9 +8,10 @@ import (
 )
 
 // These tests verify that narrowing integer conversions never silently truncate: a value outside
-// the target range must clamp to the boundary AND report Ok=false. In-range values report Ok=true.
+// the target range must clamp to the boundary (a string falls back to the default) AND report
+// Ok=false. In-range values report Ok=true.
 
-// floatInter / floatFloater exercise the Inter and Floater interface paths with custom types.
+// testInter / testFloater exercise the Inter and Floater interface paths with custom types.
 type testInter int64
 
 func (i testInter) Int() int { return int(i) }

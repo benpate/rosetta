@@ -129,9 +129,9 @@ func TestChannelWithCancel_Cancelled(t *testing.T) {
 	// Cancel immediately so the goroutine stops at its next iteration.
 	close(cancel)
 
-	// Drain the channel. Depending on scheduling, zero or more items may be
-	// delivered before the cancel signal is observed, but the channel must
-	// always close cleanly without blocking.
+	// Drain the channel, which must close without blocking. The goroutine sees
+	// the closed cancel before its first send, so nothing is delivered; the
+	// assertion only bounds the count.
 	count := 0
 	for range ChannelWithCancel(it, func() int { return 0 }, cancel) {
 		count++

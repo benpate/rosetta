@@ -18,14 +18,14 @@ const OperatorLessOrEqual = "<="
 // OperatorLessThan represents a "less than" comparison, when used in Predicates and Criteria
 const OperatorLessThan = "<"
 
-// OperatorBeginsWith represents a "begins with" comparison , when used in Predicates and Criteria.  It is only valid for string values.
+// OperatorBeginsWith represents a "begins with" comparison , when used in Predicates and Criteria.  It is only valid for strings and []string.
 const OperatorBeginsWith = "BEGINS"
 
-// OperatorEndsWith represents a "ends with" comparison, when used in Predicates and Criteria.  It is only valid for string values.
+// OperatorEndsWith represents a "ends with" comparison, when used in Predicates and Criteria.  It is only valid for strings and []string.
 const OperatorEndsWith = "ENDS"
 
-// OperatorContains represents a "contains" comparison, when used in Predicates and Criteria.  It is only valid for string values.
+// OperatorContains represents a "contains" comparison, when used in Predicates and Criteria.  It is valid for the types that Contains accepts.
 const OperatorContains = "CONTAINS"
 
-// OperatorContainedBy represents a "contains" comparison in reverse, when used in Predicates and Criteria.  It is only valid for string values.
+// OperatorContainedBy represents a "contains" comparison in reverse, when used in Predicates and Criteria.  It is valid for the types that Contains accepts.
 const OperatorContainedBy = "CONTAINED BY"

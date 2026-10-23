@@ -97,7 +97,7 @@ func TestFirst4(t *testing.T) {
 // Last2/Last3/Last4 return their values in REVERSE order: last first, then
 // second-to-last, and so on.
 //
-// Only lists long enough to fill every return value are asserted here. For a list
+// Apart from the empty list, only lists long enough to fill every return value are asserted here. For a list
 // SHORTER than the number of requested items, these functions currently pad in the
 // MIDDLE rather than at the end -- Last3(["a","b"]) returns ("b", "", "a") -- which
 // is almost certainly not intended. That behavior is deliberately left unpinned

@@ -11,11 +11,11 @@ import (
 // compare against the exact 2^31 power-of-two boundary instead: any float >= 2^31 or < -2^31 is
 // out of int32 range. Both boundaries are exactly representable in float32 and float64.
 const (
-	maxInt32AsFloat = float64(1 << 31)  // 2^31, the first float above math.MaxInt32
+	maxInt32AsFloat = float64(1 << 31)  // 2^31, the first integer above math.MaxInt32
 	minInt32AsFloat = -float64(1 << 31) // -2^31, exactly math.MinInt32
 )
 
-// Int32 forces a conversion from an arbitrary value into an int.
+// Int32 forces a conversion from an arbitrary value into an int32.
 // If the value cannot be converted, then the zero value for the type (0) is used.
 func Int32(value any) int32 {
 
@@ -23,7 +23,7 @@ func Int32(value any) int32 {
 	return result
 }
 
-// Int32Default forces a conversion from an arbitrary value into a int.
+// Int32Default forces a conversion from an arbitrary value into an int32.
 // if the value cannot be converted, then the default value is used.
 func Int32Default(value any, defaultValue int32) int32 {
 

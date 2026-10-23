@@ -40,8 +40,8 @@ func (element Integer) IsRequired() bool {
 	return element.Required
 }
 
-// Validate implements the Element interface
-// It validates a value using this schema
+// Validate validates a value using this schema.
+// It is not part of the Element interface
 func (element Integer) Validate(value any) error {
 
 	intValue, ok := toInt64(value)
@@ -116,7 +116,7 @@ func (element Integer) GetElement(name string) (Element, bool) {
 }
 
 // Inherit implements the Element interface
-// It inherits properties from the parent element
+// It is a no-op for Integer elements
 func (element Integer) Inherit(_ Element) {
 	// Do nothing
 }
@@ -204,8 +204,8 @@ func (element *Integer) UnmarshalMap(data map[string]any) error {
 	return nil
 }
 
-// toInt64 converts any signed or unsigned integer type into an int64, returning FALSE
-// if the value is not an integer at all.
+// toInt64 converts any signed integer type into an int64, returning FALSE for any other
+// value, including an unsigned integer.
 func toInt64(value any) (int64, bool) {
 	switch typed := value.(type) {
 

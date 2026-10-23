@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// MapOfInt attempts to convert the generic value into a map[string]string
+// MapOfInt attempts to convert the generic value into a map[string]int
 func MapOfInt(value any) map[string]int {
 	if result, _ := MapOfIntOk(value); result != nil {
 		return result
@@ -13,7 +13,7 @@ func MapOfInt(value any) map[string]int {
 	return make(map[string]int)
 }
 
-// MapOfIntOk attempts to convert the generic value into a map[string]string
+// MapOfIntOk attempts to convert the generic value into a map[string]int
 // The boolean result value returns TRUE if successful.  FALSE otherwise
 func MapOfIntOk(value any) (map[string]int, bool) {
 

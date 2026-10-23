@@ -56,7 +56,7 @@ func WithOperator(value1 any, operator string, value2 any) (bool, error) {
 	}
 }
 
-// Equal is a simplified version of Compare.  It ONLY returns true if the two provided values are EQUAL.
+// Equal is a simplified version of Interface.  It ONLY returns true if the two provided values are EQUAL.
 // In all other cases (including errors) it returns FALSE
 func Equal(value1 any, value2 any) bool {
 
@@ -70,7 +70,7 @@ func Equal(value1 any, value2 any) bool {
 	return false
 }
 
-// LessThan is a simplified version of Compare.  It ONLY returns true if value1 is verifiably LESS THAN value2.
+// LessThan is a simplified version of Interface.  It ONLY returns true if value1 is verifiably LESS THAN value2.
 // In all other cases (including errors) it returns FALSE
 func LessThan(value1 any, value2 any) bool {
 
@@ -84,7 +84,7 @@ func LessThan(value1 any, value2 any) bool {
 	return false
 }
 
-// GreaterThan is a simplified version of Compare.  It ONLY returns true if value1 is verifiably GREATER THAN value2.
+// GreaterThan is a simplified version of Interface.  It ONLY returns true if value1 is verifiably GREATER THAN value2.
 // In all other cases (including errors) it returns FALSE
 func GreaterThan(value1 any, value2 any) bool {
 

@@ -50,8 +50,8 @@ func zeroValueAt(element Element, path string) (any, error) {
 	return nil, nil
 }
 
-// readableObject returns an object that the getters can reach: a list or map held by value is
-// read through a pointer to a copy, and anything else is returned unchanged
+// readableObject returns an object that the getters can reach: a PointerGetter as it is, and
+// anything else as pointerToCopy returns it
 func readableObject(object any) any {
 
 	if _, ok := object.(PointerGetter); ok {
@@ -99,7 +99,7 @@ func isPastEnd(key string, length int) bool {
 
 // pointerToCopy returns a pointer to a copy of a list or map held by value: its own type when
 // that pointer is a PointerGetter, otherwise the rosetta type with its layout.  Any other value,
-// including a struct, is returned unchanged.
+// including a struct or a list or map that no rosetta type can hold, is returned unchanged.
 func pointerToCopy(object any) any {
 
 	if object == nil {

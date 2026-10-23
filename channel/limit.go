@@ -1,8 +1,8 @@
 package channel
 
 // Limit returns a channel that will receive at most the specified number of items from the input channel.
-// When the maximum is reached, Limit will close the "done" channel, to communicate to other goroutines
-// that they can stop sending items.
+// When it stops, at the maximum or when the input closes first, Limit closes the "done" channel, to
+// communicate to other goroutines that they can stop sending items.
 func Limit[T any](maximum int, input <-chan T, done chan<- struct{}) <-chan T {
 
 	result := make(chan T)

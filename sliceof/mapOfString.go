@@ -55,7 +55,7 @@ func (x MapOfString) NotEmpty() bool {
 	return len(x) > 0
 }
 
-// First returns the first element in the slice, or nil if the slice is empty
+// First returns the first element in the slice, or an empty map if the slice is empty
 func (x MapOfString) First() mapof.String {
 	if len(x) > 0 {
 		return x[0]
@@ -78,7 +78,7 @@ func (x MapOfString) FirstN(n int) MapOfString {
 	return x[:n]
 }
 
-// Last returns the last element in the slice, or nil if the slice is empty
+// Last returns the last element in the slice, or an empty map if the slice is empty
 func (x MapOfString) Last() mapof.String {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -98,7 +98,7 @@ func (x MapOfString) Filter(fn func(mapof.String) bool) MapOfString {
 }
 
 // At returns a bound-safe element from the slice.  If the index
-// is out of bounds, then `At` returns the zero value for the slice type
+// is out of bounds, then `At` returns the zero value for the element type
 func (x MapOfString) At(index int) mapof.String {
 	return slice.At(x, index)
 }
@@ -108,7 +108,7 @@ func (x MapOfString) AtOK(index int) (mapof.String, bool) {
 	return slice.AtOK(x, index)
 }
 
-// Reverse returns a new slice with the elements in reverse order
+// Reverse reverses the order of the elements in the slice in place, and returns it
 func (x MapOfString) Reverse() MapOfString {
 	for i, j := 0, len(x)-1; i < j; i, j = i+1, j-1 {
 		x[i], x[j] = x[j], x[i]

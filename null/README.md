@@ -13,7 +13,7 @@ b.Bool()      // read the value
 b.IsNull()    // false
 b.Unset()     // back to null
 
-b := null.NewBool(true) // or construct a non-null value directly
+b = null.NewBool(true) // or construct a non-null value directly
 
 // null.Object[T] wraps any type with the same API
 var o null.Object[time.Time]
@@ -22,7 +22,7 @@ o.Set(time.Now()) // now present
 o.Object()        // read the value (T)
 o.IsNull()        // false
 
-o := null.NewObject(myStruct) // or construct a non-null value directly
+s := null.NewObject(myStruct) // or construct a non-null value directly
 ```
 
 ### Null, zero, and present

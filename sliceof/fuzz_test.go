@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// growthLimit bounds the indexes handed to the slice-growing functions below.
+// growthLimit bounds the indexes that FuzzObject_Grow hands to GetPointer.
 // GetPointer and SetIndex accept ANY non-negative index and grow the slice to fit it
 // one element at a time, so an unbounded fuzzer would simply exhaust memory instead of
 // finding bugs.  Keys larger than this are still exercised against the read-side

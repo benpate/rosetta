@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// carriesOwnReference returns TRUE for the kinds that already hold a reference, and which To()
-// therefore hands straight back instead of wrapping in a new pointer.
+// carriesOwnReference returns TRUE for the kinds that already hold a reference. To() returns a
+// pointer as-is and wraps the rest, but the fuzz target checks only that they do not panic.
 func carriesOwnReference(value any) bool {
 
 	switch reflect.ValueOf(value).Kind() {

@@ -315,8 +315,8 @@ func TestInterface_FloatFraction(t *testing.T) {
 	require.Equal(t, 0, result, "float32(1.5) == float64(1.5)")
 }
 
-// TestInterface_NumericVsNonNumeric confirms that pairing a number with a string, bool,
-// or unknown type is reported as incompatible rather than silently coerced.
+// TestInterface_NumericVsNonNumeric confirms that pairing a number with a string or an
+// unknown type is reported as incompatible rather than silently coerced.
 func TestInterface_NumericVsNonNumeric(t *testing.T) {
 
 	incompatible := func(value1 any, value2 any) {
@@ -354,9 +354,8 @@ func TestInterface_BoolCoercion(t *testing.T) {
 	equalBool(true, "true")
 	equalBool(false, "false")
 
-	// Unequal bools order per compare.Bool, which (by its own pinned contract) ranks
-	// true BELOW false. We assert the coerced result matches that direct comparison
-	// rather than a natural false<true ordering.
+	// Unequal bools order per compare.Bool, which ranks false BELOW true. We assert the
+	// coerced result matches that direct comparison.
 	result, err := Interface(true, 0)
 	require.Nil(t, err)
 	require.Equal(t, Bool(true, false), result, "Interface(true, 0) matches Bool(true, false)")

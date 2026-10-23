@@ -104,10 +104,10 @@ func TestValidateObject_WritesBackRewrittenValue(t *testing.T) {
 }
 
 /***********************************
- * Any.ValidateRequiredIf (was ~21%)
+ * Any.validateRequiredIf (was ~21%)
  ***********************************/
 
-// anyRequiredObject is a backing object for exercising Any.ValidateRequiredIf: a trigger field
+// anyRequiredObject is a backing object for exercising Any.validateRequiredIf: a trigger field
 // drives the condition and a value field is read back via the getter interfaces.
 type anyRequiredObject struct {
 	Trigger string
@@ -130,7 +130,7 @@ func (o *anyRequiredObject) GetPointer(name string) (any, bool) {
 		return &o.Trigger, true
 	case "value":
 		// Return the string value itself (not a pointer) so an empty value reads as a zero
-		// value, which is how Any.ValidateRequiredIf detects a missing required field.
+		// value, which is how Any.validateRequiredIf detects a missing required field.
 		return o.Value, true
 	}
 	return nil, false

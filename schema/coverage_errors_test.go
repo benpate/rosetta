@@ -51,7 +51,7 @@ func TestGet_Integer32_Unsupported(t *testing.T) {
 // NOT that the object is the wrong type.  (This is the "title on model.Stream" case.)
 func TestGet_String_UnsupportedProperty(t *testing.T) {
 
-	// testStructB implements StringGetter AND PointerGetter, but only backs
+	// A testStructB value implements StringGetter, but only backs
 	// "name" as a string -- it has no "title" property at all.
 	schema := New(Object{Properties: ElementMap{"title": String{}}})
 

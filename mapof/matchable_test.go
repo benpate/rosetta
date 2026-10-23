@@ -112,12 +112,6 @@ func TestMatchable_EqualNotEqual(t *testing.T) {
 	require.True(t, m.NotEqual(map[string]any{"a": "apple"}))
 }
 
-// NOTE: Matchable.MapOfAny() / MapOfString() are intentionally NOT tested here.
-// They call convert.MapOfAny(m), and because Matchable defines a MapOfAny()
-// method, convert re-dispatches back into Matchable.MapOfAny(), causing
-// unbounded recursion / stack overflow. This is a bug in the library, not the
-// test; testing it would crash the whole package.
-
 func TestMatchable_IsZeroValue(t *testing.T) {
 	m := newTestMatchable()
 	// compare.IsZero does not recognize arbitrary struct types, so both a
@@ -204,8 +198,8 @@ func TestMatchable_Conversions_StringValues(t *testing.T) {
 		"KNOWN LIMITATION: convert.String has no reflect.String fallback for named string types")
 }
 
-// stringMatcher is a string-backed Matcher, used to confirm the conversions work for a
-// value type that convert.MapOfString can render losslessly.
+// stringMatcher is a string-backed Matcher, used to confirm that MapOfAny keeps a named
+// string value that convert.MapOfString cannot render.
 type stringMatcher string
 
 // Match reports whether this value satisfies the given predicate.

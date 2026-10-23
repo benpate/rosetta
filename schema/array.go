@@ -134,7 +134,7 @@ func (element Array) AllProperties() ElementMap {
  * Array-Specific Methods
  ******************************************/
 
-// GetLength returns the length of the array value (if the object implements ArrayGetter)
+// GetLength returns the length of the array value (if the object implements LengthGetter)
 func (Array) GetLength(value any) (int, bool) {
 	return getLength(value)
 }

@@ -1,6 +1,6 @@
 package iterator
 
-// Iterator interface allows callers to iterator over a large number of items in an array/slice
+// Iterator interface allows callers to iterate over a large number of items, one at a time
 // Deprecated: freeing up this namespace to use for new Go 1.23 range functions
 type Iterator interface {
 

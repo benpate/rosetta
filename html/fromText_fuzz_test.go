@@ -40,7 +40,7 @@ func FuzzFromText(f *testing.F) {
 }
 
 // FuzzFromTextRoundTrip asserts that FromText is lossless: decoding the entities it produces and
-// turning <br> back into a space reproduces the same whitespace-collapsed text as collapsing the
+// turning <br> back into a newline reproduces the same whitespace-collapsed text as collapsing the
 // input directly. This proves FromText only escapes/formats content, never drops or corrupts it.
 func FuzzFromTextRoundTrip(f *testing.F) {
 

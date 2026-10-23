@@ -12,7 +12,7 @@ import (
 	"github.com/benpate/rosetta/sliceof"
 )
 
-// forEachRunner retrieves a value from the input object, and writes it to the output object
+// forEachRunner runs a pipeline over each item of a source list or map, and writes the results to a list in the output object
 type forEachRunner struct {
 	SourcePath string
 	TargetPath string
@@ -21,7 +21,7 @@ type forEachRunner struct {
 	Pipeline   Pipeline
 }
 
-// ForEach creates a new Rule that copies a value from one location to another
+// ForEach creates a new Rule that runs rulesMap over each item at sourcePath, and writes the results as a list at targetPath
 func ForEach(sourcePath string, targetPath string, filter string, rulesMap []map[string]any) Rule {
 
 	runner := forEachRunner{}

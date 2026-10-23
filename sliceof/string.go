@@ -51,7 +51,7 @@ func (x String) NotEmpty() bool {
 	return len(x) > 0
 }
 
-// First returns the first element in the slice, or nil if the slice is empty
+// First returns the first element in the slice, or "" if the slice is empty
 func (x String) First() string {
 	if len(x) > 0 {
 		return x[0]
@@ -74,7 +74,7 @@ func (x String) FirstN(n int) String {
 	return x[:n]
 }
 
-// Last returns the last element in the slice, or nil if the slice is empty
+// Last returns the last element in the slice, or "" if the slice is empty
 func (x String) Last() string {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -88,7 +88,7 @@ func (x String) Find(fn func(string) bool) (string, bool) {
 }
 
 // At returns a bound-safe element from the slice.  If the index
-// is out of bounds, then `At` returns the zero value for the slice type
+// is out of bounds, then `At` returns the zero value for the element type
 func (x String) At(index int) string {
 	return slice.At(x, index)
 }

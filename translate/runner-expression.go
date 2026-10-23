@@ -52,7 +52,6 @@ func (runner expressionRunner) MarshalMap() map[string]any {
 	}
 }
 
-// newExpressionRunner returns a fully initialized expressionRunner
 // UnmarshalMap populates this `expression` rule from its map representation.
 func (runner *expressionRunner) UnmarshalMap(data mapof.Any) error {
 

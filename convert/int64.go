@@ -15,7 +15,7 @@ const (
 	minInt64AsFloat = -float64(1 << 63) // -2^63, exactly math.MinInt64
 )
 
-// Int64 forces a conversion from an arbitrary value into an int.
+// Int64 forces a conversion from an arbitrary value into an int64.
 // If the value cannot be converted, then the zero value for the type (0) is used.
 func Int64(value any) int64 {
 
@@ -23,7 +23,7 @@ func Int64(value any) int64 {
 	return result
 }
 
-// Int64Default forces a conversion from an arbitrary value into a int.
+// Int64Default forces a conversion from an arbitrary value into an int64.
 // if the value cannot be converted, then the default value is used.
 func Int64Default(value any, defaultValue int64) int64 {
 

@@ -41,7 +41,7 @@ func TestFloatGetter(t *testing.T) {
 	require.Equal(t, float64(12345678), getter.value)
 }
 
-// testFloatPointer tests getting/setting bool values via a pointer
+// testFloatPointer tests getting/setting float values via a pointer
 type testFloatPointer struct {
 	value float64
 }

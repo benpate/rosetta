@@ -45,7 +45,7 @@ func (t *testArrayA) SetIndex(index int, value any) bool {
 	return false
 }
 
-// GetPointer implements the Getter interface
+// GetStringOK implements the StringGetter interface
 func (t testArrayA) GetStringOK(path string) (string, bool) {
 	if index, ok := Index(path, len(t)); ok {
 		return t[index], true
@@ -54,7 +54,7 @@ func (t testArrayA) GetStringOK(path string) (string, bool) {
 	return "", false
 }
 
-// SetString implements the Setter interface
+// SetString implements the StringSetter interface
 func (t *testArrayA) SetString(path string, value string) bool {
 
 	if index, ok := Index(path); ok {

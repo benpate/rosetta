@@ -22,8 +22,8 @@ func NewTemplate() Template {
 	return make(Template)
 }
 
-// ParseTemplate copies a map into a Template, compiling every string that holds
-// a template.
+// ParseTemplate copies a map into a Template, compiling every top-level string that
+// holds a template.
 func ParseTemplate(value map[string]any) Template {
 
 	result := make(Template, len(value))
@@ -52,7 +52,7 @@ func wrapTemplate(value any) any {
 	return source
 }
 
-// UnmarshalJSON decodes a JSON object, compiling every string that holds a template.
+// UnmarshalJSON decodes a JSON object, compiling every top-level string that holds a template.
 func (x *Template) UnmarshalJSON(data []byte) error {
 
 	const location = "mapof.Template.UnmarshalJSON"
@@ -86,8 +86,8 @@ func (x Template) Evaluate(key string, data any) (string, error) {
 
 		return result, nil
 
-	// A map literal written in Go is never parsed, so its templates are compiled here, once, into a
-	// cache beside the map. Writing them back into the map would race with its other readers.
+	// A map literal written in Go is never parsed, so its templates are compiled here, once per source
+	// while loose's shared cache has room. Writing them back into the map would race with its other readers.
 	case string:
 		result, err := loose.CachedTemplate(value).Execute(data)
 
@@ -114,8 +114,8 @@ func (x Template) unwrap(key string) (any, bool) {
 	return value, ok
 }
 
-// Clone returns a deep copy of this map, so that a caller can change it, at any depth, without
-// changing the original. Its loose.Template values are shared, because they never change.
+// Clone returns a deep copy of this map, so that a caller can change any map or slice within it without
+// changing the original. Pointers, structs, arrays, and loose.Template values are shared, not copied.
 func (x Template) Clone() Template {
 
 	if x == nil {
@@ -263,7 +263,7 @@ func (x Template) GetBool(key string, data any) bool {
 }
 
 // GetBoolOK returns the value for the key, rendered against the data and coerced to bool, with TRUE
-// if it was present and coercible.
+// if it was present and converted losslessly.
 func (x Template) GetBoolOK(key string, data any) (value bool, ok bool) {
 	if result, present := x.evaluateScalar(key, data); present {
 		return convert.BoolOk(result, false)
@@ -279,7 +279,7 @@ func (x Template) GetFloat(key string, data any) float64 {
 }
 
 // GetFloatOK returns the value for the key, rendered against the data and coerced to float64, with
-// TRUE if it was present and coercible.
+// TRUE if it was present and converted losslessly.
 func (x Template) GetFloatOK(key string, data any) (value float64, ok bool) {
 	if result, present := x.evaluateScalar(key, data); present {
 		return convert.FloatOk(result, 0)
@@ -295,7 +295,7 @@ func (x Template) GetInt(key string, data any) int {
 }
 
 // GetIntOK returns the value for the key, rendered against the data and coerced to int, with TRUE
-// if it was present and coercible.
+// if it was present and converted losslessly.
 func (x Template) GetIntOK(key string, data any) (value int, ok bool) {
 	if result, present := x.evaluateScalar(key, data); present {
 		return convert.IntOk(result, 0)
@@ -311,7 +311,7 @@ func (x Template) GetInt64(key string, data any) int64 {
 }
 
 // GetInt64OK returns the value for the key, rendered against the data and coerced to int64, with
-// TRUE if it was present and coercible.
+// TRUE if it was present and converted losslessly.
 func (x Template) GetInt64OK(key string, data any) (value int64, ok bool) {
 	if result, present := x.evaluateScalar(key, data); present {
 		return convert.Int64Ok(result, 0)
@@ -327,7 +327,7 @@ func (x Template) GetString(key string, data any) string {
 }
 
 // GetStringOK returns the value for the key, rendered against the data and coerced to string, with
-// TRUE if it was present and coercible.
+// TRUE if it was present and converted losslessly.
 func (x Template) GetStringOK(key string, data any) (value string, ok bool) {
 	if result, present := x.evaluateAny(key, data); present {
 		return convert.StringOk(result, "")
@@ -478,7 +478,7 @@ func (x *Template) SetString(key string, value string) bool {
 }
 
 // SetValue replaces the entire map with the provided value, if it can be converted to a map,
-// compiling every string that holds a template.
+// compiling every top-level string that holds a template.
 func (x *Template) SetValue(value any) error {
 
 	const location = "mapof.Template.SetValue"
@@ -606,7 +606,7 @@ func (x Template) GetSliceOfPlainMap(name string, data any) []map[string]any {
 	return Any{name: x.GetAny(name, data)}.GetSliceOfPlainMap(name)
 }
 
-// MapOfAny implements the MapOfAny interface.
+// MapOfAny implements the convert.MapOfAnyGetter interface.
 // It returns a copy of this map, with every loose.Template replaced by its source string
 func (x Template) MapOfAny() map[string]any {
 
@@ -623,8 +623,7 @@ func (x Template) MapOfAny() map[string]any {
 	return result
 }
 
-// MapOfString implements the MapOfString interface.
-// It returns this map's original values as a map[string]string
+// MapOfString returns this map's original values as a map[string]string
 func (x Template) MapOfString() map[string]string {
 	return convert.MapOfString(x.MapOfAny())
 }

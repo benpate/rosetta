@@ -82,7 +82,7 @@ func (x Any) GetBool(key string) bool {
 	return result
 }
 
-// GetBoolOK returns the value for the key coerced to bool, with TRUE if it was present and coercible.
+// GetBoolOK returns the value for the key coerced to bool, with TRUE if it was present and converted losslessly.
 func (x Any) GetBoolOK(key string) (value bool, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.BoolOk(value, false)
@@ -96,7 +96,7 @@ func (x Any) GetFloat(key string) float64 {
 	return result
 }
 
-// GetFloatOK returns the value for the key coerced to float64, with TRUE if it was present and coercible.
+// GetFloatOK returns the value for the key coerced to float64, with TRUE if it was present and converted losslessly.
 func (x Any) GetFloatOK(key string) (value float64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.FloatOk(value, 0)
@@ -110,7 +110,7 @@ func (x Any) GetInt(key string) int {
 	return result
 }
 
-// GetIntOK returns the value for the key coerced to int, with TRUE if it was present and coercible.
+// GetIntOK returns the value for the key coerced to int, with TRUE if it was present and converted losslessly.
 func (x Any) GetIntOK(key string) (value int, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.IntOk(value, 0)
@@ -124,7 +124,7 @@ func (x Any) GetInt64(key string) int64 {
 	return result
 }
 
-// GetInt64OK returns the value for the key coerced to int64, with TRUE if it was present and coercible.
+// GetInt64OK returns the value for the key coerced to int64, with TRUE if it was present and converted losslessly.
 func (x Any) GetInt64OK(key string) (value int64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.Int64Ok(value, 0)
@@ -138,7 +138,7 @@ func (x Any) GetString(key string) string {
 	return result
 }
 
-// GetStringOK returns the value for the key coerced to string, with TRUE if it was present and coercible.
+// GetStringOK returns the value for the key coerced to string, with TRUE if it was present and converted losslessly.
 func (x Any) GetStringOK(key string) (value string, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.StringOk(value, "")
@@ -405,14 +405,13 @@ func (m Any) GetSliceOfPlainMap(name string) []map[string]any {
 	}
 }
 
-// MapOfAny implements the MapOfAny interface.
+// MapOfAny implements the convert.MapOfAnyGetter interface.
 // It returns this value as a map[string]any
 func (m Any) MapOfAny() map[string]any {
 	return m
 }
 
-// MapOfString implements the MapOfString interface.
-// It returns this value as a map[string]string
+// MapOfString returns this value as a map[string]string, converting each value to a string
 func (m Any) MapOfString() map[string]string {
 	return convert.MapOfString(m.MapOfAny())
 }

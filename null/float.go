@@ -104,7 +104,7 @@ func (f *Float) UnmarshalJSON(value []byte) error {
 		return nil
 	}
 
-	// Try to convert the value to an integer
+	// Try to convert the value to a float
 	result, err := strconv.ParseFloat(valueStr, 64)
 
 	if err != nil {

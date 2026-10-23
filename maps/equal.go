@@ -1,6 +1,6 @@
 package maps
 
-// Equal returns TRUE if the two maps are identical, having the same items in the same order, with no alterations.
+// Equal returns TRUE if the two maps are identical, having the same keys with the same values.
 func Equal[T comparable](map1 map[string]T, map2 map[string]T) bool {
 
 	// Lengths must be identical

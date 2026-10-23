@@ -7,8 +7,8 @@ func At[T any](slice []T, index int) T {
 	return result
 }
 
-// AtOK returns a bounds-safe value from a slice.  If the index is out of
-// bounds for the slice, then `At` returns the zero value for that type.
+// AtOK returns a bounds-safe value from a slice, and TRUE.  If the index is out of
+// bounds for the slice, then `AtOK` returns the zero value for that type, and FALSE.
 func AtOK[T any](slice []T, index int) (T, bool) {
 
 	// Underflow? Return empty value

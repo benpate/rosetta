@@ -2,7 +2,7 @@ package schema
 
 import "fmt"
 
-// getLength returns the length of an object, if it is an ArrayGetter
+// getLength returns the length of an object, if it is a LengthGetter
 func getLength(object any) (int, bool) {
 
 	if getter, ok := object.(LengthGetter); ok {

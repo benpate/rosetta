@@ -13,7 +13,7 @@ func init() {
 	whitespace = regexp.MustCompile(`\s+`)
 }
 
-// CollapseWhitespace converts all whitespace characters into a single SPACE character
+// CollapseWhitespace converts each run of ASCII whitespace into a single SPACE character, and trims both ends
 func CollapseWhitespace(text string) string {
 	result := whitespace.ReplaceAllString(text, " ")
 

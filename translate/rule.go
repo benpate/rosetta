@@ -103,7 +103,7 @@ func (rule *Rule) UnmarshalMap(data mapof.Any) error {
 		return nil
 	}
 
-	// From Runner
+	// Path Runner
 	if path := data.GetString("path"); path != "" {
 
 		runner := pathRunner{}

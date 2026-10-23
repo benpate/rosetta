@@ -18,7 +18,7 @@ var formats = make(map[string]format.Generator)
 // without paying for a lock on the hot read path.
 var formatsFrozen atomic.Bool
 
-// UseFormat adds a custom FormatFunc function to this library.  Used to register custom validators.
+// UseFormat adds a custom format.Generator to this library.  Used to register custom validators.
 //
 // UseFormat is only safe to call during program startup (e.g. from init), before
 // any schema validation reads the registry. A call that arrives after the registry

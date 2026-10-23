@@ -52,7 +52,7 @@ func (x Float) NotEmpty() bool {
 	return len(x) > 0
 }
 
-// First returns the first element in the slice, or nil if the slice is empty
+// First returns the first element in the slice, or 0 if the slice is empty
 func (x Float) First() float64 {
 	if len(x) > 0 {
 		return x[0]
@@ -75,7 +75,7 @@ func (x Float) FirstN(n int) Float {
 	return x[:n]
 }
 
-// Last returns the last element in the slice, or nil if the slice is empty
+// Last returns the last element in the slice, or 0 if the slice is empty
 func (x Float) Last() float64 {
 	if len(x) > 0 {
 		return x[len(x)-1]
@@ -94,7 +94,7 @@ func (x Float) Filter(fn func(float64) bool) Float {
 }
 
 // At returns a bound-safe element from the slice.  If the index
-// is out of bounds, then `At` returns the zero value for the slice type
+// is out of bounds, then `At` returns the zero value for the element type
 func (x Float) At(index int) float64 {
 	return slice.At(x, index)
 }
@@ -121,7 +121,7 @@ func (x Float) ContainsFloaterface(value any) bool {
 		return slice.Contains(x, value)
 	}
 
-	// If we can't convert the value to a string, then it is not contained in the slice
+	// If we can't convert the value to a float64, then it is not contained in the slice
 	return false
 }
 
@@ -165,7 +165,7 @@ func (x Float) Shuffle() Float {
 	return slice.Shuffle(x)
 }
 
-// Keys returns a slice of float64s representing the indexes of this slice
+// Keys returns a slice of strings representing the indexes of this slice
 func (x Float) Keys() []string {
 	keys := make([]string, len(x))
 
@@ -177,7 +177,7 @@ func (x Float) Keys() []string {
 }
 
 /****************************************
- * Getter Floaterfaces/Setters
+ * Getter Interfaces/Setters
  ****************************************/
 
 // GetAny returns the rquested property as an any type
@@ -244,7 +244,7 @@ func (s *Float) SetFloat(key string, value float64) bool {
 	return false
 }
 
-// SetValue sets the value at the specified index, growing the slice if necessary
+// SetValue replaces the entire slice with the provided value, converted to float64s
 func (s *Float) SetValue(value any) error {
 	*s = convert.SliceOfFloat(value)
 	return nil

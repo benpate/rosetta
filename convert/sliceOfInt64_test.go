@@ -126,7 +126,7 @@ func TestSliceOfInt64(t *testing.T) {
 		})
 	}
 
-	// Scalars widen into a one-item slice
+	// Scalars widen into a one-item slice, and a comma-delimited string splits
 	check("int", 42, []int64{42})
 	check("int64", int64(42), []int64{42})
 	check("float64", float64(3), []int64{3})

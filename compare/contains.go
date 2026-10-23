@@ -7,7 +7,7 @@ import (
 	"github.com/benpate/rosetta/convert"
 )
 
-// Contains is a simple "generic-safe" function for string comparison.  It returns TRUE if value1 contains value2
+// Contains is a simple "generic-safe" function for strings and slices.  It returns TRUE if value1 contains value2
 func Contains(value1 any, value2 any) bool {
 
 	switch value1 := value1.(type) {

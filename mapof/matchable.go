@@ -40,7 +40,8 @@ func (m Matchable[T]) Match(expression exp.Expression) Matchable[T] {
 	return result
 }
 
-// MatchOne returns the first element that matches the given expression, along with a boolean indicating if a match was found.
+// MatchOne returns an element that matches the given expression (an arbitrary one when several match),
+// along with a boolean indicating if a match was found.
 func (m Matchable[T]) MatchOne(expression exp.Expression) (T, bool) {
 	for _, value := range m {
 		if expression.Match(value.Match) {
@@ -132,8 +133,8 @@ func (m Matchable[T]) IsZeroValue(name string) bool {
 	return compare.IsZero(m[name])
 }
 
-// MapOfAny implements the MapOfAny interface.
-// It returns this value as a map[string]any
+// MapOfAny implements the convert.MapOfAnyGetter interface.
+// It returns a copy of this value as a map[string]any
 func (m Matchable[T]) MapOfAny() map[string]any {
 
 	// Copy the entries directly.  Handing `m` to convert.MapOfAny would come straight back
@@ -148,8 +149,7 @@ func (m Matchable[T]) MapOfAny() map[string]any {
 	return result
 }
 
-// MapOfString implements the MapOfString interface.
-// It returns this value as a map[string]string
+// MapOfString returns this value as a map[string]string, converting each value to a string
 func (m Matchable[T]) MapOfString() map[string]string {
 	return convert.MapOfString(m.MapOfAny())
 }

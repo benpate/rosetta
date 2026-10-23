@@ -210,8 +210,8 @@ func (element *Number) UnmarshalMap(data map[string]any) error {
 	return nil
 }
 
-// toFloat converts any numeric type into a float64, returning FALSE if the value is
-// not a number at all.
+// toFloat converts any signed integer or float type into a float64, returning FALSE for
+// any other value, including an unsigned integer.
 func toFloat(value any) (float64, bool) {
 
 	switch v := value.(type) {

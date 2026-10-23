@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// IntBitsizeOk returns (result, lossless, inBounds): lossless reports whether the
-// underlying numeric conversion round-tripped (no parse failure, no fractional part),
-// and inBounds reports whether the value fit the requested bit size without clamping.
+// IntBitsizeOk returns (result, lossless, inBounds): lossless reports whether the underlying
+// int64 conversion round-tripped (no parse failure, no fractional part, no int64 clamp),
+// and inBounds reports whether that int64 fit the requested bit size without clamping.
 
 // TestIntBitsizeOk_8 exercises narrowing to int8, including in-range values, the exact
 // boundaries, clamping of out-of-range values (inBounds=false), and lossy inputs.
@@ -130,7 +130,7 @@ func TestIntBitsizeOk_64(t *testing.T) {
 	assert(int64(math.MaxInt64), math.MaxInt64, true, true)
 	assert(int64(math.MinInt64), math.MinInt64, true, true)
 
-	// A value larger than int64 is clamped to math.MaxInt by Int64Ok (lossy), then passed
+	// A value larger than int64 is clamped to math.MaxInt64 by Int64Ok (lossy), then passed
 	// through the 64-bit case which never narrows, so inBounds is true.
 	assert(math.MaxFloat64, math.MaxInt64, false, true)
 

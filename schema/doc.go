@@ -15,7 +15,7 @@
 // bind to.
 //
 // Setting a value validates it, so a write can coerce, clamp, or truncate what
-// it was given rather than storing it verbatim. String elements delegate that
-// work to a named format from the format subpackage, and UseFormat registers
-// additional ones.
+// it was given rather than storing it verbatim. String elements also pass the
+// value through named formats from the format subpackage, and UseFormat
+// registers additional ones.
 package schema

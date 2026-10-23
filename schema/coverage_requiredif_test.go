@@ -125,7 +125,7 @@ func TestRequiredIf_Array_NoCondition(t *testing.T) {
 // to resolve its path ("Invalid property") before reaching its length/required
 // logic. This test pins that current behavior; the deeper branches of
 // Array.ValidateRequiredIf are not reachable for a nested array until that is
-// fixed. See the summary notes for details.
+// fixed. BUG-295 tracks it.
 func TestRequiredIf_Array_NestedConditionCannotResolvePath(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{
 		"name":  String{},

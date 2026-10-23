@@ -71,8 +71,8 @@ func TimeOk(value any, defaultValue time.Time) (time.Time, bool) {
 	return defaultValue, false
 }
 
-// TimeWithLocale parses a string into a time.Time using the provided locale(s).
-// If no locale is provided, it will use a list of common layouts, including RFE3339, RFC3339 (nano), HTTP timestamps, and others.
+// TimeWithLocale parses a string into a time.Time using the provided layout(s).
+// If no layout is provided, it will use a list of common layouts, including RFC3339, RFC3339 (nano), HTTP timestamps, and others.
 func TimeWithLocale(value string, layouts ...string) (time.Time, bool) {
 
 	if len(layouts) == 0 {

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Every mapof type must report IsMap() == TRUE. schema's validate_Object relies on this
+// Every mapof type but Slices must report IsMap() == TRUE. schema's validate_Object relies on this
 // to treat an absent key as a legitimately-empty optional property; a type that silently
 // lost IsMap() would instead make absent keys fail validation.
 //

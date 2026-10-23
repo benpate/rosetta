@@ -34,7 +34,7 @@ func TestCachedTemplate_CachesTemplates(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, first, cached)
 
-	// A second compile is the cached template itself, and does not grow the cache
+	// A second call returns the cached template itself, and does not grow the cache
 	size := templateCacheSize.Load()
 	require.Equal(t, first, CachedTemplate(source))
 	require.Equal(t, size, templateCacheSize.Load())

@@ -97,7 +97,7 @@ func TestArrayGetter_Broken(t *testing.T) {
 }
 
 // TestArrayGetter_DoesNotShadowSlices confirms that a real Go slice still takes the reflection
-// fast path.  A named slice type satisfies neither Length nor GetIndex, but this pins that the
+// fast path.  A plain slice satisfies neither Length nor GetIndex, but this pins that the
 // interface check cannot start intercepting ordinary slices.
 func TestArrayGetter_DoesNotShadowSlices(t *testing.T) {
 

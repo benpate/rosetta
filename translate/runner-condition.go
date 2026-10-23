@@ -85,8 +85,8 @@ func (runner *conditionRunner) UnmarshalMap(data mapof.Any) error {
 	)
 }
 
-// populate assigns the parsed fields of this `condition` rule, and is the one place that
-// both UnmarshalMap and the package constructors go through.
+// populate assigns the parsed fields of this `condition` rule for UnmarshalMap. The Condition
+// constructor takes rules that are already built, so it does not go through here.
 func (runner *conditionRunner) populate(condition string, thenRules []map[string]any, elseRules []map[string]any) error {
 
 	const location = "rosetta.translate.conditionRunner.UnmarshalMap"

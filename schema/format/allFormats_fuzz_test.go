@@ -125,8 +125,8 @@ func FuzzFormats_AcceptedValueIsDerivedFromInput(f *testing.F) {
 	generators := allGenerators()
 	args := formatArgs()
 
-	// The formats that legitimately REWRITE their input rather than returning it verbatim.
-	// Each strips or renders content, so the result is checked only for not being the config.
+	// The formats exempt from the verbatim check below. Most strip, render, or canonicalize
+	// content, so the result is checked only for not being the config.
 	transforms := map[string]bool{
 		"HTML":            true,
 		"NoHTML":          true,

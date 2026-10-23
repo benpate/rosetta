@@ -17,8 +17,8 @@ func SliceOfInt(value any) []int {
 }
 
 // SliceOfIntOk converts the value into a slice of ints.
-// It works with float, int, int, string, and []any, []float, []int, []int, and []string values.
-// It returns TRUE if the conversion was successful, and FALSE otherwise.
+// It works with float64, int, int64, string, and []any, []float64, []int, []int64, and []string values.
+// It returns TRUE if the conversion was lossless, and FALSE otherwise.
 func SliceOfIntOk(value any) ([]int, bool) {
 
 	// NILCHECK: value cannot be nil
