@@ -26,7 +26,7 @@ func TestErrorDetails_NameTypesNotValues(t *testing.T) {
 		"child":  Object{Properties: ElementMap{"inner": String{}}},
 	}})
 
-	// A pointer to a plain map implements no getter, so every property read fails with the object in hand
+	// A pointer to a plain map has no getters, so every property read fails with the object in hand
 	newObject := func() map[string]any {
 		return map[string]any{"name": "", "secret": testSecret}
 	}

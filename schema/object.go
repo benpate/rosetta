@@ -114,7 +114,7 @@ func (element Object) Inherit(parent Element) {
 }
 
 // AllProperties implements the Element interface
-// It returns a flat map of this object's named properties, with nested Objects flattened into dotted keys
+// It returns a flat map of the named properties, with nested Objects flattened into dotted keys
 func (element Object) AllProperties() ElementMap {
 
 	result := make(ElementMap, len(element.Properties))

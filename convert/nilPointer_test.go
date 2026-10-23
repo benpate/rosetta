@@ -32,7 +32,7 @@ func nilPointerInputs() map[string]any {
 	}
 }
 
-// TestNilPointer_NoPanics runs the exported conversions that use reflection against every
+// TestNilPointer_NoPanics runs the listed exported conversions against every
 // flavor of nil.  None of them may panic.
 func TestNilPointer_NoPanics(t *testing.T) {
 

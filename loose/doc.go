@@ -7,7 +7,7 @@
 // seen in the wild. String does the same for text fields that peers sometimes
 // send as bare numbers or booleans. Int64 is not Int on purpose: the accepted
 // range must not narrow on a 32-bit target. String rejects input that is not a
-// JSON scalar, while Int64 quietly degrades anything it cannot read to zero.
+// JSON scalar, while Int64 quietly degrades any valid JSON it cannot read to zero.
 //
 // Template is a string that compiles as a text/template when it holds a "{{"
 // followed later by a "}}". A string that does not compile is kept as plain

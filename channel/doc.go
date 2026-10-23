@@ -9,6 +9,6 @@
 // while Limit closes the done channel it is given when it stops.
 //
 // Filter and Map buffer one item, which decouples producer from consumer by a
-// single item; every other output is unbuffered. A slow consumer still applies
+// single item; every other channel it creates is unbuffered. A slow consumer still applies
 // backpressure all the way up the chain.
 package channel

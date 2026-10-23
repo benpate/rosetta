@@ -261,8 +261,8 @@ func (x Any) GetFloatOK(key string) (float64, bool) {
 	return 0, false
 }
 
-// GetPointer returns a pointer to a copy of the element at the key index (a pointer element is returned as-is),
-// growing the slice as needed (implements schema PointerGetter).
+// GetPointer returns a pointer to a copy of the element at the key index, or a nil or pointer
+// element as-is, growing the slice as needed (implements schema PointerGetter).
 func (x *Any) GetPointer(key string) (any, bool) {
 	if index, ok := sliceStringIndex(key); ok {
 		growSlice(x, index)

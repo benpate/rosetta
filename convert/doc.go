@@ -6,8 +6,8 @@
 // be converted. The Default form substitutes a caller-supplied fallback
 // instead. The Ok form returns that same value alongside a boolean reporting
 // whether the conversion was lossless, so a rounded value or a fallback to
-// the default reads FALSE. TimeOk, SliceOfAnyOk, SliceOfMapOk, and the map
-// converters report plain success instead.
+// the default reads FALSE. TimeOk, SliceOfAnyOk, SliceOfMapOk, and most map
+// converters report plain success instead; MapOfIntOk and MapOfInt32Ok go by input type.
 //
 // Conversions reach through pointers, interfaces, and the small accessor
 // interfaces shared with the compare package, so a type that can describe

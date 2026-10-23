@@ -86,8 +86,8 @@ func (x Template) Evaluate(key string, data any) (string, error) {
 
 		return result, nil
 
-	// A map literal written in Go is never parsed, so its templates are compiled here, once per source
-	// while loose's shared cache has room. Writing them back into the map would race with its other readers.
+	// A Go map literal is never parsed, so its templates are compiled here, once per source while
+	// loose's shared cache has room. Writing them back into the map would race with its readers.
 	case string:
 		result, err := loose.CachedTemplate(value).Execute(data)
 
@@ -114,8 +114,8 @@ func (x Template) unwrap(key string) (any, bool) {
 	return value, ok
 }
 
-// Clone returns a deep copy of this map, so that a caller can change any map or slice within it without
-// changing the original. Pointers, structs, arrays, and loose.Template values are shared, not copied.
+// Clone returns a deep copy of this map, so that a caller can change any map or slice within it
+// without changing the original. Pointers, structs, arrays, and loose.Template values are shared.
 func (x Template) Clone() Template {
 
 	if x == nil {

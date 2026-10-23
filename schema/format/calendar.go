@@ -12,7 +12,7 @@ import (
 // followed by an offset rejected every canonical timestamp and accepted only nonsense.
 var iso8601 = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(Z|[+-]\d{2}:\d{2})?)?$`)
 
-// ISO8601 returns a StringFormat that validates a value as an ISO-8601 date and time (e.g. "2026-03-04T13:02").
+// ISO8601 returns a StringFormat that validates an ISO-8601 date and time, e.g. "2026-03-04T13:02".
 func ISO8601(arg string) StringFormat {
 	return func(value string) (string, error) {
 		if iso8601.Match([]byte(value)) {
@@ -63,8 +63,8 @@ func DateTime(arg string) StringFormat {
 	}
 }
 
-// Time returns a StringFormat that validates a value as an RFC-3339 full-time (e.g. "13:02:00" or "13:02:00Z"),
-// or as a time to the minute (e.g. "13:02").
+// Time returns a StringFormat that validates an RFC-3339 full-time ("13:02:00" or "13:02:00Z"),
+// or a time to the minute ("13:02").
 func Time(arg string) StringFormat {
 
 	return func(value string) (string, error) {

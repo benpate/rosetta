@@ -1,7 +1,7 @@
 package mapof
 
-// MapOfAny converts Any, Template, Bool, Float, Int, Int64, String, *Any, *Template, or a plain/pointer
-// map[string]X of those value types into a mapof.Any, returning TRUE on success, or (nil, false) otherwise.
+// MapOfAny converts Any, Template, Bool, Float, Int, Int64, String, *Any, *Template, or a plain or
+// pointer map[string]X of those value types into a mapof.Any, and TRUE, or (nil, false) otherwise.
 func MapOfAny(value any) (Any, bool) {
 
 	switch typed := value.(type) {

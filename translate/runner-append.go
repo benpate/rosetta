@@ -12,7 +12,7 @@ type appendRunner struct {
 	Target string
 }
 
-// Append creates a new Rule that appends a constant value to the list at target in the output object
+// Append creates a Rule that appends a constant value to the list at target in the output object
 func Append(append any, target string) Rule {
 	return Rule{newAppendRunner(append, target)}
 }

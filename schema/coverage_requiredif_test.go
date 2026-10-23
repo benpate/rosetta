@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Integer.ValidateRequiredIf -------------------------------------------------
+// Integer.validateRequiredIf -------------------------------------------------
 
 func TestRequiredIf_Integer_ConditionFalse(t *testing.T) {
 	// The condition is false, so the (empty) value is not required
@@ -38,7 +38,7 @@ func TestRequiredIf_Integer_RequiredAndPresent(t *testing.T) {
 	require.NoError(t, schema.ValidateRequiredIf(testStructB{Name: "Bob", Age: 42}))
 }
 
-// Boolean.ValidateRequiredIf -------------------------------------------------
+// Boolean.validateRequiredIf -------------------------------------------------
 
 func TestRequiredIf_Boolean_RequiredButMissing(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{
@@ -67,7 +67,7 @@ func TestRequiredIf_Boolean_ConditionFalse(t *testing.T) {
 	require.NoError(t, schema.ValidateRequiredIf(testStructA{Name: "Alice", Active: false}))
 }
 
-// Number.ValidateRequiredIf --------------------------------------------------
+// Number.validateRequiredIf --------------------------------------------------
 
 func TestRequiredIf_Number_RequiredButMissing(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{
@@ -96,7 +96,7 @@ func TestRequiredIf_Number_ConditionFalse(t *testing.T) {
 	require.NoError(t, schema.ValidateRequiredIf(testStructA{Name: "Alice", Latitude: 0}))
 }
 
-// String.ValidateRequiredIf --------------------------------------------------
+// String.validateRequiredIf --------------------------------------------------
 
 func TestRequiredIf_String_RequiredButMissing(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{
@@ -107,7 +107,7 @@ func TestRequiredIf_String_RequiredButMissing(t *testing.T) {
 	require.Error(t, schema.ValidateRequiredIf(testStructA{Name: "Bob", Optional: ""}))
 }
 
-// Array.ValidateRequiredIf ---------------------------------------------------
+// Array.validateRequiredIf ---------------------------------------------------
 
 func TestRequiredIf_Array_NoCondition(t *testing.T) {
 	// With no condition, ValidateRequiredIf returns immediately
@@ -119,13 +119,13 @@ func TestRequiredIf_Array_NoCondition(t *testing.T) {
 	require.NoError(t, schema.ValidateRequiredIf(&value))
 }
 
-// NOTE: Array.ValidateRequiredIf resolves the field via
+// NOTE: Array.validateRequiredIf resolves the field via
 // getPropertyRecursive(element, ...) using the *array's own* element rather than
 // the schema root, so a nested array with a real `required-if` condition fails
 // to resolve its path ("Invalid property") before reaching its length/required
 // logic. This test pins that current behavior; the deeper branches of
-// Array.ValidateRequiredIf are not reachable for a nested array until that is
-// fixed. BUG-295 tracks it.
+// Array.validateRequiredIf are not reachable for a nested array until that is
+// fixed. BUG-295 records the same 400 for an absent array, but not this cause.
 func TestRequiredIf_Array_NestedConditionCannotResolvePath(t *testing.T) {
 	schema := New(Object{Properties: ElementMap{
 		"name":  String{},

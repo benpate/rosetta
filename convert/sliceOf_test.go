@@ -102,7 +102,7 @@ func TestSliceOf_PassthroughDoesNotCopy(t *testing.T) {
 	require.Equal(t, "changed", original[0])
 }
 
-// TestSliceOf_NilInputs confirms that nil, a nil pointer, and a nil slice convert without panicking.
+// TestSliceOf_NilInputs confirms that nil, a nil pointer, and a nil slice convert with no panic.
 func TestSliceOf_NilInputs(t *testing.T) {
 
 	var nilSlicePtr *[]string

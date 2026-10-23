@@ -6,8 +6,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// NOTE: These tests cover Schema.Append's error branches.  Its success path, which hands Set a
-// pointer to the grown array, is exercised by translate's TestAppend.
+// NOTE: These tests cover two of Schema.Append's error branches: a path that is not an array,
+// and a value Get cannot read.  Its success path, which hands Set a pointer to the grown array, is
+// exercised by translate's TestAppend.
 
 func TestSchema_Append_NotAnArray(t *testing.T) {
 	// Appending to a non-array element returns an error

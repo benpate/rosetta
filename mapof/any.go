@@ -82,7 +82,7 @@ func (x Any) GetBool(key string) bool {
 	return result
 }
 
-// GetBoolOK returns the value for the key coerced to bool, with TRUE if it was present and converted losslessly.
+// GetBoolOK returns the key's value as a bool, and TRUE if it was present and converted losslessly.
 func (x Any) GetBoolOK(key string) (value bool, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.BoolOk(value, false)
@@ -96,7 +96,7 @@ func (x Any) GetFloat(key string) float64 {
 	return result
 }
 
-// GetFloatOK returns the value for the key coerced to float64, with TRUE if it was present and converted losslessly.
+// GetFloatOK returns the key's value as a float64, and TRUE if present and converted losslessly.
 func (x Any) GetFloatOK(key string) (value float64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.FloatOk(value, 0)
@@ -110,7 +110,7 @@ func (x Any) GetInt(key string) int {
 	return result
 }
 
-// GetIntOK returns the value for the key coerced to int, with TRUE if it was present and converted losslessly.
+// GetIntOK returns the key's value as an int, and TRUE if it was present and converted losslessly.
 func (x Any) GetIntOK(key string) (value int, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.IntOk(value, 0)
@@ -124,7 +124,7 @@ func (x Any) GetInt64(key string) int64 {
 	return result
 }
 
-// GetInt64OK returns the value for the key coerced to int64, with TRUE if it was present and converted losslessly.
+// GetInt64OK returns the key's value as an int64, and TRUE if present and converted losslessly.
 func (x Any) GetInt64OK(key string) (value int64, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.Int64Ok(value, 0)
@@ -138,7 +138,7 @@ func (x Any) GetString(key string) string {
 	return result
 }
 
-// GetStringOK returns the value for the key coerced to string, with TRUE if it was present and converted losslessly.
+// GetStringOK returns the key's value as a string, and TRUE if present and converted losslessly.
 func (x Any) GetStringOK(key string) (value string, ok bool) {
 	if value, ok := x[key]; ok {
 		return convert.StringOk(value, "")

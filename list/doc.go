@@ -7,7 +7,7 @@
 // and PushTail build a new string. The named types — Dot, Comma, Slash,
 // Semicolon, Space, Equal — bind a delimiter to a string so the same operations
 // read as methods, and the List interface lets code accept any of them. Those
-// methods return a List, which allocates for each non-empty list they return.
+// methods return a List, which can allocate for each non-empty list that escapes.
 //
 // The delimiter is a byte, not a rune. A multi-byte delimiter cannot be
 // expressed here, and the functions are written for the ASCII punctuation that

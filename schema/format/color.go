@@ -11,7 +11,7 @@ import (
 // EVERY validation, so compiling inside one would recompile the pattern each time.
 var colorPattern = regexp.MustCompile("(?i)^#[0-9a-f]{6}$")
 
-// Color returns a StringFormat that validates a value as a six-digit hexadecimal color (e.g. "#336699").
+// Color returns a StringFormat that validates a six-digit hexadecimal color (e.g. "#336699").
 func Color(arg string) StringFormat {
 
 	return func(value string) (string, error) {

@@ -22,7 +22,7 @@ func Validate(schema Schema, value any) (any, bool, error) {
 	rootValue, restore := addressableRoot(schema.Element, value)
 	result, rewrites, err := validate(schema.Element, rootValue)
 
-	// On error, name the ORIGINAL value's type; validate() can return nil, or a wrapped copy, on error.
+	// On error, name the ORIGINAL value's type: validate() can return nil, or a wrapped copy.
 	if err != nil {
 		return result, false, derp.Wrap(
 			err, location, "Value is not valid for this schema", typeName(value),

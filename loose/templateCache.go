@@ -37,7 +37,7 @@ func CachedTemplate(source string) Template {
 // template the cache holds for its source, or the compiled template if the cache is full.
 func storeTemplate(source string, compiled Template) Template {
 
-	// RULE: The cache never holds more than its limit of templates, so a stream of new strings cannot grow it
+	// RULE: The cache never holds more than its limit, so a stream of new strings cannot grow it
 	if templateCacheSize.Add(1) > templateCacheLimit {
 		templateCacheSize.Add(-1)
 		return compiled
