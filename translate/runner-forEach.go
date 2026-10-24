@@ -1,6 +1,7 @@
 package translate
 
 import (
+	"fmt"
 	"text/template"
 
 	"github.com/benpate/derp"
@@ -53,10 +54,11 @@ func (runner forEachRunner) Execute(sourceSchema schema.Schema, sourceValue any,
 		return nil
 	}
 
+	// RULE: Name the path and the type, never a value, because the source may be a whole record
 	sourceGetter, ok := sourceArray.(schema.KeysGetter)
 
 	if !ok {
-		return derp.Internal(location, "Source value must implement schema.KeysGetter", sourceValue)
+		return derp.Internal(location, "Source value must implement schema.KeysGetter", runner.SourcePath, fmt.Sprintf("%T", sourceArray))
 	}
 
 	// Get the list of keys from the source array.  If none, then exit
