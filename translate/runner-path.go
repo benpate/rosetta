@@ -1,6 +1,8 @@
 package translate
 
 import (
+	"fmt"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/convert"
 	"github.com/benpate/rosetta/mapof"
@@ -41,16 +43,17 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
 
 		// Make a deep copy of the source (to prevent pointer shenanigans)
 		if err := deepcopy.Copy(&duplicateValue, sourceValue); err != nil {
-			return derp.Wrap(err, location, "Unable to deep copy value", runner.Path, sourceValue)
+			return derp.Wrap(err, location, "Unable to deep copy value", runner.Path, fmt.Sprintf("%T", sourceValue))
 		}
 
 		// Dereference pointers (if applicable)
 		duplicateValue = convert.Element(duplicateValue)
 	}
 
-	// Set the value in the target object
+	// Set the value in the target object. Errors name the value's type, never the value,
+	// because a path may name a whole sub-record
 	if err := targetSchema.Set(targetObject, runner.Target, duplicateValue); err != nil {
-		return derp.Wrap(err, location, "Unable to set target value", runner.Target, sourceValue)
+		return derp.Wrap(err, location, "Unable to set target value", runner.Target, fmt.Sprintf("%T", sourceValue))
 	}
 
 	// Success.

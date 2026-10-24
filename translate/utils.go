@@ -2,6 +2,7 @@ package translate
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/benpate/derp"
@@ -23,8 +24,9 @@ func executeTemplate(t *template.Template, data any) string {
 
 	var buffer bytes.Buffer
 
+	// The data is often a whole record, so the report names its type and nothing more
 	if err := t.Execute(&buffer, data); err != nil {
-		derp.Report(derp.Wrap(err, location, "Executing template", data))
+		derp.Report(derp.Wrap(err, location, "Executing template", fmt.Sprintf("%T", data)))
 		return ""
 	}
 
