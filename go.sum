@@ -14,8 +14,8 @@ github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWD
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/tiendc/go-deepcopy v1.7.2 h1:Ut2yYR7W9tWjTQitganoIue4UGxZwCcJy3orjrrIj44=
 github.com/tiendc/go-deepcopy v1.7.2/go.mod h1:4bKjNC2r7boYOkD2IOuZpYjmlDdzjbpTRyCx+goBCJQ=
-github.com/yuin/goldmark v1.8.6 h1:d0VcaP1sx9GkFVkoW+KtggpGi2KZ965i14b0+bDQST4=
-github.com/yuin/goldmark v1.8.6/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
+github.com/yuin/goldmark v1.8.7 h1:XT/tNqCIbabh0ln675w4x3dv04kQBKi8NwYqi9IJaxI=
+github.com/yuin/goldmark v1.8.7/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
 go.yaml.in/yaml/v3 v3.0.5/go.mod h1:HVTZu1O7/Vkt2N+BFy8Zza+lnLsABggaTM2ZpNIGuKg=
 golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e h1:HgI6W1OolKK6tcV74is+rl9SMT0njsHlp0TbQiGXI/A=

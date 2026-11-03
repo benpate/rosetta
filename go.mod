@@ -9,7 +9,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.12.1
 	github.com/tiendc/go-deepcopy v1.7.2
-	github.com/yuin/goldmark v1.8.6
+	github.com/yuin/goldmark v1.8.7
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e
 	golang.org/x/text v0.43.0
 )
