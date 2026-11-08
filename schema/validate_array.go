@@ -119,24 +119,26 @@ func validate_Array_length(getter ArrayGetter, element Array) error {
 	return nil
 }
 
-// addressableCopy returns a pointer to a shallow copy of the value.  A plain map[string]any has no
-// getters behind its pointer, so it is copied into a mapof.Any instead, as Get reads it.
+// addressableCopy returns a pointer to a shallow copy of the value.  A plain map or slice has no
+// accessors behind its pointer, so it is copied into the rosetta type that Get reads it through.
 func addressableCopy(original reflect.Value) any {
 
 	pointer := reflect.New(original.Type())
 	pointer.Elem().Set(original)
 
-	if original.Kind() != reflect.Map {
+	// Only a map or a slice can be converted into a rosetta type
+	if kind := original.Kind(); (kind != reflect.Map) && (kind != reflect.Slice) {
 		return pointer.Interface()
 	}
 
-	if _, isGetter := pointer.Interface().(PointerGetter); isGetter {
+	// A type with its own accessors is validated as it is
+	if isValidatable(pointer.Interface()) {
 		return pointer.Interface()
 	}
 
-	// pointerToCopy returns a *mapof.Any for a plain map[string]any, and the map itself when no
-	// rosetta type can hold it
-	if readable, ok := pointerToCopy(original.Interface()).(PointerGetter); ok {
+	// pointerToCopy returns a *mapof.Any for a plain map[string]any, a *sliceof.Any for a plain
+	// []any (including BSON's primitive.A), and the value itself when no rosetta type can hold it
+	if readable := pointerToCopy(original.Interface()); isValidatable(readable) {
 		return readable
 	}
 
@@ -161,4 +163,16 @@ func restoreType(validated any, originalType reflect.Type) any {
 	}
 
 	return result.Interface()
+}
+
+// isValidatable returns TRUE if validate can read this value: a map or struct through
+// PointerGetter, or a list through ArrayGetterSetter
+func isValidatable(value any) bool {
+
+	switch value.(type) {
+	case PointerGetter, ArrayGetterSetter:
+		return true
+	}
+
+	return false
 }
