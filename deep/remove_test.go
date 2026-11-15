@@ -67,6 +67,13 @@ func TestRemove_EveryContainer(t *testing.T) {
 		"array of maps": func() (any, any) {
 			return [1]map[string]any{{"bcc": 1}}, [1]map[string]any{{}}
 		},
+		"*sliceof.Any": func() (any, any) {
+			return &sliceof.Any{map[string]any{"bcc": 1, "to": 2}}, &sliceof.Any{map[string]any{"to": 2}}
+		},
+		"*sliceof.Any in a map": func() (any, any) {
+			return map[string]any{"list": &sliceof.Any{mapof.Any{"bcc": 1}}},
+				map[string]any{"list": &sliceof.Any{mapof.Any{}}}
+		},
 		"slice of slices": func() (any, any) {
 			return [][]any{{map[string]any{"bcc": 1}}}, [][]any{{map[string]any{}}}
 		},
@@ -87,36 +94,42 @@ func TestRemove_EveryContainer(t *testing.T) {
 func TestRemove_NothingToRemove(t *testing.T) {
 
 	values := map[string]any{
-		"nil":            nil,
-		"bool":           true,
-		"float32":        float32(1),
-		"float64":        1.5,
-		"int":            1,
-		"int8":           int8(1),
-		"int16":          int16(1),
-		"int32":          int32(1),
-		"int64":          int64(1),
-		"uint":           uint(1),
-		"string":         "bcc",
-		"time.Time":      time.Now(),
-		"[]bool":         []bool{true},
-		"[]float32":      []float32{1},
-		"[]float64":      []float64{1},
-		"[]int":          []int{1},
-		"[]int8":         []int8{1},
-		"[]int16":        []int16{1},
-		"[]int32":        []int32{1},
-		"[]int64":        []int64{1},
-		"[]string":       []string{"bcc"},
-		"[]byte":         []byte("bcc"),
-		"sliceof.Float":  sliceof.Float{1},
-		"sliceof.Int":    sliceof.Int{1},
-		"sliceof.String": sliceof.String{"bcc"},
-		"database date":  testDateTime(1),
-		"database ID":    testObjectID{1},
-		"nil map":        map[string]any(nil),
-		"nil named map":  testDocument(nil),
-		"nil slice":      []any(nil),
+		"nil":                nil,
+		"bool":               true,
+		"float32":            float32(1),
+		"float64":            1.5,
+		"int":                1,
+		"int8":               int8(1),
+		"int16":              int16(1),
+		"int32":              int32(1),
+		"int64":              int64(1),
+		"uint":               uint(1),
+		"string":             "bcc",
+		"time.Time":          time.Now(),
+		"[]bool":             []bool{true},
+		"[]float32":          []float32{1},
+		"[]float64":          []float64{1},
+		"[]int":              []int{1},
+		"[]int8":             []int8{1},
+		"[]int16":            []int16{1},
+		"[]int32":            []int32{1},
+		"[]int64":            []int64{1},
+		"[]string":           []string{"bcc"},
+		"[]byte":             []byte("bcc"),
+		"sliceof.Float":      sliceof.Float{1},
+		"sliceof.Int":        sliceof.Int{1},
+		"sliceof.String":     sliceof.String{"bcc"},
+		"database date":      testDateTime(1),
+		"database ID":        testObjectID{1},
+		"database decimal":   testDecimal{h: 1},
+		"database timestamp": testTimestamp{T: 1},
+		"database regex":     testRegex{Pattern: "bcc"},
+		"database null":      testNull{},
+		"simple structs":     []testTimestamp{{T: 1}},
+		"nil *sliceof.Any":   (*sliceof.Any)(nil),
+		"nil map":            map[string]any(nil),
+		"nil named map":      testDocument(nil),
+		"nil slice":          []any(nil),
 	}
 
 	for name, value := range values {
@@ -178,7 +191,9 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 	values := map[string]any{
 		"struct":                    testStruct{},
 		"pointer":                   &number,
-		"pointer to slice":          &sliceof.Any{map[string]any{"bcc": 1}},
+		"pointer to slice":          &[]any{map[string]any{"bcc": 1}},
+		"struct in sliceof pointer": &sliceof.Any{testStruct{}},
+		"struct with an interface":  struct{ V any }{V: map[string]any{"bcc": 1}},
 		"pointer to map":            &map[string]any{"bcc": 1},
 		"nil pointer":               (*int)(nil),
 		"function":                  func() {},
@@ -200,7 +215,7 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 			err := Remove(value, "bcc")
 
 			require.Error(t, err)
-			require.True(t, derp.IsBadRequest(err), "an unsupported type is a Bad Request")
+			require.True(t, derp.IsInternalServerError(err), "an unsupported type is an Internal error")
 		})
 	}
 }
@@ -209,7 +224,7 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 // the error
 func TestRemove_ErrorNamesTypeNotValue(t *testing.T) {
 
-	err := Remove(map[string]any{"object": testStruct{Secret: "hunter2-recipient"}}, "bcc")
+	err := Remove(map[string]any{"object": testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}}, "bcc")
 
 	require.Error(t, err)
 	require.NotContains(t, errorText(t, err), "hunter2-recipient")
@@ -230,5 +245,52 @@ func TestRemove_Remover(t *testing.T) {
 
 	t.Run("its error is returned", func(t *testing.T) {
 		require.Error(t, Remove([]any{testFailingCopier{}}, "bcc"))
+	})
+}
+
+// TestRemove_MaxDepth proves that a walk stops at the maximum depth, which is what stops a
+// value that contains itself
+func TestRemove_MaxDepth(t *testing.T) {
+
+	t.Run("map that contains itself", func(t *testing.T) {
+
+		value := map[string]any{}
+		value["self"] = value
+
+		err := Remove(value, "bcc")
+
+		require.Error(t, err)
+		require.True(t, derp.IsInternalServerError(err))
+		require.Less(t, len(errorText(t, err)), 2_000)
+	})
+
+	t.Run("reflected containers that contain themselves", func(t *testing.T) {
+
+		document := testDocument{}
+		document["list"] = testArray{document}
+
+		require.Error(t, Remove(document, "bcc"))
+	})
+
+	t.Run("pointer that leads to itself", func(t *testing.T) {
+
+		value := &sliceof.Any{nil}
+		(*value)[0] = value
+
+		require.Error(t, Remove(value, "bcc"))
+	})
+
+	t.Run("the limit allows what a JSON decoder allows", func(t *testing.T) {
+
+		var value any = map[string]any{"bcc": 1}
+
+		for range maxDepth {
+			value = []any{value}
+		}
+
+		require.NoError(t, Remove(value, "bcc"))
+		require.False(t, hasKey(value, "bcc"))
+
+		require.Error(t, Remove([]any{value}, "bcc"))
 	})
 }

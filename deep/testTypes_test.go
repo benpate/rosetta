@@ -11,8 +11,20 @@ type (
 	testObjectID [12]byte
 )
 
-// testStruct is a type that Copy and Remove refuse
-type testStruct struct{ Secret string }
+// These types have the same layout as the driver's Decimal128, Timestamp, Regex, and Null:
+// structs that hold no map, slice, or pointer
+type (
+	testDecimal   struct{ h, l uint64 }
+	testTimestamp struct{ T, I uint32 }
+	testRegex     struct{ Pattern, Options string }
+	testNull      struct{}
+)
+
+// testStruct is a type that Copy and Remove refuse, because it holds a map
+type testStruct struct {
+	Secret string
+	Hidden map[string]any
+}
 
 // testCopier is a struct that copies itself, and counts how often it was asked
 type testCopier struct {
