@@ -41,7 +41,8 @@ func (runner pathRunner) Execute(sourceSchema schema.Schema, sourceObject any, t
 
 	if err == nil {
 
-		// Make a deep copy of the source (to prevent pointer shenanigans)
+		// Make a deep copy of the source (to prevent pointer shenanigans). This moves to
+		// rosetta/deep once it can copy pointers and structs; see AGENTS.md.
 		if err := deepcopy.Copy(&duplicateValue, sourceValue); err != nil {
 			return derp.Wrap(err, location, "Unable to deep copy value", runner.Path, fmt.Sprintf("%T", sourceValue))
 		}
