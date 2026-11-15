@@ -1,6 +1,7 @@
 package deep
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/benpate/derp"
@@ -78,6 +79,10 @@ func removeValue(value any, match Matcher, depth int) error {
 
 	case nil, bool, float32, float64, int, int8, int16, int32, int64, string, time.Time:
 		return nil
+
+	// RULE: Raw JSON is refused, because it is written out as an object that was never searched
+	case json.RawMessage:
+		return derp.Internal(location, "Cannot remove properties from raw JSON", typeName(value))
 	}
 
 	// Maps get cleansed of matching properties

@@ -14,6 +14,10 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 **It has its own case in both switches because `schema` stores every new list as one.** `Copy` returns a new pointer to a copied slice. Every other pointer is refused.
 
+## Raw JSON is copied but never searched
+
+**`Remove` returns an error for a `json.RawMessage`, at any depth.** It is a slice of bytes to reflection, so it would pass as a simple value, and `json.Marshal` then writes it out as an object that no one searched. `Copy` copies its bytes. A simple type with its own `MarshalJSON` that writes an object has the same gap and is not caught, since refusing every `json.Marshaler` would refuse database IDs and dates.
+
 ## Map keys are copied as they are, and never checked
 
 **`copyReflectedMap` deep-copies a map's values and reuses its keys, and `Remove` never looks inside a key.** A map keyed by a pointer, or by a struct that holds one, therefore copies without an error and the copy shares that pointer, which is the one gap in the rule above. No JSON or BSON decoder builds such a key. Closing it means refusing a key type that `isSimpleType` rejects, while still allowing the `any` keys of a `map[any]any`.

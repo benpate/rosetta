@@ -1,6 +1,7 @@
 package deep
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -204,6 +205,9 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 		"nil pointer":               (*int)(nil),
 		"function":                  func() {},
 		"channel":                   make(chan int),
+		"raw JSON":                  json.RawMessage(`{"bcc":"x"}`),
+		"raw JSON in map":           map[string]any{"a": json.RawMessage(`{"bcc":"x"}`)},
+		"raw JSON in typed slice":   []json.RawMessage{json.RawMessage(`{"bcc":"x"}`)},
 		"struct in map":             map[string]any{"a": testStruct{}},
 		"struct in slice":           []any{testStruct{}},
 		"struct in typed map":       map[string]mapof.Any{"a": {"b": testStruct{}}},

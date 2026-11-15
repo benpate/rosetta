@@ -52,6 +52,7 @@ func TestCopy_KeepsTypeAndData(t *testing.T) {
 		"[]any":                   []any{1, "a", nil, map[string]any{"b": 2}},
 		"[]bool":                  []bool{true},
 		"[]byte":                  []byte("abc"),
+		"raw JSON":                json.RawMessage(`{"a":1}`),
 		"[]float32":               []float32{1},
 		"[]float64":               []float64{1},
 		"[]int":                   []int{1},
