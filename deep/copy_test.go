@@ -18,72 +18,82 @@ func TestCopy_KeepsTypeAndData(t *testing.T) {
 	now := time.Now()
 
 	values := map[string]any{
-		"nil":                  nil,
-		"bool":                 true,
-		"float32":              float32(1.5),
-		"float64":              2.5,
-		"int":                  1,
-		"int8":                 int8(2),
-		"int16":                int16(3),
-		"int32":                int32(4),
-		"int64":                int64(5),
-		"uint":                 uint(6),
-		"string":               "seven",
-		"time.Time":            now,
-		"map[string]any":       map[string]any{"a": 1, "b": nil, "c": []any{nil, "d"}},
-		"map[string]bool":      map[string]bool{"a": true},
-		"map[string]int":       map[string]int{"a": 1},
-		"map[string]int8":      map[string]int8{"a": 1},
-		"map[string]int16":     map[string]int16{"a": 1},
-		"map[string]int32":     map[string]int32{"a": 1},
-		"map[string]int64":     map[string]int64{"a": 1},
-		"map[string]float32":   map[string]float32{"a": 1},
-		"map[string]float64":   map[string]float64{"a": 1},
-		"map[string]string":    map[string]string{"a": "b"},
-		"map[string]mapof.Any": map[string]mapof.Any{"a": {"b": 1}},
-		"map[string][]string":  map[string][]string{"a": {"b"}},
-		"map[int]any":          map[int]any{1: []any{"a"}},
-		"mapof.Any":            mapof.Any{"a": mapof.Any{"b": 1}},
-		"mapof.Bool":           mapof.Bool{"a": true},
-		"mapof.Float":          mapof.Float{"a": 1},
-		"mapof.Int":            mapof.Int{"a": 1},
-		"mapof.Int64":          mapof.Int64{"a": 1},
-		"mapof.String":         mapof.String{"a": "b"},
-		"[]any":                []any{1, "a", nil, map[string]any{"b": 2}},
-		"[]bool":               []bool{true},
-		"[]byte":               []byte("abc"),
-		"[]float32":            []float32{1},
-		"[]float64":            []float64{1},
-		"[]int":                []int{1},
-		"[]int8":               []int8{1},
-		"[]int16":              []int16{1},
-		"[]int32":              []int32{1},
-		"[]int64":              []int64{1},
-		"[]uint":               []uint{1},
-		"[]string":             []string{"a"},
-		"[]map[string]any":     []map[string]any{{"a": 1}},
-		"[]map[string]string":  []map[string]string{{"a": "b"}},
-		"[]mapof.Any":          []mapof.Any{{"a": 1}},
-		"[][]any":              [][]any{{1}, nil},
-		"sliceof.Any":          sliceof.Any{1, "a"},
-		"sliceof.Float":        sliceof.Float{1},
-		"sliceof.Int":          sliceof.Int{1},
-		"sliceof.String":       sliceof.String{"a"},
-		"sliceof.MapOfAny":     sliceof.MapOfAny{{"a": 1}},
-		"sliceof.MapOfString":  sliceof.MapOfString{{"a": "b"}},
-		"database array":       testArray{"a", testDocument{"b": testDateTime(1)}},
-		"database document":    testDocument{"_id": testObjectID{1, 2, 3}, "list": testArray{1}},
-		"database date":        testDateTime(1700000000000),
-		"database ID":          testObjectID{1, 2, 3},
-		"[2]any":               [2]any{map[string]any{"a": 1}, nil},
-		"empty map":            map[string]any{},
-		"empty slice":          []any{},
-		"nil map[string]any":   map[string]any(nil),
-		"nil mapof.String":     mapof.String(nil),
-		"nil []any":            []any(nil),
-		"nil []string":         []string(nil),
-		"nil database array":   testArray(nil),
-		"nil database doc":     testDocument(nil),
+		"nil":                     nil,
+		"bool":                    true,
+		"float32":                 float32(1.5),
+		"float64":                 2.5,
+		"int":                     1,
+		"int8":                    int8(2),
+		"int16":                   int16(3),
+		"int32":                   int32(4),
+		"int64":                   int64(5),
+		"uint":                    uint(6),
+		"string":                  "seven",
+		"time.Time":               now,
+		"map[string]any":          map[string]any{"a": 1, "b": nil, "c": []any{nil, "d"}},
+		"map[string]bool":         map[string]bool{"a": true},
+		"map[string]int":          map[string]int{"a": 1},
+		"map[string]int8":         map[string]int8{"a": 1},
+		"map[string]int16":        map[string]int16{"a": 1},
+		"map[string]int32":        map[string]int32{"a": 1},
+		"map[string]int64":        map[string]int64{"a": 1},
+		"map[string]float32":      map[string]float32{"a": 1},
+		"map[string]float64":      map[string]float64{"a": 1},
+		"map[string]string":       map[string]string{"a": "b"},
+		"map[string]mapof.Any":    map[string]mapof.Any{"a": {"b": 1}},
+		"map[string][]string":     map[string][]string{"a": {"b"}},
+		"map[int]any":             map[int]any{1: []any{"a"}},
+		"mapof.Any":               mapof.Any{"a": mapof.Any{"b": 1}},
+		"mapof.Bool":              mapof.Bool{"a": true},
+		"mapof.Float":             mapof.Float{"a": 1},
+		"mapof.Int":               mapof.Int{"a": 1},
+		"mapof.Int64":             mapof.Int64{"a": 1},
+		"mapof.String":            mapof.String{"a": "b"},
+		"[]any":                   []any{1, "a", nil, map[string]any{"b": 2}},
+		"[]bool":                  []bool{true},
+		"[]byte":                  []byte("abc"),
+		"[]float32":               []float32{1},
+		"[]float64":               []float64{1},
+		"[]int":                   []int{1},
+		"[]int8":                  []int8{1},
+		"[]int16":                 []int16{1},
+		"[]int32":                 []int32{1},
+		"[]int64":                 []int64{1},
+		"[]uint":                  []uint{1},
+		"[]string":                []string{"a"},
+		"[]map[string]any":        []map[string]any{{"a": 1}},
+		"[]map[string]string":     []map[string]string{{"a": "b"}},
+		"[]mapof.Any":             []mapof.Any{{"a": 1}},
+		"[][]any":                 [][]any{{1}, nil},
+		"sliceof.Any":             sliceof.Any{1, "a"},
+		"sliceof.Float":           sliceof.Float{1},
+		"sliceof.Int":             sliceof.Int{1},
+		"sliceof.String":          sliceof.String{"a"},
+		"sliceof.MapOfAny":        sliceof.MapOfAny{{"a": 1}},
+		"sliceof.MapOfString":     sliceof.MapOfString{{"a": "b"}},
+		"database array":          testArray{"a", testDocument{"b": testDateTime(1)}},
+		"database document":       testDocument{"_id": testObjectID{1, 2, 3}, "list": testArray{1}},
+		"database date":           testDateTime(1700000000000),
+		"database ID":             testObjectID{1, 2, 3},
+		"database decimal":        testDecimal{h: 1, l: 2},
+		"database timestamp":      testTimestamp{T: 1, I: 2},
+		"database regex":          testRegex{Pattern: "a", Options: "i"},
+		"database null":           testNull{},
+		"slice of simple structs": []testTimestamp{{T: 1}},
+		"array of simple structs": [1]testRegex{{Pattern: "a"}},
+		"map of simple structs":   map[string]testDecimal{"a": {h: 1}},
+		"[]testObjectID":          []testObjectID{{1}, {2}},
+		"*sliceof.Any":            &sliceof.Any{1, map[string]any{"a": nil}},
+		"nil *sliceof.Any":        (*sliceof.Any)(nil),
+		"[2]any":                  [2]any{map[string]any{"a": 1}, nil},
+		"empty map":               map[string]any{},
+		"empty slice":             []any{},
+		"nil map[string]any":      map[string]any(nil),
+		"nil mapof.String":        mapof.String(nil),
+		"nil []any":               []any(nil),
+		"nil []string":            []string(nil),
+		"nil database array":      testArray(nil),
+		"nil database doc":        testDocument(nil),
 	}
 
 	for name, original := range values {
@@ -155,6 +165,103 @@ func TestCopy_SharesNothing(t *testing.T) {
 	})
 }
 
+// TestCopy_PointerToSlice proves that a *sliceof.Any is copied to a new pointer, which
+// shares nothing with the original
+func TestCopy_PointerToSlice(t *testing.T) {
+
+	original := map[string]any{"list": &sliceof.Any{map[string]any{"a": 1}}}
+
+	result, err := Copy(original)
+	require.NoError(t, err)
+
+	copied := result["list"].(*sliceof.Any)
+	require.NotSame(t, original["list"], copied)
+
+	(*copied)[0].(map[string]any)["a"] = 2
+	*copied = append(*copied, "new")
+
+	require.Equal(t, &sliceof.Any{map[string]any{"a": 1}}, original["list"])
+}
+
+// TestCopy_MaxDepth proves that a walk stops at the maximum depth, which is what stops a
+// value that contains itself
+func TestCopy_MaxDepth(t *testing.T) {
+
+	t.Run("map that contains itself", func(t *testing.T) {
+
+		original := map[string]any{}
+		original["self"] = original
+
+		result, err := Copy(original)
+
+		require.Error(t, err)
+		require.Nil(t, result)
+		require.True(t, derp.IsInternalServerError(err))
+	})
+
+	t.Run("slice that contains itself", func(t *testing.T) {
+
+		original := []any{nil}
+		original[0] = original
+
+		_, err := Copy(original)
+		require.Error(t, err)
+	})
+
+	t.Run("reflected containers that contain themselves", func(t *testing.T) {
+
+		document := testDocument{}
+		document["list"] = testArray{document}
+
+		_, err := Copy(document)
+		require.Error(t, err)
+
+		array := [1]any{}
+		slice := testArray{nil}
+		array[0] = slice
+		slice[0] = array
+
+		_, err = Copy(slice)
+		require.Error(t, err)
+	})
+
+	t.Run("pointer that leads to itself", func(t *testing.T) {
+
+		original := &sliceof.Any{nil}
+		(*original)[0] = original
+
+		_, err := Copy(original)
+		require.Error(t, err)
+	})
+
+	t.Run("the limit allows what a JSON decoder allows", func(t *testing.T) {
+
+		var original any = "deepest"
+
+		for range maxDepth {
+			original = []any{original}
+		}
+
+		result, err := Copy(original)
+		require.NoError(t, err)
+		require.Equal(t, original, result)
+
+		_, err = Copy([]any{original})
+		require.Error(t, err)
+	})
+
+	t.Run("the error does not grow with the depth", func(t *testing.T) {
+
+		original := map[string]any{}
+		original["self"] = original
+
+		_, err := Copy(original)
+
+		require.Error(t, err)
+		require.Less(t, len(errorText(t, err)), 2_000)
+	})
+}
+
 // TestCopy_UnsupportedTypes proves that a value Copy cannot copy is an error, at any depth,
 // and that no partial copy comes back with it
 func TestCopy_UnsupportedTypes(t *testing.T) {
@@ -162,23 +269,26 @@ func TestCopy_UnsupportedTypes(t *testing.T) {
 	number := 1
 
 	values := map[string]any{
-		"struct":                    testStruct{},
-		"pointer":                   &number,
-		"pointer to slice":          &sliceof.Any{1},
-		"nil pointer":               (*int)(nil),
-		"function":                  func() {},
-		"channel":                   make(chan int),
-		"struct in map":             map[string]any{"a": 1, "b": testStruct{}},
-		"struct in slice":           []any{1, testStruct{}},
-		"struct in named map":       mapof.Any{"a": testStruct{}},
-		"struct in typed map":       map[string]mapof.Any{"a": {"b": testStruct{}}},
-		"struct in slice of maps":   sliceof.MapOfAny{{"a": testStruct{}}},
-		"struct in reflected map":   testDocument{"a": testStruct{}},
-		"struct in reflected slice": testArray{testStruct{}},
-		"struct in array":           [1]any{testStruct{}},
-		"slice of structs":          []testStruct{{}},
-		"array of structs":          [1]testStruct{},
-		"map of structs":            map[string]testStruct{"a": {}},
+		"struct":                     testStruct{},
+		"pointer":                    &number,
+		"pointer to slice":           &[]any{1},
+		"pointer in sliceof pointer": &sliceof.Any{&number},
+		"struct with a pointer":      struct{ P *int }{},
+		"struct with an interface":   struct{ V any }{},
+		"nil pointer":                (*int)(nil),
+		"function":                   func() {},
+		"channel":                    make(chan int),
+		"struct in map":              map[string]any{"a": 1, "b": testStruct{}},
+		"struct in slice":            []any{1, testStruct{}},
+		"struct in named map":        mapof.Any{"a": testStruct{}},
+		"struct in typed map":        map[string]mapof.Any{"a": {"b": testStruct{}}},
+		"struct in slice of maps":    sliceof.MapOfAny{{"a": testStruct{}}},
+		"struct in reflected map":    testDocument{"a": testStruct{}},
+		"struct in reflected slice":  testArray{testStruct{}},
+		"struct in array":            [1]any{testStruct{}},
+		"slice of structs":           []testStruct{{}},
+		"array of structs":           [1]testStruct{},
+		"map of structs":             map[string]testStruct{"a": {}},
 	}
 
 	for name, original := range values {
@@ -188,7 +298,7 @@ func TestCopy_UnsupportedTypes(t *testing.T) {
 
 			require.Error(t, err)
 			require.Nil(t, result)
-			require.True(t, derp.IsBadRequest(err), "an unsupported type is a Bad Request")
+			require.True(t, derp.IsInternalServerError(err), "an unsupported type is an Internal error")
 		})
 	}
 }
@@ -197,7 +307,7 @@ func TestCopy_UnsupportedTypes(t *testing.T) {
 // the error
 func TestCopy_ErrorNamesTypeNotValue(t *testing.T) {
 
-	_, err := Copy(map[string]any{"bcc": testStruct{Secret: "hunter2-recipient"}})
+	_, err := Copy(map[string]any{"bcc": testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}})
 
 	require.Error(t, err)
 	require.NotContains(t, errorText(t, err), "hunter2-recipient")
@@ -321,7 +431,7 @@ func TestCopy_ReturnsCallersType(t *testing.T) {
 		result, err := Copy(testStruct{Secret: "a"})
 
 		require.Error(t, err)
-		require.Equal(t, testStruct{}, result)
+		require.Empty(t, result)
 	})
 
 	t.Run("wrong type returns the zero value", func(t *testing.T) {

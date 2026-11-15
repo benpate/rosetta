@@ -12,18 +12,34 @@ import (
 )
 
 // Copy returns a deep copy of a value, which shares no map or slice with the original.
-// A value that it cannot copy, such as a pointer or a struct, is an error.
+// A value that it cannot copy, such as a function or a struct that holds a map, is an error.
 func Copy[T any](original T) (T, error) {
 
 	const location = "deep.Copy"
 
+	result, err := copyAs(original, 0)
+
+	// RULE: The error is wrapped here and nowhere deeper, so that its length does not
+	// grow with the depth of the value
+	if err != nil {
+		return result, derp.Wrap(err, location, "Unable to copy value")
+	}
+
+	return result, nil
+}
+
+// copyAs deep-copies a value at one level of nesting, and returns it as the original's type
+func copyAs[T any](original T, depth int) (T, error) {
+
+	const location = "deep.copyAs"
+
 	var zero T
 
 	// Deep-copy the value
-	duplicate, err := copyValue(original)
+	duplicate, err := copyValue(original, depth)
 
 	if err != nil {
-		return zero, derp.Wrap(err, location, "Duplicating value")
+		return zero, err
 	}
 
 	// A nil copy (a JSON `null`) matches no type assertion, so it is returned as the zero value
@@ -43,9 +59,14 @@ func Copy[T any](original T) (T, error) {
 }
 
 // copyValue returns a deep copy of a value of any type, as a value of that same type
-func copyValue(value any) (any, error) {
+func copyValue(value any, depth int) (any, error) {
 
 	const location = "deep.copyValue"
+
+	// RULE: A walk stops at the maximum depth, which also stops a value that contains itself
+	if depth > maxDepth {
+		return nil, derp.Internal(location, "Max Depth Exceeded", "Check this data structure for cycles")
+	}
 
 	// Simple types are copied by value
 	switch typed := value.(type) {
@@ -134,13 +155,13 @@ func copyValue(value any) (any, error) {
 	switch typed := value.(type) {
 
 	case map[string]any:
-		return copyMap(typed)
+		return asAny(copyMap(typed, depth))
 
 	case map[string]mapof.Any:
-		return copyMap(typed)
+		return asAny(copyMap(typed, depth))
 
 	case mapof.Any:
-		return copyMap(typed)
+		return asAny(copyMap(typed, depth))
 	}
 
 	// Slices of simple types have nothing deeper to copy
@@ -190,25 +211,28 @@ func copyValue(value any) (any, error) {
 	switch typed := value.(type) {
 
 	case []any:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case []map[string]any:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case []map[string]string:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case []mapof.Any:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case sliceof.Any:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case sliceof.MapOfAny:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
 
 	case sliceof.MapOfString:
-		return copySlice(typed)
+		return asAny(copySlice(typed, depth))
+
+	case *sliceof.Any:
+		return asAny(copySlicePointer(typed, depth))
 	}
 
 	// Values that know how to copy themselves
@@ -224,13 +248,11 @@ func copyValue(value any) (any, error) {
 	}
 
 	// Every other map, slice, and array is copied by reflection
-	return copyReflected(value)
+	return copyReflected(value, depth)
 }
 
 // copyMap deep-copies a map, and returns the copy as the map's own type
-func copyMap[M ~map[K]V, K comparable, V any](original M) (any, error) {
-
-	const location = "deep.copyMap"
+func copyMap[M ~map[K]V, K comparable, V any](original M, depth int) (M, error) {
 
 	// A nil map stays nil, as it does in maps.Clone
 	if original == nil {
@@ -243,10 +265,10 @@ func copyMap[M ~map[K]V, K comparable, V any](original M) (any, error) {
 	for key, value := range original {
 
 		// Deep-copy the individual value
-		duplicate, err := Copy(value)
+		duplicate, err := copyAs(value, depth+1)
 
 		if err != nil {
-			return nil, derp.Wrap(err, location, "Duplicating map value")
+			return nil, err
 		}
 
 		// Add it to the map
@@ -258,9 +280,7 @@ func copyMap[M ~map[K]V, K comparable, V any](original M) (any, error) {
 }
 
 // copySlice deep-copies a slice, and returns the copy as the slice's own type
-func copySlice[S ~[]T, T any](original S) (any, error) {
-
-	const location = "deep.copySlice"
+func copySlice[S ~[]T, T any](original S, depth int) (S, error) {
 
 	// A nil slice stays nil, as it does in slices.Clone
 	if original == nil {
@@ -273,10 +293,10 @@ func copySlice[S ~[]T, T any](original S) (any, error) {
 	for _, value := range original {
 
 		// Deep-copy the individual value
-		duplicate, err := Copy(value)
+		duplicate, err := copyAs(value, depth+1)
 
 		if err != nil {
-			return nil, derp.Wrap(err, location, "Duplicating slice item")
+			return nil, err
 		}
 
 		// Append the duplicated, typed value to the result
@@ -285,6 +305,34 @@ func copySlice[S ~[]T, T any](original S) (any, error) {
 
 	// Send in the clones
 	return result, nil
+}
+
+// copySlicePointer deep-copies the slice that a pointer leads to, and returns a pointer to
+// the copy. A nil pointer stays nil.
+func copySlicePointer[S ~[]T, T any](original *S, depth int) (*S, error) {
+
+	if original == nil {
+		return nil, nil
+	}
+
+	result, err := copySlice(*original, depth)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// asAny returns a copy as an `any`, and a nil in place of the copy when there is an error
+func asAny[T any](value T, err error) (any, error) {
+
+	// RULE: A typed nil stored in an `any` is not nil, so an error returns an untyped nil
+	if err != nil {
+		return nil, err
+	}
+
+	return value, nil
 }
 
 // typeName names a value's Go type for an error detail
