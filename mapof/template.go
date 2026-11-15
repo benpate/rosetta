@@ -135,9 +135,7 @@ func (x Template) Clone() Template {
 // Pointers, structs, and arrays are returned as they are.
 func deepCopy(value any) any {
 
-	original := reflect.ValueOf(value)
-
-	switch original.Kind() {
+	switch original := reflect.ValueOf(value); original.Kind() {
 
 	case reflect.Map:
 		return deepCopyMap(original)
@@ -157,11 +155,9 @@ func deepCopyMap(original reflect.Value) any {
 		return original.Interface()
 	}
 
-	elementType := original.Type().Elem()
 	result := reflect.MakeMapWithSize(original.Type(), original.Len())
-	iterator := original.MapRange()
 
-	for iterator.Next() {
+	for elementType, iterator := original.Type().Elem(), original.MapRange(); iterator.Next(); {
 		result.SetMapIndex(iterator.Key(), deepCopyItem(iterator.Value(), elementType))
 	}
 

@@ -583,17 +583,13 @@ func FuzzTemplate_NewTemplate(f *testing.F) {
 		// and text/template accepts it. This is checked against the standard
 		// library directly, so a shortcut in NewTemplate cannot hide here.
 		_, parseErr := template.New("").Parse(source)
-		expected := looksLikeTemplate(source) && (parseErr == nil)
-
-		if value.IsTemplate() != expected {
+		if expected := looksLikeTemplate(source) && (parseErr == nil); value.IsTemplate() != expected {
 			t.Fatalf("IsTemplate() = %t, want %t (source %q, parse error %v)", value.IsTemplate(), expected, source, parseErr)
 		}
 
 		// Property: plain text executes as itself, whatever the data.
 		if !value.IsTemplate() {
-			result, err := value.Execute(templateFuzzData{ID: "x"})
-
-			if (err != nil) || (result != source) {
+			if result, err := value.Execute(templateFuzzData{ID: "x"}); (err != nil) || (result != source) {
 				t.Fatalf("plain text %q executed as %q, %v", source, result, err)
 			}
 			return
@@ -609,9 +605,7 @@ func FuzzTemplate_NewTemplate(f *testing.F) {
 
 		// Property: executing a compiled template never panics, and a failure
 		// never returns partial output.
-		result, err := value.Execute(templateFuzzData{ID: "x"})
-
-		if (err != nil) && (result != "") {
+		if result, err := value.Execute(templateFuzzData{ID: "x"}); (err != nil) && (result != "") {
 			t.Fatalf("failed execution of %q still returned %q", source, result)
 		}
 	})
@@ -632,7 +626,7 @@ func FuzzTemplate_UnmarshalJSON(f *testing.F) {
 	f.Fuzz(func(t *testing.T, input string) {
 
 		var text String
-		textErr := json.Unmarshal([]byte(input), &text)
+		textErr := json.Unmarshal([]byte(input), &text) // nolint:scopeguard // decoded before Template, on purpose
 
 		value := NewTemplate("unchanged")
 		templateErr := json.Unmarshal([]byte(input), &value)

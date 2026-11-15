@@ -174,7 +174,8 @@ func TestCopy_PointerToSlice(t *testing.T) {
 	result, err := Copy(original)
 	require.NoError(t, err)
 
-	copied := result["list"].(*sliceof.Any)
+	copied, isPointer := result["list"].(*sliceof.Any)
+	require.True(t, isPointer)
 	require.NotSame(t, original["list"], copied)
 
 	(*copied)[0].(map[string]any)["a"] = 2
@@ -341,7 +342,7 @@ func TestCopy_UnsupportedTypes(t *testing.T) {
 
 			require.Error(t, err)
 			require.Nil(t, result)
-			require.True(t, derp.IsInternalServerError(err), "an unsupported type is an Internal error")
+			require.True(t, derp.IsInternalServerError(err), "expected an Internal error")
 		})
 	}
 }
@@ -350,7 +351,9 @@ func TestCopy_UnsupportedTypes(t *testing.T) {
 // the error
 func TestCopy_ErrorNamesTypeNotValue(t *testing.T) {
 
-	_, err := Copy(map[string]any{"bcc": testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}})
+	hidden := testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}
+
+	_, err := Copy(map[string]any{"bcc": hidden})
 
 	require.Error(t, err)
 	require.NotContains(t, errorText(t, err), "hunter2-recipient")
@@ -365,7 +368,11 @@ func TestCopy_Copier(t *testing.T) {
 		copies := 0
 		copier := testCopier{Name: "a", Copies: &copies}
 
-		original := map[string]any{"direct": copier, "listed": []any{copier}, "reflected": testArray{copier}}
+		original := map[string]any{
+			"direct":    copier,
+			"listed":    []any{copier},
+			"reflected": testArray{copier},
+		}
 
 		result, err := Copy(original)
 
@@ -396,7 +403,8 @@ func TestCopy_Copier(t *testing.T) {
 		require.Equal(t, 2, box.Depth)
 
 		// The copy is a new box, and shares nothing with the original
-		copied := result["list"].([]any)[0].(*testBox)
+		copied, isBox := result["list"].([]any)[0].(*testBox)
+		require.True(t, isBox)
 		require.NotSame(t, box, copied)
 
 		copied.Child.(map[string]any)["a"].([]any)[0] = 2

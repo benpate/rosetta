@@ -76,37 +76,7 @@ func removeValue(value any, match Matcher, depth int) error {
 	// Simple types pass through (no properties to remove)
 	switch value.(type) {
 
-	case nil:
-		return nil
-
-	case bool:
-		return nil
-
-	case float32:
-		return nil
-
-	case float64:
-		return nil
-
-	case int:
-		return nil
-
-	case int8:
-		return nil
-
-	case int16:
-		return nil
-
-	case int32:
-		return nil
-
-	case int64:
-		return nil
-
-	case string:
-		return nil
-
-	case time.Time:
+	case nil, bool, float32, float64, int, int8, int16, int32, int64, string, time.Time:
 		return nil
 	}
 
@@ -179,57 +149,22 @@ func removeValue(value any, match Matcher, depth int) error {
 		return nil
 	}
 
-	// Slices get each item scanned
+	// Slices of simple types have no properties to remove
+	switch value.(type) {
+
+	case []bool, []byte, []float32, []float64, []int, []int8, []int16, []int32, []int64, []string,
+		sliceof.Float, sliceof.Int, sliceof.String:
+		return nil
+	}
+
+	// Slices of other values get each item scanned
 	switch typed := value.(type) {
 
 	case []any:
 		return removeFromSlice(typed, match, depth)
 
-	case []bool:
-		return nil
-
-	case []float32:
-		return nil
-
-	case []float64:
-		return nil
-
-	case []int:
-		return nil
-
-	case []int8:
-		return nil
-
-	case []int16:
-		return nil
-
-	case []int32:
-		return nil
-
-	case []int64:
-		return nil
-
-	case []byte:
-		return nil
-
-	case []string:
-		return nil
-
 	case sliceof.Any:
 		return removeFromSlice(typed, match, depth)
-
-	case sliceof.Float:
-		return nil
-
-	case sliceof.Int:
-		return nil
-
-	case sliceof.String:
-		return nil
-	}
-
-	// Slices of Maps
-	switch typed := value.(type) {
 
 	case []map[string]any:
 		return removeFromSlice(typed, match, depth)
@@ -247,13 +182,7 @@ func removeValue(value any, match Matcher, depth int) error {
 		return removeFromSlice(typed, match, depth)
 
 	case *sliceof.Any:
-
-		// A nil pointer leads to nothing
-		if typed == nil {
-			return nil
-		}
-
-		return removeFromSlice(*typed, match, depth)
+		return removeFromSlicePointer(typed, match, depth)
 	}
 
 	// Values that know how to remove their own properties
@@ -311,4 +240,16 @@ func removeFromSlice[T any](value []T, match Matcher, depth int) error {
 
 	// Silence is golden
 	return nil
+}
+
+// removeFromSlicePointer deletes the matching properties from the slice that a pointer leads to
+func removeFromSlicePointer[S ~[]T, T any](value *S, match Matcher, depth int) error {
+
+	// A nil pointer leads to nothing
+	if value == nil {
+		return nil
+	}
+
+	// Search the slice itself, at the pointer's own depth
+	return removeFromSlice(*value, match, depth)
 }

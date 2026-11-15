@@ -79,40 +79,10 @@ func copyValue(value any, depth int) (any, error) {
 	}
 
 	// Simple types are copied by value
-	switch typed := value.(type) {
+	switch value.(type) {
 
-	case nil:
-		return nil, nil
-
-	case bool:
-		return typed, nil
-
-	case float32:
-		return typed, nil
-
-	case float64:
-		return typed, nil
-
-	case int:
-		return typed, nil
-
-	case int8:
-		return typed, nil
-
-	case int16:
-		return typed, nil
-
-	case int32:
-		return typed, nil
-
-	case int64:
-		return typed, nil
-
-	case string:
-		return typed, nil
-
-	case time.Time:
-		return typed, nil
+	case nil, bool, float32, float64, int, int8, int16, int32, int64, string, time.Time:
+		return value, nil
 	}
 
 	// Maps of simple types have nothing deeper to copy

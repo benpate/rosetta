@@ -21,7 +21,8 @@ func TestRemove_EveryContainer(t *testing.T) {
 			return map[string]any{"bcc": 1, "to": 2}, map[string]any{"to": 2}
 		},
 		"nested maps": func() (any, any) {
-			return map[string]any{"object": map[string]any{"bcc": 1, "tag": []any{map[string]any{"bcc": 1}}}},
+			tag := []any{map[string]any{"bcc": 1}}
+			return map[string]any{"object": map[string]any{"bcc": 1, "tag": tag}},
 				map[string]any{"object": map[string]any{"tag": []any{map[string]any{}}}}
 		},
 		"map[string]bool":    func() (any, any) { return map[string]bool{"bcc": true, "to": true}, map[string]bool{"to": true} },
@@ -34,7 +35,8 @@ func TestRemove_EveryContainer(t *testing.T) {
 		"map[string]float64": func() (any, any) { return map[string]float64{"bcc": 1}, map[string]float64{} },
 		"map[string]string":  func() (any, any) { return map[string]string{"bcc": "a", "to": "b"}, map[string]string{"to": "b"} },
 		"map[string]mapof.Any": func() (any, any) {
-			return map[string]mapof.Any{"bcc": {}, "a": {"bcc": 1, "to": 2}}, map[string]mapof.Any{"a": {"to": 2}}
+			return map[string]mapof.Any{"bcc": {}, "a": {"bcc": 1, "to": 2}},
+				map[string]mapof.Any{"a": {"to": 2}}
 		},
 		"mapof.Any":    func() (any, any) { return mapof.Any{"bcc": 1, "a": mapof.Any{"bcc": 1}}, mapof.Any{"a": mapof.Any{}} },
 		"mapof.Bool":   func() (any, any) { return mapof.Bool{"bcc": true}, mapof.Bool{} },
@@ -52,7 +54,8 @@ func TestRemove_EveryContainer(t *testing.T) {
 		"sliceof.MapOfAny":    func() (any, any) { return sliceof.MapOfAny{{"bcc": 1}}, sliceof.MapOfAny{{}} },
 		"sliceof.MapOfString": func() (any, any) { return sliceof.MapOfString{{"bcc": "a"}}, sliceof.MapOfString{{}} },
 		"database document": func() (any, any) {
-			return testDocument{"bcc": 1, "list": testArray{testDocument{"bcc": 1, "id": testObjectID{1}}}},
+			item := testDocument{"bcc": 1, "id": testObjectID{1}}
+			return testDocument{"bcc": 1, "list": testArray{item}},
 				testDocument{"list": testArray{testDocument{"id": testObjectID{1}}}}
 		},
 		"database array": func() (any, any) { return testArray{testDocument{"bcc": 1}}, testArray{testDocument{}} },
@@ -69,7 +72,8 @@ func TestRemove_EveryContainer(t *testing.T) {
 			return [1]map[string]any{{"bcc": 1}}, [1]map[string]any{{}}
 		},
 		"*sliceof.Any": func() (any, any) {
-			return &sliceof.Any{map[string]any{"bcc": 1, "to": 2}}, &sliceof.Any{map[string]any{"to": 2}}
+			return &sliceof.Any{map[string]any{"bcc": 1, "to": 2}},
+				&sliceof.Any{map[string]any{"to": 2}}
 		},
 		"*sliceof.Any in a map": func() (any, any) {
 			return map[string]any{"list": &sliceof.Any{mapof.Any{"bcc": 1}}},
@@ -150,7 +154,8 @@ func TestRemove_Names(t *testing.T) {
 
 	t.Run("several names", func(t *testing.T) {
 
-		value := map[string]any{"bto": 1, "bcc": 2, "to": 3, "object": testDocument{"bto": 1, "cc": 2}}
+		object := testDocument{"bto": 1, "cc": 2}
+		value := map[string]any{"bto": 1, "bcc": 2, "to": 3, "object": object}
 
 		require.NoError(t, Remove(value, "bto", "bcc"))
 		require.Equal(t, map[string]any{"to": 3, "object": testDocument{"cc": 2}}, value)
@@ -216,7 +221,7 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 			err := Remove(value, "bcc")
 
 			require.Error(t, err)
-			require.True(t, derp.IsInternalServerError(err), "an unsupported type is an Internal error")
+			require.True(t, derp.IsInternalServerError(err), "expected an Internal error")
 		})
 	}
 }
@@ -225,7 +230,9 @@ func TestRemove_UnsupportedTypes(t *testing.T) {
 // the error
 func TestRemove_ErrorNamesTypeNotValue(t *testing.T) {
 
-	err := Remove(map[string]any{"object": testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}}, "bcc")
+	hidden := testStruct{Secret: "hunter2-recipient", Hidden: map[string]any{"bcc": 1}}
+
+	err := Remove(map[string]any{"object": hidden}, "bcc")
 
 	require.Error(t, err)
 	require.NotContains(t, errorText(t, err), "hunter2-recipient")

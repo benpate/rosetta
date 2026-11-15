@@ -68,18 +68,24 @@ func isSimpleType(valueType reflect.Type) bool {
 		return isSimpleType(valueType.Elem())
 
 	case reflect.Struct:
-
-		for index := range valueType.NumField() {
-			if !isSimpleType(valueType.Field(index).Type) {
-				return false
-			}
-		}
-
-		return true
+		return hasSimpleFields(valueType)
 	}
 
 	// Maps, slices, pointers, interfaces, functions, and channels are not
 	return false
+}
+
+// hasSimpleFields returns TRUE if every field of a struct type is a simple type
+func hasSimpleFields(structType reflect.Type) bool {
+
+	for index := range structType.NumField() {
+		if !isSimpleType(structType.Field(index).Type) {
+			return false
+		}
+	}
+
+	// Nothing to hide
+	return true
 }
 
 // copyReflectedMap deep-copies a map of any type, keeping a nil map nil

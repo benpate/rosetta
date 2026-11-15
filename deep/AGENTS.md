@@ -72,13 +72,21 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 | Benchmark | ns/op | allocs/op |
 |---|---|---|
-| `Copy_Listed` | 690 | 22 |
-| `Copy_Reflected` | 1,660 | 55 |
-| `Remove_Listed` | 249 | 2 |
-| `Remove_Reflected` | 738 | 24 |
-| `Remove_LargeStringMap` | 837 | 2 |
+| `Copy_Listed` | 650 | 12 |
+| `Copy_Reflected` | 1,700 | 45 |
+| `Remove_Listed` | 255 | 2 |
+| `Remove_Reflected` | 763 | 24 |
+| `Remove_LargeStringMap` | 860 | 2 |
 
 The listed types are why the two switches are long: reflection costs more than twice the time and allocations.
+
+## The simple-type clause returns the value it was given
+
+**`copyValue` lists every simple type in one clause and returns `value`, never a typed copy of it.** A clause per type that returned its own typed variable boxed each value into a new `any`, which cost 10 more allocations on the sample document (22 against 12).
+
+## The long switches stay flagged by revive
+
+**`copyValue` and `removeValue` exceed revive's length and cyclomatic limits, and that is accepted.** A clause that calls a generic helper needs its own typed variable, so those clauses cannot be merged, and moving them into helpers only moves the finding. Clauses that all do the same thing are merged into one.
 
 ## A Matcher sees the property name and nothing else
 
