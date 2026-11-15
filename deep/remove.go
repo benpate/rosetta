@@ -2,18 +2,22 @@ package deep
 
 import (
 	"slices"
+	"time"
 
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/sliceof"
 )
 
-// Remove deletes the provided propertyName(s) from the
-// data structure
+// Remove deletes the named properties from every map within a value, changing it in place.
+// A value that it cannot search, such as a pointer or a struct, is an error.
 func Remove(value any, propertyNames ...string) error {
 
 	// Simple types pass through (no properties to remove)
 	switch value.(type) {
+
+	case nil:
+		return nil
 
 	case bool:
 		return nil
@@ -41,12 +45,18 @@ func Remove(value any, propertyNames ...string) error {
 
 	case string:
 		return nil
+
+	case time.Time:
+		return nil
 	}
 
 	// Maps get cleansed of propertyNames
 	switch typed := value.(type) {
 
 	case map[string]any:
+		return recursiveRemoveFromMap(typed, propertyNames...)
+
+	case map[string]mapof.Any:
 		return recursiveRemoveFromMap(typed, propertyNames...)
 
 	case map[string]bool:
@@ -164,6 +174,9 @@ func Remove(value any, propertyNames ...string) error {
 	case []map[string]string:
 		return removeFromSlice(typed, propertyNames...)
 
+	case []mapof.Any:
+		return removeFromSlice(typed, propertyNames...)
+
 	case sliceof.MapOfAny:
 		return removeFromSlice(typed, propertyNames...)
 
@@ -171,55 +184,56 @@ func Remove(value any, propertyNames ...string) error {
 		return removeFromSlice(typed, propertyNames...)
 	}
 
-	// Interfaces
+	// Values that know how to remove their own properties
 	if typed, isRemover := value.(Remover); isRemover {
 		return typed.Remove(propertyNames...)
 	}
 
-	// Otherwise, nothing to do here.
-	return nil
+	// Every other map, slice, and array is searched by reflection
+	return removeReflected(value, propertyNames...)
 }
 
+// recursiveRemoveFromMap deletes the named properties from a map, then from each value it holds
 func recursiveRemoveFromMap[V any](value map[string]V, propertyNames ...string) error {
 
-	const location = "deep.removeFromMap"
+	const location = "deep.recursiveRemoveFromMap"
 
 	for key, property := range value {
 
+		// Deleting a key while ranging over its map is safe in Go
 		if slices.Contains(propertyNames, key) {
 			delete(value, key)
 			continue
 		}
 
 		if err := Remove(property, propertyNames...); err != nil {
-			return derp.Wrap(err, location, "removing from ")
+			return derp.Wrap(err, location, "Removing from map value")
 		}
-
-		// Set the (updated?) property back into this map
-		value[key] = property
 	}
 
+	// Nothing left to lose
 	return nil
 }
 
-func removeFromMap[K comparable, V any](value map[K]V, propertyNames ...K) {
-
-	const location = "deep.removeFromMap"
+// removeFromMap deletes the named properties from a map whose values hold no other maps
+func removeFromMap[V any](value map[string]V, propertyNames ...string) {
 
 	for _, key := range propertyNames {
 		delete(value, key)
 	}
 }
 
+// removeFromSlice deletes the named properties from every item in a slice
 func removeFromSlice[T any](value []T, propertyNames ...string) error {
 
 	const location = "deep.removeFromSlice"
 
 	for index := range value {
 		if err := Remove(value[index], propertyNames...); err != nil {
-			return derp.Wrap(err, location, "Removing property")
+			return derp.Wrap(err, location, "Removing from slice item")
 		}
 	}
 
+	// Silence is golden
 	return nil
 }
