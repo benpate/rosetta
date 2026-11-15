@@ -44,12 +44,10 @@ func copyReflectedMap(original reflect.Value, depth int) (any, error) {
 		return original.Interface(), nil
 	}
 
-	itemType := original.Type().Elem()
 	result := reflect.MakeMapWithSize(original.Type(), original.Len())
-	iterator := original.MapRange()
 
 	// Iterate over each item in the map
-	for iterator.Next() {
+	for itemType, iterator := original.Type().Elem(), original.MapRange(); iterator.Next(); {
 
 		duplicate, err := copyReflectedItem(iterator.Value(), itemType, depth+1)
 

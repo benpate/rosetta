@@ -41,14 +41,10 @@ func removeReflectedMap(
 	target reflect.Value, match Matcher, depth int,
 ) error {
 
-	iterator := target.MapRange()
-
-	for iterator.Next() {
-
-		key := iterator.Key()
+	for iterator := target.MapRange(); iterator.Next(); {
 
 		// Deleting a key while ranging over its map is safe, as it is in a `for range`
-		if isMatchingKey(key, match) {
+		if key := iterator.Key(); isMatchingKey(key, match) {
 			target.SetMapIndex(key, reflect.Value{})
 			continue
 		}

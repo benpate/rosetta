@@ -62,6 +62,20 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 **`Remove` is `RemoveFunc` with `matchNames`, and the walk asks the `Matcher` about every string key.** A map of simple values is ranged over key by key, where it used to delete each name directly. On a 100-key `map[string]string` that took a no-match `Remove` from 27 ns to 825 ns. Give `Named` a fast path only with a benchmark that shows a caller needs it.
 
+## Benchmark baseline
+
+**[benchmark_test.go](benchmark_test.go) holds the baseline, measured 2026-11-14 on darwin/arm64 with go1.27.4.** Allocations are the number to compare, since they do not vary between runs.
+
+| Benchmark | ns/op | allocs/op |
+|---|---|---|
+| `Copy_Listed` | 690 | 22 |
+| `Copy_Reflected` | 1,660 | 55 |
+| `Remove_Listed` | 249 | 2 |
+| `Remove_Reflected` | 738 | 24 |
+| `Remove_LargeStringMap` | 837 | 2 |
+
+The listed types are why the two switches are long: reflection costs more than twice the time and allocations.
+
 ## A Matcher sees the property name and nothing else
 
 **It is not told the value, the path, or the depth.** A rule that needs one of those is a new function type, not a change to `Matcher`, because `Remover` implementations depend on its signature.

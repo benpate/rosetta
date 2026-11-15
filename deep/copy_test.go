@@ -262,6 +262,49 @@ func TestCopy_MaxDepth(t *testing.T) {
 	})
 }
 
+// TestCopy_SharedOriginal proves that many goroutines can copy one shared document at once,
+// and strip their copies, without changing the original. It needs the race detector.
+func TestCopy_SharedOriginal(t *testing.T) {
+
+	build := func() map[string]any {
+		return map[string]any{
+			"bcc":    []any{"carol"},
+			"object": testDocument{"bcc": "dave", "tag": testArray{mapof.Any{"name": "go"}}},
+		}
+	}
+
+	shared := build()
+	results := make(chan error, 8)
+
+	for range 8 {
+		go func() {
+
+			for range 100 {
+
+				duplicate, err := Copy(shared)
+
+				if err != nil {
+					results <- err
+					return
+				}
+
+				if err := Remove(duplicate, "bcc"); err != nil {
+					results <- err
+					return
+				}
+			}
+
+			results <- nil
+		}()
+	}
+
+	for range 8 {
+		require.NoError(t, <-results)
+	}
+
+	require.Equal(t, build(), shared)
+}
+
 // TestCopy_UnsupportedTypes proves that a value Copy cannot copy is an error, at any depth,
 // and that no partial copy comes back with it
 func TestCopy_UnsupportedTypes(t *testing.T) {
