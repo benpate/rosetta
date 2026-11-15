@@ -1,11 +1,14 @@
 package deep
 
 import (
+	"fmt"
+
 	"github.com/benpate/derp"
 	"github.com/benpate/rosetta/mapof"
 	"github.com/benpate/rosetta/sliceof"
 )
 
+// Copy returns a deep copy of a value, which shares no map or slice with the original
 func Copy(value any) (any, error) {
 
 	// Simple types
@@ -76,19 +79,28 @@ func Copy(value any) (any, error) {
 		return copyMap(typed)
 
 	case mapof.Any:
-		return copyMap(typed)
-
-	case mapof.Float:
-		return copyMap(typed)
-
-	case mapof.Int:
-		return copyMap(typed)
-
-	case mapof.Int64:
-		return copyMap(typed)
+		result, err := copyMap(typed)
+		return mapof.Any(result), err
 
 	case mapof.Bool:
-		return copyMap(typed)
+		result, err := copyMap(typed)
+		return mapof.Bool(result), err
+
+	case mapof.Float:
+		result, err := copyMap(typed)
+		return mapof.Float(result), err
+
+	case mapof.Int:
+		result, err := copyMap(typed)
+		return mapof.Int(result), err
+
+	case mapof.Int64:
+		result, err := copyMap(typed)
+		return mapof.Int64(result), err
+
+	case mapof.String:
+		result, err := copyMap(typed)
+		return mapof.String(result), err
 
 	}
 
@@ -122,17 +134,24 @@ func Copy(value any) (any, error) {
 	case []int64:
 		return copySlice(typed)
 
-	case sliceof.Any:
+	case []string:
 		return copySlice(typed)
+
+	case sliceof.Any:
+		result, err := copySlice(typed)
+		return sliceof.Any(result), err
 
 	case sliceof.Float:
-		return copySlice(typed)
+		result, err := copySlice(typed)
+		return sliceof.Float(result), err
 
 	case sliceof.Int:
-		return copySlice(typed)
+		result, err := copySlice(typed)
+		return sliceof.Int(result), err
 
 	case sliceof.String:
-		return copySlice(typed)
+		result, err := copySlice(typed)
+		return sliceof.String(result), err
 	}
 
 	// Slices of Maps
@@ -145,10 +164,12 @@ func Copy(value any) (any, error) {
 		return copySlice(typed)
 
 	case sliceof.MapOfAny:
-		return copySlice(typed)
+		result, err := copySlice(typed)
+		return sliceof.MapOfAny(result), err
 
 	case sliceof.MapOfString:
-		return copySlice(typed)
+		result, err := copySlice(typed)
+		return sliceof.MapOfString(result), err
 	}
 
 	// Interfaces
@@ -157,7 +178,8 @@ func Copy(value any) (any, error) {
 	}
 
 	// Otherwise, just no.
-	return nil, derp.BadRequest("deep.Copy", "Cannot deep copy unsupported data type", value)
+	typeName := fmt.Sprintf("%T", value)
+	return nil, derp.BadRequest("deep.Copy", "Cannot deep copy unsupported data type", typeName)
 }
 
 // copyMap deep-copies a map
