@@ -55,16 +55,25 @@ func (testFailingCopier) Copy(int) (any, error) {
 }
 
 // Remove always fails
-func (testFailingCopier) Remove(int, ...string) error {
+func (testFailingCopier) Remove(int, Matcher) error {
 	return errors.New("remove failed")
 }
 
-// testRemover is a struct that records the names it was asked to remove
-type testRemover struct{ Removed *[]string }
+// testRemover is a struct that records which of its names the Matcher selected
+type testRemover struct {
+	Names   []string
+	Removed *[]string
+}
 
-// Remove records the names
-func (value testRemover) Remove(_ int, propertyNames ...string) error {
-	*value.Removed = append(*value.Removed, propertyNames...)
+// Remove records the names that match
+func (value testRemover) Remove(_ int, match Matcher) error {
+
+	for _, name := range value.Names {
+		if match(name) {
+			*value.Removed = append(*value.Removed, name)
+		}
+	}
+
 	return nil
 }
 
@@ -89,7 +98,7 @@ func (box *testBox) Copy(depth int) (any, error) {
 }
 
 // Remove deletes the named properties from the child
-func (box *testBox) Remove(depth int, propertyNames ...string) error {
+func (box *testBox) Remove(depth int, match Matcher) error {
 	box.Depth = depth
-	return RemoveWithDepth(box.Child, depth+1, propertyNames...)
+	return RemoveWithDepth(box.Child, depth+1, match)
 }

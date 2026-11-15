@@ -48,7 +48,7 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 ## Copier and Remover carry the depth
 
-**Both methods receive the depth of the value they are called on, and must pass `depth+1` to `CopyWithDepth` or `RemoveWithDepth` for everything they hold.** An implementation that calls `deep.Copy` or `deep.Remove` on its children restarts the count at zero, and a cycle through it overflows the stack. `CopyWithDepth` and `RemoveWithDepth` are exported for this one purpose, and return their errors unwrapped.
+**Both methods receive the depth of the value they are called on, and must pass `depth+1` to `CopyWithDepth` or `RemoveWithDepth` for everything they hold.** A `Remover` passes the `Matcher` it was given along unchanged. An implementation that calls `deep.Copy` or `deep.Remove` on its children restarts the count at zero, and a cycle through it overflows the stack. `CopyWithDepth` and `RemoveWithDepth` are exported for this one purpose, and return their errors unwrapped.
 
 ## Errors are wrapped once, at Copy and Remove
 
@@ -58,9 +58,17 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 **`Remove` changes the value in place and stops at the first error.** Which names are already gone depends on map order. A caller must treat a value that failed as unusable, and never send it.
 
-## Remove matches whole names only
+## Every removal runs on a Matcher
 
-**`Remove` has no prefix or predicate form yet.** Emissary's `assanitizer.Strip` removes by prefix, so `deep.Remove` can replace `assanitizer.StripKeys` but not `Strip`. Adding one is planned.
+**`Remove` is `RemoveFunc` with `matchNames`, and the walk asks the `Matcher` about every string key.** A map of simple values is ranged over key by key, where it used to delete each name directly. On a 100-key `map[string]string` that took a no-match `Remove` from 27 ns to 825 ns. Give `Named` a fast path only with a benchmark that shows a caller needs it.
+
+## A Matcher sees the property name and nothing else
+
+**It is not told the value, the path, or the depth.** A rule that needs one of those is a new function type, not a change to `Matcher`, because `Remover` implementations depend on its signature.
+
+## Matchers refuse the inputs that would match everything or nothing by accident
+
+**`HasPrefix` drops an empty prefix, and `RemoveFunc` and `RemoveWithDepth` return an error for a nil `Matcher`.** An empty prefix begins every name, so it would delete every property. A nil `Matcher` that removed nothing would look like a successful strip.
 
 ## deep imports mapof and sliceof
 

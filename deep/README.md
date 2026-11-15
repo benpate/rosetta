@@ -1,6 +1,6 @@
 # deep
 
-Functions that reach every level of nested data: `deep.Copy` makes a copy that shares nothing with the original, and `deep.Remove` deletes named properties wherever they appear. Both are written for the maps and slices that a JSON or database decoder returns. Part of [rosetta](../README.md).
+Functions that reach every level of nested data: `deep.Copy` makes a copy that shares nothing with the original, and `deep.Remove` and `deep.RemoveFunc` delete properties wherever they appear. Both are written for the maps and slices that a JSON or database decoder returns. Part of [rosetta](../README.md).
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/benpate/rosetta/deep.svg)](https://pkg.go.dev/github.com/benpate/rosetta/deep)
 
@@ -45,7 +45,26 @@ func (envelope *Envelope) Copy(depth int) (any, error) {
 }
 ```
 
-`deep.Remove` matches whole, case-sensitive property names. It changes the value it is given, so copy first when the original must survive. If it returns an error, some names may already be gone and others not, so a value that failed must not be used as if it were clean.
+`deep.Remove` changes the value it is given, so copy first when the original must survive. If it returns an error, some names may already be gone and others not, so a value that failed must not be used as if it were clean.
+
+### Choosing what to remove
+
+`deep.Remove` matches whole, case-sensitive property names. `deep.RemoveFunc` takes a `deep.Matcher`, a function that is asked about each property name, for every other rule:
+
+```go
+// Remove every property in a reserved namespace
+err := deep.RemoveFunc(document, deep.HasPrefix("emissary:", "x-"))
+
+// Combine rules
+err = deep.RemoveFunc(document, deep.AnyOf(deep.Named("bto", "bcc"), deep.HasPrefix("x-")))
+
+// Or write one
+err = deep.RemoveFunc(document, func(name string) bool {
+	return strings.EqualFold(name, "bcc")
+})
+```
+
+`deep.Named`, `deep.HasPrefix`, and `deep.AnyOf` are the Matchers that come with the package. `deep.HasPrefix` ignores an empty prefix, which would otherwise match every property.
 
 ### Maximum depth
 

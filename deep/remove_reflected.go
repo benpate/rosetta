@@ -2,14 +2,13 @@ package deep
 
 import (
 	"reflect"
-	"slices"
 
 	"github.com/benpate/derp"
 )
 
-// removeReflected deletes the named properties from a value by its kind, for the types that
+// removeReflected deletes the matching properties from a value by its kind, for the types that
 // Remove does not list. It returns an error for a kind that it cannot search.
-func removeReflected(value any, propertyNames []string, depth int) error {
+func removeReflected(value any, match Matcher, depth int) error {
 
 	const location = "deep.removeReflected"
 
@@ -24,10 +23,10 @@ func removeReflected(value any, propertyNames []string, depth int) error {
 	switch target.Kind() {
 
 	case reflect.Map:
-		return removeReflectedMap(target, propertyNames, depth)
+		return removeReflectedMap(target, match, depth)
 
 	case reflect.Slice, reflect.Array:
-		return removeReflectedList(target, propertyNames, depth)
+		return removeReflectedList(target, match, depth)
 	}
 
 	// RULE: Every other pointer, struct, function, or channel is refused, because a
@@ -36,10 +35,10 @@ func removeReflected(value any, propertyNames []string, depth int) error {
 	return derp.Internal(location, message, typeName(value))
 }
 
-// removeReflectedMap deletes the named properties from a map of any type, then from each
+// removeReflectedMap deletes the matching properties from a map of any type, then from each
 // value it holds
 func removeReflectedMap(
-	target reflect.Value, propertyNames []string, depth int,
+	target reflect.Value, match Matcher, depth int,
 ) error {
 
 	iterator := target.MapRange()
@@ -49,14 +48,14 @@ func removeReflectedMap(
 		key := iterator.Key()
 
 		// Deleting a key while ranging over its map is safe, as it is in a `for range`
-		if isNamedKey(key, propertyNames) {
+		if isMatchingKey(key, match) {
 			target.SetMapIndex(key, reflect.Value{})
 			continue
 		}
 
 		child := iterator.Value().Interface()
 
-		if err := removeValue(child, propertyNames, depth+1); err != nil {
+		if err := removeValue(child, match, depth+1); err != nil {
 			return err
 		}
 	}
@@ -64,9 +63,9 @@ func removeReflectedMap(
 	return nil
 }
 
-// removeReflectedList deletes the named properties from every item in a slice or an array
+// removeReflectedList deletes the matching properties from every item in a slice or an array
 func removeReflectedList(
-	target reflect.Value, propertyNames []string, depth int,
+	target reflect.Value, match Matcher, depth int,
 ) error {
 
 	// Simple items have no properties
@@ -77,7 +76,7 @@ func removeReflectedList(
 	for index := range target.Len() {
 		child := target.Index(index).Interface()
 
-		if err := removeValue(child, propertyNames, depth+1); err != nil {
+		if err := removeValue(child, match, depth+1); err != nil {
 			return err
 		}
 	}
@@ -85,8 +84,8 @@ func removeReflectedList(
 	return nil
 }
 
-// isNamedKey returns TRUE if a map key is a string that matches one of the property names
-func isNamedKey(key reflect.Value, propertyNames []string) bool {
+// isMatchingKey returns TRUE if a map key is a string that the Matcher selects
+func isMatchingKey(key reflect.Value, match Matcher) bool {
 
 	// A key in a map[any]any is read as the value it holds
 	if key.Kind() == reflect.Interface {
@@ -97,5 +96,5 @@ func isNamedKey(key reflect.Value, propertyNames []string) bool {
 		return false
 	}
 
-	return slices.Contains(propertyNames, key.String())
+	return match(key.String())
 }

@@ -6,9 +6,9 @@ type Copier interface {
 	Copy(depth int) (any, error)
 }
 
-// Remover is implemented by a value that deletes the named properties from itself, which Remove
-// uses for a type it does not otherwise know. It searches what it holds with RemoveWithDepth
-// and depth+1.
+// Remover is implemented by a value that deletes the matching properties from itself, which
+// Remove uses for a type it does not otherwise know. It searches what it holds with
+// RemoveWithDepth and depth+1.
 type Remover interface {
-	Remove(depth int, propertyNames ...string) error
+	Remove(depth int, match Matcher) error
 }

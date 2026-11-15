@@ -1,6 +1,7 @@
 package deep
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -234,10 +235,11 @@ func TestRemove_ErrorNamesTypeNotValue(t *testing.T) {
 // TestRemove_Remover proves that a value which removes its own properties is given every name
 func TestRemove_Remover(t *testing.T) {
 
-	t.Run("receives the names", func(t *testing.T) {
+	t.Run("receives the matcher", func(t *testing.T) {
 
 		removed := []string{}
-		value := map[string]any{"a": testRemover{Removed: &removed}}
+		remover := testRemover{Names: []string{"to", "bto", "cc", "bcc"}, Removed: &removed}
+		value := map[string]any{"a": remover}
 
 		require.NoError(t, Remove(value, "bto", "bcc"))
 		require.Equal(t, []string{"bto", "bcc"}, removed)
@@ -313,5 +315,94 @@ func TestRemove_MaxDepth(t *testing.T) {
 		require.False(t, hasKey(value, "bcc"))
 
 		require.Error(t, Remove([]any{value}, "bcc"))
+	})
+}
+
+// TestRemoveFunc proves that RemoveFunc deletes what its Matcher selects, at every depth and
+// in every kind of container
+func TestRemoveFunc(t *testing.T) {
+
+	// build returns a fresh document that holds every kind of container
+	build := func() map[string]any {
+		return map[string]any{
+			"x-top": 1,
+			"to":    2,
+			"plain": map[string]string{"x-a": "1", "b": "2"},
+			"named": mapof.Int{"x-a": 1, "b": 2},
+			"list":  []any{map[string]any{"x-a": 1, "bcc": 2, "b": 3}},
+			"other": testDocument{"x-a": 1, "b": testArray{testDocument{"X-a": 1, "bcc": 2}}},
+			"keyed": map[any]any{"x-a": 1, 2: "x-b"},
+		}
+	}
+
+	t.Run("prefix", func(t *testing.T) {
+
+		value := build()
+
+		require.NoError(t, RemoveFunc(value, HasPrefix("x-")))
+		require.Equal(t, map[string]any{
+			"to":    2,
+			"plain": map[string]string{"b": "2"},
+			"named": mapof.Int{"b": 2},
+			"list":  []any{map[string]any{"bcc": 2, "b": 3}},
+			"other": testDocument{"b": testArray{testDocument{"X-a": 1, "bcc": 2}}},
+			"keyed": map[any]any{2: "x-b"},
+		}, value)
+	})
+
+	t.Run("names and prefixes together", func(t *testing.T) {
+
+		value := build()
+
+		require.NoError(t, RemoveFunc(value, AnyOf(Named("bcc", "to"), HasPrefix("x-", "X-"))))
+		require.Equal(t, map[string]any{
+			"plain": map[string]string{"b": "2"},
+			"named": mapof.Int{"b": 2},
+			"list":  []any{map[string]any{"b": 3}},
+			"other": testDocument{"b": testArray{testDocument{}}},
+			"keyed": map[any]any{2: "x-b"},
+		}, value)
+	})
+
+	t.Run("a function of the caller's own", func(t *testing.T) {
+
+		value := map[string]any{"BCC": 1, "Bcc": map[string]any{"bcc": 2}, "to": 3}
+
+		require.NoError(t, RemoveFunc(value, func(name string) bool {
+			return strings.EqualFold(name, "bcc")
+		}))
+		require.Equal(t, map[string]any{"to": 3}, value)
+	})
+
+	t.Run("a matcher that selects everything", func(t *testing.T) {
+
+		value := map[string]any{"a": 1, "b": map[string]any{"c": 2}}
+
+		require.NoError(t, RemoveFunc(value, func(string) bool { return true }))
+		require.Empty(t, value)
+	})
+
+	t.Run("a nil matcher is an error, and removes nothing", func(t *testing.T) {
+
+		value := map[string]any{"bcc": 1}
+
+		err := RemoveFunc(value, nil)
+
+		require.Error(t, err)
+		require.True(t, derp.IsInternalServerError(err))
+		require.Equal(t, map[string]any{"bcc": 1}, value)
+
+		require.Error(t, RemoveWithDepth(value, 0, nil))
+		require.Equal(t, map[string]any{"bcc": 1}, value)
+	})
+
+	t.Run("unsupported types and cycles are errors", func(t *testing.T) {
+
+		require.Error(t, RemoveFunc(map[string]any{"a": testStruct{}}, HasPrefix("x-")))
+
+		value := map[string]any{}
+		value["self"] = value
+
+		require.Error(t, RemoveFunc(value, HasPrefix("x-")))
 	})
 }

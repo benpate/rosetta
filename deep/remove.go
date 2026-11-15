@@ -1,7 +1,6 @@
 package deep
 
 import (
-	"slices"
 	"time"
 
 	"github.com/benpate/derp"
@@ -17,7 +16,26 @@ func Remove(value any, propertyNames ...string) error {
 
 	// RULE: The error is wrapped here and nowhere deeper, so that its length does not
 	// grow with the depth of the value
-	if err := removeValue(value, propertyNames, 0); err != nil {
+	// The names are not copied, because nothing keeps the Matcher once this call returns
+	if err := removeValue(value, matchNames(propertyNames), 0); err != nil {
+		return derp.Wrap(err, location, "Unable to remove properties")
+	}
+
+	return nil
+}
+
+// RemoveFunc deletes every property that the Matcher selects from every map within a value,
+// changing it in place. It returns the same errors as Remove, and one for a nil Matcher.
+func RemoveFunc(value any, match Matcher) error {
+
+	const location = "deep.RemoveFunc"
+
+	// RULE: A nil Matcher is refused, because removing nothing would look like success
+	if match == nil {
+		return derp.Internal(location, "Matcher must not be nil")
+	}
+
+	if err := removeValue(value, match, 0); err != nil {
 		return derp.Wrap(err, location, "Unable to remove properties")
 	}
 
@@ -26,14 +44,21 @@ func Remove(value any, propertyNames ...string) error {
 
 // RemoveWithDepth continues a removal that is already under way, at the given level of
 // nesting. It is for a Remover, which passes its own depth plus one for each value it holds.
-func RemoveWithDepth(value any, depth int, propertyNames ...string) error {
+func RemoveWithDepth(value any, depth int, match Matcher) error {
+
+	const location = "deep.RemoveWithDepth"
+
+	// RULE: A nil Matcher is refused, because removing nothing would look like success
+	if match == nil {
+		return derp.Internal(location, "Matcher must not be nil")
+	}
 
 	// The error is returned as it is, because Remove wraps it at the top of the walk
-	return removeValue(value, propertyNames, depth)
+	return removeValue(value, match, depth)
 }
 
-// removeValue deletes the named properties from a value at one level of nesting
-func removeValue(value any, propertyNames []string, depth int) error {
+// removeValue deletes the matching properties from a value at one level of nesting
+func removeValue(value any, match Matcher, depth int) error {
 
 	const location = "deep.removeValue"
 
@@ -79,72 +104,72 @@ func removeValue(value any, propertyNames []string, depth int) error {
 		return nil
 	}
 
-	// Maps get cleansed of propertyNames
+	// Maps get cleansed of matching properties
 	switch typed := value.(type) {
 
 	case map[string]any:
-		return recursiveRemoveFromMap(typed, propertyNames, depth)
+		return recursiveRemoveFromMap(typed, match, depth)
 
 	case map[string]mapof.Any:
-		return recursiveRemoveFromMap(typed, propertyNames, depth)
+		return recursiveRemoveFromMap(typed, match, depth)
 
 	case map[string]bool:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]int:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]int8:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]int16:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]int32:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]int64:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]float32:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]float64:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case map[string]string:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case mapof.Any:
-		return recursiveRemoveFromMap(typed, propertyNames, depth)
+		return recursiveRemoveFromMap(typed, match, depth)
 
 	case mapof.Float:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case mapof.Int:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case mapof.Int64:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case mapof.Bool:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 
 	case mapof.String:
-		removeFromMap(typed, propertyNames)
+		removeFromMap(typed, match)
 		return nil
 	}
 
@@ -152,7 +177,7 @@ func removeValue(value any, propertyNames []string, depth int) error {
 	switch typed := value.(type) {
 
 	case []any:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case []bool:
 		return nil
@@ -185,7 +210,7 @@ func removeValue(value any, propertyNames []string, depth int) error {
 		return nil
 
 	case sliceof.Any:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case sliceof.Float:
 		return nil
@@ -201,19 +226,19 @@ func removeValue(value any, propertyNames []string, depth int) error {
 	switch typed := value.(type) {
 
 	case []map[string]any:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case []map[string]string:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case []mapof.Any:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case sliceof.MapOfAny:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case sliceof.MapOfString:
-		return removeFromSlice(typed, propertyNames, depth)
+		return removeFromSlice(typed, match, depth)
 
 	case *sliceof.Any:
 
@@ -222,34 +247,33 @@ func removeValue(value any, propertyNames []string, depth int) error {
 			return nil
 		}
 
-		return removeFromSlice(*typed, propertyNames, depth)
+		return removeFromSlice(*typed, match, depth)
 	}
 
 	// Values that know how to remove their own properties
 	if typed, isRemover := value.(Remover); isRemover {
 
 		// RULE: The Remover is told its depth, so that a cycle which passes through it still ends
-		return typed.Remove(depth, propertyNames...)
+		return typed.Remove(depth, match)
 	}
 
 	// Every other map, slice, and array is searched by reflection
-	return removeReflected(value, propertyNames, depth)
+	return removeReflected(value, match, depth)
 }
 
-// recursiveRemoveFromMap deletes the named properties from a map, then from each value it holds
-func recursiveRemoveFromMap[V any](
-	value map[string]V, propertyNames []string, depth int,
-) error {
+// recursiveRemoveFromMap deletes the matching properties from a map, then from each value
+// it holds
+func recursiveRemoveFromMap[V any](value map[string]V, match Matcher, depth int) error {
 
 	for key, property := range value {
 
 		// Deleting a key while ranging over its map is safe in Go
-		if slices.Contains(propertyNames, key) {
+		if match(key) {
 			delete(value, key)
 			continue
 		}
 
-		if err := removeValue(property, propertyNames, depth+1); err != nil {
+		if err := removeValue(property, match, depth+1); err != nil {
 			return err
 		}
 	}
@@ -258,19 +282,22 @@ func recursiveRemoveFromMap[V any](
 	return nil
 }
 
-// removeFromMap deletes the named properties from a map whose values hold no other maps
-func removeFromMap[V any](value map[string]V, propertyNames []string) {
+// removeFromMap deletes the matching properties from a map whose values hold no other maps
+func removeFromMap[V any](value map[string]V, match Matcher) {
 
-	for _, key := range propertyNames {
-		delete(value, key)
+	// Deleting a key while ranging over its map is safe in Go
+	for key := range value {
+		if match(key) {
+			delete(value, key)
+		}
 	}
 }
 
-// removeFromSlice deletes the named properties from every item in a slice
-func removeFromSlice[T any](value []T, propertyNames []string, depth int) error {
+// removeFromSlice deletes the matching properties from every item in a slice
+func removeFromSlice[T any](value []T, match Matcher, depth int) error {
 
 	for index := range value {
-		if err := removeValue(value[index], propertyNames, depth+1); err != nil {
+		if err := removeValue(value[index], match, depth+1); err != nil {
 			return err
 		}
 	}

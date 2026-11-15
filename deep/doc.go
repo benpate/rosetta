@@ -6,7 +6,9 @@
 // keeps its own type, and the copy is returned as the type that Copy was given.
 //
 // Remove deletes the named properties from every map within a value, in place.
-// To leave the original untouched, Copy it first and Remove from the copy.
+// RemoveFunc does the same for the properties that a Matcher selects, such as
+// HasPrefix. To leave the original untouched, Copy it first and Remove from
+// the copy.
 //
 // Both functions list the common types for speed, and reach every other map,
 // slice, and array by reflection. A value that neither can walk, such as a
