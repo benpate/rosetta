@@ -12,6 +12,7 @@ func copyReflected(value any, depth int) (any, error) {
 
 	const location = "deep.copyReflected"
 
+	// Read the value's type and kind
 	original := reflect.ValueOf(value)
 
 	// Types that hold no map, slice, or pointer (such as a database's date and ID types)
@@ -20,6 +21,7 @@ func copyReflected(value any, depth int) (any, error) {
 		return value, nil
 	}
 
+	// Containers are copied item by item
 	switch original.Kind() {
 
 	case reflect.Map:
@@ -37,13 +39,58 @@ func copyReflected(value any, depth int) (any, error) {
 	return nil, derp.Internal(location, "Cannot deep copy unsupported data type", typeName(value))
 }
 
+// copierType and removerType are the Copier and Remover interfaces, as reflection names them
+var (
+	copierType  = reflect.TypeFor[Copier]()
+	removerType = reflect.TypeFor[Remover]()
+)
+
+// isSimpleType returns TRUE for a type that holds no map, slice, pointer, or interface at any
+// level: a boolean, number, or string, and an array or struct made only of simple types
+func isSimpleType(valueType reflect.Type) bool {
+
+	// RULE: A type that copies or searches itself is never skipped as simple, so that its
+	// own method is called wherever it is held
+	if valueType.Implements(copierType) || valueType.Implements(removerType) {
+		return false
+	}
+
+	// Booleans, numbers, and strings are simple, and so is anything made only of them
+	switch valueType.Kind() {
+
+	case reflect.Bool, reflect.String,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
+		return true
+
+	case reflect.Array:
+		return isSimpleType(valueType.Elem())
+
+	case reflect.Struct:
+
+		for index := range valueType.NumField() {
+			if !isSimpleType(valueType.Field(index).Type) {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	// Maps, slices, pointers, interfaces, functions, and channels are not
+	return false
+}
+
 // copyReflectedMap deep-copies a map of any type, keeping a nil map nil
 func copyReflectedMap(original reflect.Value, depth int) (any, error) {
 
+	// A nil map stays nil
 	if original.IsNil() {
 		return original.Interface(), nil
 	}
 
+	// Make a new map of the same type and size
 	result := reflect.MakeMapWithSize(original.Type(), original.Len())
 
 	// Iterate over each item in the map
@@ -58,16 +105,19 @@ func copyReflectedMap(original reflect.Value, depth int) (any, error) {
 		result.SetMapIndex(iterator.Key(), duplicate)
 	}
 
+	// Mapped out
 	return result.Interface(), nil
 }
 
 // copyReflectedSlice deep-copies a slice of any type, keeping a nil slice nil
 func copyReflectedSlice(original reflect.Value, depth int) (any, error) {
 
+	// A nil slice stays nil
 	if original.IsNil() {
 		return original.Interface(), nil
 	}
 
+	// Make a new slice of the same type and length
 	itemType := original.Type().Elem()
 	result := reflect.MakeSlice(original.Type(), original.Len(), original.Len())
 
@@ -95,7 +145,8 @@ func copyReflectedSlice(original reflect.Value, depth int) (any, error) {
 // copyReflectedArray deep-copies an array of any type
 func copyReflectedArray(original reflect.Value, depth int) (any, error) {
 
-	// An array of simple items never arrives here, because copyReflected returns it first
+	// Make a new array of the same type. An array of simple items never arrives here,
+	// because copyReflected returns it first.
 	itemType := original.Type().Elem()
 	result := reflect.New(original.Type()).Elem()
 
@@ -121,6 +172,7 @@ func copyReflectedItem(
 
 	const location = "deep.copyReflectedItem"
 
+	// Deep-copy the item
 	duplicate, err := copyValue(item.Interface(), depth)
 
 	if err != nil {
@@ -132,54 +184,14 @@ func copyReflectedItem(
 		return reflect.Zero(itemType), nil
 	}
 
+	// RULE: A Copier can return any type, and storing the wrong one would panic
 	result := reflect.ValueOf(duplicate)
 
-	// RULE: A Copier can return any type, and storing the wrong one would panic
 	if !result.Type().AssignableTo(itemType) {
 		message := "Duplicated value is wrong type"
 		return reflect.Value{}, derp.Internal(location, message, typeName(duplicate))
 	}
 
+	// A perfect fit
 	return result, nil
-}
-
-// copierType and removerType are the Copier and Remover interfaces, as reflection names them
-var (
-	copierType  = reflect.TypeFor[Copier]()
-	removerType = reflect.TypeFor[Remover]()
-)
-
-// isSimpleType returns TRUE for a type that holds no map, slice, pointer, or interface at any
-// level: a boolean, number, or string, and an array or struct made only of simple types
-func isSimpleType(valueType reflect.Type) bool {
-
-	// RULE: A type that copies or searches itself is never skipped as simple, so that its
-	// own method is called wherever it is held
-	if valueType.Implements(copierType) || valueType.Implements(removerType) {
-		return false
-	}
-
-	switch valueType.Kind() {
-
-	case reflect.Bool, reflect.String,
-		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
-		reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128:
-		return true
-
-	case reflect.Array:
-		return isSimpleType(valueType.Elem())
-
-	case reflect.Struct:
-
-		for index := range valueType.NumField() {
-			if !isSimpleType(valueType.Field(index).Type) {
-				return false
-			}
-		}
-
-		return true
-	}
-
-	return false
 }

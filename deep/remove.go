@@ -14,13 +14,16 @@ func Remove(value any, propertyNames ...string) error {
 
 	const location = "deep.Remove"
 
+	// The names are not copied, because nothing keeps the Matcher once this call returns
+	match := matchNames(propertyNames)
+
 	// RULE: The error is wrapped here and nowhere deeper, so that its length does not
 	// grow with the depth of the value
-	// The names are not copied, because nothing keeps the Matcher once this call returns
-	if err := removeValue(value, matchNames(propertyNames), 0); err != nil {
+	if err := removeValue(value, match, 0); err != nil {
 		return derp.Wrap(err, location, "Unable to remove properties")
 	}
 
+	// Gone, baby, gone
 	return nil
 }
 
@@ -35,10 +38,13 @@ func RemoveFunc(value any, match Matcher) error {
 		return derp.Internal(location, "Matcher must not be nil")
 	}
 
+	// RULE: The error is wrapped here and nowhere deeper, so that its length does not
+	// grow with the depth of the value
 	if err := removeValue(value, match, 0); err != nil {
 		return derp.Wrap(err, location, "Unable to remove properties")
 	}
 
+	// Poof
 	return nil
 }
 
@@ -64,7 +70,7 @@ func removeValue(value any, match Matcher, depth int) error {
 
 	// RULE: A walk stops at the maximum depth, which also stops a value that contains itself
 	if depth > maxDepth {
-		return derp.Internal(location, "Max Depth Exceeded", "Check this data structure for cycles")
+		return derp.Internal(location, "Max Depth Exceeded", "Check value for cycles")
 	}
 
 	// Simple types pass through (no properties to remove)
@@ -273,6 +279,7 @@ func recursiveRemoveFromMap[V any](value map[string]V, match Matcher, depth int)
 			continue
 		}
 
+		// Search the values that remain, one level deeper
 		if err := removeValue(property, match, depth+1); err != nil {
 			return err
 		}

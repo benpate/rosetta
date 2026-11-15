@@ -12,6 +12,7 @@ func removeReflected(value any, match Matcher, depth int) error {
 
 	const location = "deep.removeReflected"
 
+	// Read the value's type and kind
 	target := reflect.ValueOf(value)
 
 	// Types that hold no map, slice, or pointer (such as a database's date and ID types)
@@ -20,6 +21,7 @@ func removeReflected(value any, match Matcher, depth int) error {
 		return nil
 	}
 
+	// Containers are searched item by item
 	switch target.Kind() {
 
 	case reflect.Map:
@@ -49,6 +51,7 @@ func removeReflectedMap(
 			continue
 		}
 
+		// Search the values that remain, one level deeper
 		child := iterator.Value().Interface()
 
 		if err := removeValue(child, match, depth+1); err != nil {
@@ -56,6 +59,7 @@ func removeReflectedMap(
 		}
 	}
 
+	// Off the map
 	return nil
 }
 
@@ -69,6 +73,7 @@ func removeReflectedList(
 		return nil
 	}
 
+	// Search each item, one level deeper
 	for index := range target.Len() {
 		child := target.Index(index).Interface()
 
@@ -77,6 +82,7 @@ func removeReflectedList(
 		}
 	}
 
+	// Checked it twice
 	return nil
 }
 
@@ -88,6 +94,7 @@ func isMatchingKey(key reflect.Value, match Matcher) bool {
 		key = key.Elem()
 	}
 
+	// Only a string can be a property name
 	if key.Kind() != reflect.String {
 		return false
 	}

@@ -3,14 +3,14 @@ module github.com/benpate/rosetta
 go 1.27.4
 
 require (
-	github.com/benpate/derp v0.49.0
+	github.com/benpate/derp v0.50.0
 	github.com/benpate/exp v0.12.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.12.1
 	github.com/tiendc/go-deepcopy v1.7.2
 	github.com/yuin/goldmark v1.8.7
-	golang.org/x/exp v0.0.0-20261112173441-d10d3b464990
+	golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4
 	golang.org/x/text v0.44.0
 )
 

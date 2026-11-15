@@ -17,6 +17,7 @@ func Copy[T any](original T) (T, error) {
 
 	const location = "deep.Copy"
 
+	// Start the walk at the top level
 	result, err := copyAs(original, 0)
 
 	// RULE: The error is wrapped here and nowhere deeper, so that its length does not
@@ -25,6 +26,7 @@ func Copy[T any](original T) (T, error) {
 		return result, derp.Wrap(err, location, "Unable to copy value")
 	}
 
+	// Seeing double
 	return result, nil
 }
 
@@ -254,6 +256,13 @@ func copyValue(value any, depth int) (any, error) {
 	return copyReflected(value, depth)
 }
 
+// typeName names a value's Go type for an error detail
+func typeName(value any) string {
+
+	// Errors name the type and never the value, which can hold private data
+	return fmt.Sprintf("%T", value)
+}
+
 // copyMap deep-copies a map, and returns the copy as the map's own type
 func copyMap[M ~map[K]V, K comparable, V any](original M, depth int) (M, error) {
 
@@ -262,6 +271,7 @@ func copyMap[M ~map[K]V, K comparable, V any](original M, depth int) (M, error) 
 		return original, nil
 	}
 
+	// Make a new map of the same type and size
 	result := make(M, len(original))
 
 	// Iterate over each item in the map
@@ -282,6 +292,17 @@ func copyMap[M ~map[K]V, K comparable, V any](original M, depth int) (M, error) 
 	return result, nil
 }
 
+// asAny returns a copy as an `any`, and a nil in place of the copy when there is an error
+func asAny[T any](value T, err error) (any, error) {
+
+	// RULE: A typed nil stored in an `any` is not nil, so an error returns an untyped nil
+	if err != nil {
+		return nil, err
+	}
+
+	return value, nil
+}
+
 // copySlice deep-copies a slice, and returns the copy as the slice's own type
 func copySlice[S ~[]T, T any](original S, depth int) (S, error) {
 
@@ -290,6 +311,7 @@ func copySlice[S ~[]T, T any](original S, depth int) (S, error) {
 		return original, nil
 	}
 
+	// Make a new slice of the same type, with room for every item
 	result := make(S, 0, len(original))
 
 	// Iterate over each item in the slice
@@ -314,33 +336,18 @@ func copySlice[S ~[]T, T any](original S, depth int) (S, error) {
 // the copy. A nil pointer stays nil.
 func copySlicePointer[S ~[]T, T any](original *S, depth int) (*S, error) {
 
+	// A nil pointer leads to nothing
 	if original == nil {
 		return nil, nil
 	}
 
+	// Copy the slice itself, at the pointer's own depth
 	result, err := copySlice(*original, depth)
 
 	if err != nil {
 		return nil, err
 	}
 
+	// Point to the copy
 	return &result, nil
-}
-
-// asAny returns a copy as an `any`, and a nil in place of the copy when there is an error
-func asAny[T any](value T, err error) (any, error) {
-
-	// RULE: A typed nil stored in an `any` is not nil, so an error returns an untyped nil
-	if err != nil {
-		return nil, err
-	}
-
-	return value, nil
-}
-
-// typeName names a value's Go type for an error detail
-func typeName(value any) string {
-
-	// Errors name the type and never the value, which can hold private data
-	return fmt.Sprintf("%T", value)
 }
