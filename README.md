@@ -21,6 +21,7 @@ Many of these packages pre-date Go generics, and many are being refactored to ta
 * [Channel](https://github.com/benpate/rosetta/tree/main/channel) tools for manipulating Go channels
 * [Compare](https://github.com/benpate/rosetta/tree/main/compare) values of unknown data types.
 * [Convert](https://github.com/benpate/rosetta/tree/main/convert) between arbitrary data types with sensible, configurable defaults.
+* [Deep](https://github.com/benpate/rosetta/tree/main/deep) copy and property removal for nested maps and slices
 * [First](https://github.com/benpate/rosetta/tree/main/first) non-empty value from a list of candidates
 * [FuncMap](https://github.com/benpate/rosetta/tree/main/funcmap) helper functions for Go templates
 * [HTML](https://github.com/benpate/rosetta/tree/main/html) conversion tools

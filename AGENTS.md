@@ -95,6 +95,10 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 - **`CachedTemplate` is the only package-level mutable state in `loose`, and it is deliberate.** It is a `sync.Map` of compiled Templates keyed by source, in [loose/templateCache.go](loose/templateCache.go): it stores only strings that compile, never changes an entry once stored, and stops growing at `templateCacheLimit`. `NewTemplate` stays uncached on purpose, because `UnmarshalJSON` feeds it arbitrary decoded text that would fill the cache. Call `CachedTemplate` only with template strings written by authors, such as Go literals and configuration.
 - **`Template` never rejects a malformed template: it keeps the string as plain text, with no compiled template.** A typo in a template therefore renders literally instead of failing, so a caller that needs every template to compile must check `IsTemplate()` itself. `UnmarshalJSON` decodes through `String`, so it accepts the same scalars and rejects objects and arrays. Its fuzz target compares encodings, not values, because each decode compiles a new template. Its own `FuzzTemplate_*` targets check the compile decision against `text/template` directly, and skip executing templates that use `range`, `define`, `block`, `break`, or `continue`: those can loop without end, and templates come from trusted authors, so their running time is out of scope.
 
+## deep
+
+See [deep/AGENTS.md](deep/AGENTS.md) for this package's rules (unknown types are errors, the two type lists must agree, no cycle detection).
+
 ## null
 
 See [null/AGENTS.md](null/AGENTS.md) for this package's rules (IsZero vs IsNull, strict no-coercion JSON, the encoding/json marshal contract).
