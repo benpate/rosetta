@@ -103,6 +103,10 @@ func Remove(value any, propertyNames ...string) error {
 	case mapof.Bool:
 		removeFromMap(typed, propertyNames...)
 		return nil
+
+	case mapof.String:
+		removeFromMap(typed, propertyNames...)
+		return nil
 	}
 
 	// Slices get each item scanned
@@ -133,6 +137,9 @@ func Remove(value any, propertyNames ...string) error {
 		return nil
 
 	case []int64:
+		return nil
+
+	case []string:
 		return nil
 
 	case sliceof.Any:
