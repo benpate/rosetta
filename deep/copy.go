@@ -171,21 +171,14 @@ func copyMap[K comparable, V any](original map[K]V) (map[K]V, error) {
 	for key, value := range original {
 
 		// Deep-copy the individual value
-		duplicate, err := Copy(value)
+		duplicate, err := copyAs(value)
 
 		if err != nil {
 			return result, derp.Wrap(err, location, "Duplicating map key")
 		}
 
-		// Assert the duplicate is the correct type
-		typed, isCorrectType := duplicate.(V)
-
-		if !isCorrectType {
-			return result, derp.Internal(location, "Duplicated value is wrong type")
-		}
-
 		// Append to the map
-		result[key] = typed
+		result[key] = duplicate
 	}
 
 	// Success!
@@ -202,21 +195,46 @@ func copySlice[T any](original []T) ([]T, error) {
 	for _, value := range original {
 
 		// Deep-copy the individual value
-		duplicate, err := Copy(value)
+		duplicate, err := copyAs(value)
 
 		if err != nil {
 			return result, derp.Wrap(err, location, "Duplicating slice index")
 		}
 
-		typed, isCorrectType := duplicate.(T)
-
-		if !isCorrectType {
-			return result, derp.Internal(location, "Duplicated value is incorrect type")
-		}
-
 		// Append the duplicated, typed value to the result
-		result = append(result, typed)
+		result = append(result, duplicate)
 	}
 
 	return result, nil
+}
+
+// copyAs deep-copies a value and returns the copy as the original's own type
+func copyAs[T any](original T) (T, error) {
+
+	const location = "deep.copyAs"
+
+	var zero T
+
+	// Deep-copy the value
+	duplicate, err := Copy(original)
+
+	if err != nil {
+		return zero, derp.Wrap(err, location, "Duplicating value")
+	}
+
+	// A nil copy (a JSON `null`) matches no type assertion, so it is returned as the zero value
+	if duplicate == nil {
+		return zero, nil
+	}
+
+	// Assert the duplicate is the correct type
+	typed, isCorrectType := duplicate.(T)
+
+	if !isCorrectType {
+		typeName := fmt.Sprintf("%T", duplicate)
+		return zero, derp.Internal(location, "Duplicated value is wrong type", typeName)
+	}
+
+	// Two of a kind
+	return typed, nil
 }
