@@ -97,7 +97,7 @@ A recurring defect pattern in this repo: two implementations of one contract dri
 
 ## deep
 
-See [deep/AGENTS.md](deep/AGENTS.md) for this package's rules (unknown types are errors, the two type lists must agree, no cycle detection).
+See [deep/AGENTS.md](deep/AGENTS.md) for this package's rules (unknown types are errors, the two type lists must agree, the depth limit is the only cycle guard).
 
 ## null
 

@@ -243,6 +243,27 @@ func TestRemove_Remover(t *testing.T) {
 		require.Equal(t, []string{"bto", "bcc"}, removed)
 	})
 
+	t.Run("is told its depth, and continues from it", func(t *testing.T) {
+
+		box := &testBox{Child: map[string]any{"bcc": 1, "to": 2}}
+		value := map[string]any{"list": []any{box}}
+
+		require.NoError(t, Remove(value, "bcc"))
+		require.Equal(t, 2, box.Depth)
+		require.Equal(t, map[string]any{"to": 2}, box.Child)
+	})
+
+	t.Run("a cycle through a Remover ends in an error", func(t *testing.T) {
+
+		box := &testBox{}
+		box.Child = map[string]any{"box": box}
+
+		err := Remove(box, "bcc")
+
+		require.Error(t, err)
+		require.Less(t, len(errorText(t, err)), 2_000)
+	})
+
 	t.Run("its error is returned", func(t *testing.T) {
 		require.Error(t, Remove([]any{testFailingCopier{}}, "bcc"))
 	})

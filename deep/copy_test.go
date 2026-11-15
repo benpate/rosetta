@@ -343,6 +343,35 @@ func TestCopy_Copier(t *testing.T) {
 		require.Equal(t, 1, copies)
 	})
 
+	t.Run("is told its depth, and continues from it", func(t *testing.T) {
+
+		box := &testBox{Child: map[string]any{"a": []any{1}}}
+		original := map[string]any{"list": []any{box}}
+
+		result, err := Copy(original)
+		require.NoError(t, err)
+		require.Equal(t, 2, box.Depth)
+
+		// The copy is a new box, and shares nothing with the original
+		copied := result["list"].([]any)[0].(*testBox)
+		require.NotSame(t, box, copied)
+
+		copied.Child.(map[string]any)["a"].([]any)[0] = 2
+		require.Equal(t, map[string]any{"a": []any{1}}, box.Child)
+	})
+
+	t.Run("a cycle through a Copier ends in an error", func(t *testing.T) {
+
+		box := &testBox{}
+		box.Child = map[string]any{"box": box}
+
+		result, err := Copy(box)
+
+		require.Error(t, err)
+		require.Nil(t, result)
+		require.Less(t, len(errorText(t, err)), 2_000)
+	})
+
 	t.Run("error returns nil", func(t *testing.T) {
 
 		var original any = testFailingCopier{}

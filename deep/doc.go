@@ -10,5 +10,9 @@
 //
 // Both functions list the common types for speed, and reach every other map,
 // slice, and array by reflection. A value that neither can walk, such as a
-// pointer or a struct, is an error, unless it implements Copier or Remover.
+// function or a struct that holds a map, is an error, unless it implements
+// Copier or Remover.
+//
+// Both stop with an error at 10,000 levels of nesting, which is what stops a
+// map or slice that contains itself.
 package deep

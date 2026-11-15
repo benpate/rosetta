@@ -33,7 +33,7 @@ type testCopier struct {
 }
 
 // Copy returns this value, and records the call
-func (value testCopier) Copy() (any, error) {
+func (value testCopier) Copy(int) (any, error) {
 	*value.Copies++
 	return value, nil
 }
@@ -42,7 +42,7 @@ func (value testCopier) Copy() (any, error) {
 type testWrongCopier struct{}
 
 // Copy returns a string, which no container of testWrongCopier can hold
-func (testWrongCopier) Copy() (any, error) {
+func (testWrongCopier) Copy(int) (any, error) {
 	return "not a testWrongCopier", nil
 }
 
@@ -50,12 +50,12 @@ func (testWrongCopier) Copy() (any, error) {
 type testFailingCopier struct{}
 
 // Copy always fails
-func (testFailingCopier) Copy() (any, error) {
+func (testFailingCopier) Copy(int) (any, error) {
 	return "partial", errors.New("copy failed")
 }
 
 // Remove always fails
-func (testFailingCopier) Remove(...string) error {
+func (testFailingCopier) Remove(int, ...string) error {
 	return errors.New("remove failed")
 }
 
@@ -63,7 +63,33 @@ func (testFailingCopier) Remove(...string) error {
 type testRemover struct{ Removed *[]string }
 
 // Remove records the names
-func (value testRemover) Remove(propertyNames ...string) error {
+func (value testRemover) Remove(_ int, propertyNames ...string) error {
 	*value.Removed = append(*value.Removed, propertyNames...)
 	return nil
+}
+
+// testBox is a pointer type that copies and searches the value it holds, one level deeper
+type testBox struct {
+	Child any
+	Depth int // The depth that Copy or Remove was last called with
+}
+
+// Copy returns a new box that holds a deep copy of the child
+func (box *testBox) Copy(depth int) (any, error) {
+
+	box.Depth = depth
+
+	child, err := CopyWithDepth(box.Child, depth+1)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &testBox{Child: child}, nil
+}
+
+// Remove deletes the named properties from the child
+func (box *testBox) Remove(depth int, propertyNames ...string) error {
+	box.Depth = depth
+	return RemoveWithDepth(box.Child, depth+1, propertyNames...)
 }

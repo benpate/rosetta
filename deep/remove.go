@@ -24,6 +24,14 @@ func Remove(value any, propertyNames ...string) error {
 	return nil
 }
 
+// RemoveWithDepth continues a removal that is already under way, at the given level of
+// nesting. It is for a Remover, which passes its own depth plus one for each value it holds.
+func RemoveWithDepth(value any, depth int, propertyNames ...string) error {
+
+	// The error is returned as it is, because Remove wraps it at the top of the walk
+	return removeValue(value, propertyNames, depth)
+}
+
 // removeValue deletes the named properties from a value at one level of nesting
 func removeValue(value any, propertyNames []string, depth int) error {
 
@@ -219,7 +227,9 @@ func removeValue(value any, propertyNames []string, depth int) error {
 
 	// Values that know how to remove their own properties
 	if typed, isRemover := value.(Remover); isRemover {
-		return typed.Remove(propertyNames...)
+
+		// RULE: The Remover is told its depth, so that a cycle which passes through it still ends
+		return typed.Remove(depth, propertyNames...)
 	}
 
 	// Every other map, slice, and array is searched by reflection

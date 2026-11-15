@@ -28,6 +28,14 @@ func Copy[T any](original T) (T, error) {
 	return result, nil
 }
 
+// CopyWithDepth continues a copy that is already under way, at the given level of nesting.
+// It is for a Copier, which passes its own depth plus one for each value that it holds.
+func CopyWithDepth[T any](original T, depth int) (T, error) {
+
+	// The error is returned as it is, because Copy wraps it at the top of the walk
+	return copyAs(original, depth)
+}
+
 // copyAs deep-copies a value at one level of nesting, and returns it as the original's type
 func copyAs[T any](original T, depth int) (T, error) {
 
@@ -65,7 +73,7 @@ func copyValue(value any, depth int) (any, error) {
 
 	// RULE: A walk stops at the maximum depth, which also stops a value that contains itself
 	if depth > maxDepth {
-		return nil, derp.Internal(location, "Max Depth Exceeded", "Check this data structure for cycles")
+		return nil, derp.Internal(location, "Max Depth Exceeded", "Check value for cycles")
 	}
 
 	// Simple types are copied by value
@@ -238,13 +246,8 @@ func copyValue(value any, depth int) (any, error) {
 	// Values that know how to copy themselves
 	if typed, isCopier := value.(Copier); isCopier {
 
-		result, err := typed.Copy()
-
-		if err != nil {
-			return nil, derp.Wrap(err, location, "Copying value", typeName(value))
-		}
-
-		return result, nil
+		// RULE: The Copier is told its depth, so that a cycle which passes through it still ends
+		return asAny(typed.Copy(depth))
 	}
 
 	// Every other map, slice, and array is copied by reflection

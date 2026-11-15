@@ -4,7 +4,15 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 ## Unknown types are an error in both functions, on purpose
 
-**`Copy` and `Remove` refuse a pointer, struct, function, or channel at any depth.** `Remove` strips `bto` and `bcc` before delivery, so skipping a container it cannot search would send a blind recipient out with no warning. Do not make either function pass an unknown value through. `time.Time` is the one struct both accept, as a simple value. A `*sliceof.Any`, which `schema` stores for new lists, is refused like any other pointer.
+**`Copy` and `Remove` refuse a pointer, function, channel, or a struct that is not simple, at any depth.** `Remove` strips `bto` and `bcc` before delivery, so skipping a container it cannot search would send a blind recipient out with no warning. Do not make either function pass an unknown value through. The error is `derp.Internal`, because a value of the wrong type is the program's mistake and not the client's.
+
+## Simple types are copied by value and never searched
+
+**`isSimpleType` accepts a boolean, number, or string, and any array or struct made only of those.** Such a value holds no map, slice, pointer, or interface, so nothing in it can be shared or hide a property. This is how the MongoDB driver's `ObjectID`, `Decimal128`, `Timestamp`, and `Regex` pass. A type that implements `Copier` or `Remover` is never simple, so its own method is still called inside a typed slice. `time.Time` holds a pointer, so it has its own case in both switches.
+
+## A *sliceof.Any is the one pointer both functions follow
+
+**It has its own case in both switches because `schema` stores every new list as one.** `Copy` returns a new pointer to a copied slice. Every other pointer is refused.
 
 ## The type lists in Copy and Remove must agree
 
@@ -12,19 +20,19 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 ## Reflection covers the types rosetta cannot import
 
-**`copyReflected` and `removeReflected` handle every map, slice, and array by kind.** That is how the MongoDB driver's `primitive.A`, `M`, `DateTime`, and `ObjectID` are supported without importing it. The tests use look-alike types in [testTypes_test.go](testTypes_test.go) for the same reason. `primitive.D` is a slice of structs, so it is refused.
+**`copyReflected` and `removeReflected` handle every map, slice, and array by kind.** That is how the MongoDB driver's `primitive.A`, `M`, `DateTime`, and `ObjectID` are supported without importing it. The tests use look-alike types in [testTypes_test.go](testTypes_test.go) for the same reason. `primitive.D` is refused: its items are structs that hold an interface, and `Remove` could not shorten a slice it was handed by value.
 
 ## A copy keeps every container's type
 
-**`copyMap` and `copySlice` take `~map` and `~[]` constraints so that they build the caller's own type.** With a plain `map[K]V` parameter, Go infers the underlying type and a `mapof.Any` comes back as a `map[string]any`. That then fails the type assertion in `Copy` for any typed container that holds one, such as a `sliceof.MapOfAny`.
+**`copyMap` and `copySlice` take `~map` and `~[]` constraints so that they build the caller's own type.** With a plain `map[K]V` parameter, Go infers the underlying type and a `mapof.Any` comes back as a `map[string]any`. That then fails the type assertion in `copyAs` for any typed container that holds one, such as a `sliceof.MapOfAny`.
 
 ## Copy is generic, and copyValue does the work
 
-**`Copy[T]` asserts the result of `copyValue` back to the caller's type; every recursive call goes through one of the two.** `copyValue` is not named `copy`, because that would shadow the builtin. A `Copier` that returns a different type than its own is an error wherever the caller's type is concrete, and passes through where it is `any`.
+**`copyAs[T]` asserts the result of `copyValue` back to the caller's type; every recursive call goes through one of the two, and `Copy` only starts the walk.** `copyValue` is not named `copy`, because that would shadow the builtin. A `Copier` that returns a different type than its own is an error wherever the caller's type is concrete, and passes through where it is `any`.
 
 ## A nil item is stored as the zero value
 
-**`Copy` and `copyReflectedItem` check for a nil copy before they assert its type.** A nil interface matches no type assertion, even `.(any)`, so without the check every JSON `null` inside a container fails the copy.
+**`copyAs` and `copyReflectedItem` check for a nil copy before they assert its type.** A nil interface matches no type assertion, even `.(any)`, so without the check every JSON `null` inside a container fails the copy.
 
 ## Nil containers stay nil
 
@@ -34,9 +42,21 @@ Agent notes for the `deep` package. See [README.md](README.md) for what the pack
 
 **Every error detail goes through `typeName`.** The values here are documents that hold blind recipients, and Emissary stores every reported error. On an error, `Copy` returns the zero value of the caller's type (nil for `any`) and never a partial copy.
 
-## A self-referencing map or slice recurses until the stack overflows
+## The depth limit is the only cycle guard
 
-**Neither function detects a cycle.** Refusing pointers does not prevent one, because maps and slices are references: `m["self"] = m` is a cycle with no pointer in it. A JSON or BSON decoder cannot build one, so only data assembled in Go can. A stack overflow is fatal and no `recover` catches it.
+**`copyValue` and `removeValue` compare their depth to `maxDepth` first, and every container passes `depth+1` to what it holds.** Refusing pointers does not prevent a cycle, because maps and slices are references: `m["self"] = m` has no pointer in it. Without the limit that value overflows the stack, which is fatal and which no `recover` catches. A helper that recurses without adding to the depth brings the crash back.
+
+## Copier and Remover carry the depth
+
+**Both methods receive the depth of the value they are called on, and must pass `depth+1` to `CopyWithDepth` or `RemoveWithDepth` for everything they hold.** An implementation that calls `deep.Copy` or `deep.Remove` on its children restarts the count at zero, and a cycle through it overflows the stack. `CopyWithDepth` and `RemoveWithDepth` are exported for this one purpose, and return their errors unwrapped.
+
+## Errors are wrapped once, at Copy and Remove
+
+**The recursive helpers return an error as it is, including one from a `Copier` or `Remover`, and only `Copy` and `Remove` call `derp.Wrap`.** Wrapping at every level would nest the error as deeply as the value, and the depth error would arrive 10,000 layers deep.
+
+## A failed Remove leaves the value half-stripped
+
+**`Remove` changes the value in place and stops at the first error.** Which names are already gone depends on map order. A caller must treat a value that failed as unusable, and never send it.
 
 ## Remove matches whole names only
 
